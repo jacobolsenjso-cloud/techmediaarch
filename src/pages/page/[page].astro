@@ -1,0 +1,23 @@
+---
+// Side 2, 3 … af artikellisten: /page/2.html osv.
+import MainLayout from '../../layouts/MainLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Pagination from '../../components/Pagination.astro';
+import { INDLAEG } from '../../lib/indhold';
+
+const PR_SIDE = 24;
+export function getStaticPaths() {
+  const antal = Math.ceil(INDLAEG.length / 24);
+  return Array.from({ length: Math.max(0, antal - 1) }, (_, i) => ({ params: { page: String(i + 2) } }));
+}
+const side = Number(Astro.params.page);
+const antal = Math.ceil(INDLAEG.length / PR_SIDE);
+const liste = INDLAEG.slice((side - 1) * PR_SIDE, side * PR_SIDE);
+---
+<MainLayout title={`All articles – page ${side}`} description={`Tech Media Arch articles, page ${side} of ${antal}.`} noindex breadcrumb={[{ navn: `Page ${side}`, href: `/page/${side}.html` }]}>
+  <div class="page-wrapper" style="padding-top: 24px;">
+    <div class="section-heading"><h1>All articles</h1><span class="section-note">Page {side} of {antal}</span></div>
+    <div class="card-grid">{liste.map((p) => <ArticleCard p={p} />)}</div>
+    <Pagination side={side} antal={antal} />
+  </div>
+</MainLayout>

@@ -1,0 +1,30 @@
+---
+// Emneside: /topic/ai.html osv. Erstatter Bloggers /search/label/AI (workeren
+// sender de gamle adresser hertil med 301).
+import MainLayout from '../../layouts/MainLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import EmneChips from '../../components/EmneChips.astro';
+import { EMNER, TYND_GRAENSE, emneUrl } from '../../lib/emner';
+import { iEmne } from '../../lib/indhold';
+
+export function getStaticPaths() {
+  return EMNER.filter((e) => iEmne(e).length > 0).map((e) => ({ params: { topic: e.slug }, props: { e } }));
+}
+const { e } = Astro.props;
+const liste = iEmne(e);
+const schema = {
+  '@context': 'https://schema.org', '@type': 'CollectionPage', name: `${e.navn} articles`,
+  url: `https://www.techmediaarch.com${emneUrl(e)}`,
+  mainEntity: { '@type': 'ItemList', itemListElement: liste.slice(0, 30).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `https://www.techmediaarch.com${p.href}` })) },
+};
+---
+<MainLayout title={`${e.navn}: articles and guides`} description={`All Tech Media Arch articles about ${e.navn} — ${liste.length} article${liste.length === 1 ? '' : 's'}, newest first.`}
+  noindex={liste.length < TYND_GRAENSE} schema={schema} breadcrumb={[{ navn: e.navn, href: emneUrl(e) }]}>
+  <div class="page-wrapper" style="padding-top: 24px;">
+    <EmneChips aktiv={e.slug} />
+    <div class="section-heading" style={`--tag-accent: ${e.farve}`}>
+      <h1>{e.navn}</h1><span class="section-note">{liste.length} article{liste.length === 1 ? '' : 's'}, newest first</span>
+    </div>
+    <div class="card-grid">{liste.map((p, i) => <ArticleCard p={p} eager={i < 3} />)}</div>
+  </div>
+</MainLayout>

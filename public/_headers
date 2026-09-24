@@ -1,0 +1,8 @@
+# Testadressen (workers.dev) må aldrig blive indekseret. Workeren sætter samme
+# header på de svar, den selv laver; denne regel dækker filerne, der serveres
+# direkte uden om workeren.
+https://techmediaarch.:konto.workers.dev/*
+  X-Robots-Tag: noindex, nofollow
+
+/images/*
+  Cache-Control: public, max-age=31536000, immutable

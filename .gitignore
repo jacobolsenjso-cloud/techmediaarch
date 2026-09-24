@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.env
+.env.*
+.dev.vars
+_shots/
+_*.out
+_*.err
+scripts/billeder-brugt.json

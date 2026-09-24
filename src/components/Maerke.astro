@@ -1,0 +1,18 @@
+---
+// Sitets mærke (den isometriske "M"), tegnet som vektor ud fra techmediaarchs
+// eksisterende favicon, så det er skarpt i alle størrelser. Farverne er de samme.
+interface Props { class?: string; id?: string; }
+const { class: klasse = '', id = 'm' } = Astro.props;
+---
+<svg class={klasse} viewBox="0 4 48 36" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id={`${id}pk`} x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e8188c"/><stop offset="1" stop-color="#b52ec2"/></linearGradient>
+    <linearGradient id={`${id}ring`} x1="6" y1="0" x2="42" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#b530b5"/><stop offset="0.5" stop-color="#7d44d6"/><stop offset="0.5" stop-color="#3ee4e6"/><stop offset="1" stop-color="#29e9e0"/></linearGradient>
+    <linearGradient id={`${id}pu`} x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a834c4"/><stop offset="1" stop-color="#7d3fd4"/></linearGradient>
+  </defs>
+  <path d="M1 19 L13 25.5 L13 39 L1 39 Z" fill={`url(#${id}pk)`}/>
+  <path fill-rule="evenodd" fill={`url(#${id}ring)`} d="M6 15 L24 5 L42 15 L24 25 Z M15 15 L24 10 L33 15 L24 20 Z"/>
+  <path d="M14 19.5 L24 25 L24 31 L14 25.5 Z" fill={`url(#${id}pu)`}/>
+  <path d="M24 25 L34 19.5 L34 25.5 L24 31 Z" fill="#9a9a9a"/>
+  <path d="M34 19.5 L41 15.5 L47 18.8 L47 39 L42.5 39 L42.5 21.5 L38.5 21.5 L38.5 39 L34 39 Z" fill="#6f6f6f"/>
+</svg>

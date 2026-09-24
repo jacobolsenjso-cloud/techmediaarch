@@ -1,0 +1,15 @@
+---
+// Sidenavigation. Side 1 er forsiden (/), side 2+ ligger på /page/N.html.
+interface Props { side: number; antal: number; }
+const { side, antal } = Astro.props;
+const url = (n: number) => (n === 1 ? '/' : `/page/${n}.html`);
+---
+{antal > 1 && (
+  <nav class="pagination" aria-label="Pages">
+    {side > 1 ? <a href={url(side - 1)} class="pagination-btn">← Previous</a> : <span class="pagination-btn pagination-disabled" aria-disabled="true">← Previous</span>}
+    {Array.from({ length: antal }, (_, i) => i + 1).map((n) => (
+      n === side ? <span class="pagination-num active" aria-current="page">{n}</span> : <a href={url(n)} class="pagination-num">{n}</a>
+    ))}
+    {side < antal ? <a href={url(side + 1)} class="pagination-btn">Next →</a> : <span class="pagination-btn pagination-disabled" aria-disabled="true">Next →</span>}
+  </nav>
+)}

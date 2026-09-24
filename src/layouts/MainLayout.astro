@@ -1,0 +1,519 @@
+---
+// Hovedskabelonen. Bygget på techfeedwatchs MainLayout (samme topbar, sidemenu,
+// farver, mørk tilstand, søgning og footer), men uden videodelen: ingen
+// notifikationsklokke, ingen videokatalog, ingen service worker, ingen shorts.
+import '@fontsource-variable/inter';
+import interLatinWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import { EMNER, emneUrl } from '../lib/emner';
+import Maerke from '../components/Maerke.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string | null;
+  schema?: object | object[] | null;
+  noindex?: boolean;
+  nocanonical?: boolean;
+  ogType?: 'article' | 'website';
+  breadcrumb?: { navn: string; href: string }[];
+}
+const { title, description, image, schema, noindex, nocanonical, ogType = 'website', breadcrumb = [] } = Astro.props;
+const SITE = 'https://www.techmediaarch.com';
+const BRAND = 'Tech Media Arch';
+// Med build.format 'file' kalder Astro forsiden /index.html — den rigtige adresse er /
+const currentPath = Astro.url.pathname.replace(/\/index\.html$/, '/');
+
+const defaultDesc = 'Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.';
+const desc = description || defaultDesc;
+// Samme regel som techfeedwatch: brandet hænges kun på, hvis der er plads
+const fuldTitel = !title ? `${BRAND} | AI and Tech News, Guides and Analysis`
+  : (title.length + BRAND.length + 3 <= 60 ? `${title} | ${BRAND}` : title);
+// Canonical: Astro giver stien kodet (mellemrum = %20), præcis som Blogger skrev den
+const canonicalURL = SITE + currentPath;
+const ogImage = image ? (image.startsWith('http') ? image : SITE + image) : `${SITE}/og-default.png`;
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: [{ name: 'Frontpage', href: '/' }, ...breadcrumb].map((b, i) => ({
+    '@type': 'ListItem', position: i + 1, name: b.navn ?? (b as any).name, item: SITE + b.href,
+  })),
+};
+const siteSchema = [
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, url: SITE + '/',
+    potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${SITE}/search.html?q={search_term_string}` }, 'query-input': 'required name=search_term_string' } },
+  { '@context': 'https://schema.org', '@type': 'Organization', '@id': `${SITE}/#organization`, name: BRAND, url: SITE + '/',
+    logo: `${SITE}/icon-512.png` },
+];
+const schemaListe = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* Mørk tilstand sættes FØR siden tegnes, så der ikke blinker en hvid side. */}
+    <script is:inline>
+      (function () { try { if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode-preload'); } catch (e) {} })();
+    </script>
+    <style is:inline>
+      html.dark-mode-preload { background: #141317; color-scheme: dark; }
+      html.dark-mode-preload body { background: #141317; color: #f4f2f0; }
+    </style>
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141317" media="(prefers-color-scheme: dark)" />
+    <link rel="preload" href={interLatinWoff2} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+    <title>{fuldTitel}</title>
+
+    {/* Google Consent Mode v2 — SKAL stå før alle Google-tags. Alt afvises som
+        udgangspunkt; Googles egen samtykkedialog (Funding Choices, sat op i
+        AdSense for techmediaarch.com) opdaterer valget. Byg ikke eget banner. */}
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'granted', security_storage: 'granted', wait_for_update: 500 });
+    </script>
+    {/* AdSense: samme konto som i dag (pub-9695260339642032), auto-annoncer. */}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9695260339642032" crossorigin="anonymous"></script>
+
+    <meta name="description" content={desc} />
+    {!nocanonical && <link rel="canonical" href={canonicalURL} />}
+    <link rel="alternate" type="application/rss+xml" title="Tech Media Arch RSS" href={`${SITE}/rss.xml`} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={BRAND} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title || fuldTitel} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title || fuldTitel} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={ogImage} />
+    {schemaListe.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+    {currentPath !== '/' && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />}
+    {currentPath === '/' && <script type="application/ld+json" set:html={JSON.stringify(siteSchema)} />}
+
+    <style is:global>
+      /* Farver og grundlag kopieret fra techfeedwatch, så de to sites ser ens ud.
+         --teal er brandfarven til baggrunde/kanter; --teal-text er mørkere og
+         bruges hvor farven er TEKST (#0891b2 giver kun 3,4:1 på lys baggrund). */
+      :root { --bg-color: #f8fafc; --text-color: #111; --card-bg: #fff; --border-color: #e5e7eb; --sidebar-bg: #fff; --hover-bg: #f1f5f9; --teal: #0891b2; --teal-text: #0e7490; --muted: #6b7280; }
+      body.dark-mode { --bg-color: #141317; --text-color: #f4f2f0; --card-bg: #1f1d24; --border-color: #322e39; --sidebar-bg: #141317; --hover-bg: #262230; --teal: #0891b2; --teal-text: #38bdf8; --muted: #9ca3af; }
+      body.dark-mode [style*="#1e3a8a"] { --tag-accent: #6d9eff; }
+      body { background: var(--bg-color); color: var(--text-color); margin: 0; font-family: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+      * { -webkit-tap-highlight-color: transparent; }
+      h1, h2, h3, h4 { letter-spacing: -0.02em; }
+      a { transition: color 0.15s ease, opacity 0.15s ease; }
+      ::selection { background: rgba(8, 145, 178, 0.22); }
+      :focus-visible { outline: 2px solid #0891b2; outline-offset: 2px; border-radius: 4px; }
+      .tma-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, #0891b2, #22d3ee); z-index: 1100; transition: width 0.1s linear; pointer-events: none; box-shadow: 0 0 8px rgba(8, 145, 178, 0.5); }
+      @media (prefers-reduced-motion: reduce) { .tma-progress { transition: none; } }
+      .tma-reveal { opacity: 0; }
+      .tma-reveal.is-visible { animation: tmaReveal 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+      @keyframes tmaReveal { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+      @media (prefers-reduced-motion: reduce) { .tma-reveal { opacity: 1 !important; } .tma-reveal.is-visible { animation: none !important; } }
+
+      /* --- Topbar --- */
+      .top-navbar { height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; background: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); z-index: 1000; position: sticky; top: 0; box-sizing: border-box; }
+      .nav-left { display: flex; align-items: center; gap: 15px; }
+      .nav-right { display: flex; align-items: center; gap: 8px; }
+      .icon-btn { background: none; border: none; font-size: 1.2rem; color: var(--text-color); cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.2s; }
+      .icon-btn:hover { background: var(--hover-bg); }
+      .search-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: var(--sidebar-bg); display: none; align-items: center; padding: 0 20px; box-sizing: border-box; z-index: 40; }
+      .search-overlay.active { display: flex; }
+      .search-input-wrapper { flex: 0 1 520px; margin-right: 10px; position: relative; }
+      .search-overlay .icon-btn { margin-left: auto; }
+      .search-input-wrapper input { width: 100%; padding: 10px 15px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); outline: none; font-size: 1rem; box-sizing: border-box; font-family: inherit; }
+      .search-suggest { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 14px 36px rgba(0,0,0,0.18); overflow-y: auto; max-height: 72vh; display: none; z-index: 60; }
+      .search-suggest.active { display: block; }
+      .search-suggest-item { display: flex; gap: 12px; align-items: center; padding: 9px 12px; text-decoration: none; color: var(--text-color); }
+      .search-suggest-item:hover, .search-suggest-item.is-active { background: var(--hover-bg); }
+      .search-suggest-thumb { width: 68px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--hover-bg); }
+      .search-suggest-title { font-size: 0.9rem; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .search-suggest-footer { display: block; padding: 11px 12px; text-align: center; font-size: 0.85rem; font-weight: 700; color: var(--teal-text); text-decoration: none; border-top: 1px solid var(--border-color); }
+      .search-suggest-footer.is-active { background: var(--hover-bg); }
+      .search-suggest-empty { padding: 16px 12px; color: var(--muted); font-size: 0.9rem; text-align: center; }
+      @media (min-width: 769px) {
+        .search-input-wrapper { margin: 0 auto; }
+        .search-overlay .icon-btn { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); margin-left: 0; }
+      }
+      .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-color); cursor: pointer; padding: 0; }
+      .logo { font-size: 1.2rem; font-weight: bold; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px; min-height: 44px; }
+      .logo-arch { color: var(--teal-text); }
+      .logo-mark { height: 34px; width: auto; display: block; flex-shrink: 0; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.28)); }
+      body.dark-mode .logo-mark { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55)); }
+
+      /* --- Layout: sidemenu + indhold (siden ruller i .content-area, ikke i dokumentet) --- */
+      .main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
+      .sidebar { width: 220px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; z-index: 20; transition: left 0.3s ease; box-sizing: border-box; }
+      .nav-item { padding: 10px 15px; min-height: 44px; box-sizing: border-box; text-decoration: none; color: var(--text-color); border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease; }
+      .nav-item:hover, .nav-item.active { background: var(--hover-bg); color: var(--teal-text); }
+      .nav-item:hover { transform: translateX(3px); }
+      .nav-icon { width: 19px; height: 19px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; }
+      .nav-item.active .nav-icon, .nav-item:hover .nav-icon { opacity: 1; }
+      .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tag-accent); flex-shrink: 0; margin: 0 5px 0 5px; }
+      .nav-heading { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 6px 15px 2px; }
+      .nav-sep { width: 100%; border: 0; border-top: 1px solid var(--border-color); margin: 10px 0; }
+      .content-area { flex: 1; background: var(--bg-color); position: relative; display: flex; flex-direction: column; scroll-behavior: smooth; overflow-y: scroll !important; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: #cbd5e1 var(--bg-color); }
+      .content-area::-webkit-scrollbar { width: 14px; }
+      .content-area::-webkit-scrollbar-track { background: var(--bg-color); }
+      .content-area::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; border: 3px solid var(--bg-color); }
+      body.dark-mode .content-area { scrollbar-color: #475569 #0f1115; }
+      body.dark-mode .content-area::-webkit-scrollbar-track { background: #0f1115; }
+      body.dark-mode .content-area::-webkit-scrollbar-thumb { background-color: #475569; border: 3px solid #0f1115; }
+      @keyframes tmaFadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .content-area { animation: tmaFadeIn 0.4s ease backwards; }
+      @media (prefers-reduced-motion: reduce) { .content-area { animation: none; } .nav-item:hover { transform: none; } }
+
+      /* --- Footer --- */
+      .site-footer { padding: 20px; text-align: center; border-top: 1px solid var(--border-color); font-size: 14px; color: var(--muted); margin-top: auto; }
+      .footer-copy { margin: 0; }
+      .footer-links { margin-top: 8px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; }
+      .footer-link { color: inherit; text-decoration: none; margin: 0 4px; padding: 8px 6px; min-width: 44px; min-height: 44px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; }
+      .footer-link:hover { color: var(--teal-text); }
+      .footer-sep { opacity: 0.6; }
+      .scroll-top-btn { display: none; position: fixed; bottom: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); align-items: center; justify-content: center; cursor: pointer; z-index: 500; font-size: 1.3rem; line-height: 1; padding: 0; }
+      .scroll-top-btn.visible { display: flex; }
+      .scroll-top-btn:hover { border-color: var(--teal-text); color: var(--teal-text); }
+
+      @media (max-width: 768px) {
+        .mobile-menu-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-left: -8px; font-size: 1.35rem; border-radius: 8px; }
+        .mobile-menu-btn:active { background: var(--hover-bg); }
+        .top-navbar { padding: 0 10px; }
+        .nav-left { gap: 8px; }
+        .logo { font-size: 1rem; gap: 6px; }
+        .logo-mark { height: 28px; }
+        .nav-right { gap: 0; }
+        .sidebar { position: fixed; top: 60px; left: 0; height: calc(100vh - 60px); transform: translateX(-100%); box-shadow: 2px 0 15px rgba(0,0,0,0.2); z-index: 2000; transition: transform 0.3s ease; }
+        .sidebar.open { transform: translateX(0); }
+        .site-footer { padding-top: 30px; padding-bottom: calc(30px + env(safe-area-inset-bottom)); }
+        .footer-inner { display: flex; flex-direction: column; align-items: flex-start; text-align: left; width: fit-content; margin: 0 auto; }
+        .footer-copy { margin-bottom: 12px; }
+        .footer-links { flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 0; }
+        .footer-link { margin: 0; }
+        .footer-sep { display: none; }
+      }
+
+
+      /* ===== Brødtekst fra Blogger (artikler og faste sider) =====
+         Indholdet er flyttet ordret, så her styles de elementer, Blogger-indlæggene
+         faktisk bruger: tabeller (116 indlæg), citater (121), YouTube-rammer (129),
+         billeder med billedtekst (tr-caption-container) og centrerede billeder (separator). */
+      .post-body { line-height: 1.8; font-size: 1.05rem; margin-bottom: 30px; overflow-wrap: break-word; }
+      .post-body h2 { font-size: 1.5rem; line-height: 1.3; margin: 2em 0 0.6em; scroll-margin-top: 20px; }
+      .post-body h3 { font-size: 1.2rem; line-height: 1.35; margin: 1.6em 0 0.5em; scroll-margin-top: 20px; }
+      .post-body h4 { font-size: 1.05rem; margin: 1.4em 0 0.4em; }
+      .post-body p { margin: 0 0 1.1em; }
+      .post-body li > p { margin: 0 0 0.4em; }
+      .post-body ul, .post-body ol { padding-left: 1.4em; margin: 0 0 1.2em; }
+      .post-body li { margin-bottom: 0.35em; }
+      .post-body a { color: var(--teal-text); text-decoration: none; font-weight: 600; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+      .post-body a:hover { border-bottom-color: var(--teal-text); }
+      .post-body img { max-width: 100%; height: auto; border-radius: 10px; }
+      .post-body .separator { text-align: center; margin: 1.2em 0; clear: both; }
+      .post-body .separator a { border: 0; margin: 0 !important; }
+      .post-body .tr-caption-container { margin: 1.5em auto; border-collapse: collapse; }
+      .post-body .tr-caption-container td { border: 0; padding: 0; background: none; }
+      .post-body .tr-caption { font-size: 0.85rem; color: var(--muted); padding-top: 8px !important; text-align: center; }
+      .post-body hr { border: 0; border-top: 1px solid var(--border-color); margin: 2em 0; }
+      .post-body blockquote { margin: 1.5em 0; padding: 14px 20px; border-left: 4px solid #0891b2; background: var(--hover-bg); border-radius: 0 8px 8px 0; font-size: 1rem; }
+      .post-body blockquote p:last-child { margin-bottom: 0; }
+      .post-body table:not(.tr-caption-container) { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.93rem; line-height: 1.55; display: block; overflow-x: auto; }
+      .post-body table:not(.tr-caption-container) th, .post-body table:not(.tr-caption-container) td { border: 1px solid var(--border-color); padding: 10px 12px; text-align: left; vertical-align: top; }
+      .post-body table:not(.tr-caption-container) th { background: var(--hover-bg); font-weight: 700; }
+      .post-body table:not(.tr-caption-container) tr:nth-child(even) td { background: color-mix(in srgb, var(--hover-bg) 55%, transparent); }
+      .post-body table p { margin: 0; }
+      .post-body iframe { max-width: 100%; border: 0; border-radius: 12px; }
+      .post-body iframe[src*="youtube"] { width: 100%; height: auto; aspect-ratio: 16 / 9; display: block; margin: 1.5em 0; box-shadow: 0 8px 28px rgba(0,0,0,0.10); background: #000; }
+      .post-body pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 0.88rem; line-height: 1.6; }
+      .post-body code { font-size: 0.9em; }
+      .post-body :not(pre) > code { background: var(--hover-bg); padding: 2px 6px; border-radius: 4px; }
+      .post-body details { background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; margin: 1em 0; }
+      .post-body summary { cursor: pointer; font-weight: 700; }
+      @media (max-width: 768px) { .post-body { font-size: 1rem; } .post-body h2 { font-size: 1.3rem; } }
+
+      /* ===== Fælles byggeklodser til lister (forside, emner, søgning) — fra techfeedwatchs forside ===== */
+      .page-wrapper { padding: 0 20px 20px 20px; max-width: 1600px; margin: 0 auto; flex: 1; width: 100%; box-sizing: border-box; }
+      .section-heading { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 18px 0; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); }
+      .section-heading h2, .section-heading h1 { margin: 0; font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; }
+      .section-heading .section-note { font-size: 0.83rem; color: var(--muted); font-weight: 500; }
+      .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
+      .article-card { text-decoration: none; color: inherit; display: block; transition: transform 0.2s; }
+      .article-card:hover { transform: translateY(-3px); }
+      .card-thumb { aspect-ratio: 16/9; border-radius: 12px; position: relative; margin-bottom: 10px; overflow: hidden; background-color: #e6e8eb; background-image: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 80%); background-size: 200% 100%; background-repeat: no-repeat; animation: tmaShimmer 1.5s ease-in-out infinite; }
+      body.dark-mode .card-thumb { background-color: #26242c; background-image: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0) 80%); }
+      .card-thumb.is-loaded { animation: none; background-image: none; }
+      .card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+      .article-card:hover .card-thumb img { transform: scale(1.06); }
+      .article-card:hover .card-thumb { box-shadow: 0 6px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05); }
+      /* Artikler uden billede får et roligt felt i emnets farve i stedet for et hul */
+      .card-thumb-empty { animation: none; background: linear-gradient(135deg, color-mix(in srgb, var(--tag-accent, #0891b2) 22%, var(--card-bg)), var(--hover-bg)); display: flex; align-items: center; justify-content: center; }
+      .card-thumb-empty svg { width: 34%; height: auto; opacity: 0.55; }
+      @keyframes tmaShimmer { 0% { background-position: 150% 0; } 100% { background-position: -150% 0; } }
+      .card-title { margin: 0 0 5px 0; font-size: 15px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .article-card:hover .card-title { color: var(--teal-text); }
+      .card-excerpt { margin: 4px 0 6px 0; font-size: 13.5px; line-height: 1.5; color: #4b5563; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      body.dark-mode .card-excerpt { color: #a1a1aa; }
+      .card-meta { font-size: 13px; color: var(--muted); margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+      .card-topic { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+      .card-topic::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
+      @media (prefers-reduced-motion: reduce) { .card-thumb { animation: none; } .card-thumb img { transition: none; } .article-card:hover .card-thumb img { transform: none; } }
+
+      /* Emne-chips: pille-design med farveprik, som techfeedwatchs emnefilter */
+      .chip-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 0; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+      .chip { background: var(--hover-bg); color: var(--text-color); border: 1px solid transparent; padding: 7px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-decoration: none; line-height: 1.5; display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; }
+      .chip.active { background: #111; color: #fff; }
+      body.dark-mode .chip.active { background: #f1f5f9; color: #111; }
+      .chip-accent { border-color: var(--tag-accent); }
+      .chip-accent::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); margin-right: 7px; }
+      .chip-accent.active { background: var(--tag-accent); color: #fff; border-color: var(--tag-accent); }
+      .chip-accent:not(.active):hover { background: color-mix(in srgb, var(--tag-accent) 14%, var(--hover-bg)); transform: translateY(-1px); box-shadow: 0 3px 10px color-mix(in srgb, var(--tag-accent) 28%, transparent); }
+      body.dark-mode .chip-accent:not(.active):hover { background: color-mix(in srgb, var(--tag-accent) 26%, var(--hover-bg)); }
+      .chip-count { font-weight: 500; opacity: 0.6; margin-left: 6px; font-size: 0.8rem; }
+
+      .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 20px 0 40px 0; flex-wrap: wrap; }
+      .pagination-btn, .pagination-num { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding: 0 16px; border-radius: 20px; background: var(--hover-bg); color: var(--text-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: background 0.2s; box-sizing: border-box; }
+      .pagination-num { padding: 0; }
+      .pagination-btn:hover, .pagination-num:hover { background: #e5e7eb; }
+      body.dark-mode .pagination-btn:hover, body.dark-mode .pagination-num:hover { background: #334155; }
+      .pagination-num.active { background: #111; color: #fff; }
+      body.dark-mode .pagination-num.active { background: #f1f5f9; color: #111; }
+      .pagination-disabled { opacity: 0.4; pointer-events: none; }
+      @media (max-width: 768px) {
+        .page-wrapper { padding: 15px; }
+        .card-grid { grid-template-columns: 1fr; }
+        .card-thumb { border-radius: 8px; }
+        /* Mobil: én vandret række, der kan rulles, i stedet for 4-5 rækker chips */
+        .chip-bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-left: -15px; margin-right: -15px; padding: 10px 15px; }
+        .chip-bar::-webkit-scrollbar { display: none; }
+        .chip { flex: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <script is:inline>
+      (function () { try { if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode'); } catch (e) {} })();
+    </script>
+    <div class="tma-progress" id="tmaProgress"></div>
+
+    <header class="top-navbar" id="mainHeader">
+      <div class="nav-left">
+        <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">☰</button>
+        <a href="/" class="logo" aria-label="Tech Media Arch home">
+          <Maerke class="logo-mark" id="hdr" />
+          <span class="logo-text">Tech Media <span class="logo-arch">Arch</span></span>
+        </a>
+      </div>
+      <div class="nav-right">
+        <button id="searchBtn" class="icon-btn" aria-label="Open search" aria-expanded="false" aria-controls="searchOverlay">🔍</button>
+        <button id="themeToggle" class="icon-btn" aria-label="Toggle dark mode">🌙</button>
+      </div>
+      <div class="search-overlay" id="searchOverlay">
+        <div class="search-input-wrapper">
+          <input type="text" placeholder="Search articles..." id="topSearchInput" autocomplete="off" aria-label="Search articles" />
+          <div class="search-suggest" id="searchSuggest" role="listbox"></div>
+        </div>
+        <button id="closeSearchBtn" class="icon-btn" aria-label="Close search">❌</button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <aside class="sidebar" id="sidebar">
+        <a href="/" class={`nav-item ${currentPath === '/' ? 'active' : ''}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
+          Home
+        </a>
+        <a href="/p/start-here.html" class={`nav-item ${aktiv('/p/start-here.html') ? 'active' : ''}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
+          Start here
+        </a>
+        <a href="/p/watch.html" class={`nav-item ${aktiv('/p/watch.html') ? 'active' : ''}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>
+          Watch
+        </a>
+        <hr class="nav-sep" />
+        <div class="nav-heading">Topics</div>
+        {EMNER.map((e) => (
+          <a href={emneUrl(e)} class={`nav-item ${aktiv(emneUrl(e)) ? 'active' : ''}`} style={`--tag-accent: ${e.farve}`}>
+            <span class="nav-dot" aria-hidden="true"></span>
+            {e.navn}
+          </a>
+        ))}
+        <hr class="nav-sep" />
+        <a href="/p/sitemap.html" class={`nav-item ${aktiv('/p/sitemap.html') ? 'active' : ''}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          All articles
+        </a>
+        <a href="/p/about-us.html" class={`nav-item ${aktiv('/p/about-us.html') ? 'active' : ''}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          About
+        </a>
+      </aside>
+
+      <main class="content-area">
+        <slot />
+
+        <footer class="site-footer">
+          <div class="footer-inner">
+            <p class="footer-copy">&copy; {new Date().getFullYear()} Tech Media Arch. All rights reserved.</p>
+            <div class="footer-links">
+              {/* Samme links og rækkefølge som Bloggers footer (LinkList204, sorteret alfabetisk).
+                  "Report Abuse" er udeladt: det var Bloggers egen side. */}
+              <a href="/p/about-us.html" class="footer-link">About Us</a><span class="footer-sep">|</span>
+              <a href="/p/accessibility-information.html" class="footer-link">Accessibility Information</a><span class="footer-sep">|</span>
+              <a href="/p/copyright-trademark-and-patent.html" class="footer-link">Copyright &amp; Trademark</a><span class="footer-sep">|</span>
+              <a href="/p/disclosure.html" class="footer-link">Disclosure</a><span class="footer-sep">|</span>
+              <a href="/p/faq.html" class="footer-link">F.A.Q.</a><span class="footer-sep">|</span>
+              <a href="/p/privacy-policy.html" class="footer-link">Privacy Policy</a><span class="footer-sep">|</span>
+              <a href="/rss.xml" class="footer-link">RSS</a><span class="footer-sep">|</span>
+              <a href="/p/sitemap.html" class="footer-link">Sitemap</a><span class="footer-sep">|</span>
+              <a href="/p/start-here.html" class="footer-link">Start Here</a><span class="footer-sep">|</span>
+              <a href="/p/terms-conditions.html" class="footer-link">Terms &amp; Conditions</a><span class="footer-sep">|</span>
+              <a href="/p/we-not-sell-your-personal-information.html" class="footer-link">We not Sell your Personal Information</a>
+              <span class="footer-sep" id="cookieSettingsSep" hidden>|</span><a href="#" id="cookieSettingsLink" class="footer-link" hidden>Cookie settings</a>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <button type="button" id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top" title="Scroll to top">↑</button>
+
+    {/* "Cookie settings" åbner Googles egen samtykkedialog igen — vises kun,
+        når Googles CMP faktisk er indlæst. */}
+    <script is:inline>
+      (function () {
+        var link = document.getElementById('cookieSettingsLink');
+        var sep = document.getElementById('cookieSettingsSep');
+        if (!link) return;
+        function enable() {
+          link.hidden = false; if (sep) sep.hidden = false;
+          link.addEventListener('click', function (e) { e.preventDefault(); try { window.googlefc.showRevocationMessage(); } catch (err) {} });
+        }
+        var tries = 0;
+        var t = setInterval(function () {
+          if (window.googlefc && typeof window.googlefc.showRevocationMessage === 'function') { clearInterval(t); enable(); }
+          else if (++tries > 40) clearInterval(t);
+        }, 250);
+      })();
+    </script>
+
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', function () {
+        var body = document.body;
+        // Mørk tilstand
+        var themeBtn = document.getElementById('themeToggle');
+        var updateIcon = function () { if (themeBtn) themeBtn.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌙'; };
+        updateIcon();
+        if (themeBtn) themeBtn.addEventListener('click', function () {
+          var dark = body.classList.toggle('dark-mode');
+          try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+          document.documentElement.classList.toggle('dark-mode-preload', dark);
+          updateIcon();
+        });
+
+        // Søgning i topbaren: forslag mens man skriver, Enter = fuld søgeside.
+        // Artikellisten hentes først, når feltet bruges (search-index.json).
+        var searchBtn = document.getElementById('searchBtn');
+        var closeSearchBtn = document.getElementById('closeSearchBtn');
+        var overlay = document.getElementById('searchOverlay');
+        var input = document.getElementById('topSearchInput');
+        var suggest = document.getElementById('searchSuggest');
+        if (searchBtn && overlay) searchBtn.addEventListener('click', function () {
+          overlay.classList.add('active'); searchBtn.setAttribute('aria-expanded', 'true');
+          setTimeout(function () { input && input.focus(); }, 30);
+        });
+        if (closeSearchBtn && overlay) closeSearchBtn.addEventListener('click', function () {
+          overlay.classList.remove('active'); searchBtn.setAttribute('aria-expanded', 'false');
+        });
+        if (input && suggest) {
+          var data = null, loading = false, idx = -1;
+          var norm = function (s) { return String(s || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9#+.]+/g, ' '); };
+          var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+          var hide = function () { suggest.classList.remove('active'); suggest.innerHTML = ''; idx = -1; };
+          var go = function () { var q = input.value.trim(); if (q) location.href = '/search.html?q=' + encodeURIComponent(q); };
+          var load = function () {
+            if (data || loading) return; loading = true;
+            fetch('/search-index.json').then(function (r) { return r.json(); }).then(function (d) { data = d; loading = false; if (document.activeElement === input) render(); }).catch(function () { loading = false; });
+          };
+          var render = function () {
+            idx = -1;
+            var q = input.value.trim();
+            if (!q) { hide(); return; }
+            if (!data) { load(); suggest.innerHTML = '<div class="search-suggest-empty">Searching…</div>'; suggest.classList.add('active'); return; }
+            var ord = norm(q).split(' ').filter(Boolean);
+            var hits = data.filter(function (a) { var h = norm(a.t + ' ' + a.d + ' ' + a.e.join(' ')); return ord.every(function (w) { return h.indexOf(w) !== -1; }); }).slice(0, 7);
+            if (!hits.length) { suggest.innerHTML = '<div class="search-suggest-empty">No matches. Press Enter to search anyway.</div>'; suggest.classList.add('active'); return; }
+            suggest.innerHTML = hits.map(function (a) {
+              return '<a class="search-suggest-item" href="' + a.u + '">' + (a.i ? '<img class="search-suggest-thumb" src="' + a.i + '" alt="" loading="lazy">' : '<span class="search-suggest-thumb"></span>') + '<span class="search-suggest-title">' + esc(a.t) + '</span></a>';
+            }).join('') + '<a class="search-suggest-footer" href="/search.html?q=' + encodeURIComponent(q) + '">See all results →</a>';
+            suggest.classList.add('active');
+          };
+          input.addEventListener('focus', load);
+          input.addEventListener('input', render);
+          input.addEventListener('keydown', function (e) {
+            var items = Array.prototype.slice.call(suggest.querySelectorAll('.search-suggest-item, .search-suggest-footer'));
+            if (e.key === 'ArrowDown' && items.length) { e.preventDefault(); idx = Math.min(idx + 1, items.length - 1); }
+            else if (e.key === 'ArrowUp' && items.length) { e.preventDefault(); idx = Math.max(idx - 1, 0); }
+            else if (e.key === 'Enter') { if (idx >= 0 && items[idx]) location.href = items[idx].getAttribute('href'); else go(); return; }
+            else if (e.key === 'Escape') { hide(); return; }
+            else return;
+            items.forEach(function (el, i) { el.classList.toggle('is-active', i === idx); });
+            if (items[idx]) items[idx].scrollIntoView({ block: 'nearest' });
+          });
+          document.addEventListener('click', function (e) { if (!suggest.contains(e.target) && e.target !== input) hide(); });
+        }
+
+        // Mobilmenu
+        var menuBtn = document.getElementById('mobileMenuBtn');
+        var sidebar = document.getElementById('sidebar');
+        if (menuBtn && sidebar) {
+          menuBtn.addEventListener('click', function () { var open = sidebar.classList.toggle('open'); menuBtn.setAttribute('aria-expanded', open); });
+          document.addEventListener('click', function (e) {
+            if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) { sidebar.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); }
+          });
+        }
+
+        // Siden ruller i .content-area, ikke i vinduet — mål og ryk der.
+        var box = document.querySelector('.content-area');
+        var topBtn = document.getElementById('scrollTopBtn');
+        var bar = document.getElementById('tmaProgress');
+        var onScroll = function () {
+          var st = box.scrollTop, max = box.scrollHeight - box.clientHeight;
+          if (bar) bar.style.width = (max > 0 ? (st / max) * 100 : 0) + '%';
+          if (topBtn) topBtn.classList.toggle('visible', st > 400 && st + box.clientHeight < box.scrollHeight - 120);
+        };
+        if (box) {
+          box.addEventListener('scroll', onScroll, { passive: true });
+          window.addEventListener('resize', onScroll);
+          onScroll();
+          if (topBtn) topBtn.addEventListener('click', function () { box.scrollTo({ top: 0, behavior: 'smooth' }); });
+        }
+
+        // Kort fader blidt ind, når de rulles i syne
+        if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && box) {
+          var els = document.querySelectorAll('.article-card');
+          var obs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+              if (!en.isIntersecting) return;
+              var el = en.target; el.classList.add('is-visible'); obs.unobserve(el);
+              setTimeout(function () { el.classList.remove('tma-reveal', 'is-visible'); }, 750);
+            });
+          }, { root: box, rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+          els.forEach(function (el) { el.classList.add('tma-reveal'); obs.observe(el); });
+        }
+
+        // Skeleton-glimtet stopper, når kortets billede er hentet
+        var loaded = function (img) { var t = img.closest && img.closest('.card-thumb'); if (t) t.classList.add('is-loaded'); };
+        document.addEventListener('load', function (e) { if (e.target && e.target.tagName === 'IMG') loaded(e.target); }, true);
+        document.addEventListener('error', function (e) { if (e.target && e.target.tagName === 'IMG') loaded(e.target); }, true);
+        document.querySelectorAll('.card-thumb img').forEach(function (img) { if (img.complete && img.naturalWidth > 0) loaded(img); });
+      });
+    </script>
+  </body>
+</html>

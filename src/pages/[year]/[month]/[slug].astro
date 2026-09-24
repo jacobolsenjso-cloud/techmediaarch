@@ -1,0 +1,243 @@
+---
+// Artikelsiden. Adressen er præcis Bloggers: /2026/06/navn.html.
+// Opbygningen følger techfeedwatchs artikelside (brødkrumme, byline, handlinger,
+// emne-chips, indholdsfortegnelse, brødtekst, del-boks, forfatter/udgiver,
+// forrige/næste, relaterede) — uden videoafspilleren og alt det, der hørte til den.
+import MainLayout from '../../../layouts/MainLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+import { INDLAEG, datoTekst } from '../../../lib/indhold';
+import { emneUrl } from '../../../lib/emner';
+import Maerke from '../../../components/Maerke.astro';
+
+export function getStaticPaths() {
+  return INDLAEG.map((p) => ({ params: { year: p.aar, month: p.maaned, slug: p.navn }, props: { p } }));
+}
+const { p } = Astro.props;
+const SITE = 'https://www.techmediaarch.com';
+const emne = p.emner[0];
+
+// "Updated" vises kun, når indlægget reelt er ændret senere (mere end et døgn efter)
+const opdateret = new Date(p.updated).getTime() - new Date(p.published).getTime() > 86400000;
+
+const i = INDLAEG.indexOf(p);
+const nyere = INDLAEG[i - 1];
+const aeldre = INDLAEG[i + 1];
+
+// Relaterede: samme emne først, derefter de nyeste; aldrig artiklen selv
+const somEmne = emne ? INDLAEG.filter((x) => x !== p && x.emner.some((e) => e.slug === emne.slug)) : [];
+const relaterede = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].slice(0, 8);
+// Sidebaren lover "More in <emne>" — så den må kun vise det emne. Har emnet
+// for få artikler, hedder den "Latest articles" og viser de nyeste i stedet.
+const nokIEmne = somEmne.length >= 3;
+const sidebarTitel = nokIEmne ? `More in ${emne!.navn}` : 'Latest articles';
+const sidebarListe = (nokIEmne ? somEmne : INDLAEG.filter((x) => x !== p)).slice(0, 8);
+
+// Indholdsfortegnelse ved 3+ overskrifter. Bliver den lang (de ældre indlæg har
+// op til 40), vises kun hovedafsnittene (h2), så den ikke fylder en hel skærm.
+const toc = p.overskrifter.length < 3 ? [] : p.overskrifter.length > 14 ? p.overskrifter.filter((h) => h.niveau === 2) : p.overskrifter;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: p.title,
+  description: p.description,
+  datePublished: p.published,
+  dateModified: p.updated,
+  mainEntityOfPage: SITE + p.href,
+  ...(p.image ? { image: SITE + p.image } : {}),
+  author: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/' },
+  publisher: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/icon-512.png' } },
+  ...(p.labels.length ? { keywords: p.labels.join(', ') } : {}),
+};
+const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
+---
+<MainLayout title={p.title} description={p.description} image={p.image} schema={schema} ogType="article" breadcrumb={crumbs}>
+  <style is:global>
+    .article-layout { display: flex; gap: 25px; max-width: 1200px; margin: 0 auto; padding: 30px 20px; box-sizing: border-box; align-items: flex-start; width: 100%; }
+    .article-primary { flex: 1; min-width: 0; width: 100%; max-width: 100%; }
+    .article-secondary { width: 340px; flex-shrink: 0; position: sticky; top: 20px; max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; }
+    .breadcrumbs-bar { background: var(--hover-bg); padding: 0 18px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; }
+    .breadcrumbs-bar a { color: var(--teal-text); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
+    .article-title { margin: 0 0 15px 0; font-size: 2rem; line-height: 1.2; }
+    .article-byline { display: flex; align-items: center; gap: 12px; margin: 0 0 18px 0; }
+    .byline-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; background: var(--hover-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; }
+    .byline-avatar svg { width: 24px; height: auto; }
+    .byline-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .byline-name { font-size: 0.92rem; font-weight: 600; }
+    .byline-name a { color: inherit; text-decoration: none; }
+    .byline-name a:hover { text-decoration: underline; }
+    .byline-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-size: 0.83rem; color: var(--muted); font-weight: 500; }
+    .meta-sep { opacity: 0.5; }
+    .action-bar { display: flex; gap: 10px; margin-bottom: 22px; align-items: center; flex-wrap: wrap; }
+    .action-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--hover-bg); border-radius: 20px; height: 40px; padding: 0 16px; border: 1px solid var(--border-color); color: var(--text-color); font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .action-pill:hover { background: #e2e8f0; }
+    body.dark-mode .action-pill:hover { background: #334155; }
+    .action-icon { width: 18px; height: 18px; }
+    .tag-container { margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-badge { display: inline-flex; align-items: center; gap: 6px; background-color: #e2e8f0; color: #334155; padding: 5px 14px; min-height: 32px; box-sizing: border-box; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; }
+    .tag-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
+    body.dark-mode .tag-badge { background-color: #27272a; color: #d4d4d8; }
+    .tag-badge:hover { background-color: #cbd5e1; color: #0f172a; transform: translateY(-1px); }
+    .toc-container { background: var(--hover-bg); border-radius: 8px; padding: 20px; margin-bottom: 30px; border: 1px solid var(--border-color); }
+    .toc-title { font-weight: bold; margin-bottom: 12px; font-size: 1.1rem; }
+    .toc-list { list-style: none; padding: 0; margin: 0; }
+    .toc-list li { margin-bottom: 8px; }
+    .toc-depth-3 { padding-left: 20px; font-size: 0.95rem; opacity: 0.9; }
+    .toc-list a { color: var(--text-color); text-decoration: none; font-weight: 500; }
+    .toc-list a:hover { color: var(--teal-text); }
+    .disclosure-box { font-size: 0.85rem; line-height: 1.6; color: var(--muted); background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 18px; margin: 0 0 30px 0; }
+    .disclosure-box strong { color: var(--text-color); }
+    .share-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px 24px; margin-bottom: 40px; }
+    .share-cta-title { font-weight: 700; font-size: 1.05rem; margin: 0 0 4px 0; }
+    .share-cta-sub { font-size: 0.9rem; color: var(--muted); margin: 0; }
+    .share-cta-btn { display: inline-flex; align-items: center; gap: 8px; background: #0e7490; color: #fff; border: none; border-radius: 8px; padding: 11px 20px; min-height: 44px; font-size: 0.95rem; font-weight: 600; cursor: pointer; flex-shrink: 0; font-family: inherit; transition: background 0.2s, transform 0.2s; }
+    .share-cta-btn:hover { background: #155e75; transform: translateY(-1px); }
+    .share-cta-btn svg { width: 16px; height: 16px; }
+    .publisher-box { display: flex; gap: 20px; align-items: flex-start; background: var(--hover-bg); border: 1px solid var(--border-color); border-left: 4px solid #0891b2; border-radius: 10px; padding: 24px; margin: 10px 0 30px; }
+    .publisher-mark { width: 64px; height: 64px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .publisher-mark svg { width: 38px; height: auto; }
+    .publisher-name { font-weight: 700; font-size: 1.1rem; margin: 0 0 8px; }
+    .publisher-text { font-size: 0.97rem; line-height: 1.65; margin: 0; }
+    .publisher-text a { color: var(--teal-text); font-weight: 600; text-decoration: none; }
+    .nav-row { display: flex; gap: 20px; border-top: 1px solid var(--border-color); padding-top: 25px; margin-bottom: 40px; }
+    .nav-card { flex: 1; background: var(--card-bg); border: 2px solid var(--border-color); padding: 15px 20px; border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.2s ease; display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; overflow: hidden; min-width: 0; }
+    .nav-card:hover { transform: translateY(-3px); border-color: var(--teal-text); box-shadow: 0 6px 24px rgba(0,0,0,0.06); }
+    .nav-card.right { text-align: right; }
+    .nav-label { font-size: 0.8rem; color: var(--teal-text); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+    .nav-title { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nav-card.disabled { opacity: 0.4; pointer-events: none; }
+    .related-articles-title { font-size: 1.4rem; margin: 0 0 18px 0; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+    .related-grid .card-excerpt { display: none; }
+    .side-title { font-size: 1.1rem; margin: 0 0 15px 0; }
+    .side-list { display: flex; flex-direction: column; gap: 14px; }
+    .side-item { display: grid; grid-template-columns: 130px 1fr; gap: 12px; text-decoration: none; color: inherit; align-items: start; }
+    .side-item .card-thumb { margin: 0; border-radius: 8px; }
+    .side-item-title { font-size: 14px; line-height: 1.4; font-weight: 600; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .side-item:hover .side-item-title { color: var(--teal-text); }
+    @media (max-width: 900px) {
+      .article-layout { flex-direction: column; padding: 15px 12px; }
+      .article-secondary { width: 100%; position: static; max-height: none; overflow: visible; padding-right: 0; }
+      .article-title { font-size: 1.5rem; }
+      .nav-row { flex-direction: column; gap: 12px; }
+      .share-cta { flex-direction: column; align-items: flex-start; }
+      .share-cta-btn { width: 100%; justify-content: center; }
+      .publisher-box { flex-direction: column; padding: 18px; gap: 12px; }
+      .related-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    }
+  </style>
+
+  <div class="article-layout">
+    <div class="article-primary">
+      <nav class="breadcrumbs-bar" aria-label="Breadcrumb">
+        <a href="/">Frontpage</a>
+        {emne && <><span>/</span><a href={emneUrl(emne)}>{emne.navn}</a></>}
+      </nav>
+
+      <h1 class="article-title">{p.title}</h1>
+
+      <div class="article-byline">
+        <span class="byline-avatar" aria-hidden="true"><Maerke id="by" /></span>
+        <div class="byline-text">
+          <span class="byline-name">Published by <a href="/p/about-us.html">Tech Media Arch</a></span>
+          <span class="byline-meta">
+            <time datetime={p.published}>{datoTekst(p.published)}</time>
+            {opdateret && <><span class="meta-sep">·</span><span>Updated <time datetime={p.updated}>{datoTekst(p.updated)}</time></span></>}
+            <span class="meta-sep">·</span><span>{p.minutter} min read</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button type="button" class="action-pill share-trigger" aria-label="Share this article">
+          <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <span class="share-text">Share</span>
+        </button>
+      </div>
+
+      {p.emner.length > 0 && (
+        <div class="tag-container">
+          {p.emner.map((e) => <a href={emneUrl(e)} class="tag-badge" style={`--tag-accent: ${e.farve}`}>{e.navn}</a>)}
+        </div>
+      )}
+
+      {toc.length > 0 && (
+        <nav class="toc-container" aria-label="Table of contents">
+          <div class="toc-title">Table of Contents</div>
+          <ul class="toc-list">
+            {toc.map((h) => <li class={`toc-depth-${h.niveau}`}><a href={`#${h.id}`}>{h.tekst}</a></li>)}
+          </ul>
+        </nav>
+      )}
+
+      <article class="post-body" set:html={p.html} />
+
+      {/* Stod før som fodnote i hvert indlæg (Blogger-feedets fodnote). */}
+      <p class="disclosure-box"><strong>Affiliate disclosure:</strong> Please note that some links on TechMediaArch.com are affiliate links. We may receive a commission, at no extra cost to you, if you click through our links and make a purchase from one of our partners.</p>
+
+      <div class="share-cta">
+        <div>
+          <p class="share-cta-title">Share this article</p>
+          <p class="share-cta-sub">Send it to someone who follows AI and tech, or save the link for later.</p>
+        </div>
+        <button type="button" class="share-cta-btn share-trigger" aria-label="Share this article">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <span class="share-text">Share</span>
+        </button>
+      </div>
+
+      <div class="publisher-box">
+        <span class="publisher-mark" aria-hidden="true"><Maerke id="pub" /></span>
+        <div>
+          <p class="publisher-name">Tech Media Arch</p>
+          <p class="publisher-text">News, guides and analysis on AI and technology. <a href="/p/about-us.html">About us</a> · <a href="/p/start-here.html">Start here</a></p>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <a href={aeldre ? aeldre.href : '#'} class={`nav-card ${aeldre ? '' : 'disabled'}`}>
+          <span class="nav-label">← Previous article</span>
+          <span class="nav-title">{aeldre ? aeldre.title : 'No older articles'}</span>
+        </a>
+        <a href={nyere ? nyere.href : '#'} class={`nav-card right ${nyere ? '' : 'disabled'}`}>
+          <span class="nav-label">Next article →</span>
+          <span class="nav-title">{nyere ? nyere.title : 'No newer articles'}</span>
+        </a>
+      </div>
+
+      {relaterede.length > 0 && (
+        <section>
+          <h2 class="related-articles-title">Related articles</h2>
+          <div class="related-grid">{relaterede.map((r) => <ArticleCard p={r} />)}</div>
+        </section>
+      )}
+    </div>
+
+    {sidebarListe.length > 0 && (
+      <aside class="article-secondary" aria-label="More articles">
+        <h2 class="side-title">{sidebarTitel}</h2>
+        <div class="side-list">
+          {sidebarListe.map((r) => (
+            <a href={r.href} class="side-item">
+              {r.image ? <div class="card-thumb"><img src={r.image} alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
+              <h3 class="side-item-title">{r.title}</h3>
+            </a>
+          ))}
+        </div>
+      </aside>
+    )}
+  </div>
+
+  {/* Del-knapper: telefonens egen del-menu når den findes, ellers kopieres linket. */}
+  <script is:inline>
+    document.querySelectorAll('.share-trigger').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var data = { title: document.title, url: location.href };
+        if (navigator.share) { navigator.share(data).catch(function () {}); return; }
+        var label = btn.querySelector('.share-text');
+        var done = function () { if (label) { var old = label.textContent; label.textContent = 'Link copied'; setTimeout(function () { label.textContent = old; }, 2000); } };
+        if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(done).catch(function () {});
+      });
+    });
+  </script>
+</MainLayout>

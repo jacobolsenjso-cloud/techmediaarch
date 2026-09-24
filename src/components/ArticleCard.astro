@@ -1,0 +1,28 @@
+---
+// Artikelkort i techfeedwatchs stil, men med artiklens eget billede i stedet
+// for en YouTube-miniature. Uden billede vises et roligt felt i emnets farve.
+import type { Indlaeg } from '../lib/indhold';
+import { datoTekst, udsnit } from '../lib/indhold';
+import Maerke from './Maerke.astro';
+interface Props { p: Indlaeg; eager?: boolean; }
+const { p, eager = false } = Astro.props;
+const emne = p.emner[0];
+---
+<a href={p.href} class="article-card" style={emne ? `--tag-accent: ${emne.farve}` : undefined}>
+  {p.image ? (
+    <div class="card-thumb"><img src={p.image} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" /></div>
+  ) : (
+    <div class="card-thumb card-thumb-empty" aria-hidden="true">
+      <Maerke id={`c${p.aar}${p.maaned}`} />
+    </div>
+  )}
+  <h3 class="card-title">{p.title}</h3>
+  <p class="card-excerpt">{udsnit(p.description)}</p>
+  <p class="card-meta">
+    {emne && <span class="card-topic">{emne.navn}</span>}
+    {emne && <span aria-hidden="true">·</span>}
+    <span>{datoTekst(p.published)}</span>
+    <span aria-hidden="true">·</span>
+    <span>{p.minutter} min read</span>
+  </p>
+</a>

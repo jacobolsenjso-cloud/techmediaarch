@@ -1,0 +1,20 @@
+---
+// 404-siden. Workeren serverer den med status 404 for alle ukendte adresser.
+// Ingen canonical: siden vises på mange adresser, og ingen af dem er "den rigtige".
+import MainLayout from '../layouts/MainLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { INDLAEG } from '../lib/indhold';
+const nyeste = INDLAEG.slice(0, 6);
+---
+<MainLayout title="Page not found" description="The page you are looking for does not exist." noindex nocanonical>
+  <div class="page-wrapper" style="padding-top: 40px;">
+    <div style="text-align: center; margin: 0 auto 40px; max-width: 600px;">
+      <div style="font-size: 88px; font-weight: 900; color: #0891b2; line-height: 1;">404</div>
+      <h1 style="margin: 16px 0 10px;">This page could not be found</h1>
+      <p style="color: var(--muted); line-height: 1.6;">The link may be old, or the page may have moved. Try the search, or pick one of the latest articles below.</p>
+      <p><a href="/" class="chip active" style="display: inline-flex;">Go to the frontpage</a></p>
+    </div>
+    <div class="section-heading"><h2>Latest articles</h2></div>
+    <div class="card-grid">{nyeste.map((p) => <ArticleCard p={p} />)}</div>
+  </div>
+</MainLayout>

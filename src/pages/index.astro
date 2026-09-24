@@ -1,0 +1,97 @@
+---
+// Forsiden: samme opbygning som techfeedwatchs forside — introkort, emne-chips,
+// redaktionel top (én hovedhistorie + fire mindre) og derefter et grid.
+import MainLayout from '../layouts/MainLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import EmneChips from '../components/EmneChips.astro';
+import Pagination from '../components/Pagination.astro';
+import { INDLAEG, datoTekst, udsnit } from '../lib/indhold';
+
+export const PR_SIDE = 24;
+const side1 = INDLAEG.slice(0, PR_SIDE);
+const antalSider = Math.max(1, Math.ceil(INDLAEG.length / PR_SIDE));
+const hoved = side1[0];
+const sideHistorier = side1.slice(1, 5);
+const resten = side1.slice(5);
+---
+<MainLayout description="Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.">
+  <style is:global>
+    .home-hero { max-width: 1600px; margin: 22px auto 6px auto; padding: 0 20px; box-sizing: border-box; width: 100%; }
+    .home-hero-card { position: relative; overflow: hidden; border-radius: 18px; border: 1px solid var(--border-color); background: linear-gradient(135deg, rgba(8,145,178,0.10), rgba(8,145,178,0.02) 62%); padding: 38px 34px; }
+    .home-hero-card::after { content: ''; position: absolute; top: -45%; right: -8%; width: 360px; height: 360px; background: radial-gradient(circle, rgba(8,145,178,0.16), transparent 70%); pointer-events: none; }
+    .home-hero-title { margin: 0 0 10px 0; font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; position: relative; }
+    .home-hero-sub { margin: 0 0 20px 0; font-size: 1.05rem; line-height: 1.6; color: #4b5563; max-width: 640px; position: relative; }
+    body.dark-mode .home-hero-sub { color: #b8b3bd; }
+    .home-hero-links { display: flex; flex-wrap: wrap; gap: 10px; position: relative; }
+    .home-hero-link { display: inline-flex; align-items: center; gap: 7px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); text-decoration: none; padding: 9px 16px; border-radius: 999px; font-weight: 600; font-size: 0.9rem; min-height: 44px; box-sizing: border-box; transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+    .home-hero-link:hover { transform: translateY(-2px); border-color: var(--teal-text); box-shadow: 0 6px 24px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04); }
+    .hero-link-icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; }
+    @media (max-width: 768px) { .home-hero { margin: 15px auto 4px; padding: 0 15px; } .home-hero-card { padding: 26px 20px; border-radius: 14px; } .home-hero-title { font-size: 1.6rem; } .home-hero-sub { font-size: 0.98rem; } }
+
+    .lead-section { display: grid; grid-template-columns: 1.35fr 1fr; gap: 26px; margin-bottom: 42px; align-items: start; }
+    .lead-secondary { display: flex; flex-direction: column; gap: 20px; }
+    .lead-card { text-decoration: none; color: inherit; display: block; }
+    .lead-card .card-thumb { border-radius: 14px; margin-bottom: 14px; }
+    .lead-card:hover .card-thumb img { transform: scale(1.04); }
+    .lead-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 9px; color: var(--teal-text); }
+    .lead-eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent, #0891b2); }
+    .lead-title { margin: 0 0 9px 0; font-size: 1.75rem; line-height: 1.22; font-weight: 800; letter-spacing: -0.02em; }
+    .lead-card:hover .lead-title { color: var(--teal-text); }
+    .lead-excerpt { margin: 0 0 11px 0; font-size: 1rem; line-height: 1.6; color: #4b5563; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    body.dark-mode .lead-excerpt { color: #a1a1aa; }
+    .lead-mini { display: grid; grid-template-columns: 132px 1fr; gap: 14px; text-decoration: none; color: inherit; align-items: start; }
+    .lead-mini .card-thumb { border-radius: 10px; margin: 0; }
+    .lead-mini-title { margin: 0 0 5px 0; font-size: 1rem; line-height: 1.35; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .lead-mini:hover .lead-mini-title { color: var(--teal-text); }
+    @media (max-width: 900px) { .lead-section { grid-template-columns: 1fr; gap: 30px; } .lead-title { font-size: 1.45rem; } }
+    @media (max-width: 520px) { .lead-mini { grid-template-columns: 110px 1fr; gap: 12px; } .lead-title { font-size: 1.3rem; } .lead-excerpt { -webkit-line-clamp: 2; font-size: 0.95rem; } }
+  </style>
+
+  <section class="home-hero">
+    <div class="home-hero-card">
+      <h1 class="home-hero-title">AI and tech news, guides and analysis.</h1>
+      <p class="home-hero-sub">Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.</p>
+      <div class="home-hero-links">
+        <a href="/p/start-here.html" class="home-hero-link"><svg class="hero-link-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Start here</a>
+        <a href="/p/watch.html" class="home-hero-link"><svg class="hero-link-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>Watch</a>
+        <a href="/p/sitemap.html" class="home-hero-link"><svg class="hero-link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>All articles</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="page-wrapper">
+    <EmneChips />
+
+    {hoved && (
+      <section class="lead-section" aria-label="Latest">
+        <a href={hoved.href} class="lead-card" style={hoved.emner[0] ? `--tag-accent: ${hoved.emner[0].farve}` : undefined}>
+          {hoved.image ? <div class="card-thumb"><img src={hoved.image} alt="" loading="eager" fetchpriority="high" /></div> : null}
+          {hoved.emner[0] && <span class="lead-eyebrow">{hoved.emner[0].navn}</span>}
+          <h2 class="lead-title">{hoved.title}</h2>
+          <p class="lead-excerpt">{udsnit(hoved.description, 230)}</p>
+          <p class="card-meta"><span>{datoTekst(hoved.published)}</span><span aria-hidden="true">·</span><span>{hoved.minutter} min read</span></p>
+        </a>
+        <div class="lead-secondary">
+          {sideHistorier.map((p) => (
+            <a href={p.href} class="lead-mini">
+              {p.image ? <div class="card-thumb"><img src={p.image} alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
+              <div>
+                <h3 class="lead-mini-title">{p.title}</h3>
+                <p class="card-meta"><span>{datoTekst(p.published)}</span></p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {resten.length > 0 && (
+      <>
+        <div class="section-heading"><h2>Latest articles</h2></div>
+        <div class="card-grid">{resten.map((p) => <ArticleCard p={p} />)}</div>
+      </>
+    )}
+
+    <Pagination side={1} antal={antalSider} />
+  </div>
+</MainLayout>

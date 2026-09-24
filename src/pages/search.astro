@@ -1,0 +1,41 @@
+---
+// Søgeside: /search.html?q=… (Bloggers /search?q= sendes hertil af workeren).
+// Søgningen sker i browseren mod search-index.json, så siden har intet indhold
+// uden JavaScript — derfor noindex.
+import MainLayout from '../layouts/MainLayout.astro';
+---
+<MainLayout title="Search" description="Search all Tech Media Arch articles." noindex breadcrumb={[{ navn: 'Search', href: '/search.html' }]}>
+  <div class="page-wrapper" style="padding-top: 24px;">
+    <div class="section-heading"><h1 id="searchHeading">Search</h1><span class="section-note" id="searchCount"></span></div>
+    <form action="/search.html" method="get" style="margin: 0 0 24px; display: flex; gap: 10px; max-width: 620px;">
+      <input type="search" name="q" id="searchPageInput" placeholder="Search articles..." aria-label="Search articles"
+        style="flex: 1; padding: 12px 16px; border-radius: 22px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); font-size: 1rem; font-family: inherit; min-height: 44px; box-sizing: border-box;" />
+      <button type="submit" class="chip active" style="border: 0; cursor: pointer; font-family: inherit;">Search</button>
+    </form>
+    <div class="card-grid" id="searchResults"></div>
+  </div>
+  <script is:inline>
+    (function () {
+      var q = new URLSearchParams(location.search).get('q') || '';
+      var input = document.getElementById('searchPageInput');
+      var out = document.getElementById('searchResults');
+      var count = document.getElementById('searchCount');
+      var heading = document.getElementById('searchHeading');
+      input.value = q;
+      if (!q.trim()) return;
+      heading.textContent = 'Results for “' + q + '”';
+      var norm = function (s) { return String(s || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9#+.]+/g, ' '); };
+      var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
+      fetch('/search-index.json').then(function (r) { return r.json(); }).then(function (data) {
+        var ord = norm(q).split(' ').filter(Boolean);
+        var hits = data.filter(function (a) { var h = norm(a.t + ' ' + a.d + ' ' + a.e.join(' ') + ' ' + a.l.join(' ')); return ord.every(function (w) { return h.indexOf(w) !== -1; }); });
+        count.textContent = hits.length + ' article' + (hits.length === 1 ? '' : 's');
+        out.innerHTML = hits.length ? hits.map(function (a) {
+          return '<a class="article-card" href="' + a.u + '">' +
+            (a.i ? '<div class="card-thumb is-loaded"><img src="' + a.i + '" alt="" loading="lazy"></div>' : '<div class="card-thumb card-thumb-empty"></div>') +
+            '<h3 class="card-title">' + esc(a.t) + '</h3><p class="card-excerpt">' + esc(a.d) + '</p><p class="card-meta"><span>' + esc(a.p) + '</span></p></a>';
+        }).join('') : '<p style="color: var(--muted);">No articles match your search. Try fewer or different words.</p>';
+      });
+    })();
+  </script>
+</MainLayout>
