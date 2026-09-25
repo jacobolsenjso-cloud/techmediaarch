@@ -21,6 +21,18 @@
   // Forhåndsvisnings-adresser pr. version slås fra: de ville ikke være dækket af
   // noindex-reglen i public/_headers.
   "workers_dev": true,
+  // Trin 5 (25/9-2026): det rigtige domæne sendes til denne Worker via ruter.
+  // DNS-records er IKKE ændret — Blogger ligger urørt bagved. Fortryd = fjern
+  // ruterne her og kør "npx wrangler deploy" igen (eller slet dem i Cloudflare
+  // under techmediaarch.com → Workers Routes); så svarer Blogger straks igen.
+  // Kun www: techmediaarch.com (uden www) sendes stadig til Blogger/Google, som
+  // omdirigerer til www (målt 25/9: der er ingen Cloudflare-regel, der gør det).
+  // En rute på den adresse ville servere filerne direkte uden omdirigering.
+  // HVIS Blogger en dag slettes: lav først en Redirect Rule i Cloudflare:
+  // techmediaarch.com/* -> https://www.techmediaarch.com/$1 (301).
+  "routes": [
+    { "pattern": "www.techmediaarch.com/*", "zone_name": "techmediaarch.com" }
+  ],
   "preview_urls": false,
   "observability": { "enabled": true }
 }
