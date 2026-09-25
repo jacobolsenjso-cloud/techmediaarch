@@ -15,7 +15,10 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "html_handling": "none",
-    "not_found_handling": "none"
+    "not_found_handling": "none",
+    // Videoer går gennem workeren, som kan sende dem i stykker (206) — Safari kræver
+    // det. De statiske filer alene svarer altid med hele filen. Se video() i worker/index.js.
+    "run_worker_first": ["/video/*"]
   },
   // Test-adressen techmediaarch.<konto>.workers.dev er slået til (trin 4).
   // Forhåndsvisnings-adresser pr. version slås fra: de ville ikke være dækket af
@@ -25,11 +28,10 @@
   // DNS-records er IKKE ændret — Blogger ligger urørt bagved. Fortryd = fjern
   // ruterne her og kør "npx wrangler deploy" igen (eller slet dem i Cloudflare
   // under techmediaarch.com → Workers Routes); så svarer Blogger straks igen.
-  // Kun www: techmediaarch.com (uden www) sendes stadig til Blogger/Google, som
-  // omdirigerer til www (målt 25/9: der er ingen Cloudflare-regel, der gør det).
-  // En rute på den adresse ville servere filerne direkte uden omdirigering.
-  // HVIS Blogger en dag slettes: lav først en Redirect Rule i Cloudflare:
-  // techmediaarch.com/* -> https://www.techmediaarch.com/$1 (301).
+  // Kun www: techmediaarch.com (uden www) sendes til www af Cloudflare-reglen
+  // "Apex to www (replaces Blogger redirect)" under Rules → Redirect Rules (oprettet
+  // 25/9, 301, søgedelen bevares). Blogger bruges altså ikke længere til det.
+  // Læg IKKE en rute på techmediaarch.com: den ville servere filerne uden omdirigering.
   "routes": [
     { "pattern": "www.techmediaarch.com/*", "zone_name": "techmediaarch.com" }
   ],

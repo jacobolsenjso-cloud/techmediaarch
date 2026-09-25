@@ -7,6 +7,8 @@
 //   2. Bloggers gamle adresser (etiketter, søgning, feeds, arkiver) -> 301 til den nye
 //   3. robots.txt          -> lukket på testadressen, åben på det rigtige domæne
 //   4. alt andet           -> 404-siden med status 404
+// Undtagelse: /video/* går ALTID gennem workeren (run_worker_first), så den kan
+// sende videoen i stykker til Safari — se video() nedenfor.
 const PROD = 'www.techmediaarch.com';
 
 // Blogger-menuens emner -> ny emneside. Skal matche src/lib/emner.ts.
@@ -39,6 +41,33 @@ function medRobotsHeader(res, host) {
 
 const flyt = (url, sti) => Response.redirect(new URL(sti, url).toString(), 301);
 
+// Videoer (/video/*): Cloudflares statiske filer svarer altid med HELE filen (200), også
+// når browseren kun beder om et stykke ("Range: bytes=0-1"). Safari på iPhone/Mac
+// afspiller kun video, hvis serveren kan sende stykker (206 Partial Content) — målt
+// 25/9: www svarede 200 på Range. Derfor sendes /video/* gennem workeren
+// (run_worker_first i wrangler.jsonc), som skærer det ønskede stykke ud.
+async function video(request, env) {
+  const hel = await env.ASSETS.fetch(new Request(request.url, { method: 'GET' }));
+  if (hel.status !== 200) return hel;
+  const headers = new Headers(hel.headers);
+  headers.set('Accept-Ranges', 'bytes');
+  const range = request.headers.get('Range');
+  const tom = request.method === 'HEAD';
+  if (!range) return new Response(tom ? null : hel.body, { status: 200, headers });
+  const data = await hel.arrayBuffer();
+  const n = data.byteLength;
+  const m = range.match(/^bytes=(\d*)-(\d*)$/);
+  let start = -1, slut = -1;
+  if (m && m[1] !== '') { start = Number(m[1]); slut = m[2] === '' ? n - 1 : Math.min(Number(m[2]), n - 1); }
+  else if (m && m[2] !== '') { start = Math.max(0, n - Number(m[2])); slut = n - 1; } // "bytes=-500" = de sidste 500
+  if (start < 0 || start >= n || start > slut) {
+    return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${n}` } });
+  }
+  headers.set('Content-Range', `bytes ${start}-${slut}/${n}`);
+  headers.set('Content-Length', String(slut - start + 1));
+  return new Response(tom ? null : data.slice(start, slut + 1), { status: 206, headers });
+}
+
 async function haandter(request, env) {
   const url = new URL(request.url);
   const host = url.hostname;
@@ -47,6 +76,12 @@ async function haandter(request, env) {
 
   // Domænet uden www sendes til www, som Blogger også gjorde
   if (host === 'techmediaarch.com') return Response.redirect(`https://${PROD}${url.pathname}${url.search}`, 301);
+
+  // Findes videoen ikke, fortsætter vi ned til den almindelige 404-side
+  if (sti.startsWith('/video/')) {
+    const v = await video(request, env);
+    if (v.status !== 404) return v;
+  }
 
   if (sti === '/robots.txt') {
     return new Response(robots(host), { headers: { 'content-type': 'text/plain; charset=utf-8' } });

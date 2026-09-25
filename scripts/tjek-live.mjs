@@ -8,6 +8,8 @@
 //     (På www.techmediaarch.com er det omvendt: åben robots.txt og ingen noindex.)
 //  3. Bloggers gamle adresser omdirigeres (etiket, søgning, feed, arkiv), ukendt = 404
 //  4. Bloggers JSON-feeds (Watch- og Sitemap-siden bruger dem) svarer med data
+//  5. Videoen kan hentes i stykker (206 — Safari kræver det)
+//  6. (kun rigtigt domæne) techmediaarch.com uden www sendes til www med sti og søgedel
 // Afslutter med kode 1, hvis noget fejler.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -78,6 +80,23 @@ for (const s of ['/feeds/posts/default/-/Video?alt=json&max-results=5', '/feeds/
   let n = -1; try { n = ((await r.json()).feed.entry || []).length; } catch {}
   console.log(`${s}: ${r.status} · ${n} poster`);
   if (r.status !== 200 || n < 1) fejl.push(`feed svarer ikke med data: ${s}`);
+}
+
+// 5: video i stykker
+{
+  const r = await hent('/video/tubemagic.mp4', { headers: { Range: 'bytes=0-1' } });
+  const n = (await r.arrayBuffer()).byteLength;
+  const cr = r.headers.get('content-range') || '';
+  console.log(`/video/tubemagic.mp4 Range 0-1: ${r.status} · ${n} bytes · ${cr}`);
+  if (r.status !== 206 || n !== 2 || !/^bytes 0-1\/\d+$/.test(cr)) fejl.push('video sendes ikke i stykker (206) — Safari kan ikke afspille den');
+}
+
+// 6: domænet uden www (Cloudflare Redirect Rule)
+if (PROD) {
+  const r = await fetch('https://techmediaarch.com/2024/09/faq.html?x=1', { redirect: 'manual' }); await r.arrayBuffer();
+  const loc = r.headers.get('location');
+  console.log(`techmediaarch.com/2024/09/faq.html?x=1 -> ${r.status} ${loc}`);
+  if (r.status !== 301 || loc !== 'https://www.techmediaarch.com/2024/09/faq.html?x=1') fejl.push(`uden www: ventede 301 til www, fik ${r.status} ${loc}`);
 }
 
 console.log(`fejl: ${fejl.length}`);
