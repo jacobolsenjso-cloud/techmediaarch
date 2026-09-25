@@ -6,3 +6,6 @@ https://techmediaarch.:konto.workers.dev/*
 
 /images/*
   Cache-Control: public, max-age=31536000, immutable
+
+/video/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -268,6 +268,8 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .post-body .yt-play-btn::before { content: ""; position: absolute; top: 50%; left: 54%; transform: translate(-50%, -50%); border-style: solid; border-width: 11px 0 11px 19px; border-color: transparent transparent transparent #fff; }
       .post-body .yt-lazy:hover .yt-play-btn, .post-body .yt-play-btn:focus-visible { background: #f00; }
       .post-body .yt-lazy iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; margin: 0; }
+      /* Video uploadet til Blogger, nu afspillet fra vores egen kopi (lodret 9:16, se temakoder.mjs) */
+      .post-body .tma-video { display: block; width: 100%; max-width: 360px; height: auto; aspect-ratio: 9 / 16; margin: 1.5em auto; border-radius: 12px; background: #000; box-shadow: 0 8px 28px rgba(0,0,0,0.10); }
       .post-body iframe[src*="youtube"] { width: 100%; height: auto; aspect-ratio: 16 / 9; display: block; margin: 1.5em 0; box-shadow: 0 8px 28px rgba(0,0,0,0.10); background: #000; }
       .post-body pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 0.88rem; line-height: 1.6; }
       .post-body code { font-size: 0.9em; }

@@ -60,6 +60,26 @@ export function youtubeLazy(html) {
   });
 }
 
+// Videoer uploadet direkte til Blogger (ikke YouTube). Blogger viste dem i en ramme fra
+// blogger.com/video.g?token=…, som kun virker, så længe Blogger-bloggen findes. Her
+// skiftes rammen ud med en almindelig videoafspiller og en kopi af videoen på vores eget
+// site (public/video/). Kopien er lavet fra Takeout-eksportens original: 720×1280 i stedet
+// for 1080×1920 (7,7 MB i stedet for 45 MB) — målt 0,991 i SSIM (billedlighed, 1 = ens).
+// preload="none": intet af videoen hentes, før læseren trykker afspil.
+// Ukendte Blogger-videoer lades urørt (så tjek-site finder dem).
+const BLOGGER_VIDEOER = {
+  'AD6v5dyYEf_opkBGPjqEt44spNuPYCv72X7Ghw7I-tAw8tuVTkGhb8WYl3iUemyQQnYUhZ1TytTpKEJiPuO7bP8TQQ':
+    { fil: '/video/tubemagic.mp4', billede: '/video/tubemagic.jpg', bredde: 720, hoejde: 1280 },
+};
+
+export function bloggerVideo(html) {
+  return html.replace(/<iframe\b[^>]*\ssrc=(["'])https?:\/\/www\.blogger\.com\/video\.g\?token=([\w-]+)\1[^>]*>\s*<\/iframe>/gi, (hel, q, token) => {
+    const v = BLOGGER_VIDEOER[token];
+    if (!v) return hel;
+    return `<video class="tma-video" controls playsinline preload="none" poster="${v.billede}" width="${v.bredde}" height="${v.hoejde}"><source src="${v.fil}" type="video/mp4"></video>`;
+  });
+}
+
 // Vandmærke på billederne — samme regel som Blogger-temaets script ("STØVSUGEREN" +
 // vandmærke), som kørte i browseren, når siden var indlæst:
 //   - billeder under 150 px i bredden (tracking-pixels, ikoner) røres ikke

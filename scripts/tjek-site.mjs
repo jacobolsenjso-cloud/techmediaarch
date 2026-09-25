@@ -8,6 +8,8 @@
 //  5. Hver side har præcis én <title> og (undtagen 404) én canonical
 //  6. Ingen rå Blogger-genvejskoder ({getButton} o.l.) står synligt på siderne
 //  7. Alle strukturerede data (JSON-LD) kan læses som gyldig JSON
+//  8. Ingen side afhænger af Bloggers videoafspiller (blogger.com/video.g), og
+//     videoernes forsidebilleder (poster) findes
 // Afslutter med kode 1, hvis noget fejler.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -88,6 +90,8 @@ for (const f of html) {
     if (KENDTE.has(kort)) { kendteFundet.add(kort); continue; }
     fejl.push(`DØDT link i ${f}: ${u}`);
   }
+  if (/blogger\.com\/video\.g/.test(s)) fejl.push(`BLOGGER-video (virker kun, så længe Blogger findes) på ${f}`);
+  for (const [, u] of s.matchAll(/\sposter="(\/[^"]*)"/g)) { billeder++; if (!findes(u)) fejl.push(`MANGLER videobillede i ${f}: ${u}`); }
   for (const [, u] of s.matchAll(/\ssrc="(\/[^"]*)"/g)) {
     billeder++;
     if (findes(u)) continue;
