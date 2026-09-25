@@ -77,6 +77,20 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       function gtag(){dataLayer.push(arguments);}
       gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'granted', security_storage: 'granted', wait_for_update: 500 });
     </script>
+    {/* Google Analytics 4 (G-TJTC0HR0JK) — samme måling, som før kom via Cloudflare Zaraz
+        (Zaraz slukket 25/9). Står EFTER samtykke-standarden ovenfor: GA sætter ingen
+        cookies, før læseren har sagt ja i Googles samtykkedialog. Kun på det rigtige
+        domæne, så test-adressen (workers.dev) ikke tæller med i statistikken. */}
+    <script is:inline>
+      if (location.hostname === 'www.techmediaarch.com') {
+        var gaScript = document.createElement('script');
+        gaScript.async = true;
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-TJTC0HR0JK';
+        document.head.appendChild(gaScript);
+        gtag('js', new Date());
+        gtag('config', 'G-TJTC0HR0JK');
+      }
+    </script>
     {/* AdSense: samme konto som i dag (pub-9695260339642032), auto-annoncer. */}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9695260339642032" crossorigin="anonymous"></script>
 
