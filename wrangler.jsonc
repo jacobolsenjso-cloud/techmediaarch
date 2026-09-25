@@ -24,16 +24,20 @@
   // Forhåndsvisnings-adresser pr. version slås fra: de ville ikke være dækket af
   // noindex-reglen i public/_headers.
   "workers_dev": true,
-  // Trin 5 (25/9-2026): det rigtige domæne sendes til denne Worker via ruter.
-  // DNS-records er IKKE ændret — Blogger ligger urørt bagved. Fortryd = fjern
-  // ruterne her og kør "npx wrangler deploy" igen (eller slet dem i Cloudflare
-  // under techmediaarch.com → Workers Routes); så svarer Blogger straks igen.
-  // Kun www: techmediaarch.com (uden www) sendes til www af Cloudflare-reglen
-  // "Apex to www (replaces Blogger redirect)" under Rules → Redirect Rules (oprettet
-  // 25/9, 301, søgedelen bevares). Blogger bruges altså ikke længere til det.
-  // Læg IKKE en rute på techmediaarch.com: den ville servere filerne uden omdirigering.
+  // www.techmediaarch.com er Workerens EGET domæne (custom domain, 25/9-2026 aften).
+  // Cloudflare laver selv DNS-posten og certifikatet; Workeren er "originalen", og
+  // Blogger er ikke længere med i kæden (CNAME www -> ghs.google.com er slettet med
+  // Jacobs ok). Før det var www en Workers-rute oven på Bloggers DNS-post.
+  // Fortryd: læg CNAME www -> ghs.google.com (proxied) ind igen i Cloudflare DNS,
+  // skift til "routes": [{ "pattern": "www.techmediaarch.com/*", "zone_name":
+  // "techmediaarch.com" }] og kør "npx wrangler deploy" — så svarer Blogger igen.
+  // techmediaarch.com uden www sendes til www af Cloudflare-reglen "Apex to www
+  // (replaces Blogger redirect)" under Rules → Redirect Rules (301, søgedelen bevares).
+  // Domænet uden www har kun en "tom" DNS-post (AAAA 100::, proxied), så reglen kan svare.
+  // Læg IKKE www-domænet eller en rute på techmediaarch.com: den ville servere filerne
+  // uden omdirigering.
   "routes": [
-    { "pattern": "www.techmediaarch.com/*", "zone_name": "techmediaarch.com" }
+    { "pattern": "www.techmediaarch.com", "custom_domain": true }
   ],
   "preview_urls": false,
   "observability": { "enabled": true }
