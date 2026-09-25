@@ -15,6 +15,8 @@
 //     i Bloggers format (worker/index.js).
 import MainLayout from '../../layouts/MainLayout.astro';
 import '../../styles/blogger-watch.css';
+// Temaets tre kort-regler ordret, uden om Vites CSS-behandling (se filen)
+import raaRegler from '../../styles/blogger-watch-raa.css?raw';
 import { SIDER } from '../../lib/indhold';
 const s = SIDER.find((x) => x.navn === 'watch');
 if (!s) throw new Error('Watch-siden mangler i src/content/pages');
@@ -46,6 +48,7 @@ if (!s) throw new Error('Watch-siden mangler i src/content/pages');
     }
     @media (max-width: 768px) { .tma-blogger-scope { padding: 20px 0 10px; } }
   </style>
+  <style is:inline set:html={raaRegler} />
   {/* .tma-pb svarer til temaets .post-body (se src/styles/blogger-watch.css) */}
   <div class="tma-blogger-scope"><div class="tma-pb" set:html={s.html} /></div>
 </MainLayout>

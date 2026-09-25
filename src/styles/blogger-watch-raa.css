@@ -1,0 +1,9 @@
+/* Temaets tre regler for Watch-kortene, ordret (inkl. de mærkelige "&#160;").
+   De VIRKER faktisk: "&#160;" slutter på et semikolon, så browseren smider kun
+   det stykke væk og læser resten af reglen. Derfor er de med, ordret.
+   Filen hentes som rå tekst (?raw) og sættes ind i siden uden om Vite: både
+   esbuild (Astro 6) og Lightning CSS (Astro 7) "retter" eller afviser reglerne,
+   og så ville de ikke længere være de samme som på Blogger. */
+:where(.tma-blogger-scope) .watch-card {&#160; background:var(--content-bg,#fff);&#160; border-radius:8px;&#160; box-shadow:0 4px 6px rgba(0,0,0,0.1);&#160; overflow:hidden;&#160; text-decoration:none!important;&#160; transition:transform 0.2s;&#160; display:flex;&#160; flex-direction:column}
+:where(.tma-blogger-scope) .watch-card:hover {transform:translateY(-5px)}
+:where(.tma-blogger-scope) #dynamic-watch-grid {&#160; &#160; display:grid!important;&#160; &#160; visibility:visible!important;&#160; &#160; opacity:1!important;&#160; &#160; height:auto!important;&#160; &#160; min-height:200px!important}
