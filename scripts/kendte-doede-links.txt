@@ -1,0 +1,35 @@
+# Interne links i indholdet, som ALLEREDE var døde på Blogger (målt 24/9-2026: 404 på www.techmediaarch.com).
+# De er ikke skabt af flytningen. Kontrollen (tjek-site.mjs) melder dem som kendte, ikke som fejl.
+# Rettes de i indholdet, skal linjen fjernes her.
+/2024/08/Artificial%20Intelligence%20AI%20is%20transforming%20our%20world.html
+/2024/09/blog-post_324.html
+/2024/10/%20shocks%20again%20claude%20%20alexa%20smarter%20robots%20openai%20asi%20llama%203-2%20%20more.html
+/2024/08/blog-post.html
+/2024/10/nvida%20ai%20predicts%20that%20ai%20will%20be%20able%20to%20do%20some%20jobs%20.html
+/2024/10/Aave%20launch%20on%20ethereum%20imminent%20world%20liberty%20financial%20takes%20the%20lead.html
+/2026/04/denmarks-big-breakup-why-theyre.html
+/2024/10/the%20coming%20wave%20how%20ai%20will%20change%20everything%20%20fm%20camp%202024.html
+/2024/10/how%20trust%20in%20ai%20systems%20in%20companies%20can%20build%20trust.html
+/2024/10/the%20359%20companies%20success%20and%20profit.html
+/2024/10/meta%20unveils%20revolutionary%20ai%20video%20marketing.html
+/2024/09/eToro%20US%20Pays%20the%20Price.html
+/2024/09/blog-post_25.html
+/2024/09/The%20AI%20Advantage%20How%20Financial%20Services%20using%20AI.html
+/2024/09/Staying%20Ahead%20of%20Scammers%20scam%20detector%20validator%20tool.html
+/2024/09/IFA%202024%20The%20Hottest%20Gadget%20Announcements%20You%20Need%20to%20Know.html
+/share-widget?w=poi
+/2026/03/how-to-embed-youtube-videos.html
+/2025/01/the%20future%20of%20ai%20microsoft%20and%20openai%20strengthen%20partnership.html
+/2025/01/open%20source%20chatbot%20revolution%20china%20takes%20on%20the%20tech%20giants.html
+/2025/01/market%20insights%20trumps%20stargate%20and%20ais%20rising%20tide.html
+/2025/01/how%20artificial%20intelligence%20can%20enhance%20your%20cybersecurity%20strategy.html
+/2025/01/chinas%20deepseek%20ai%20models%20send%20shockwaves%20through%20tech%20community.html
+/2024/10/wildfire%20of%20growth%20teslas%20energy%20storage.html
+/2024/10/ted%20ai%20conference%20shock%20ai%20expert%20claims%2020%20seconds%20of%20human.html
+/2024/10/breaking%20cybersecurity%20news%20in%20cybersecurity%20ai%20attacks.html
+/2024/09/blog-post_357.html
+/2024/09/blog-post_20.html
+/2024/09/Lightweight%20AR%20prototype%20on%20the%20Horizon%20Meta%20Unveils%20100g%20Orion%20Prototype.html
+/2024/09/Bondora%20passive%20Income%20Invest%20in%20Loan%20Fractions%20and%20Earn%20Up%20to%206.75%20p.a..html
+/2024/09/Berlins%20Best%20Top%2010%20Futuristic%20Gadgets%20Unveiled%20at%20IFA%202024.html
+/2024/08/blog-post_12.html

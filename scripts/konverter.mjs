@@ -69,6 +69,17 @@ function retHtml(html, kilde) {
   // 2) Interne links bliver relative, så de virker på både testadressen og det rigtige domæne.
   h = h.replace(/(href\s*=\s*["'])https?:\/\/(?:www\.)?techmediaarch\.(?:com|blogspot\.com)(\/[^"']*)/gi, '$1$2');
 
+  // 2a) Links til Bloggers etiketsider for menuens emner peger direkte på den nye
+  //     emneside (ellers ville hvert klik tage en omdirigering via workeren).
+  const MENU = ['AI', 'Tech', 'Data', 'DevOps', 'Dev', 'It', 'Design', 'Marketing', 'Product', 'Fintech', 'Crypto', 'Web3', 'Infosec', 'Vlog'];
+  h = h.replace(/href=(["'])\/search\/label\/([^"'?#]+)\1/g, (m, q, label) =>
+    MENU.includes(decodeURIComponent(label)) ? `href=${q}/topic/${decodeURIComponent(label).toLowerCase()}.html${q}` : m);
+
+  // 2b) Feed-kald i sidernes JavaScript (Watch-siden) peger på domænet med fuld
+  //     adresse. Relativ adresse rammer workerens feed-efterligning på både
+  //     testadressen og det rigtige domæne.
+  h = h.replace(/https?:\/\/(?:www\.)?techmediaarch\.com\/feeds\//gi, '/feeds/');
+
   // 3) Bloggers indholdsfortegnelse (mbtTOC2) byggede sig selv med temaets script,
   //    som ikke findes på det nye site. Skabelonen laver i stedet en rigtig
   //    indholdsfortegnelse ud fra overskrifterne, så pladsholder og kald fjernes.
@@ -91,6 +102,21 @@ function tekstUdsnit(html, max = 155) {
   if (tekst.length <= max) return tekst;
   return tekst.slice(0, max).replace(/\s+\S*$/, '').replace(/[.,;:!?—-]+$/, '') + '…';
 }
+
+// Bloggers søgebeskrivelse pr. indlæg/side (blogger:metaDescription) fra Google Takeout,
+// hvis <eksportmappe>/takeout-feed.atom findes. Det er den, Blogger viste Google.
+const xmlTekst = (s) => s.replace(/&#(\d+);/g, (m, n) => String.fromCodePoint(+n)).replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCodePoint(parseInt(n, 16)))
+  .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+const TAKEOUT = new Map();
+const takeoutFil = path.join(EKSPORT, 'takeout-feed.atom');
+if (fs.existsSync(takeoutFil)) {
+  for (const [, e] of fs.readFileSync(takeoutFil, 'utf8').matchAll(/<entry>([\s\S]*?)<\/entry>/g)) {
+    const fil = (e.match(/<blogger:filename>([^<]*)<\/blogger:filename>/) || [])[1];
+    const md = (e.match(/<blogger:metaDescription>([^<]*)<\/blogger:metaDescription>/) || [])[1];
+    if (fil && md && md.trim()) TAKEOUT.set(fil, xmlTekst(md).trim());
+  }
+}
+const takeoutBeskrivelse = (url) => TAKEOUT.get(decodeURI(url.replace(SITE, ''))) || TAKEOUT.get(url.replace(SITE, '')) || null;
 
 // Bloggers egen metabeskrivelse, læst fra den gemte side (sider/…html), hvis den findes
 function gemtBeskrivelse(url) {
@@ -130,7 +156,7 @@ for (const p of udvalgte) {
   const billede = foersteBillede(body);
   const data = {
     title: p.title.$t.trim(),
-    description: gemtBeskrivelse(url) || tekstUdsnit(body),
+    description: takeoutBeskrivelse(url) || gemtBeskrivelse(url) || tekstUdsnit(body),
     published: p.published.$t,
     updated: p.updated.$t,
     labels: (p.category || []).map((c) => c.term),
@@ -152,7 +178,7 @@ for (const p of pages) {
   const body = retHtml(p.content.$t, 'p/' + navn);
   const data = {
     title: p.title.$t.trim(),
-    description: gemtBeskrivelse(url) || tekstUdsnit(body),
+    description: takeoutBeskrivelse(url) || gemtBeskrivelse(url) || tekstUdsnit(body),
     published: p.published.$t,
     updated: p.updated.$t,
     bloggerId: p.id.$t.split('page-').pop(),
@@ -169,6 +195,7 @@ if (MED_BILLEDER) {
   }
 }
 
+console.log(`søgebeskrivelser fra Takeout: ${TAKEOUT.size}`);
 console.log(`indlæg skrevet: ${antal} af ${udvalgte.length}, sider: ${antalSider} af ${pages.length}, billeder brugt: ${brugteBilleder.size}${MED_BILLEDER ? ' (kopieret)' : ''}`);
 fs.writeFileSync(path.join(ROD, 'scripts/billeder-brugt.json'), JSON.stringify([...brugteBilleder].sort(), null, 1));
 if (advarsler.length) { console.log(`advarsler (${advarsler.length}):`); advarsler.slice(0, 40).forEach((a) => console.log('  ' + a)); }

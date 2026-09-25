@@ -1,0 +1,51 @@
+---
+// Watch-siden (/p/watch.html) — skal se ud og opføre sig PRÆCIS som på Blogger.
+//
+// Derfor vises Bloggers indhold (HTML, CSS og JavaScript) helt uændret. Det eneste,
+// denne skabelon gør, er at give indholdet de omgivelser, det var skrevet til:
+//  1. Temaets regler for indholdsfeltet (src/styles/blogger-watch.css) og temaets CSS-variabler (farver, skrift, bredde) — målt i det gamle tema.
+//     Sitets egne variabler med samme navn nulstilles inde i Watch-området, så
+//     indholdets egne reserveværdier gælder, som på Blogger.
+//  2. Beholderen: på Blogger trak den sig ud til hele vinduets bredde (100vw) og
+//     35 px op under menuen. Med sidemenuen her ville den stikke ud over kanten,
+//     så den holdes i sin kolonne (højst 970 px, som temaets --container).
+//  3. Mørk tilstand: temaet brugte klassen html.is-dark — den sættes nu af
+//     skabelonen samtidig med sitets egen (se MainLayout).
+//  4. Videoerne hentes som før fra /feeds/posts/default/-/Video — workeren svarer
+//     i Bloggers format (worker/index.js).
+import MainLayout from '../../layouts/MainLayout.astro';
+import '../../styles/blogger-watch.css';
+import { SIDER } from '../../lib/indhold';
+const s = SIDER.find((x) => x.navn === 'watch');
+if (!s) throw new Error('Watch-siden mangler i src/content/pages');
+---
+<MainLayout title={s.title} description={s.description} breadcrumb={[{ navn: s.title, href: s.href }]}>
+  <style is:global>
+    .tma-blogger-scope {
+      /* Temaets værdier (Blogger-temaet, :root) */
+      --accent-color: #3669e9; --body-font: Arial, Tahoma, Helvetica, FreeSans, sans-serif, sans-serif;
+      --title-font: Arial, Tahoma, Helvetica, FreeSans, sans-serif, sans-serif; --title-weight: 700;
+      --text-font: Arial, Tahoma, Helvetica, FreeSans, sans-serif, sans-serif;
+      --border-color: #c7d2fe; --gray-bg: #eef2ff; --outer-bg: #ffffff; --radius: 0.5rem;
+      --rgba-0d: #1118270d; --rgba-33: #11182733; --summary-color: #6b7280; --text-color: #4b5563;
+      --title-color: #4c4d4e; --white-color: #ffffff; --container: 60.625rem;
+      /* Sitets egne variabler, som indholdet ikke kendte: nulstilles */
+      --card-bg: initial; --hover-bg: initial;
+      font-family: var(--body-font); color: var(--text-color); font-size: .875rem; line-height: 1.25rem;
+      max-width: 60.625rem; margin: 0 auto; padding: 35px 0 20px; box-sizing: border-box; width: 100%;
+    }
+    html.is-dark .tma-blogger-scope {
+      --accent-color: #3669e9; --border-color: rgba(255,255,255,0.30); --gray-bg: rgba(255,255,255,0.15);
+      --outer-bg: #000000; --summary-color: #d0d1da; --text-color: #d0d1da; --title-color: #f8f9fb;
+    }
+    @media (max-width: 1043px) { .tma-blogger-scope { --container: 100%; } }
+    /* Beholderen holdes i sin kolonne (se punkt 2 øverst) */
+    body .tma-blogger-scope .watch-library-container {
+      width: 100% !important; max-width: 100% !important; left: auto !important;
+      transform: none !important; margin-top: 0 !important;
+    }
+    @media (max-width: 768px) { .tma-blogger-scope { padding: 20px 0 10px; } }
+  </style>
+  {/* .tma-pb svarer til temaets .post-body (se src/styles/blogger-watch.css) */}
+  <div class="tma-blogger-scope"><div class="tma-pb" set:html={s.html} /></div>
+</MainLayout>

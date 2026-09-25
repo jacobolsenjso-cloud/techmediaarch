@@ -1,0 +1,103 @@
+/* Blogger-temaets regler for indholdsfeltet (.post-body) og annoncefelter, flyttet
+   ordret fra det gamle tema og afgrænset til Watch-siden (:where(.tma-blogger-scope) .tma-pb).
+   :where() betyder, at afgrænsningen ikke gør reglerne stærkere end på Blogger —
+   ellers ville de vinde over Watch-sidens egne regler, som de tabte til før.
+   Hvorfor: Watch-sidens eget indhold var skrevet til at stå inde i temaets .post-body
+   og arver skriftstørrelse, afstande og farver derfra. Uden disse regler ville siden
+   se anderledes ud end på Blogger.
+   Genereret fra den gemte Watch-side 24/9-2026. Regler med "&#160;" INDE I SELVE
+   SELEKTOREN er udeladt — dér gør de selektoren ugyldig, så de gjorde intet på Blogger. */
+:where(.tma-blogger-scope) ins.adsbygoogle { display:block!important;min-width:250px!important;min-height:50px!important;height:auto!important;width:100%!important;overflow:visible!important;background-color:#f8f9fa;border-radius:4px }
+:where(.tma-blogger-scope) .tma-pb img { opacity:1!important;visibility:visible!important;display:block!important;transition:none!important;transform:none!important }
+@media screen and (max-width:768px) { :where(.tma-blogger-scope) .adsbygoogle { width:100%!important;max-width:100vw!important;display:block!important } }
+html.is-dark :where(.tma-blogger-scope) .tma-pb { color:var(--title-color,#f8f9fb)!important }
+:where(.tma-blogger-scope) .tma-pb { font-family:var(--text-font) }
+:where(.tma-blogger-scope) .tma-pb a { color:var(--accent-color) }
+:where(.tma-blogger-scope) .tma-pb .btn.share:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.contact:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb table thead th { color:var(--title-color) }
+:where(.tma-blogger-scope) .tma-pb .contact-form-widget .cf-s { font-size:1rem }
+:where(.tma-blogger-scope) .tma-pb .button:not([disabled]):hover { opacity:.9 }
+:where(.tma-blogger-scope) .tma-pb .btn.continue:before { content:"" }
+:where(.tma-blogger-scope) .rtl .tma-pb .btn.continue:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.x2:before { font-size:1.25rem }
+:where(.tma-blogger-scope) .tma-pb h2 { font-size:1.875rem }
+:where(.tma-blogger-scope) .tma-pb .button { display:inline-block }
+:where(.tma-blogger-scope) .tma-pb { position:relative;font-size:1rem;color:var(--text-color);line-height:1.5em }
+:where(.tma-blogger-scope) .tma-pb p { margin-bottom:1.5rem }
+:where(.tma-blogger-scope) .tma-pb h1, :where(.tma-blogger-scope) .tma-pb h2, :where(.tma-blogger-scope) .tma-pb h3, :where(.tma-blogger-scope) .tma-pb h4 { font-size:1.125rem;color:var(--title-color);line-height:1.35em;margin:0 0 1rem }
+:where(.tma-blogger-scope) .tma-pb h1 { font-size:2.25rem }
+:where(.tma-blogger-scope) .tma-pb h3 { font-size:1.5rem }
+:where(.tma-blogger-scope) .tma-pb img { height:auto!important;border-radius:var(--radius) }
+:where(.tma-blogger-scope) .tma-pb ol, :where(.tma-blogger-scope) .tma-pb ul { padding:0 0 0 1.5rem;margin:0 }
+:where(.tma-blogger-scope) .tma-pb li+li, :where(.tma-blogger-scope) .tma-pb ol ol, :where(.tma-blogger-scope) .tma-pb ol ul, :where(.tma-blogger-scope) .tma-pb ul ol, :where(.tma-blogger-scope) .tma-pb ul ul { margin:.75rem 0 0 }
+:where(.tma-blogger-scope) .tma-pb ol li, :where(.tma-blogger-scope) .tma-pb ul li { list-style:none }
+:where(.tma-blogger-scope) .tma-pb ul li:before { content:"";font-size:.375rem;line-height:1rem;vertical-align:middle;margin:0 .375rem 0 0 }
+:where(.tma-blogger-scope) .tma-pb ul li ul li:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb ol { counter-reset:pbt }
+:where(.tma-blogger-scope) .tma-pb ol>li { counter-increment:pbt;list-style:none }
+:where(.tma-blogger-scope) .tma-pb ol>li:before { content:counters(pbt,".") ".";font-family:inherit;font-size:1em;margin:0 .375em 0 0 }
+:where(.tma-blogger-scope) .tma-pb a:hover, :where(.tma-blogger-scope) .tma-pb u { text-decoration:underline }
+:where(.tma-blogger-scope) .tma-pb strike { text-decoration:line-through }
+:where(.tma-blogger-scope) .tma-pb sup { vertical-align:super }
+:where(.tma-blogger-scope) .tma-pb .button { height:2.5rem;background:var(--btn-bg);font-family:var(--body-font);font-size:1rem;color:var(--btn-color);line-height:2.5rem;text-decoration:none!important;cursor:pointer;padding:0 1.5rem;margin:0 .5rem .5rem 0 }
+:where(.tma-blogger-scope) .tma-pb .button.x2 { height:3rem;font-size:1rem;line-height:3rem }
+:where(.tma-blogger-scope) .tma-pb .button.is-c, :where(.tma-blogger-scope) .rtl.tma-pb .button.is-c { margin:0 .25rem .5rem }
+:where(.tma-blogger-scope) .tma-pb .button[disabled] { opacity:.5 }
+:where(.tma-blogger-scope) .tma-pb .button.color { color:var(--white-color) }
+:where(.tma-blogger-scope) .tma-pb .button.color:focus { box-shadow:0 0 0 2px var(--border-color) }
+:where(.tma-blogger-scope) .tma-pb .button.x2 span { display:inline-block;background:rgb(255 255 255 / 5%);font-size:.875rem;line-height:1;padding:.25rem .5rem;margin:0 0 0 1.5rem;border-radius:var(--radius) }
+:where(.tma-blogger-scope) .tma-pb .button:before { font-style:normal;vertical-align:middle;line-height:1;margin:0 .5rem 0 0 }
+:where(.tma-blogger-scope) .tma-pb .btn.preview:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.download:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.link:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.cart:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.info:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.phone:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.gift:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.whatsapp:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.paypal:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb .btn.telegram:before { content:"" }
+:where(.tma-blogger-scope) .tma-pb table { width:100%;overflow-x:auto;text-align:left;border-collapse:collapse;border:1px solid var(--border-color) }
+:where(.tma-blogger-scope) .tma-pb table td, :where(.tma-blogger-scope) .tma-pb table th { padding:.5rem 1rem;border:1px solid var(--border-color) }
+:where(.tma-blogger-scope) .tma-pb .contact-form-widget { display:table;width:100%;font-family:var(--body-font) }
+:where(.tma-blogger-scope) .tma-pb .contact-form-form { grid-template-columns:repeat(2,minmax(0,1fr)) }
+:where(.tma-blogger-scope) .tma-pb .contact-form-button, :where(.tma-blogger-scope) .tma-pb .contact-form-email-message, :where(.tma-blogger-scope) .tma-pb .contact-form-form p { grid-column:1/3 }
+:where(.tma-blogger-scope) .tma-pb pre { display:block;background:var(--gray-bg);font-family:monospace;font-size:.875rem;color:var(--title-color);white-space:pre-wrap;line-height:1.25rem;padding:1.5rem;border:1px solid var(--border-color);border-radius:var(--radius) }
+:where(.tma-blogger-scope) .tma-pb .google-auto-placed { margin:1.5rem 0 }
+:where(.tma-blogger-scope) ins.adsbygoogle-noablate[data-anchor-shown="true"] { z-index:990!important }
+@media (max-width:42.5rem) { :where(.tma-blogger-scope) .tma-pb table { display:block } }
+:where(.tma-blogger-scope) .tma-pb img { border-radius:10px!important;overflow:hidden!important }
+:where(.tma-blogger-scope) .tma-pb img { height:auto;width:100%;aspect-ratio:16/9 }
+:where(.tma-blogger-scope) .tma-pb img { width:100%!important;height:auto!important;max-height:800px!important;object-fit:contain!important;border-radius:10px!important;margin:2.5rem auto!important;display:block!important }
+@media screen and (max-width:980px) { :where(.tma-blogger-scope) .tma-pb p.affiliate-disclaimer, :where(.tma-blogger-scope) .tma-pb>p.affiliate-disclaimer:first-child { background-color:var(--gray-bg)!important;color:var(--summary-color)!important;font-size:0.85rem!important;font-style:italic!important;padding:16px 20px!important;border-radius:8px!important;margin-top:30px!important;margin-bottom:30px!important;border:1px dashed var(--border-color)!important;border-left:1px dashed var(--border-color)!important;box-shadow:none!important;background-image:none!important;text-align:left!important } }
+@media screen and (max-width:980px) { :where(.tma-blogger-scope) .tma-pb p.affiliate-disclaimer::before, :where(.tma-blogger-scope) .tma-pb>p.affiliate-disclaimer:first-child::before { display:none!important;content:none!important } }
+@media screen and (max-width:980px) { :where(.tma-blogger-scope) .tma-pb p.affiliate-disclaimer strong { font-weight:700!important;color:var(--title-color)!important;font-style:normal!important } }
+:where(.tma-blogger-scope) .tma-pb { display:block!important;clear:both!important;width:100%!important;max-width:100%!important;word-break:break-word!important;overflow-wrap:break-word!important }
+:where(.tma-blogger-scope) .tma-pb p, :where(.tma-blogger-scope) .tma-pb>ul, :where(.tma-blogger-scope) .tma-pb>ol { margin-bottom:25px!important;line-height:1.8!important;font-size:18px!important }
+:where(.tma-blogger-scope) .tma-pb h2, :where(.tma-blogger-scope) .tma-pb h3 { margin-top:50px!important;margin-bottom:20px!important;line-height:1.4!important;font-weight:700!important;display:block!important;clear:both!important }
+:where(.tma-blogger-scope) .adsbygoogle { background:transparent!important }
+:where(.tma-blogger-scope) .adsbygoogle[data-ad-status="unfilled"] { display:none!important }
+:where(.tma-blogger-scope) .adsbygoogle { display:block!important;min-height:280px;background:rgba(0,0,0,0.03);text-align:center }
+
+/* Temaets generelle nulstilling af boksmodel og formularfelter. Skrevet med :where()
+   så de har specificitet 0 — Watch-sidens egne regler vinder altid, som på Blogger. */
+:where(.tma-blogger-scope) :where(*, *::before, *::after) { box-sizing: border-box; }
+:where(.tma-blogger-scope) :where(button, input, select, textarea) { background: transparent; font-family: var(--body-font); font-weight: 400; appearance: none; outline: 0; border: 0; border-radius: 0; }
+:where(.tma-blogger-scope) :where(button) { cursor: pointer; }
+:where(.tma-blogger-scope) input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
+/* Temaets øvrige grundregler for elementer (samme :where()-princip) */
+:where(.tma-blogger-scope) :where(dl, ul, ul li) { list-style: none; }
+:where(.tma-blogger-scope) :where(img) { width: auto; max-width: 100%; height: auto; border: 0; display: inline-block; content-visibility: auto; }
+:where(.tma-blogger-scope) :where(img, iframe, embed, object, video) { max-width: 100% !important; }
+:where(.tma-blogger-scope) :where(a, a:visited, abbr) { text-decoration: none; }
+:where(.tma-blogger-scope) :where(h1, h2, h3, h4) { font-family: var(--title-font); font-weight: var(--title-weight); }
+:where(.tma-blogger-scope) :where(svg) { display: inline-block; width: 1em; height: 1em; font-size: 1em; line-height: 1; overflow: visible; }
+:where(.tma-blogger-scope) :where(blockquote) { background: var(--gray-bg); margin: 0; }
+
+/* Temaets tre regler for Watch-kortene, ordret (inkl. de mærkelige "&#160;").
+   De VIRKER faktisk: "&#160;" slutter på et semikolon, så browseren smider kun
+   det stykke væk og læser resten af reglen. Derfor er de med, ordret. */
+:where(.tma-blogger-scope) .watch-card {&#160; background:var(--content-bg,#fff);&#160; border-radius:8px;&#160; box-shadow:0 4px 6px rgba(0,0,0,0.1);&#160; overflow:hidden;&#160; text-decoration:none!important;&#160; transition:transform 0.2s;&#160; display:flex;&#160; flex-direction:column}
+:where(.tma-blogger-scope) .watch-card:hover {transform:translateY(-5px)}
+:where(.tma-blogger-scope) #dynamic-watch-grid {&#160; &#160; display:grid!important;&#160; &#160; visibility:visible!important;&#160; &#160; opacity:1!important;&#160; &#160; height:auto!important;&#160; &#160; min-height:200px!important}

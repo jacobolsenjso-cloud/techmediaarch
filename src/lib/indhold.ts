@@ -6,6 +6,7 @@
 // ændre i HTML'en.
 import { parse } from 'yaml';
 import { EMNER, type Emne } from './emner';
+import { temaKoder, youtubeLazy } from './temakoder.mjs';
 
 export interface Indlaeg {
   aar: string; maaned: string; navn: string;
@@ -15,13 +16,15 @@ export interface Indlaeg {
   published: string; updated: string;
   labels: string[]; emner: Emne[];
   image: string | null;
+  bloggerId: string;
   html: string;
+  feedHtml: string;     // indholdet præcis som i Blogger-eksporten — til /feeds/-svarene
   overskrifter: { niveau: number; tekst: string; id: string }[];
   minutter: number;
 }
 export interface Side {
   navn: string; sti: string; href: string;
-  title: string; description: string; published: string; updated: string; html: string;
+  title: string; description: string; published: string; updated: string; html: string; feedHtml: string; bloggerId: string;
 }
 
 function del(raa: string) {
@@ -65,7 +68,9 @@ const sideFiler = import.meta.glob('/src/content/pages/*.md', { query: '?raw', i
 
 export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => {
   const [, aar, maaned, navn] = fil.match(/\/posts\/(\d{4})\/(\d{2})\/(.+)\.md$/)!;
-  const { data, body } = del(raa);
+  const { data, body: raaBody } = del(raa);
+  // Blogger-temaets genvejskoder ({getButton} m.fl.) og YouTube-rammer vises som på Blogger — se temakoder.mjs
+  const body = youtubeLazy(temaKoder(raaBody));
   const { html, liste } = overskrifter(body);
   const labels: string[] = data.labels || [];
   const sti = `/${aar}/${maaned}/${navn}.html`;
@@ -75,18 +80,20 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
     published: data.published, updated: data.updated || data.published,
     labels, emner: EMNER.filter((e) => labels.includes(e.navn)),
     // Uden eget billede bruges miniaturen af den første indlejrede YouTube-video
-    image: data.image || youtubeBillede(body),
-    html, overskrifter: liste, minutter: minutter(body),
+    image: data.image || youtubeBillede(raaBody),
+    bloggerId: String(data.bloggerId || ''),
+    html, feedHtml: raaBody, overskrifter: liste, minutter: minutter(body),
   };
 // Sorteres som tidspunkter, ikke som tekst: datoerne har forskellig tidszone (+01:00/+02:00)
 }).sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime());
 
 export const SIDER: Side[] = Object.entries(sideFiler).map(([fil, raa]) => {
   const navn = fil.match(/\/pages\/(.+)\.md$/)![1];
-  const { data, body } = del(raa);
+  const { data, body: raaBody } = del(raa);
+  const body = youtubeLazy(temaKoder(raaBody));
   const sti = `/p/${navn}.html`;
   return { navn, sti, href: kodet(sti), title: data.title, description: data.description || '',
-    published: data.published, updated: data.updated || data.published, html: body };
+    published: data.published, updated: data.updated || data.published, html: body, feedHtml: raaBody, bloggerId: String(data.bloggerId || '') };
 });
 
 export const iEmne = (e: Emne) => INDLAEG.filter((p) => p.emner.some((x) => x.slug === e.slug));

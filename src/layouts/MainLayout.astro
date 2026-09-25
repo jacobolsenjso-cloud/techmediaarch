@@ -54,7 +54,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {/* Mørk tilstand sættes FØR siden tegnes, så der ikke blinker en hvid side. */}
     <script is:inline>
-      (function () { try { if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode-preload'); } catch (e) {} })();
+      (function () { try { if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode-preload', 'is-dark'); } catch (e) {} })();
     </script>
     <style is:inline>
       html.dark-mode-preload { background: #141317; color-scheme: dark; }
@@ -94,7 +94,8 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
     <meta name="twitter:title" content={title || fuldTitel} />
     <meta name="twitter:description" content={desc} />
     <meta name="twitter:image" content={ogImage} />
-    {schemaListe.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+    {/* "<" skrives som \u003c, så HTML i data (fx FAQ-svar) aldrig kan lukke script-tagget */}
+    {schemaListe.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s).replace(/</g, '\\u003c')} />)}
     {currentPath !== '/' && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />}
     {currentPath === '/' && <script type="application/ld+json" set:html={JSON.stringify(siteSchema)} />}
 
@@ -107,8 +108,9 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       body.dark-mode [style*="#1e3a8a"] { --tag-accent: #6d9eff; }
       body { background: var(--bg-color); color: var(--text-color); margin: 0; font-family: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
       * { -webkit-tap-highlight-color: transparent; }
-      h1, h2, h3, h4 { letter-spacing: -0.02em; }
-      a { transition: color 0.15s ease, opacity 0.15s ease; }
+      /* Ikke inde i Watch-siden: den skal se ud som på Blogger (se p/watch.astro) */
+      :where(h1, h2, h3, h4):not(:where(.tma-blogger-scope *)) { letter-spacing: -0.02em; }
+      :where(a):not(:where(.tma-blogger-scope *)) { transition: color 0.15s ease, opacity 0.15s ease; }
       ::selection { background: rgba(8, 145, 178, 0.22); }
       :focus-visible { outline: 2px solid #0891b2; outline-offset: 2px; border-radius: 4px; }
       .tma-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, #0891b2, #22d3ee); z-index: 1100; transition: width 0.1s linear; pointer-events: none; box-shadow: 0 0 8px rgba(8, 145, 178, 0.5); }
@@ -215,20 +217,37 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .post-body a { color: var(--teal-text); text-decoration: none; font-weight: 600; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
       .post-body a:hover { border-bottom-color: var(--teal-text); }
       .post-body img { max-width: 100%; height: auto; border-radius: 10px; }
+      /* Knapper fra Blogger-temaets {getButton}-kode (se src/lib/temakoder.mjs) */
+      .post-body a.tma-knap { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.5rem; padding: 0.45rem 1.5rem; margin: 0.25rem 0; background: var(--teal-text); color: #fff; border: 0; border-radius: 8px; font-size: 1rem; font-weight: 600; line-height: 1.3; text-decoration: none; white-space: normal; }
+      .post-body a.tma-knap:hover { border: 0; filter: brightness(1.12); }
+      .post-body a.tma-knap span { white-space: normal !important; }
       .post-body .separator { text-align: center; margin: 1.2em 0; clear: both; }
       .post-body .separator a { border: 0; margin: 0 !important; }
       .post-body .tr-caption-container { margin: 1.5em auto; border-collapse: collapse; }
       .post-body .tr-caption-container td { border: 0; padding: 0; background: none; }
+      /* Mobil-overløb fra Blogger-HTML: Google Docs-tekst med white-space:pre (brydes aldrig),
+         svævende billeder der holder deres faste 640px-bredde. Teksten ændres ikke, kun ombrydningen. */
+      .post-body [style*="white-space: pre"]:not(pre) { white-space: pre-wrap !important; }
+      .post-body [style*="float"] { max-width: 100%; }
+      @media (max-width: 768px) { .post-body table.tr-caption-container { float: none !important; width: 100% !important; table-layout: fixed; margin-left: 0 !important; margin-right: 0 !important; } }
       .post-body .tr-caption { font-size: 0.85rem; color: var(--muted); padding-top: 8px !important; text-align: center; }
       .post-body hr { border: 0; border-top: 1px solid var(--border-color); margin: 2em 0; }
       .post-body blockquote { margin: 1.5em 0; padding: 14px 20px; border-left: 4px solid #0891b2; background: var(--hover-bg); border-radius: 0 8px 8px 0; font-size: 1rem; }
       .post-body blockquote p:last-child { margin-bottom: 0; }
-      .post-body table:not(.tr-caption-container) { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.93rem; line-height: 1.55; display: block; overflow-x: auto; }
+      .post-body table:not(.tr-caption-container) { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.93rem; line-height: 1.55; }
+      /* Mobil: brede tabeller ruller sidelæns i stedet for at sprænge siden */
+      @media (max-width: 768px) { .post-body table:not(.tr-caption-container) { display: block; overflow-x: auto; } }
       .post-body table:not(.tr-caption-container) th, .post-body table:not(.tr-caption-container) td { border: 1px solid var(--border-color); padding: 10px 12px; text-align: left; vertical-align: top; }
       .post-body table:not(.tr-caption-container) th { background: var(--hover-bg); font-weight: 700; }
       .post-body table:not(.tr-caption-container) tr:nth-child(even) td { background: color-mix(in srgb, var(--hover-bg) 55%, transparent); }
       .post-body table p { margin: 0; }
       .post-body iframe { max-width: 100%; border: 0; border-radius: 12px; }
+      /* YouTube som billede + afspilknap; selve afspilleren hentes ved klik (se temakoder.mjs) */
+      .post-body .yt-lazy { position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 1.5em 0; border-radius: 12px; overflow: hidden; background: #000 center / cover no-repeat; box-shadow: 0 8px 28px rgba(0,0,0,0.10); cursor: pointer; }
+      .post-body .yt-play-btn { position: absolute; top: 50%; left: 50%; width: 68px; height: 48px; transform: translate(-50%, -50%); border: 0; border-radius: 14px; background: rgba(33,33,33,0.8); cursor: pointer; transition: background 0.2s; }
+      .post-body .yt-play-btn::before { content: ""; position: absolute; top: 50%; left: 54%; transform: translate(-50%, -50%); border-style: solid; border-width: 11px 0 11px 19px; border-color: transparent transparent transparent #fff; }
+      .post-body .yt-lazy:hover .yt-play-btn, .post-body .yt-play-btn:focus-visible { background: #f00; }
+      .post-body .yt-lazy iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; margin: 0; }
       .post-body iframe[src*="youtube"] { width: 100%; height: auto; aspect-ratio: 16 / 9; display: block; margin: 1.5em 0; box-shadow: 0 8px 28px rgba(0,0,0,0.10); background: #000; }
       .post-body pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 0.88rem; line-height: 1.6; }
       .post-body code { font-size: 0.9em; }
@@ -406,6 +425,17 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
     <script is:inline>
       document.addEventListener('DOMContentLoaded', function () {
         var body = document.body;
+        // YouTube: afspilleren hentes først, når læseren klikker (som på Blogger)
+        document.addEventListener('click', function (e) {
+          var w = e.target.closest && e.target.closest('.yt-lazy');
+          if (!w || w.querySelector('iframe')) return;
+          var f = document.createElement('iframe');
+          f.src = 'https://www.youtube.com/embed/' + encodeURIComponent(w.getAttribute('data-yt')) + '?autoplay=1';
+          f.title = 'YouTube video';
+          f.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+          f.setAttribute('allowfullscreen', 'true');
+          w.innerHTML = ''; w.appendChild(f);
+        });
         // Mørk tilstand
         var themeBtn = document.getElementById('themeToggle');
         var updateIcon = function () { if (themeBtn) themeBtn.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌙'; };
@@ -414,6 +444,8 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
           var dark = body.classList.toggle('dark-mode');
           try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
           document.documentElement.classList.toggle('dark-mode-preload', dark);
+          // Blogger-indhold (Watch-siden) kender mørk tilstand som html.is-dark
+          document.documentElement.classList.toggle('is-dark', dark);
           updateIcon();
         });
 

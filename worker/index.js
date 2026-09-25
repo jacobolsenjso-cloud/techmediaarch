@@ -70,14 +70,60 @@ async function haandter(request, env) {
     const q = url.searchParams.get('q');
     return flyt(url, q ? `/search.html?q=${encodeURIComponent(q)}` : '/');
   }
-  // Feeds: /feeds/posts/default (også med ?alt=rss osv.) -> /rss.xml
-  if (sti.startsWith('/feeds/')) return flyt(url, '/rss.xml');
+  // Feeds: JSON-udgaven (alt=json / alt=json-in-script) efterlignes, så Watch- og
+  // Sitemap-siden virker uændret. Alt andet (feedlæsere, alt=rss) -> /rss.xml.
+  if (sti.startsWith('/feeds/')) {
+    const alt = url.searchParams.get('alt') || '';
+    if (alt === 'json' || alt === 'json-in-script') return bloggerFeed(url, sti, alt, env, request);
+    return flyt(url, '/rss.xml');
+  }
   // Månedsarkiver: /2024/10/ eller /2024/ -> forsiden
   if (/^\/\d{4}(\/\d{2})?\/?$/.test(sti)) return flyt(url, '/');
 
   // Ukendt adresse: vis 404-siden med den rigtige statuskode
   const side404 = await env.ASSETS.fetch(new Request(new URL('/404.html', url), request));
   return new Response(side404.body, { status: 404, headers: side404.headers });
+}
+
+
+// ---- Efterligning af Bloggers JSON-feed ----
+// Understøtter det, sidernes kode faktisk bruger: /feeds/posts/default, /feeds/posts/summary,
+// /feeds/pages/default, etiket-stien /-/Etiket, start-index, max-results og JSONP (callback).
+// Data er genereret ved buildet (src/pages/feed-data/*.json.ts).
+async function hentData(env, request, fil) {
+  const r = await env.ASSETS.fetch(new Request(new URL(fil, request.url), request));
+  return r.ok ? r.json() : [];
+}
+async function bloggerFeed(url, sti, alt, env, request) {
+  const m = sti.match(/^\/feeds\/(posts|pages)\/(default|summary)(?:\/-\/(.+?))?\/?$/);
+  if (!m) return new Response('Not found', { status: 404 });
+  const [, type, visning, label] = m;
+  let poster;
+  if (type === 'pages') poster = await hentData(env, request, '/feed-data/pages.json');
+  else if (label && label.toLowerCase() === 'video' && visning === 'default') poster = await hentData(env, request, '/feed-data/label-video.json');
+  else {
+    // Øvrige etiketter og /posts/default uden etiket: uden brødtekst (for store til at sende hele)
+    poster = await hentData(env, request, '/feed-data/posts-summary.json');
+    if (label) poster = poster.filter((p) => (p.category || []).some((c) => c.term === label));
+  }
+  const start = Math.max(1, parseInt(url.searchParams.get('start-index') || '1', 10) || 1);
+  const antal = Math.min(500, Math.max(1, parseInt(url.searchParams.get('max-results') || '25', 10) || 25));
+  const origin = url.origin;
+  const udsnit = poster.slice(start - 1, start - 1 + antal).map((p) => ({
+    ...p, link: (p.link || []).map((l) => ({ ...l, href: l.href.startsWith('/') ? origin + l.href : l.href })),
+  }));
+  const data = { version: '1.0', encoding: 'UTF-8', feed: {
+    'openSearch$totalResults': { $t: String(poster.length) },
+    'openSearch$startIndex': { $t: String(start) },
+    'openSearch$itemsPerPage': { $t: String(antal) },
+    entry: udsnit,
+  } };
+  const json = JSON.stringify(data);
+  const cb = url.searchParams.get('callback');
+  if (alt === 'json-in-script' && cb && /^[\w.$]+$/.test(cb)) {
+    return new Response(`// API callback\n${cb}(${json});`, { headers: { 'content-type': 'text/javascript; charset=UTF-8' } });
+  }
+  return new Response(json, { headers: { 'content-type': 'application/json; charset=UTF-8', 'access-control-allow-origin': '*' } });
 }
 
 export default {

@@ -8,6 +8,7 @@ import ArticleCard from '../../../components/ArticleCard.astro';
 import { INDLAEG, datoTekst } from '../../../lib/indhold';
 import { emneUrl } from '../../../lib/emner';
 import Maerke from '../../../components/Maerke.astro';
+import { faqSchema } from '../../../lib/faqschema.mjs';
 
 export function getStaticPaths() {
   return INDLAEG.map((p) => ({ params: { year: p.aar, month: p.maaned, slug: p.navn }, props: { p } }));
@@ -49,9 +50,11 @@ const schema = {
   publisher: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/icon-512.png' } },
   ...(p.labels.length ? { keywords: p.labels.join(', ') } : {}),
 };
+// FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs)
+const faq = faqSchema(p.html);
 const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
 ---
-<MainLayout title={p.title} description={p.description} image={p.image} schema={schema} ogType="article" breadcrumb={crumbs}>
+<MainLayout title={p.title} description={p.description} image={p.image} schema={faq ? [schema, faq] : schema} ogType="article" breadcrumb={crumbs}>
   <style is:global>
     .article-layout { display: flex; gap: 25px; max-width: 1200px; margin: 0 auto; padding: 30px 20px; box-sizing: border-box; align-items: flex-start; width: 100%; }
     .article-primary { flex: 1; min-width: 0; width: 100%; max-width: 100%; }

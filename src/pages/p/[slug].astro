@@ -1,22 +1,24 @@
 ---
 // Faste sider: /p/about-us.html osv. — samme adresser som på Blogger.
-// Indholdet vises ordret. OBS (trin 3): Watch- og Sitemap-siden henter i dag
-// data fra Bloggers feed med JavaScript; de bygges om, så de ser ud og virker som nu.
+// Indholdet vises ordret. Sitemap-siden henter sine data fra /feeds/… med
+// JavaScript; workeren svarer i Bloggers format (se worker/index.js).
 import MainLayout from '../../layouts/MainLayout.astro';
 import { SIDER } from '../../lib/indhold';
+import { faqSchema } from '../../lib/faqschema.mjs';
 
-// Bloggers egen 404-side (techmediaarchcomp404html) og security.txt-siden
-// genskabes som rigtige filer (/404.html og /.well-known/security.txt).
 export function getStaticPaths() {
   // (skal stå inde i funktionen: Astro kører getStaticPaths isoleret)
-  const UDELAD = new Set(['techmediaarchcomp404html']);
+  // Watch-siden har sin egen skabelon (p/watch.astro).
+  const UDELAD = new Set(['watch']);
   return SIDER.filter((s) => !UDELAD.has(s.navn)).map((s) => ({ params: { slug: s.navn }, props: { s } }));
 }
 const { s } = Astro.props;
 // Nogle sider har deres egen <h1> i indholdet — så skal skabelonen ikke lave en til
 const egenH1 = /<h1[\s>]/i.test(s.html);
+// FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs)
+const faq = faqSchema(s.html);
 ---
-<MainLayout title={s.title} description={s.description} breadcrumb={[{ navn: s.title, href: s.href }]}>
+<MainLayout title={s.title} description={s.description} schema={faq} noindex={s.navn === 'techmediaarchcomp404html'} breadcrumb={[{ navn: s.title, href: s.href }]}>
   <style is:global>
     .static-page { max-width: 860px; margin: 0 auto; padding: 30px 20px 10px; box-sizing: border-box; width: 100%; }
     .static-page h1.page-title { font-size: 2rem; line-height: 1.2; margin: 0 0 20px; }
