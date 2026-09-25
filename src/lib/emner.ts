@@ -6,7 +6,7 @@
 //
 // Farverne bruges som accent (prik, kant) — aldrig som tekst eller som baggrund
 // under hvid tekst, samme regel som på techfeedwatch.
-export interface Emne { navn: string; slug: string; farve: string; }
+export interface Emne { navn: string; slug: string; farve: string; egenMenu?: boolean; }
 
 export const EMNER: Emne[] = [
   { navn: 'AI', slug: 'ai', farve: '#06b6d4' },
@@ -23,7 +23,14 @@ export const EMNER: Emne[] = [
   { navn: 'Web3', slug: 'web3', farve: '#059669' },
   { navn: 'Infosec', slug: 'infosec', farve: '#dc2626' },
   { navn: 'Vlog', slug: 'vlog', farve: '#d926c8' },
+  // "Resources" var sit eget menupunkt på Blogger (mega-menu med etiketten Resources),
+  // ikke en af kategorierne — derfor egenMenu: den får en emneside, men står ikke
+  // under "Topics" og ikke blandt emne-chipsene.
+  { navn: 'Resources', slug: 'resources', farve: '#0891b2', egenMenu: true },
 ];
+
+// Emnerne under "Topics" og i emne-chipsene (Bloggers "Categories")
+export const KATEGORIER = EMNER.filter((e) => !e.egenMenu);
 
 export const emneFraNavn = (navn: string) => EMNER.find((e) => e.navn === navn);
 export const emneFraSlug = (slug: string) => EMNER.find((e) => e.slug === slug);

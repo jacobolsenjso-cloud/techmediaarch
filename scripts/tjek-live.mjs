@@ -58,6 +58,8 @@ for (const s of ['/', '/images/15d326138cfb576f.png', '/rss.xml', '/findes-ikke-
 const forventet = [
   ['/search/label/AI', 301, '/topic/ai.html'],
   ['/search?q=claude', 301, '/search.html?q=claude'],
+  ['/search', 301, '/trending.html'],
+  ['/search/label/Resources', 301, '/topic/resources.html'],
   ['/feeds/posts/default', 301, '/rss.xml'],
   ['/2024/10/', 301, '/'],
   ['/findes-ikke-123.html', 404, null],

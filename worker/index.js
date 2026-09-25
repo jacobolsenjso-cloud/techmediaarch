@@ -13,7 +13,7 @@ const PROD = 'www.techmediaarch.com';
 const EMNER = {
   ai: 'ai', tech: 'tech', data: 'data', devops: 'devops', dev: 'dev', it: 'it',
   design: 'design', marketing: 'marketing', product: 'product', fintech: 'fintech',
-  crypto: 'crypto', web3: 'web3', infosec: 'infosec', vlog: 'vlog',
+  crypto: 'crypto', web3: 'web3', infosec: 'infosec', vlog: 'vlog', resources: 'resources',
 };
 
 function robots(host) {
@@ -65,10 +65,11 @@ async function haandter(request, env) {
     const slug = EMNER[label[1].toLowerCase()];
     return flyt(url, slug ? `/topic/${slug}.html` : '/');
   }
-  // Søgning: /search?q=x -> /search.html?q=x ; /search uden ord -> forsiden
+  // Søgning: /search?q=x -> /search.html?q=x ; /search uden ord -> /trending.html
+  // (på Blogger viste /search de nyeste indlæg — menupunkterne "Trending" og "Feed")
   if (sti === '/search' || sti.startsWith('/search/')) {
     const q = url.searchParams.get('q');
-    return flyt(url, q ? `/search.html?q=${encodeURIComponent(q)}` : '/');
+    return flyt(url, q ? `/search.html?q=${encodeURIComponent(q)}` : '/trending.html');
   }
   // Feeds: JSON-udgaven (alt=json / alt=json-in-script) efterlignes, så Watch- og
   // Sitemap-siden virker uændret. Alt andet (feedlæsere, alt=rss) -> /rss.xml.

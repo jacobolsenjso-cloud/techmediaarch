@@ -1,11 +1,11 @@
 ---
 // Emnerne som chips — samme pille-design som techfeedwatchs emnefilter, men som
 // links til emnesiderne (ingen filtrering i browseren).
-import { EMNER, emneUrl } from '../lib/emner';
+import { KATEGORIER, emneUrl } from '../lib/emner';
 import { iEmne } from '../lib/indhold';
 interface Props { aktiv?: string; }
 const { aktiv } = Astro.props;
-const emner = EMNER.map((e) => ({ e, n: iEmne(e).length })).filter((x) => x.n > 0);
+const emner = KATEGORIER.map((e) => ({ e, n: iEmne(e).length })).filter((x) => x.n > 0);
 ---
 <div class="chip-bar">
   <a href="/" class={`chip ${!aktiv ? 'active' : ''}`}>All</a>
