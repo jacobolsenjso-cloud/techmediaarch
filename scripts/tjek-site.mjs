@@ -11,7 +11,7 @@
 // Afslutter med kode 1, hvis noget fejler.
 import fs from 'node:fs';
 import path from 'node:path';
-import { temaKoder, RAA_KODE } from '../src/lib/temakoder.mjs';
+import { temaKoder, vandmaerke, RAA_KODE } from '../src/lib/temakoder.mjs';
 
 const EKS = process.argv[2];
 const DIST = path.resolve('dist');
@@ -42,9 +42,9 @@ for (const p of [...posts, ...pages]) {
   const m = side.match(/<article class="post-body"[^>]*>([\s\S]*?)<\/article>/);
   if (!m) { fejl.push(`INGEN brødtekst: ${sti}`); continue; }
   // Kilden minus det, konverteren bevidst fjerner (TOC-knap og feed-fodnote), og med
-  // temaets genvejskoder vist som på Blogger ({getButton} blev til en knap)
-  const kilde = tekst(temaKoder(p.content.$t.replace(/<div class=["']mbtTOC2["']>[\s\S]*?<div id=["']mbtTOC2["']><\/div>\s*<\/div>/gi, '')
-    .replace(/<div class=["']blogger-post-footer["']>[\s\S]*?<\/div>\s*$/i, '')));
+  // temaets genvejskoder og vandmærker vist som på Blogger ({getButton} blev til en knap)
+  const kilde = tekst(vandmaerke(temaKoder(p.content.$t.replace(/<div class=["']mbtTOC2["']>[\s\S]*?<div id=["']mbtTOC2["']><\/div>\s*<\/div>/gi, '')
+    .replace(/<div class=["']blogger-post-footer["']>[\s\S]*?<\/div>\s*$/i, ''))));
   const ny = tekst(m[1]);
   if (kilde === ny) tekstOk++;
   else {

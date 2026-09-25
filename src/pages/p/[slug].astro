@@ -16,7 +16,7 @@ const { s } = Astro.props;
 // Nogle sider har deres egen <h1> i indholdet — så skal skabelonen ikke lave en til
 const egenH1 = /<h1[\s>]/i.test(s.html);
 // FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs)
-const faq = faqSchema(s.html);
+const faq = faqSchema(s.faqHtml);
 ---
 <MainLayout title={s.title} description={s.description} schema={faq} noindex={s.navn === 'techmediaarchcomp404html'} breadcrumb={[{ navn: s.title, href: s.href }]}>
   <style is:global>

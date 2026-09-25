@@ -6,7 +6,7 @@
 // ændre i HTML'en.
 import { parse } from 'yaml';
 import { EMNER, type Emne } from './emner';
-import { temaKoder, youtubeLazy } from './temakoder.mjs';
+import { temaKoder, youtubeLazy, vandmaerke } from './temakoder.mjs';
 
 export interface Indlaeg {
   aar: string; maaned: string; navn: string;
@@ -19,12 +19,13 @@ export interface Indlaeg {
   bloggerId: string;
   html: string;
   feedHtml: string;     // indholdet præcis som i Blogger-eksporten — til /feeds/-svarene
+  faqHtml: string;      // indholdet før vandmærket — FAQ-data laves af det (som på Blogger)
   overskrifter: { niveau: number; tekst: string; id: string }[];
   minutter: number;
 }
 export interface Side {
   navn: string; sti: string; href: string;
-  title: string; description: string; published: string; updated: string; html: string; feedHtml: string; bloggerId: string;
+  title: string; description: string; published: string; updated: string; html: string; feedHtml: string; faqHtml: string; bloggerId: string;
 }
 
 function del(raa: string) {
@@ -71,7 +72,8 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
   const { data, body: raaBody } = del(raa);
   // Blogger-temaets genvejskoder ({getButton} m.fl.) og YouTube-rammer vises som på Blogger — se temakoder.mjs
   const body = youtubeLazy(temaKoder(raaBody));
-  const { html, liste } = overskrifter(body);
+  // Vandmærket på billederne (som Blogger-temaets script) — se temakoder.mjs
+  const { html, liste } = overskrifter(vandmaerke(body));
   const labels: string[] = data.labels || [];
   const sti = `/${aar}/${maaned}/${navn}.html`;
   return {
@@ -82,7 +84,7 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
     // Uden eget billede bruges miniaturen af den første indlejrede YouTube-video
     image: data.image || youtubeBillede(raaBody),
     bloggerId: String(data.bloggerId || ''),
-    html, feedHtml: raaBody, overskrifter: liste, minutter: minutter(body),
+    html, feedHtml: raaBody, faqHtml: body, overskrifter: liste, minutter: minutter(body),
   };
 // Sorteres som tidspunkter, ikke som tekst: datoerne har forskellig tidszone (+01:00/+02:00)
 }).sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime());
@@ -93,7 +95,7 @@ export const SIDER: Side[] = Object.entries(sideFiler).map(([fil, raa]) => {
   const body = youtubeLazy(temaKoder(raaBody));
   const sti = `/p/${navn}.html`;
   return { navn, sti, href: kodet(sti), title: data.title, description: data.description || '',
-    published: data.published, updated: data.updated || data.published, html: body, feedHtml: raaBody, bloggerId: String(data.bloggerId || '') };
+    published: data.published, updated: data.updated || data.published, html: vandmaerke(body), feedHtml: raaBody, faqHtml: body, bloggerId: String(data.bloggerId || '') };
 });
 
 export const iEmne = (e: Emne) => INDLAEG.filter((p) => p.emner.some((x) => x.slug === e.slug));

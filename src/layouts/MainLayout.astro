@@ -217,6 +217,12 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .post-body a { color: var(--teal-text); text-decoration: none; font-weight: 600; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
       .post-body a:hover { border-bottom-color: var(--teal-text); }
       .post-body img { max-width: 100%; height: auto; border-radius: 10px; }
+      /* Vandmærket på billederne — samme udseende som Blogger-temaets script (se temakoder.mjs).
+         !important som på Blogger, så billedernes egne gamle Blogger-stile (margin, ramme) ikke vinder. */
+      .post-body .tma-wm { position: relative !important; display: block !important; width: fit-content !important; max-width: 100% !important; margin: 2.5rem auto !important; border-radius: 10px !important; overflow: hidden !important; line-height: 0 !important; font-size: 0 !important; }
+      .post-body .tma-wm > img { display: block !important; max-width: 100% !important; width: auto; height: auto !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; box-sizing: border-box !important; border-radius: 10px !important; }
+      .post-body .tma-wm-tekst { position: absolute !important; bottom: 15px !important; right: 15px !important; color: rgba(255, 255, 255, 0.9) !important; font-size: 14px !important; font-weight: bold !important; font-family: sans-serif, Arial !important; text-shadow: 1px 1px 3px #000, -1px -1px 3px #000 !important; z-index: 2 !important; pointer-events: none !important; line-height: 1 !important; user-select: none; }
+      .post-body a[data-tma-uden-link] { pointer-events: none !important; border-bottom: 0 !important; }
       /* Knapper fra Blogger-temaets {getButton}-kode (se src/lib/temakoder.mjs) */
       .post-body a.tma-knap { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.5rem; padding: 0.45rem 1.5rem; margin: 0.25rem 0; background: var(--teal-text); color: #fff; border: 0; border-radius: 8px; font-size: 1rem; font-weight: 600; line-height: 1.3; text-decoration: none; white-space: normal; }
       .post-body a.tma-knap:hover { border: 0; filter: brightness(1.12); }

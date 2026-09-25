@@ -17,5 +17,10 @@
     "html_handling": "none",
     "not_found_handling": "none"
   },
+  // Test-adressen techmediaarch.<konto>.workers.dev er slået til (trin 4).
+  // Forhåndsvisnings-adresser pr. version slås fra: de ville ikke være dækket af
+  // noindex-reglen i public/_headers.
+  "workers_dev": true,
+  "preview_urls": false,
   "observability": { "enabled": true }
 }

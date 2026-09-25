@@ -51,7 +51,7 @@ const schema = {
   ...(p.labels.length ? { keywords: p.labels.join(', ') } : {}),
 };
 // FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs)
-const faq = faqSchema(p.html);
+const faq = faqSchema(p.faqHtml);
 const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
 ---
 <MainLayout title={p.title} description={p.description} image={p.image} schema={faq ? [schema, faq] : schema} ogType="article" breadcrumb={crumbs}>
