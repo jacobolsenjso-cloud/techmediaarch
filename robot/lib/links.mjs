@@ -18,7 +18,10 @@ async function hent(u, timeoutMs = 10000) {
     const res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': UA, accept: 'text/html' } });
     if (res.status !== 200 || !/text\/html/i.test(res.headers.get('content-type') || '')) return null;
     const html = (await res.text()).slice(0, 300000);
-    const titel = (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '').replace(/\s+/g, ' ').replace(/&amp;/g, '&').trim();
+    // Afkod HTML-tegn i titlen (ellers blev "What's" til "What&amp;#39;s" i kildelisten, målt 26/9).
+    const afkod = (t) => t.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(n)).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)))
+      .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
+    const titel = afkod(afkod((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '').replace(/\s+/g, ' '))).trim();
     return titel ? { url: res.url, titel } : null;
   } catch { return null; } finally { clearTimeout(t); }
 }

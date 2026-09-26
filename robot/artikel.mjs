@@ -200,6 +200,7 @@ if (video) {
 // kontrolleret kilde en frase, der står ordret i teksten; linket sættes kun, hvis
 // frasen findes, og teksten er ord for ord uændret bagefter. Kildelisten bliver.
 let eksterneITekst = 0;
+const brugteFraser = new Set();
 try {
   const fr = await json(`For each numbered source, give up to 3 alternative SHORT phrases (2-4 words each) copied exactly, character for character, from the article text below, that the source is specifically about. Skip a source if nothing fits.
 Return JSON {"links":[{"n": number, "phrases": ["...", "..."]}]}
@@ -211,7 +212,10 @@ ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
   for (const l of (fr.links || []).slice(0, 3)) {
     const k = kildeLinks[l.n - 1]; if (!k) continue;
     for (const frase of [].concat(l.phrases || l.phrase || []).slice(0, 3)) {
+      // Hver frase kun én gang (kørsel #14: to kilder fik begge "large language models").
+      if (brugteFraser.has(String(frase).toLowerCase().trim())) continue;
       const ny = linkIndsaet(html, frase, k.url.replace(/"/g, '%22'), { ekstern: true });
+      if (ny) brugteFraser.add(String(frase).toLowerCase().trim());
       if (ny && udenLinks(ny) === udenLinks(html)) { html = ny; eksterneITekst++; break; }
     }
   }
