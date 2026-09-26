@@ -63,14 +63,18 @@ const kandListe = [...linkKand.slice(0, 12), ...iEmne].filter((m, i, arr) => arr
 // 3 links ind via ordet "market" (bl.a. Trump/Stargate) — relevans vinder over antal.
 let interne = [];
 if (kandListe.length) {
-  const rel = await json(`New article topic: "${valgt.hoved}". Which of these existing articles would a reader of the new article find genuinely useful to click through to? They must be about a closely related subject — sharing a generic word like "AI", "market" or "tech" is not enough.
-Return JSON {"relevant":[numbers, most relevant first]}
+  // Karakter 0-3 i stedet for ja/nej: målt 26/9 (kørsel #11-13) svarede den
+  // billige model [] på et ja/nej-spørgsmål, selv med DeepSeek/ChatGPT-artikler
+  // på listen til en artikel om sprogmodeller. 2-3 kommer med.
+  const rel = await json(`New article topic: "${valgt.hoved}".
+Rate each existing article for how useful it would be as a "further reading" link for readers of the new article:
+3 = same subject, 2 = closely related subject a reader would likely want next, 1 = loosely related, 0 = unrelated (sharing a generic word like "AI" or "market" is not enough for 2).
+Return JSON {"ratings":[{"n": number, "score": 0-3}]} covering every article.
 ${kandListe.map((k, i) => `${i + 1}. ${k.titel}`).join('\n')}`);
-  log(`- Geminis svar (interne): ${JSON.stringify(rel).slice(0, 200)}`);
-  // Gemini svarer af og til med tekst i stedet for tal ("3", "3.", titel) — accepter begge.
-  interne = (Array.isArray(rel.relevant) ? rel.relevant : [])
-    .map((n) => (typeof n === 'number' || /^\d+/.test(String(n)) ? kandListe[parseInt(n, 10) - 1] : kandListe.find((k) => k.titel === String(n))))
-    .filter(Boolean).filter((k, i, a) => a.indexOf(k) === i).slice(0, 5);
+  const karakterer = (Array.isArray(rel.ratings) ? rel.ratings : []).map((r) => ({ k: kandListe[parseInt(r.n, 10) - 1], score: Number(r.score) || 0 }))
+    .filter((r) => r.k && r.score >= 2).sort((x, y) => y.score - x.score);
+  log(`- Karakterer ≥2: ${karakterer.map((r) => `${r.score}: ${r.k.titel.slice(0, 50)}`).join(' | ') || 'ingen'}`);
+  interne = karakterer.map((r) => r.k).filter((k, i, arr) => arr.indexOf(k) === i).slice(0, 5);
 }
 log(`- Interne link-kandidater: ${kandListe.length}, relevante ifølge Gemini: ${interne.length}`);
 
@@ -197,8 +201,8 @@ if (video) {
 // frasen findes, og teksten er ord for ord uændret bagefter. Kildelisten bliver.
 let eksterneITekst = 0;
 try {
-  const fr = await json(`For each numbered source, pick ONE exact phrase of 2-6 words that appears verbatim in the article text below and that the source is specifically about. Skip a source if no phrase fits well. Use each phrase once.
-Return JSON {"links":[{"n": number, "phrase": "..."}]}
+  const fr = await json(`For each numbered source, give up to 3 alternative SHORT phrases (2-4 words each) copied exactly, character for character, from the article text below, that the source is specifically about. Skip a source if nothing fits.
+Return JSON {"links":[{"n": number, "phrases": ["...", "..."]}]}
 Sources:
 ${kildeLinks.map((k, i) => `${i + 1}. ${k.titel} (${k.url})`).join('\n')}
 Article text:
@@ -206,8 +210,10 @@ ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
   log(`- Geminis svar (eksterne): ${JSON.stringify(fr).slice(0, 300)}`);
   for (const l of (fr.links || []).slice(0, 3)) {
     const k = kildeLinks[l.n - 1]; if (!k) continue;
-    const ny = linkIndsaet(html, l.phrase, k.url.replace(/"/g, '%22'), { ekstern: true });
-    if (ny && udenLinks(ny) === udenLinks(html)) { html = ny; eksterneITekst++; }
+    for (const frase of [].concat(l.phrases || l.phrase || []).slice(0, 3)) {
+      const ny = linkIndsaet(html, frase, k.url.replace(/"/g, '%22'), { ekstern: true });
+      if (ny && udenLinks(ny) === udenLinks(html)) { html = ny; eksterneITekst++; break; }
+    }
   }
 } catch (e) { log(`- Eksterne links i teksten: sprunget over (${e.message.slice(0, 80)})`); }
 log(`- Eksterne links inde i teksten: ${eksterneITekst}`);
@@ -244,11 +250,13 @@ for (const g of interne.slice(0, 3)) {
     const raa = fs.readFileSync(fil, 'utf8');
     const del = raa.match(/^(---\r?\n[\s\S]*?\r?\n---\r?\n?)([\s\S]*)$/);
     if (!del || del[2].includes(nyHref)) continue;
-    const f = await json(`A new article titled "${titel}" (topic: "${valgt.hoved}") was published. In the older article text below, find ONE exact phrase of 2-6 words that appears verbatim and would be a natural anchor for a link to the new article. Return JSON {"phrase": "..."} or {"phrase": ""} if nothing fits naturally.
+    const f = await json(`A new article titled "${titel}" (topic: "${valgt.hoved}") was published. In the older article text below, find up to 3 alternative SHORT phrases (2-4 words each), copied exactly character for character, that would be a natural anchor for a link to the new article. Return JSON {"phrases": ["...", "..."]} or {"phrases": []} if nothing fits naturally.
 Text:
 ${del[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
-    const ny = linkIndsaet(del[2], f.phrase, nyHref);
-    if (ny && udenLinks(ny) === udenLinks(del[2])) { fs.writeFileSync(fil, del[1] + ny); tilbage.push(`${g.titel} ("${f.phrase}")`); }
+    for (const frase of [].concat(f.phrases || f.phrase || []).slice(0, 3)) {
+      const ny = linkIndsaet(del[2], frase, nyHref);
+      if (ny && udenLinks(ny) === udenLinks(del[2])) { fs.writeFileSync(fil, del[1] + ny); tilbage.push(`${g.titel} ("${frase}")`); break; }
+    }
   } catch (e) { log(`- Tilbagelink fra "${g.titel}": sprunget over (${e.message.slice(0, 60)})`); }
 }
 log(`- Links fra ældre artikler til den nye: ${tilbage.length}${tilbage.length ? ' — ' + tilbage.join(' · ') : ''}`);
