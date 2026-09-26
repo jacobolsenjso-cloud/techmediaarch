@@ -2,6 +2,8 @@
 // Kører på GitHub (workflowet "Robot (manuel)", opgave "proeveartikel"), som
 // gemmer resultatet på en egen gren (udkast-…) — ALDRIG på main. Intet udgives,
 // før Jacob har godkendt artiklen.
+// TRIN 3 (26/9): samme fil bruges af tidsplanen (robot/plan.mjs, workflowet
+// "Robot (tidsplan)"), som udgiver direkte på main — højst 2 om dagen, fri ons+søn.
 //
 // Trin:
 //  1. Søgeordslisten laves (robot/soegeord.mjs) og Gemini vælger en pakke, der
@@ -45,6 +47,9 @@ Return JSON: {"ok":[numbers of acceptable keywords, best first]}
 ${kandidater.slice(0, 8).map((p, i) => `${i + 1}. ${p.hoved}`).join('\n')}`);
 const valgt = kandidater[(vurdering.ok?.[0] || 0) - 1];
 if (!valgt) throw new Error('Gemini godkendte ingen af pakkerne');
+// Til tidsplanen (robot/plan.mjs): så et afvist søgeord kan hvile i 30 dage.
+fs.mkdirSync(sti('robot/ud'), { recursive: true });
+fs.writeFileSync(sti('robot/ud/valgt.json'), JSON.stringify({ hoved: valgt.hoved, emne: valgt.emne }));
 log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}`);
 
 // --- 2. Interne link-kandidater ---------------------------------------------
