@@ -76,6 +76,19 @@ for (let forsoeg = 1; forsoeg <= 2; forsoeg++) {
 }
 if (kilder.length < 2) throw new Error(`Gemini brugte kun ${kilder.length} kilder — artiklen afvist`);
 let html = tekst.replace(/^```html?\s*|```\s*$/g, '').trim();
+// Gemini skriver kortere end bedt om (målt 26/9: 857 ord mod 1400-1900 bedt om).
+// Er udkastet under 1500 ord, får den det tilbage og skal uddybe — stadig med søgning.
+const ordI = (h) => h.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
+if (ordI(html) < 1500) {
+  log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1500.`);
+  const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1600 words by deepening the existing sections with concrete explanations, examples and practical guidance. Verify any new fact with Google Search. Keep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
+Output ONLY the full expanded article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>).
+
+${html}`, { soeg: true });
+  const ny = udv.tekst.replace(/^```html?\s*|```\s*$/g, '').trim();
+  if (ordI(ny) > ordI(html)) { html = ny; kilder = [...kilder, ...udv.kilder]; }
+  log(`- Efter uddybning: ${ordI(html)} ord.`);
+}
 
 // Fjern alle links, der ikke er et af de tilladte interne (Gemini må ikke selv finde på links).
 const tilladt = new Set(interne.map((l) => l.href));
