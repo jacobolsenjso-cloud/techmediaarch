@@ -1,47 +1,85 @@
-# TRIN 1 — søgeordsliste. Startes kun med hånden (knappen "Run workflow").
-# Laver en læseliste over forslag til nye artikler; udgiver intet og
-# committer intet. Listen ses i kørslens oversigt og kan hentes som fil.
-name: Søgeordsliste
+# Robottens MANUELLE knap (GitHub → Actions → "Robot (manuel)" → Run workflow).
+# Én fil til alle håndstartede opgaver, så Jacob ikke skal flytte en ny
+# workflow-fil ind for hver ny opgave (Claude må ikke skrive i .github/workflows).
+#   soegeord      — læseliste med søgeordspakker (trin 1). Udgiver intet.
+#   noegletjek    — tjekker at nøglerne virker. Skriver aldrig nøglerne ud.
+#   proeveartikel — skriver ÉN prøveartikel på en egen gren (udkast-...), ikke
+#                   på main, så intet udgives, før Jacob har godkendt (trin 2).
+# Versioner låst som på techfeedwatch (26/9-2026): Node 24-udgaverne af
+# handlingerne (målt i hver actions action.yml) og Ubuntu 24.04, så GitHubs
+# skift til Ubuntu 26 den 19/10 ikke ændrer noget uden varsel.
+name: Robot (manuel)
 
 on:
   workflow_dispatch:
     inputs:
+      opgave:
+        description: 'Hvad skal robotten gøre?'
+        type: choice
+        options: [soegeord, noegletjek, proeveartikel]
+        default: soegeord
       emne:
-        description: 'Kun ét emne (fx AI) — tomt = alle'
+        description: 'Emne (fx AI) — tomt = alle / robotten vælger'
         required: false
         default: ''
       pakker:
-        description: 'Pakker pr. emne'
+        description: 'soegeord: pakker pr. emne'
         required: false
         default: '3'
+      hovedsoegeord:
+        description: 'proeveartikel: hovedsøgeord fra listen (tomt = robotten vælger)'
+        required: false
+        default: ''
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  liste:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+  robot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
-      - name: Lav søgeordslisten
+      - name: Kør opgaven
         env:
-          # Kun-læse-nøgle til Search Console. Skrives aldrig ud.
+          # Nøglerne kommer fra GitHub Secrets og skrives aldrig ud.
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
-          # Til lag 3 (Gemini). Findes ikke endnu — så springes laget over.
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          CLOUDFLARE_AI_TOKEN: ${{ secrets.CLOUDFLARE_AI_TOKEN }}
           # Input sendes som miljøvariabler, ikke direkte ind i kommandoen.
+          OPGAVE: ${{ inputs.opgave }}
           EMNE: ${{ inputs.emne }}
           PAKKER: ${{ inputs.pakker }}
+          HOVED: ${{ inputs.hovedsoegeord }}
         run: |
-          if [ -n "$EMNE" ]; then node robot/soegeord.mjs --pakker "$PAKKER" --emne "$EMNE" > /dev/null
-          else node robot/soegeord.mjs --pakker "$PAKKER" > /dev/null; fi
-      - uses: actions/upload-artifact@v4
+          case "$OPGAVE" in
+            soegeord)
+              if [ -n "$EMNE" ]; then node robot/soegeord.mjs --pakker "$PAKKER" --emne "$EMNE" > /dev/null
+              else node robot/soegeord.mjs --pakker "$PAKKER" > /dev/null; fi ;;
+            noegletjek)
+              node robot/noegletjek.mjs > /dev/null ;;
+            proeveartikel)
+              node robot/artikel.mjs --emne "$EMNE" --hoved "$HOVED" ;;
+            *) echo "Ukendt opgave"; exit 1 ;;
+          esac
+      - name: Gem prøveartiklen på en egen gren (ikke main)
+        if: inputs.opgave == 'proeveartikel'
+        run: |
+          git config user.name "techmediaarch-robot"
+          git config user.email "robot@techmediaarch.com"
+          git checkout -b "udkast-${{ github.run_number }}"
+          git add src/content public robot/data
+          git commit -m "Draft article from robot run ${{ github.run_number }}" || { echo "Intet at gemme"; exit 0; }
+          git push origin "udkast-${{ github.run_number }}"
+      - uses: actions/upload-artifact@v6
+        if: always()
         with:
-          name: soegeordsliste
+          name: robot-ud
           path: robot/ud/
+          if-no-files-found: ignore
