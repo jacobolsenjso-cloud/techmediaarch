@@ -1,0 +1,87 @@
+# Robottens TIDSPLAN (trin 3, Jacobs valg 26/9-2026):
+#   højst 2 artikler om dagen, fri onsdag og søndag — udgives direkte på main.
+# Tider er UTC: 07:17 og 15:17 = kl. 9:17 og 17:17 dansk sommertid (8:17 og 16:17 vintertid).
+# Minuttallet er skævt med vilje: GitHub er mest bagud på hele og halve timer.
+# robot/plan.mjs tjekker loft og fridage igen, fordi GitHub kan være timer
+# forsinket, og fordi knappen kan trykkes i hånden.
+# Tomgangsalarmen kører hver dag kl. 05:43 UTC: rød kørsel = mail til Jacob,
+# hvis der ikke er kommet en ny artikel i 60 timer, eller den nyeste ikke svarer live.
+name: Robot (tidsplan)
+
+on:
+  schedule:
+    - cron: '17 7,15 * * 1,2,4,5,6'
+    - cron: '43 5 * * *'
+  workflow_dispatch:
+    inputs:
+      opgave:
+        description: 'Hvad skal robotten gøre? (loft og fridage gælder også her)'
+        type: choice
+        options: [artikel, tomgang]
+        default: artikel
+
+permissions:
+  contents: write
+
+# Aldrig to artikler på én gang (så loftet ikke kan snydes).
+concurrency:
+  group: robot-tidsplan
+  cancel-in-progress: false
+
+jobs:
+  artikel:
+    if: github.event.schedule == '17 7,15 * * 1,2,4,5,6' || inputs.opgave == 'artikel'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Må der udgives nu?
+        id: plan
+        run: node robot/plan.mjs --tjek
+      - name: Skriv artiklen
+        if: steps.plan.outputs.koer == 'ja'
+        env:
+          # Nøglerne kommer fra GitHub Secrets og skrives aldrig ud.
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          CLOUDFLARE_AI_TOKEN: ${{ secrets.CLOUDFLARE_AI_TOKEN }}
+        run: node robot/plan.mjs --koer
+      - name: Byg sitet (en artikel, der ødelægger bygget, når aldrig main)
+        id: bygget
+        if: steps.plan.outputs.koer == 'ja' && always()
+        run: npm run build > /dev/null
+      - name: Udgiv på main
+        if: always() && steps.plan.outputs.koer == 'ja' && steps.bygget.outcome == 'success'
+        run: |
+          git config user.name "techmediaarch-robot"
+          git config user.email "robot@techmediaarch.com"
+          git add src/content public/images robot/data
+          git diff --cached --quiet && { echo "Intet at udgive"; exit 0; }
+          git commit -m "Robot article $(date -u +%F) (run ${{ github.run_number }})"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && exit 0; sleep 10; done
+          exit 1
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: robot-ud
+          path: robot/ud/
+          if-no-files-found: ignore
+
+  tomgang:
+    if: github.event.schedule == '43 5 * * *' || inputs.opgave == 'tomgang'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: node robot/plan.mjs --tomgang
