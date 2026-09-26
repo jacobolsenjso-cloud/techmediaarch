@@ -85,7 +85,7 @@ for (const emne of emneListe) {
   const fri = vurderet.filter((x) => x.dom === 'fri');
   const tvivl = vurderet.filter((x) => x.dom === 'tvivl');
   const pakker = [];
-  // Hovedsøgeord: forklarende præfiks, mindst 2 kerneord, Googles højeste plads først.
+  // Hovedsøgeord: forklarende præfiks og mindst 2 kerneord (rækkefølgen står herunder).
   const kandidater = [...fri, ...tvivl]
     .filter((x) => HOVED_LAG[x.praefiks] && kerne(x.q).size >= 2)
     .map((x) => ({ ...x, naboer: naboer(x, vurderet) }))
@@ -153,8 +153,9 @@ let sc = null;
 if (harAdgang()) {
   try {
     const raekker = await hentSoegninger({ dage: 90 });
-    // Samme side med og uden Bloggers gamle "?m=1" tælles som én side.
-    const renSti = (u) => u.replace('https://www.techmediaarch.com', '').replace(/\?m=1$/, '') || '/';
+    // Samme side med og uden Bloggers gamle "?m=1" tælles som én side, og
+    // adresser uden www (fra Blogger-tiden) regnes med som samme side.
+    const renSti = (u) => u.replace(/^https?:\/\/(www\.)?techmediaarch\.com/, '').replace(/\?m=1$/, '') || '/';
     const prSoegning = new Map();
     for (const r of raekker) {
       const g = prSoegning.get(r.q) || { q: r.q, klik: 0, visninger: 0, sider: new Map() };
@@ -173,7 +174,7 @@ if (harAdgang()) {
       const bedst = [...g.sider.values()].sort((a, b) => b.visninger - a.visninger)[0];
       return { q: g.q, klik: g.klik, visninger: g.visninger, side: bedst.side, placering: Math.round((bedst.placeringSum / bedst.visninger) * 10) / 10 };
     });
-    // En artikel vises allerede for søgningen → styrk den artikel (ikke en ny).
+    // En af sitets sider (ikke forsiden) vises allerede → styrk den (ikke en ny artikel).
     const opdater = soegninger.filter((g) => g.side !== '/' && g.visninger >= 5).sort((a, b) => b.visninger - a.visninger);
     // Kun forsiden vises → ofte navne-søgninger på sitet; resten er mulige nye emner.
     const forsiden = soegninger.filter((g) => g.side === '/' && g.visninger >= 5).sort((a, b) => b.visninger - a.visninger);
@@ -212,10 +213,10 @@ else {
   // KUN ANTAL I LISTEN (Jacobs valg 26/9-2026): repoet er offentligt, så
   // kørslens oversigt og den hentbare fil kan ses af alle. Selve søgningerne,
   // visningerne og siderne bruges af robotten, men skrives aldrig ud.
-  const artiklerMed = new Set(sc.opdater.map((g) => g.side)).size;
+  const siderMed = new Set(sc.opdater.map((g) => g.side)).size;
   const naer = sc.opdater.filter((g) => g.placering >= 8 && g.placering <= 30).length;
   L.push(`Adgang virker: ${sc.raekker} rækker, ${sc.soegninger} forskellige søgninger de sidste 90 dage.`, '');
-  L.push(`- Søgninger hvor Google viser en af dine artikler (mindst 5 visninger): **${sc.opdater.length}** på ${artiklerMed} artikler, heraf ${naer} tæt på side 1 (placering 8-30).`);
+  L.push(`- Søgninger hvor Google viser en af dine sider (ikke forsiden, mindst 5 visninger): **${sc.opdater.length}** på ${siderMed} sider, heraf ${naer} tæt på side 1 (placering 8-30).`);
   L.push(`- Søgninger hvor kun forsiden vises (mindst 5 visninger): **${sc.forsiden.length}**.`);
   L.push('', '_Selve søgningerne vises ikke her, fordi loggen er offentlig. Se dem i Search Console._');
 }
