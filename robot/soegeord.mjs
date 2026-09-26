@@ -5,8 +5,8 @@
 //  1. henter spørgsmål fra Googles autoforslag (startord i robot/froe.json)
 //  2. smider dem væk, der allerede er dækket af en artikel (robot/lib/dubletter.mjs)
 //  3. samler de bedste i pakker: 1 hovedsøgeord + 5 beslægtede
-// Derudover, hvis Search Console-nøglen findes: søgninger hvor en eksisterende
-// side næsten er på side 1 (→ opdater den side i stedet for at skrive ny).
+// Derudover, hvis Search Console-nøglen findes: søgninger hvor Google allerede
+// viser en af sitets artikler (→ styrk den artikel i stedet for at skrive ny).
 //
 // Kør:  node robot/soegeord.mjs                  alle emner, 3 pakker pr. emne
 //       node robot/soegeord.mjs --emne AI --pakker 5
@@ -153,23 +153,31 @@ let sc = null;
 if (harAdgang()) {
   try {
     const raekker = await hentSoegninger({ dage: 90 });
+    // Samme side med og uden Bloggers gamle "?m=1" tælles som én side.
+    const renSti = (u) => u.replace('https://www.techmediaarch.com', '').replace(/\?m=1$/, '') || '/';
     const prSoegning = new Map();
     for (const r of raekker) {
-      const g = prSoegning.get(r.q) || { q: r.q, klik: 0, visninger: 0, sider: [] };
-      g.klik += r.klik; g.visninger += r.visninger; g.sider.push(r);
+      const g = prSoegning.get(r.q) || { q: r.q, klik: 0, visninger: 0, sider: new Map() };
+      g.klik += r.klik; g.visninger += r.visninger;
+      const side = renSti(r.side);
+      const s = g.sider.get(side) || { side, visninger: 0, klik: 0, placeringSum: 0 };
+      s.visninger += r.visninger; s.klik += r.klik; s.placeringSum += r.placering * r.visninger;
+      g.sider.set(side, s);
       prSoegning.set(r.q, g);
     }
-    const soegninger = [...prSoegning.values()];
-    // Næsten på side 1: position 8-30 med mindst 10 visninger → opdater siden.
-    const opdater = soegninger
-      .map((g) => ({ ...g, bedst: g.sider.sort((a, b) => b.visninger - a.visninger)[0] }))
-      .filter((g) => g.visninger >= 10 && g.bedst.placering >= 8 && g.bedst.placering <= 30)
-      .sort((a, b) => b.visninger - a.visninger);
-    // Søgninger, vi vises på, men ingen artikel dækker → mulige nye hovedsøgeord.
-    const nye = soegninger
-      .filter((g) => g.visninger >= 5 && kerne(g.q).size >= 2 && tjek(g.q, indeks).dom === 'fri')
-      .sort((a, b) => b.visninger - a.visninger);
-    sc = { raekker: raekker.length, soegninger: soegninger.length, opdater, nye };
+    // Hver søgning får den side, Google viser oftest for den (Search Console
+    // ved det selv). Første kørsel 26/9 gættede i stedet ud fra overskrifterne
+    // og kaldte "is brave browser good" for "uden egen artikel", selv om
+    // Brave-anmeldelsen er den side, Google viser.
+    const soegninger = [...prSoegning.values()].map((g) => {
+      const bedst = [...g.sider.values()].sort((a, b) => b.visninger - a.visninger)[0];
+      return { q: g.q, klik: g.klik, visninger: g.visninger, side: bedst.side, placering: Math.round((bedst.placeringSum / bedst.visninger) * 10) / 10 };
+    });
+    // En artikel vises allerede for søgningen → styrk den artikel (ikke en ny).
+    const opdater = soegninger.filter((g) => g.side !== '/' && g.visninger >= 5).sort((a, b) => b.visninger - a.visninger);
+    // Kun forsiden vises → ofte navne-søgninger på sitet; resten er mulige nye emner.
+    const forsiden = soegninger.filter((g) => g.side === '/' && g.visninger >= 5).sort((a, b) => b.visninger - a.visninger);
+    sc = { raekker: raekker.length, soegninger: soegninger.length, opdater, forsiden };
   } catch (e) { sc = { fejl: e.message }; }
 }
 
@@ -201,17 +209,21 @@ L.push('## Search Console', '');
 if (!sc) L.push('_Ikke kørt — nøglen GSC_SERVICE_ACCOUNT_JSON findes ikke her (kører kun på GitHub)._');
 else if (sc.fejl) L.push(`**Fejl:** ${sc.fejl}`);
 else {
+  // KUN ANTAL I LISTEN (Jacobs valg 26/9-2026): repoet er offentligt, så
+  // kørslens oversigt og den hentbare fil kan ses af alle. Selve søgningerne,
+  // visningerne og siderne bruges af robotten, men skrives aldrig ud.
+  const artiklerMed = new Set(sc.opdater.map((g) => g.side)).size;
+  const naer = sc.opdater.filter((g) => g.placering >= 8 && g.placering <= 30).length;
   L.push(`Adgang virker: ${sc.raekker} rækker, ${sc.soegninger} forskellige søgninger de sidste 90 dage.`, '');
-  L.push(`### Opdater eksisterende side (position 8-30, mindst 10 visninger) — ${sc.opdater.length}`, '');
-  if (!sc.opdater.length) L.push('_Ingen._');
-  for (const g of sc.opdater) L.push(`- "${g.q}" — ${g.visninger} visninger, ${g.klik} klik, position ${g.bedst.placering} → ${g.bedst.side.replace('https://www.techmediaarch.com', '')}`);
-  L.push('', `### Søgninger uden egen artikel (mindst 5 visninger) — ${sc.nye.length}`, '');
-  if (!sc.nye.length) L.push('_Ingen._');
-  for (const g of sc.nye) L.push(`- "${g.q}" — ${g.visninger} visninger, ${g.klik} klik`);
+  L.push(`- Søgninger hvor Google viser en af dine artikler (mindst 5 visninger): **${sc.opdater.length}** på ${artiklerMed} artikler, heraf ${naer} tæt på side 1 (placering 8-30).`);
+  L.push(`- Søgninger hvor kun forsiden vises (mindst 5 visninger): **${sc.forsiden.length}**.`);
+  L.push('', '_Selve søgningerne vises ikke her, fordi loggen er offentlig. Se dem i Search Console._');
 }
 const md = L.join('\n') + '\n';
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
 fs.writeFileSync(sti('robot/ud/soegeord-liste.md'), md);
-fs.writeFileSync(sti('robot/ud/soegeord-liste.json'), JSON.stringify({ dato, resultat, sc }, null, 1));
+// Search Console også kun som antal i filen (den kan hentes af alle).
+const scAntal = sc && !sc.fejl ? { raekker: sc.raekker, soegninger: sc.soegninger, opdater: sc.opdater.length, forsiden: sc.forsiden.length } : sc;
+fs.writeFileSync(sti('robot/ud/soegeord-liste.json'), JSON.stringify({ dato, resultat, sc: scAntal }, null, 1));
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
 console.log(md);
