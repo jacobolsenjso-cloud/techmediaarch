@@ -23,10 +23,10 @@ async function kald(model, body, forsoeg = 3) {
 const tekstAf = (j) => (j.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('');
 
 // Tekst, evt. med Google-søgning. Returnerer { tekst, kilder: [{ uri, titel }] }.
-export async function skriv(prompt, { soeg = false, temperatur = 0.7 } = {}) {
+export async function skriv(prompt, { soeg = false, temperatur = 0.7, model = TEKSTMODEL } = {}) {
   const body = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: temperatur } };
   if (soeg) body.tools = [{ google_search: {} }];
-  const j = await kald(TEKSTMODEL, body);
+  const j = await kald(model, body);
   const kilder = (j.candidates?.[0]?.groundingMetadata?.groundingChunks || [])
     .map((c) => c.web).filter(Boolean).map((w) => ({ uri: w.uri, titel: w.title || '' }));
   return { tekst: tekstAf(j), kilder };

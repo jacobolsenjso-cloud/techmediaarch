@@ -54,39 +54,54 @@ for (const q of [valgt.hoved, ...valgt.beslaegtede]) for (const m of mestEns(q, 
 const titelAf = (s) => arkiv.find((a) => a.sti === s)?.titel || s;
 const interne = linkKand.slice(0, 8).map((m) => ({ href: kodet(m.sti), titel: titelAf(m.sti) }));
 
-// --- 3. Skriv artiklen med Google-søgning -----------------------------------
+// --- 3. Research: søg og saml fakta med kilder ------------------------------
+// Målt 26/9: når Gemini både skal søge OG skrive, springer den ofte søgningen
+// over (0 kilder i 2 af 2 forsøg i kørsel #7). En opgave, der KUN går ud på at
+// søge, udløser søgningen langt mere sikkert. Søger den billige model stadig
+// ikke, prøves en større som reserve.
+const researchOpgave = `Use Google Search to research these questions for a factual explainer article:
+- ${[valgt.hoved, ...valgt.beslaegtede].join('\n- ')}
+Return 15-25 short bullet points of concrete, verified facts (definitions, how it works, examples, numbers with dates, best practices). Only include facts you found in search results.`;
+let fakta = ''; let kilder = [];
+for (const model of [undefined, undefined, 'gemini-3.5-flash', 'gemini-2.5-flash']) {
+  try {
+    const r = await skriv(researchOpgave, { soeg: true, temperatur: 0.2, ...(model ? { model } : {}) });
+    if (r.kilder.length >= 2) { fakta = r.tekst; kilder = r.kilder; log(`- Research: ${r.kilder.length} kilder (${model || 'standardmodel'}).`); break; }
+    log(`- Research (${model || 'standardmodel'}): ${r.kilder.length} kilder — prøver igen.`);
+  } catch (e) { log(`- Research (${model}): ${e.message.slice(0, 120)}`); }
+}
+if (kilder.length < 2) throw new Error(`Research gav kun ${kilder.length} kilder — artiklen afvist`);
+
+// --- 4. Skriv artiklen ud fra de fakta ---------------------------------------
 const opgave = `Write an in-depth, genuinely helpful English article for techmediaarch.com.
 Main keyword: "${valgt.hoved}"
 Related keywords (cover each naturally, once or twice): ${valgt.beslaegtede.map((k) => `"${k}"`).join(', ')}
 
-Use Google Search to check facts. Rules:
-- 1400-1900 words. Plain, clear language for curious non-experts.
+Base all factual claims on these researched facts (do not add other numbers, dates or quotes):
+${fakta}
+
+Rules:
+- At least 1600 words, 8-10 sections with <h2> (and <h3> where useful), each section 150-250 words. Plain, clear language for curious non-experts.
 - Answer the main keyword directly in the first paragraph.
-- Structure with <h2> and <h3>; include one short FAQ section (<h2>FAQ</h2> with <h3> questions) built from the related keywords.
-- Never claim personal testing or experience ("I tested", "in my experience", "we tried"). No invented statistics, quotes or dates; only state numbers you verified.
+- Include one FAQ section (<h2>FAQ</h2> with <h3> questions) built from the related keywords.
+- Never claim personal testing or experience ("I tested", "in my experience", "we tried").
 - Link to 3-5 of these existing articles where relevant, using the exact href and a natural anchor text:
 ${interne.map((l) => `  ${l.href}  (${l.titel})`).join('\n') || '  (none)'}
 - No other links. No images. No markdown.
 Output ONLY the article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>). No <html>, no title, no code fences.`;
-let tekst, kilder;
-for (let forsoeg = 1; forsoeg <= 2; forsoeg++) {
-  ({ tekst, kilder } = await skriv(opgave, { soeg: true }));
-  if (kilder.length >= 2) break;
-  log(`- Forsøg ${forsoeg}: Gemini brugte ${kilder.length} kilder — prøver igen.`);
-}
-if (kilder.length < 2) throw new Error(`Gemini brugte kun ${kilder.length} kilder — artiklen afvist`);
+const { tekst } = await skriv(opgave);
 let html = tekst.replace(/^```html?\s*|```\s*$/g, '').trim();
 // Gemini skriver kortere end bedt om (målt 26/9: 857 ord mod 1400-1900 bedt om).
-// Er udkastet under 1500 ord, får den det tilbage og skal uddybe — stadig med søgning.
+// Er udkastet under 1500 ord, får den det tilbage og skal uddybe — kun med de researchede fakta.
 const ordI = (h) => h.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
 if (ordI(html) < 1500) {
   log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1500.`);
-  const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1600 words by deepening the existing sections with concrete explanations, examples and practical guidance. Verify any new fact with Google Search. Keep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
+  const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1600 words by deepening the existing sections with concrete explanations, examples and practical guidance. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
 Output ONLY the full expanded article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>).
 
-${html}`, { soeg: true });
+${html}`);
   const ny = udv.tekst.replace(/^```html?\s*|```\s*$/g, '').trim();
-  if (ordI(ny) > ordI(html)) { html = ny; kilder = [...kilder, ...udv.kilder]; }
+  if (ordI(ny) > ordI(html)) html = ny;
   log(`- Efter uddybning: ${ordI(html)} ord.`);
 }
 
@@ -108,7 +123,7 @@ if (forbudt) throw new Error(`Artiklen indeholder en førstepersons-påstand: "$
 const { sat: kildeLinks, afvist: kildeAfvist } = await kontrollerKilder(kilder, 4);
 if (kildeLinks.length < 2) throw new Error(`Kun ${kildeLinks.length} kilder bestod kontrollen — artiklen afvist`);
 
-// --- 4. Titel, beskrivelse, billedtekster -----------------------------------
+// --- 5. Titel, beskrivelse, billedtekster -----------------------------------
 const meta = await json(`Article about "${valgt.hoved}". First 1500 characters:
 ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500)}
 
