@@ -9,3 +9,4 @@ _shots/
 _*.out
 _*.err
 scripts/billeder-brugt.json
+robot/ud/
