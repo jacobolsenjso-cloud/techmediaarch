@@ -46,7 +46,9 @@ const schema = {
   dateModified: p.updated,
   mainEntityOfPage: SITE + p.href,
   ...(p.image ? { image: SITE + p.image } : {}),
-  author: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/' },
+  // Forfatter = en navngiven person (Jacobs valg 27/9-2026): Google og AI-tjenester vægter,
+  // at der står et menneske bag. Navn og titel som på om-siden ("Jacob Olsen Founder & CEO").
+  author: { '@type': 'Person', name: 'Jacob Olsen', jobTitle: 'Founder & CEO', url: SITE + '/p/about-us.html', worksFor: { '@id': `${SITE}/#organization` } },
   publisher: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/icon-512.png' } },
   ...(p.labels.length ? { keywords: p.labels.join(', ') } : {}),
 };
@@ -142,7 +144,7 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
       <div class="article-byline">
         <span class="byline-avatar" aria-hidden="true"><Maerke id="by" /></span>
         <div class="byline-text">
-          <span class="byline-name">Published by <a href="/p/about-us.html">Tech Media Arch</a></span>
+          <span class="byline-name">Published by <a href="/p/about-us.html" rel="author">Jacob Olsen</a></span>
           <span class="byline-meta">
             <time datetime={p.published}>{datoTekst(p.published)}</time>
             {opdateret && <><span class="meta-sep">·</span><span>Updated <time datetime={p.updated}>{datoTekst(p.updated)}</time></span></>}
