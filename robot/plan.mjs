@@ -1,5 +1,5 @@
 // TRIN 3 — robotten på fast tidsplan (Jacobs valg 26/9-2026):
-//   højst 2 udgivelser pr. døgn, fri onsdag og søndag (dansk tid).
+//   højst 2 udgivelser pr. døgn, fri tirsdag og fredag (dansk tid; ændret fra ons+søn af Jacob 27/9).
 // Kaldes af workflowet "Robot (tidsplan)". Tre opgaver:
 //   node robot/plan.mjs --tjek     → må der udgives nu? (skriver koer=ja/nej til GitHub)
 //   node robot/plan.mjs --koer     → skriv én artikel og markér søgeordet
@@ -14,8 +14,8 @@ import { parse } from 'yaml';
 import { sti, BRUGTE, PROEVEDE } from './lib/arkiv.mjs';
 
 export const MAKS_PR_DAG = 2;
-export const FRIDAGE = ['Wed', 'Sun'];      // onsdag og søndag
-export const TOMGANG_TIMER = 60;            // længste normale pause: tirsdag eftermiddag → torsdag morgen (~40 t) + GitHubs forsinkelse
+export const FRIDAGE = ['Tue', 'Fri'];      // tirsdag og fredag
+export const TOMGANG_TIMER = 60;            // længste normale pause: mandag eftermiddag → onsdag morgen (~40 t) + GitHubs forsinkelse
 const SITE = 'https://www.techmediaarch.com';
 
 const dkDato = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Copenhagen' }).format(d);            // 2026-09-26
