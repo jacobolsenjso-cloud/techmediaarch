@@ -24,7 +24,7 @@ export async function cloudflare(prompt) {
 
 // Beskær midten til 16:9 og gem som JPEG. Returnerer webstien (/images/xxx.jpg).
 export async function gem(buf, kilde) {
-  const jpg = await sharp(buf).resize(1366, 768, { fit: 'cover', position: 'attention' }).jpeg({ quality: 82, mozjpeg: true }).toBuffer();
+  const jpg = await sharp(buf).resize(1366, 768, { fit: 'cover', position: 'centre' }).jpeg({ quality: 82, mozjpeg: true }).toBuffer();
   const navn = crypto.createHash('sha256').update(jpg).digest('hex').slice(0, 16);
   const fil = `/images/${navn}-${kilde}.jpg`;
   fs.writeFileSync(sti('public' + fil), jpg);

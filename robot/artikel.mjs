@@ -52,7 +52,17 @@ const indeks = lavIndeks(arkiv.filter((a) => a.sti.startsWith('/20')));
 const linkKand = [];
 for (const q of [valgt.hoved, ...valgt.beslaegtede]) for (const m of mestEns(q, indeks, 6)) if (!linkKand.some((k) => k.sti === m.sti)) linkKand.push(m);
 const titelAf = (s) => arkiv.find((a) => a.sti === s)?.titel || s;
-const interne = linkKand.slice(0, 8).map((m) => ({ href: kodet(m.sti), titel: titelAf(m.sti) }));
+const kandListe = linkKand.slice(0, 12).map((m) => ({ href: kodet(m.sti), titel: titelAf(m.sti) }));
+// Kun artikler, der reelt handler om det samme. Prøveartikel 2 (26/9) fik tvunget
+// 3 links ind via ordet "market" (bl.a. Trump/Stargate) — relevans vinder over antal.
+let interne = [];
+if (kandListe.length) {
+  const rel = await json(`New article topic: "${valgt.hoved}". Which of these existing articles would a reader of the new article genuinely find relevant? Be strict: a shared word is not enough.
+Return JSON {"relevant":[numbers, most relevant first]}
+${kandListe.map((k, i) => `${i + 1}. ${k.titel}`).join('\n')}`);
+  interne = (rel.relevant || []).map((n) => kandListe[n - 1]).filter(Boolean).slice(0, 5);
+}
+log(`- Interne link-kandidater: ${kandListe.length}, relevante ifølge Gemini: ${interne.length}`);
 
 // --- 3. Research: søg og saml fakta med kilder ------------------------------
 // Målt 26/9: når Gemini både skal søge OG skrive, springer den ofte søgningen
@@ -109,7 +119,7 @@ ${html}`);
 const tilladt = new Set(interne.map((l) => l.href));
 html = html.replace(/<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (hel, href, indre) => (tilladt.has(href) ? `<a href="${href}">${indre}</a>` : indre));
 const brugteInterne = [...new Set([...html.matchAll(/<a href="([^"]+)">/g)].map((m) => m[1]))];
-if (brugteInterne.length < 3) {
+if (brugteInterne.length < 3) { // kun fra de RELEVANTE kandidater — hellere færre end forkerte
   const flere = interne.filter((l) => !brugteInterne.includes(l.href)).slice(0, 3 - brugteInterne.length);
   if (flere.length) html += `<h2>Related reading</h2><ul>${flere.map((l) => `<li><a href="${l.href}">${esc(l.titel)}</a></li>`).join('')}</ul>`;
 }
@@ -131,15 +141,18 @@ Return JSON with:
 "title": 50-65 characters, contains the main keyword or a close natural variant, no clickbait, no year,
 "description": 140-160 characters, plain and specific,
 "slug": 3-6 lowercase words joined by hyphens,
-"image1": a prompt for a clean, modern editorial illustration for the top of the article (no text, no logos, no real people),
-"image2": a different prompt for an illustration further down (no text, no logos, no real people),
+"image1": a prompt for a clean, modern editorial illustration for the top of the article,
+"image2": a different prompt for an illustration further down,
 "alt1": short alt text for image 1, "alt2": short alt text for image 2`);
 const titel = String(meta.title).trim();
 const slug = String(meta.slug || titel).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
 
 // --- 5. Billeder (begge motorer) --------------------------------------------
-const b1 = await begge(meta.image1);
-const b2 = await begge(meta.image2);
+// Fast tilføjelse til begge billed-prompts. Prøveartikel 1-2 (26/9) fik tekst i
+// billederne, et falsk diagram med tal, og et motiv beskåret i toppen.
+const BILLEDREGLER = ' Wide 16:9 landscape composition, main subject centered with generous empty margins on all sides. Absolutely no text, no letters, no words, no numbers, no labels, no charts or graphs, no logos, no real people.';
+const b1 = await begge(meta.image1 + BILLEDREGLER);
+const b2 = await begge(meta.image2 + BILLEDREGLER);
 const valgBillede = (b) => (b.cf?.fil ? b.cf : b.gm);
 const hero = valgBillede(b1); const mid = valgBillede(b2);
 if (!hero?.fil || !mid?.fil) throw new Error('Mindst ét af billederne kunne ikke laves');

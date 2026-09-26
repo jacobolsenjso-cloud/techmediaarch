@@ -189,7 +189,7 @@ L.push(`# Søgeordsliste — techmediaarch.com`, '', `Lavet ${dato} UTC. Kun til
 const sumP = Object.values(resultat).reduce((s, r) => s + r.pakker.length, 0);
 const sumF = Object.values(resultat).reduce((s, r) => s + r.forslag, 0);
 const sumA = Object.values(resultat).reduce((s, r) => s + r.afvist.length, 0);
-L.push(`**${sumF}** spørgsmål fra Google · **${sumA}** afvist som dubletter · **${sumP}** pakker foreslået · Gemini-tjek (lag 3): ${geminiKoert ? `${geminiKoert} kørt` : 'ikke kørt (ingen nøgle endnu)'}`, '');
+L.push(`**${sumF}** spørgsmål fra Google · **${sumA}** afvist som dubletter · **${sumP}** pakker foreslået · Gemini-tjek (lag 3): ${geminiKoert ? `${geminiKoert} kørt` : process.env.GEMINI_API_KEY ? 'ikke brugt (ingen tvivlstilfælde blandt de valgte)' : 'ikke kørt (ingen nøgle)'}`, '');
 for (const emne of emneListe) {
   const r = resultat[emne];
   L.push(`## ${emne} — ${r.antal} artikler i dag`, '', `${r.forslag} forslag: ${r.fri} fri, ${r.tvivl} tvivl, ${r.afvist.length} afvist.`, '');
