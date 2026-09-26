@@ -1,5 +1,6 @@
 ---
 title: "Stop Losing Rankings: How to Find and Disavow Spam Backlinks in Google Search Console (2026 Guide)"
+seoTitle: "How to Find and Disavow Spam Backlinks (2026 Guide)"
 description: Learn how to find and remove spam backlinks using Google’s Disavow Tool. Protect your website’s SEO with a step-by-step, beginner-friendly guide.
 published: 2026-05-04T21:06:56.752+02:00
 updated: 2026-05-04T21:06:56.752+02:00

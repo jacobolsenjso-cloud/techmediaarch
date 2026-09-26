@@ -1,6 +1,7 @@
 ---
 title: Necro Trojan Infections Reach 11 Million, Android Users Warned of Imminent Danger
-description: Million Android users face risks from Necro Trojan
+seoTitle: "Necro Trojan Hits 11 Million Android Devices"
+description: "The Necro Trojan has infected over 11 million Android devices. Learn how it spreads, what it can steal, and how to protect your phone."
 published: 2024-09-27T15:00:00.062+02:00
 updated: 2026-04-08T09:47:04.879+02:00
 labels:

@@ -1,5 +1,6 @@
 ---
 title: "The AI Cybersecurity Conundrum: Why A Multi-Layered System is the Only Solution"
+seoTitle: "The AI Cybersecurity Conundrum: Why Layered Defence Wins"
 description: AI Cybersecurity Conundrum explores why a multi-layered security approach is essential to tackle AI cybersecurity challenges and risks.
 published: 2024-09-11T21:31:00.003+02:00
 updated: 2026-04-08T11:11:41.188+02:00

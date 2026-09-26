@@ -1,5 +1,6 @@
 ---
 title: "The 30-Minute AI Podcast Clip Playbook: Tools, Prompts, and Hooks That Drive Shares"
+seoTitle: "The 30-Minute AI Podcast Clip Playbook"
 description: How to create viral AI podcast clips in under 30 minutes. This guide breaks down the tools and techniques for generating leads and building authority.
 published: 2026-05-12T16:00:00.000+02:00
 updated: 2026-05-12T16:00:00.112+02:00

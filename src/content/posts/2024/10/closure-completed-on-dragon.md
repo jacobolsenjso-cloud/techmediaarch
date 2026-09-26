@@ -1,5 +1,6 @@
 ---
 title: Safe As Closure Completed On Dragon Hatch undocking - The Crew-8 mission has marked a significant chapter in space exploration, showcasing the collaboration between NASA and SpaceX.
+seoTitle: "Crew-8 Dragon Hatch Closed Safely Before Undocking"
 description: Crew-8's undocking marks a pivotal moment in space exploration, showcasing NASA and SpaceX's collaboration.
 published: 2024-10-24T21:00:00.028+02:00
 updated: 2026-04-08T11:37:35.567+02:00

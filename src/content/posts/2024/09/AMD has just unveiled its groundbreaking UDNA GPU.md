@@ -1,5 +1,6 @@
 ---
 title: RDNA and CDNA, reunited - AMD Launches UDNA GPU Architecture to Challenge Nvidia CUDA ecosystem
+seoTitle: "AMD Unveils UDNA GPU Architecture to Challenge Nvidia CUDA"
 description: AMD's UDNA architecture merges RDNA and CDNA, aiming to challenge Nvidia with unified GPU design Nvidia's CUDA ecosystem, and enhanced performance.
 published: 2024-09-11T20:00:00.022+02:00
 updated: 2026-04-08T11:11:41.188+02:00

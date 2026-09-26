@@ -1,5 +1,6 @@
 ---
 title: "Kling AI in Action: 10 Creative Workflows to Turn Simple Prompts into Studio-Quality Videos"
+seoTitle: "Kling AI: 10 Creative Workflows for Studio-Quality Video"
 description: Kling AI's video capabilities. Learn to create realistic, animated, and image-based videos with advanced prompting techniques for stunning results.
 published: 2026-05-16T16:58:30.519+02:00
 updated: 2026-05-16T16:58:30.519+02:00

@@ -1,6 +1,6 @@
 ---
 title: Privacy policy
-description: Privacy Policy TechMediaArch.com
+description: "How Tech Media Arch collects, uses and protects personal data, including cookies, analytics and advertising, and your privacy rights."
 published: 2026-02-16T12:08:00.000+01:00
 updated: 2026-03-12T11:37:58.337+01:00
 bloggerId: "1645160759921631795"

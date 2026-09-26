@@ -1,5 +1,6 @@
 ---
 title: Instagram Exposes "Teen Accounts" Profiles in Bid to Boost Online Safety
+seoTitle: "Instagram Launches Teen Accounts to Boost Online Safety"
 description: Instagram's new 'Teen Accounts' enhance privacy and safety for young users, easing parental concerns.
 published: 2024-09-25T22:00:00.013+02:00
 updated: 2026-04-08T09:47:04.880+02:00

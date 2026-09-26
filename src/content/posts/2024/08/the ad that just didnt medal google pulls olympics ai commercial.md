@@ -1,5 +1,6 @@
 ---
 title: "The Ad That Just Didn't Medal: Google Pulls Olympics AI Commercial"
+seoTitle: "Google Pulls Its Olympics AI Commercial"
 description: Google pulls controversial 'Dear Sydney' AI ad from Olympics after backlash over AI replacing human creativity.
 published: 2024-08-02T23:16:00.054+02:00
 updated: 2026-04-07T19:32:49.524+02:00

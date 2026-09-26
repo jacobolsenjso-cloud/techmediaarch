@@ -1,5 +1,6 @@
 ---
 title: Web3's Missing Piece The Grid Aims to Map Blockchain Data with New Tech
+seoTitle: "The Grid Aims to Map Blockchain Data for Web3"
 description: How The Grid revolutionizes blockchain data mapping for web3 startups, enhancing accessibility and innovation.
 published: 2024-12-23T20:00:00.020+01:00
 updated: 2026-04-08T11:35:42.758+02:00

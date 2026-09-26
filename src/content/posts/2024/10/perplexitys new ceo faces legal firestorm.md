@@ -1,5 +1,6 @@
 ---
 title: Perplexity's New CEO Faces Legal Firestorm and Intense Online Competition
+seoTitle: "Perplexity's CEO Faces Lawsuits and Fierce Competition"
 description: Perplexity's new CEO faces legal challenges and fierce competition in the AI landscape, impacting the company's future.
 published: 2024-10-27T18:00:00.002+01:00
 updated: 2026-04-08T11:36:30.192+02:00

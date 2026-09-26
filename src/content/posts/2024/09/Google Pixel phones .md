@@ -1,5 +1,6 @@
 ---
 title: "Google's Abyssal Problem: Pixel Phones Cry Out for More Storage Space"
+seoTitle: "Google Pixel Phones Need More Storage Space"
 description: Google's Pixel phone storage issues, user frustrations, and potential solutions for a better experience for pixel phones
 published: 2024-09-19T14:00:00.039+02:00
 updated: 2026-04-08T09:47:04.878+02:00

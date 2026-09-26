@@ -1,5 +1,6 @@
 ---
 title: Google Just Turned Chrome Into an AI Powerhouse with Gemini Skills
+seoTitle: "Google Turns Chrome Into an AI Powerhouse With Gemini"
 description: Google's latest AI updates are here. Discover how new Gemini Skills in Chrome, advanced robotics, and AI agents are changing everything.
 published: 2026-04-18T13:05:00.001+02:00
 updated: 2026-04-23T11:48:53.216+02:00

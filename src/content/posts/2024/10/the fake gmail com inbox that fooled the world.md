@@ -1,5 +1,6 @@
 ---
 title: The Fake gmail.com Inbox that Fooled the World - What You Need to Know
+seoTitle: "The Fake Gmail Inbox That Fooled the World"
 description: Gmail.com inbox, a phishing scam that misled users, its impact, and how to protect yourself from similar threats.
 published: 2024-10-12T17:30:00.030+02:00
 updated: 2026-04-08T09:47:04.880+02:00

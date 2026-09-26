@@ -1,5 +1,6 @@
 ---
 title: "Inside T‑Mobile’s AI‑RAN Partnership: How It Will Boost 5G Speeds, Coverage, and Energy Efficiency"
+seoTitle: "T-Mobile's AI-RAN Partnership: Faster, Greener 5G"
 description: The T-Mobile AI-RAN partnership, pioneering 5G and beyond. Discover how AI is transforming networks for enhanced performance and future applications.
 published: 2026-05-14T19:21:01.494+02:00
 updated: 2026-05-14T19:21:01.494+02:00

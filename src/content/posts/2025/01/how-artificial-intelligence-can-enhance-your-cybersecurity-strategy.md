@@ -1,5 +1,6 @@
 ---
 title: How Artificial Intelligence Can Enhance Your Cybersecurity Strategy
+seoTitle: "How AI Can Strengthen Your Cybersecurity Strategy"
 description: AI enhances cybersecurity by improving threat detection, response, and overall security strategies.
 published: 2025-01-12T20:30:00.035+01:00
 updated: 2026-04-08T11:14:20.992+02:00

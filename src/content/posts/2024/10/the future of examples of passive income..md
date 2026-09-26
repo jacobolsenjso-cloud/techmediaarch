@@ -1,5 +1,6 @@
 ---
 title: "Transform Your Finances with ChatGPT: 5 Surprising Examples of Passive Income!?"
+seoTitle: "5 Passive Income Ideas Using ChatGPT"
 description: How ChatGPT can empower you to generate passive income and achieve financial freedom, see some examples of passive income.
 published: 2024-10-08T15:30:00.002+02:00
 updated: 2026-04-08T09:47:04.138+02:00

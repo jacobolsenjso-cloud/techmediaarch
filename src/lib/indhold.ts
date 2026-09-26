@@ -13,6 +13,7 @@ export interface Indlaeg {
   sti: string;         // /2024/10/navn.html — som Blogger, uden kodning
   href: string;        // samme sti, kodet til brug i links (mellemrum -> %20)
   title: string; description: string;
+  seoTitle: string;     // kort søgetitel til <title> (højst ~600 px i Google), ellers = title
   published: string; updated: string;
   labels: string[]; emner: Emne[];
   image: string | null;
@@ -102,7 +103,7 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
   const sti = `/${aar}/${maaned}/${navn}.html`;
   return {
     aar, maaned, navn, sti, href: kodet(sti),
-    title: data.title, description: data.description || '',
+    title: data.title, description: data.description || '', seoTitle: data.seoTitle || data.title,
     published: data.published, updated: data.updated || data.published,
     labels, emner: EMNER.filter((e) => labels.includes(e.navn)),
     // Uden eget billede bruges miniaturen af den første indlejrede YouTube-video

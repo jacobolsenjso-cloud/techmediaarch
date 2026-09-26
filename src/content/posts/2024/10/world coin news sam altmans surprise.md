@@ -1,5 +1,6 @@
 ---
 title: World Coin News - Sam Altman's Surprise Announcement Rocks the Globe
+seoTitle: "Worldcoin News: Sam Altman's Surprise Announcement"
 description: Sam Altman's world coin news aims to revolutionize wealth distribution through biometric verification and cryptocurrency.
 published: 2024-10-19T03:00:00.018+02:00
 updated: 2026-04-08T18:03:45.669+02:00

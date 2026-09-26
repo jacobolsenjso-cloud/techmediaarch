@@ -1,6 +1,6 @@
 ---
 title: "Cracking the Code: A Beginner's Guide to Cryptocurrency Basics"
-description: Beginner's Guide to Cryptocurrency Basics
+description: "A beginner's guide to cryptocurrency: what it is, how blockchain works without a central bank, and how to get started with your first coins."
 published: 2024-08-12T22:20:00.018+02:00
 updated: 2026-04-07T19:32:49.525+02:00
 labels:

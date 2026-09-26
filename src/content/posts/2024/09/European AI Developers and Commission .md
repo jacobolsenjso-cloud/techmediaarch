@@ -1,5 +1,6 @@
 ---
 title: European AI Developers and Commission Unveils AI Factories Call for Proposals
+seoTitle: "EU Commission Opens AI Factories Call for Proposals"
 description: European AI developers and AI Factories initiative to enhance AI development and support startups with supercomputing resources.
 published: 2024-09-17T15:00:00.047+02:00
 updated: 2026-04-08T09:47:04.880+02:00

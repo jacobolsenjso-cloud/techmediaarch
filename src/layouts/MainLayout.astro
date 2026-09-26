@@ -10,6 +10,7 @@ import Maerke from '../components/Maerke.astro';
 interface Props {
   title?: string;
   description?: string;
+  seoTitle?: string; // kun til <title> — Google klipper ved ~600 px (27/9-2026)
   image?: string | null;
   schema?: object | object[] | null;
   noindex?: boolean;
@@ -17,7 +18,7 @@ interface Props {
   ogType?: 'article' | 'website';
   breadcrumb?: { navn: string; href: string }[];
 }
-const { title, description, image, schema, noindex, nocanonical, ogType = 'website', breadcrumb = [] } = Astro.props;
+const { title, seoTitle, description, image, schema, noindex, nocanonical, ogType = 'website', breadcrumb = [] } = Astro.props;
 const SITE = 'https://www.techmediaarch.com';
 const BRAND = 'Tech Media Arch';
 // Med build.format 'file' kalder Astro forsiden /index.html — den rigtige adresse er /
@@ -26,8 +27,9 @@ const currentPath = Astro.url.pathname.replace(/\/index\.html$/, '/');
 const defaultDesc = 'Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.';
 const desc = description || defaultDesc;
 // Samme regel som techfeedwatch: brandet hænges kun på, hvis der er plads
-const fuldTitel = !title ? `${BRAND} | AI and Tech News, Guides and Analysis`
-  : (title.length + BRAND.length + 3 <= 60 ? `${title} | ${BRAND}` : title);
+const kortTitel = seoTitle || title;
+const fuldTitel = !kortTitel ? `${BRAND} | AI and Tech News, Guides and Analysis`
+  : (kortTitel.length + BRAND.length + 3 <= 60 ? `${kortTitel} | ${BRAND}` : kortTitel);
 // Canonical: Astro giver stien kodet (mellemrum = %20), præcis som Blogger skrev den
 const canonicalURL = SITE + currentPath;
 const ogImage = image ? (image.startsWith('http') ? image : SITE + image) : `${SITE}/og-default.png`;

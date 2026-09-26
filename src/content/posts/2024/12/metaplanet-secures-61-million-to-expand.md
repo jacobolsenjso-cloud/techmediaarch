@@ -1,5 +1,6 @@
 ---
 title: Metaplanet Secures $61 Million to Expand Bitcoin Holdings, Following MicroStrategy's Footsteps
+seoTitle: "Metaplanet Raises $61 Million to Buy More Bitcoin"
 description: Metaplanet, a Japanese investment firm, raises $61 million to expand its Bitcoin holdings, following the model of MicroStrategy.
 published: 2024-12-23T18:00:00.010+01:00
 updated: 2026-05-20T19:38:54.437+02:00

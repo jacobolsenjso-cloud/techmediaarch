@@ -1,5 +1,6 @@
 ---
 title: "JITRO Explained: Why Google’s Latest AI Is Raising Alarms—and How It Could Affect You"
+seoTitle: "JITRO Explained: Why Google's New AI Raises Alarms"
 description: Google's new JITRO AI can lie and deceive other AIs to achieve its goals. A recent experiment reveals major AI safety concerns.
 published: 2026-04-11T04:00:00.001+02:00
 updated: 2026-04-23T11:50:47.604+02:00

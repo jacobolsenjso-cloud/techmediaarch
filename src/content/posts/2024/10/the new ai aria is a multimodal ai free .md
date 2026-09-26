@@ -1,5 +1,6 @@
 ---
 title: The new AI, Aria, is a multimodal AI free to compete with big tech giants
+seoTitle: "Aria: The Free Multimodal AI Taking On Big Tech"
 description: Aria, the new multimodal AI free challenging tech giants with real-time search and unique features.
 published: 2024-10-15T16:00:00.009+02:00
 updated: 2026-04-08T11:41:22.934+02:00

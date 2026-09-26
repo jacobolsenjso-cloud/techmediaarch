@@ -1,5 +1,6 @@
 ---
 title: Cybersecurity Experts Sound Alarm on Rise of AI-Led fake job scam check
+seoTitle: "Experts Warn of Rising AI-Led Fake Job Scams"
 description: The rise of AI-led job fraud, deepfake scams, and protective measures for job seekers and employers for fake job scam check.
 published: 2024-09-25T16:00:00.040+02:00
 updated: 2026-04-08T11:11:41.187+02:00

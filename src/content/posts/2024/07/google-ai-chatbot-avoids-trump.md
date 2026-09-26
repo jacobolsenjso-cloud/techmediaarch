@@ -1,6 +1,7 @@
 ---
 title: Google AI chatbot avoids Trump assassination questionserns
-description: Google AI chatbot avoids Trump assassination questionserns.
+seoTitle: "Meta's AI Chatbot Avoids Questions on the Trump Shooting"
+description: "Why Meta's AI chatbot refused to answer questions about the attempt on Donald Trump's life, and what the policy means for AI and breaking news."
 published: 2024-07-31T19:33:00.005+02:00
 updated: 2026-04-07T19:32:49.523+02:00
 labels:

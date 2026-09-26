@@ -1,5 +1,6 @@
 ---
 title: "TED AI Conference Shock: AI Expert Claims 20 Seconds of Human Thought Outperforms Gigabytes of Data"
+seoTitle: "TED AI Talk: 20 Seconds of Thought Beats Gigabytes of Data"
 description: AI expert claims 20 seconds of human thought surpasses vast data, sparking debate at TED AI Conference.
 published: 2024-10-27T03:00:00.001+01:00
 updated: 2026-05-20T19:25:04.071+02:00

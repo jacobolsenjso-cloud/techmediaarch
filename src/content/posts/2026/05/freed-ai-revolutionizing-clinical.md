@@ -1,5 +1,6 @@
 ---
 title: "Freed AI: Revolutionizing Clinical Documentation with Intelligent Scribing"
+seoTitle: "Freed AI: Clinical Documentation With an AI Scribe"
 description: Freed AI revolutionizes clinical documentation with intelligent scribing. Save time, reduce burnout, and enhance patient care. Learn more!
 published: 2026-05-12T12:40:34.708+02:00
 updated: 2026-05-12T12:41:12.975+02:00

@@ -1,6 +1,6 @@
 ---
 title: "Market Insights: Trump's \"Stargate\" and AI's Rising Tide"
-description: Trump's Stargate Finance and AI's impact on global economies
+description: "Trump's $500 billion Stargate announcement explained: what it means for AI investment, tech stocks and the global economy."
 published: 2025-01-22T15:30:00.031+01:00
 updated: 2026-04-08T18:08:25.403+02:00
 labels:

@@ -1,6 +1,6 @@
 ---
 title: Copyright, Trademark and Patent Information
-description: Copyright, Trademark and Patent Information Tech Media Archive
+description: "Tech Media Arch's copyright, trademark and patent policy, including how to report content you believe infringes your rights."
 published: 2025-03-03T17:15:00.000+01:00
 updated: 2025-03-03T17:15:12.399+01:00
 bloggerId: "7794866190860597204"

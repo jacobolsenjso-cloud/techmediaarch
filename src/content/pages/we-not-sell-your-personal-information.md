@@ -1,6 +1,6 @@
 ---
 title: We not Sell your Personal Information
-description: We not Sell your Personal Information.
+description: "Tech Media Arch does not sell your personal information. Read about your privacy choices and how to opt out of data sharing."
 published: 2025-03-03T17:12:00.000+01:00
 updated: 2025-03-03T17:12:09.211+01:00
 bloggerId: "4701483121110591426"

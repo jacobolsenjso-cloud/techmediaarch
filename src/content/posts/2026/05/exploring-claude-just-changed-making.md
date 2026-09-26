@@ -1,5 +1,6 @@
 ---
 title: "Exploring Claude Just Changed Making YouTube Videos Forever: A Deep Dive into AI animation"
+seoTitle: "How Claude Changed Making YouTube Videos With AI Animation"
 description: Discover how Claude Design's new AI animation tool turns YouTube scripts into pro visuals in minutes. Is this the end of video editing as we know it?
 published: 2026-05-06T11:00:00.000+02:00
 updated: 2026-05-06T11:00:00.113+02:00

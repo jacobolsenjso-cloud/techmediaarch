@@ -1,5 +1,6 @@
 ---
 title: Can AI Detection Be Trusted? Blind Tests Reveal the Top Free Detectors—and How to Avoid Costly False Flags
+seoTitle: "Can AI Detectors Be Trusted? Blind Tests of Free Tools"
 description: Learn how AI content scanners work, why they matter for SEO and authenticity, and their future impact on creators.
 published: 2026-05-19T13:00:00.000+02:00
 updated: 2026-05-19T13:00:00.115+02:00

@@ -1,5 +1,6 @@
 ---
 title: Cisco's report reveals AI and cybersecurity as top investment areas for industrial organizations
+seoTitle: "Cisco Report: AI and Cybersecurity Lead Industrial Investment"
 description: Cisco's report reveals AI and cybersecurity as top investment areas for industrial organizations.
 published: 2024-07-31T18:45:00.007+02:00
 updated: 2026-04-07T19:32:49.523+02:00

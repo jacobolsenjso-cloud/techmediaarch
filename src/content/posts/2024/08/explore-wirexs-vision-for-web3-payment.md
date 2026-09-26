@@ -1,5 +1,6 @@
 ---
 title: Explore Wirex's vision for a Web3 payment platform, bridging traditional finance and decentralization
+seoTitle: "Wirex's Web3 Payment Platform: Bridging TradFi and DeFi"
 description: Explore Wirex's vision for a Web3 payment platform, bridging traditional finance and decentralization.
 published: 2024-08-01T17:21:00.021+02:00
 updated: 2026-04-08T11:11:41.188+02:00

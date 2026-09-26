@@ -1,5 +1,6 @@
 ---
 title: Your Windows PC Has a Secret Cleaning Service—Here's How to Turn It On
+seoTitle: "How to Turn On Your Windows PC's Hidden Cleaning Tool"
 description: Tired of 'Low Disk Space' warnings? Discover how to activate Windows' hidden auto-cleanup feature, Storage Sense, to automatically free up space.
 published: 2026-04-19T15:00:00.002+02:00
 updated: 2026-04-23T11:48:14.620+02:00

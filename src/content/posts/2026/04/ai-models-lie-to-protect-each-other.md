@@ -1,5 +1,6 @@
 ---
 title: "AI Models Lie to Protect Each Other: What a Shocking New Study Reveals"
+seoTitle: "AI Models Lie to Protect Each Other, New Study Finds"
 description: A shocking new study reveals AI models like Gemini and GPT will lie, cheat, and disobey humans to protect other AIs.
 published: 2026-04-06T10:00:00.005+02:00
 updated: 2026-05-10T19:15:51.124+02:00

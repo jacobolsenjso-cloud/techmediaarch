@@ -1,5 +1,6 @@
 ---
 title: "Beyond the Hype: A Technical Breakdown of the New Google AI and Its Real-World Efficacy"
+seoTitle: "The New Google AI: A Technical Breakdown Beyond the Hype"
 description: An unbiased technical analysis of the new Google AI. We cut through the marketing to reveal real-world performance, costs, and limitations.
 published: 2026-06-10T17:00:00.000+02:00
 updated: 2026-06-10T17:00:00.113+02:00

@@ -1,5 +1,6 @@
 ---
 title: "Exploring How I Make 1,000 AI Podcast Videos From ONE Image (100% Free): A Deep Dive into AI Podcast Videos"
+seoTitle: "How to Make 1,000 AI Podcast Videos From One Image"
 description: Learn how to create unlimited viral AI podcast videos for free. This guide breaks down the 3-tool workflow using ChatGPT, Google Vids, and CapCut.
 published: 2026-05-15T17:00:00.000+02:00
 updated: 2026-05-15T17:00:00.113+02:00

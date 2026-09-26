@@ -1,5 +1,6 @@
 ---
 title: "Eclipse Initiative Takes On Cybersecurity, AI Regulations: Industry to Take Note"
+seoTitle: "Eclipse Initiative Takes On Cybersecurity and AI Rules"
 description: "Digital lock. Photographic image by: TechMediaArcive. The Eclipse Foundation is making significant strides in cybersecurity and AI regulations, bringing…"
 published: 2024-09-28T22:00:00.042+02:00
 updated: 2026-04-08T09:47:04.880+02:00

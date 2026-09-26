@@ -1,5 +1,6 @@
 ---
 title: Taco Bell to introduce AI drive-thru ordering at hundreds of locations by year-end, enhancing speed and accuracy
+seoTitle: "Taco Bell to Roll Out AI Drive-Thru Ordering at Hundreds of Sites"
 description: Taco Bell to introduce AI drive-thru ordering at hundreds of locations by year-end, enhancing speed and accuracy.
 published: 2024-08-01T15:01:00.026+02:00
 updated: 2026-04-07T19:32:49.523+02:00

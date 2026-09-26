@@ -1,5 +1,6 @@
 ---
 title: Meta's AI Intelligent Growth Plan Explores Public Facebook and Instagram Posts using meta's ai tools
+seoTitle: "Meta's AI Plan Explores Public Facebook and Instagram Posts"
 description: Meta's AI growth plan uses public Facebook and Instagram posts, addressing privacy and regulatory challenges, using Meta's AI tools.
 published: 2024-09-21T16:00:00.059+02:00
 updated: 2026-04-08T09:47:04.138+02:00

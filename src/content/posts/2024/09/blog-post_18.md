@@ -1,5 +1,6 @@
 ---
 title: Microsoft and BlackRock Launch Global AI Infrastructure Investment Partnership in Financial Services AI Task Force
+seoTitle: "Microsoft and BlackRock Launch AI Infrastructure Partnership"
 description: Microsoft and BlackRock's partnership aims to invest $100 billion in AI infrastructure, enhancing economic growth in financial services ai task force.
 published: 2024-09-18T15:00:00.027+02:00
 updated: 2026-04-08T09:47:04.879+02:00

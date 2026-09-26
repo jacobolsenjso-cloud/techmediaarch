@@ -1,5 +1,6 @@
 ---
 title: "Exploring the Possibilities of openfuture.ai: Your Gateway to AI Innovation"
+seoTitle: "Exploring openfuture.ai: Your Gateway to AI Innovation"
 description: openfuture.ai for AI innovation. Create avatars, enhance visuals, and revolutionize character interaction. Discover the future of digital content.
 published: 2026-05-16T15:00:00.000+02:00
 updated: 2026-05-16T15:00:00.115+02:00

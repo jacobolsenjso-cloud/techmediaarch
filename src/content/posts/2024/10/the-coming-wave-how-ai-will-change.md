@@ -1,5 +1,6 @@
 ---
 title: "The Coming Wave: How AI Will Change Everything | FM Camp 2024"
+seoTitle: "The Coming Wave: How AI Will Change Everything"
 description: Aragorn's keynote at FM Camp 2024 explores the transformative power of AI and technology, predicting unprecedented changes in society and the economy.
 published: 2024-10-07T17:15:00.010+02:00
 updated: 2026-04-25T15:55:08.512+02:00

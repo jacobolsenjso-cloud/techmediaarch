@@ -1,5 +1,6 @@
 ---
 title: "Beyond the Blockchain: How AI-Powered DeFi Is Shaping the Future of Web3"
+seoTitle: "How AI-Powered DeFi Is Shaping the Future of Web3"
 description: "Futuristic cityscape. Photographic image by: TechMediaArcive The intersection of artificial intelligence (AI) and decentralized finance (DeFi) is paving…"
 published: 2024-10-02T16:00:00.027+02:00
 updated: 2026-04-08T09:47:04.138+02:00

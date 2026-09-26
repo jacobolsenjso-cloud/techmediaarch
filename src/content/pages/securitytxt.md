@@ -1,6 +1,6 @@
 ---
 title: Security.txt
-description: Security.txt Tech Media Arch
+description: "Tech Media Arch's security.txt: how security researchers can report a vulnerability on techmediaarch.com."
 published: 2025-10-25T23:39:00.000+02:00
 updated: 2026-03-01T15:09:01.173+01:00
 bloggerId: "880607369801804392"

@@ -1,6 +1,6 @@
 ---
 title: Terms & Conditions
-description: Terms & Conditions Techmediaarch.com
+description: "The terms and conditions for using Tech Media Arch, including use of content, links to other websites and limitation of liability."
 published: 2025-08-26T16:05:00.000+02:00
 updated: 2025-08-26T16:07:14.066+02:00
 bloggerId: "6724039318908345628"

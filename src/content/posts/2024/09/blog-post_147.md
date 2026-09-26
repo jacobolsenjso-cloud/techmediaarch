@@ -1,5 +1,6 @@
 ---
 title: Intezer Secures $33M to Develop AI-Driven Tools for Plugging Cybersecurity Holes
+seoTitle: "Intezer Raises $33M for AI-Driven Cybersecurity Tools"
 description: Intezer secures $33M to enhance AI tools for cybersecurity, tackling vulnerabilities and boosting defense strategies, in Cybersecurity Holes.
 published: 2024-09-18T19:00:00.020+02:00
 updated: 2026-04-08T09:47:04.134+02:00

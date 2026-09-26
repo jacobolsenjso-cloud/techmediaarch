@@ -1,6 +1,6 @@
 ---
 title: Sitemap
-description: Sitemap Tech Media Archive
+description: "A complete overview of pages and topics on Tech Media Arch, to help you find articles about AI, tech, crypto and more."
 published: 2025-11-16T13:09:00.000+01:00
 updated: 2026-09-14T10:13:55.584+02:00
 bloggerId: "8470002873685889161"

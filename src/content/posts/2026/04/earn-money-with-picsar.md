@@ -1,5 +1,6 @@
 ---
 title: "Earn Money with Picsart: The New Monetization Program is Open to All"
+seoTitle: "Picsart's New Monetization Program Is Open to All"
 description: Picsart's new 'Earn with Picsart' program is here! Learn how you can monetize your creations with no invite list. Get started on your Picsart PC today
 published: 2026-04-11T10:00:00.001+02:00
 updated: 2026-05-10T19:47:39.059+02:00

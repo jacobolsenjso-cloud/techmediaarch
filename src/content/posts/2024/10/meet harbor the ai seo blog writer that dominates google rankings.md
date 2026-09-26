@@ -1,5 +1,6 @@
 ---
 title: "Meet Harbor: The AI SEO Blog Writer that Dominates Google Rankings"
+seoTitle: "Meet Harbor: The AI SEO Blog Writer for Google Rankings"
 description: What is Harbor's AI that boosts SEO, enhances content quality, and drives Google rankings for writers and creators, and white AI SEO Blog Writer?
 published: 2024-10-07T11:48:00.006+02:00
 updated: 2026-04-08T18:12:10.651+02:00

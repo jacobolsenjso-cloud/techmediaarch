@@ -1,5 +1,6 @@
 ---
 title: "AI Audio Recorder: The Plaud NotePin That's More Than Meets the Eye"
+seoTitle: "Plaud NotePin: The AI Audio Recorder Explained"
 description: Discover how Plaud NotePin enhances productivity with real-time transcription, integrations, and advanced features.
 published: 2024-09-14T17:15:00.003+02:00
 updated: 2026-04-08T09:47:04.136+02:00

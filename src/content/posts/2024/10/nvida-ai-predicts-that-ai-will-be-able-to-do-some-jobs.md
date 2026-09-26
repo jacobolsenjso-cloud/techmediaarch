@@ -1,6 +1,7 @@
 ---
 title: CEO of NVIDIA AI, predicts that AI will be able to do some jobs 1,000 times better
-description: Jensen Huang, the CEO of NVIDIA.
+seoTitle: "Nvidia CEO Predicts AI Will Do Some Jobs 1,000x Better"
+description: "NVIDIA CEO Jensen Huang predicts AI and AGI could soon beat humans at many tasks. What he said at Stanford and what it means for jobs."
 published: 2026-01-12T11:14:00.049+01:00
 updated: 2026-04-08T17:59:28.457+02:00
 labels:

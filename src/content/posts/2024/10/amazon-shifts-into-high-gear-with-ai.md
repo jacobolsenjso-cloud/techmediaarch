@@ -1,5 +1,6 @@
 ---
 title: Amazon Shifts into High Gear with AI-Driven electric delivery vehicles
+seoTitle: "Amazon Speeds Up With AI-Driven Electric Delivery Vans"
 description: Amazon's AI-driven electric delivery vehicles, enhance efficiency and sustainability in logistics.
 published: 2024-10-20T21:00:00.011+02:00
 updated: 2026-05-18T11:58:57.847+02:00

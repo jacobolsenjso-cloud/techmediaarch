@@ -1,5 +1,6 @@
 ---
 title: China's DeepSeek AI Models Send Shockwaves Through Tech Community
+seoTitle: "China's DeepSeek AI Models Shake the Tech World"
 description: "DeepSeek vs ChatGPT: China's AI models challenge US tech dominance with cost-effective, groundbreaking innovations."
 published: 2025-01-26T15:00:00.018+01:00
 updated: 2026-05-27T09:55:40.584+02:00

@@ -1,5 +1,6 @@
 ---
 title: AI-powered tech aims to Level the Playing Field for People with Speech Impairments
+seoTitle: "AI Tech Levels the Playing Field for Speech Impairments"
 description: AI-powered tech enhances communication and accessibility for individuals with speech impairments.
 published: 2024-09-24T21:00:00.086+02:00
 updated: 2026-04-08T09:47:04.878+02:00

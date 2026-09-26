@@ -1,6 +1,6 @@
 ---
 title: About Us
-description: About us Tech Media Arch
+description: "About Tech Media Arch: an independent blog founded by Jacob Olsen that explains AI news, tools and technology trends in plain language."
 published: 2026-03-05T12:32:00.000+01:00
 updated: 2026-03-29T15:13:52.067+02:00
 bloggerId: "6268712934090928161"

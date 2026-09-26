@@ -1,5 +1,6 @@
 ---
 title: "Google Recruits Character: AI Founders in Major AI Talent Acquisition"
+seoTitle: "Google Recruits Character.AI Founders in Major Talent Deal"
 description: Google has hired the co-founders of Character.AI, Noam Shazeer, and Daniel De Freitas, in a strategic move that includes a licensing deal for Characte
 published: 2024-08-06T10:28:00.033+02:00
 updated: 2026-04-07T19:32:49.524+02:00

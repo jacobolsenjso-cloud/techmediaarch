@@ -1,5 +1,6 @@
 ---
 title: The $1 Trillion Question Can Tech Stocks Recover from DeepSeek's Impact & How DeepSeek's AI Model Challenges US Dominance!
+seoTitle: "Can Tech Stocks Recover From DeepSeek's $1 Trillion Hit?"
 description: DeepSeek's influence on tech stocks and recovery potential during market turmoil.
 published: 2025-01-27T15:00:00.043+01:00
 updated: 2026-04-08T18:07:38.400+02:00

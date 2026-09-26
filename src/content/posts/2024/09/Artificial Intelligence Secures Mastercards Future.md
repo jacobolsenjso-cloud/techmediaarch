@@ -1,5 +1,6 @@
 ---
 title: Artificial Intelligence Secures Mastercard's Future with $2.65 Billion Cybersecurity Deal
+seoTitle: "Mastercard's $2.65 Billion AI Cybersecurity Deal"
 description: Mastercard secures its future with a $2.65B cybersecurity deal, leveraging AI to enhance financial security.
 published: 2024-09-15T16:14:00.026+02:00
 updated: 2026-04-08T11:11:41.187+02:00

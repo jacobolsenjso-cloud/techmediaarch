@@ -1,5 +1,6 @@
 ---
 title: Siri's ChatGPT Integration Brings AI Power to Your Fingertips, But at What Cost?
+seoTitle: "Siri's ChatGPT Integration: AI Power, but at What Cost?"
 description: "Siri's ChatGPT integration: enhanced AI features, privacy concerns, and its impact on user experience."
 published: 2024-10-26T18:00:00.004+02:00
 updated: 2026-04-08T18:10:12.616+02:00

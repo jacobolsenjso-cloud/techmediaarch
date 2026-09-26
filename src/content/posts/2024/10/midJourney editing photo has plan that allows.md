@@ -1,5 +1,6 @@
 ---
 title: MidJourney editing photo - has plan that allows anyone on the web to edit photos with AI
+seoTitle: "Midjourney Plans to Let Anyone Edit Photos With AI"
 description: How midjourney edit photo whit an AI editing tool, enabling easy online image edits for everyone.
 published: 2024-10-19T21:00:00.002+02:00
 updated: 2026-04-08T18:03:10.641+02:00

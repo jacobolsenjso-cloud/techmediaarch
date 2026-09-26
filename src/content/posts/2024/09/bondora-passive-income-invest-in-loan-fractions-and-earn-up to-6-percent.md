@@ -1,5 +1,6 @@
 ---
 title: "Bondora passive Income: Invest in Loan Fractions and Earn Up to 6 % p.a."
+seoTitle: "Bondora Passive Income: Earn Up to 6% a Year on Loans"
 description: How to earn up to 6 % p.a. with Bondora loan fractions and explore the benefits and risks.
 published: 2024-09-27T20:00:00.122+02:00
 updated: 2026-04-08T18:13:58.594+02:00

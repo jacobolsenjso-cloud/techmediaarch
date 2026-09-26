@@ -1,5 +1,6 @@
 ---
 title: "HCL Tech Today: Real-Time Price & AI-Powered Trends—Trade Confidently"
+seoTitle: "HCL Tech Today: Real-Time Price and AI-Powered Trends"
 description: Get live HCL Tech share price updates, trends, and analysis. Explore key financial data, analyst ratings, and future prospects for informed investment
 published: 2026-05-20T16:00:00.000+02:00
 updated: 2026-05-20T16:00:00.113+02:00

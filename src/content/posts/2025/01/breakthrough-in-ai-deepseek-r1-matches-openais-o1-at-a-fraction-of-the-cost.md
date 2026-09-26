@@ -1,5 +1,6 @@
 ---
 title: Breakthrough in AI - DeepSeek-R1 Matches OpenAI's o1 at a Fraction of the Cost
+seoTitle: "DeepSeek-R1 Matches OpenAI's o1 at a Fraction of the Cost"
 description: "DeepSeek-R1: Open-source AI rivaling OpenAI o1, offering top performance at a fraction of the cost."
 published: 2025-01-22T22:00:00.009+01:00
 updated: 2026-04-08T11:34:32.802+02:00

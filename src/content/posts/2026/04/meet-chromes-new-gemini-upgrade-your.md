@@ -1,5 +1,6 @@
 ---
 title: "Meet Chrome’s New Gemini Upgrade: Your Built‑In AI for Research, Drafting, and Everyday Browsing"
+seoTitle: "Chrome's Gemini Upgrade: Built-In AI for Everyday Browsing"
 description: Learn how to run Google's powerful Gemma 4 AI model directly on your PC for free. Our step-by-step guide shows you how to get started with LM Studio.
 published: 2026-04-18T20:48:00.000+02:00
 updated: 2026-04-23T11:48:37.076+02:00

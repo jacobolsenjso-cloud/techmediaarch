@@ -1,5 +1,6 @@
 ---
 title: "Rephrasy AI Review 2026: Real-World Tests on Tone, Readability, Originality, and Ethics"
+seoTitle: "Rephrasy AI Review 2026: Tone, Readability and Originality"
 description: Can Rephrasy AI really bypass GPTZero and Turnitin? We put this AI humanizer to the test. See the surprising results and what it means for writers.
 published: 2026-05-23T15:00:00.000+02:00
 updated: 2026-05-23T15:00:00.116+02:00

@@ -1,6 +1,6 @@
 ---
 title: F.A.Q
-description: FAQ Tech media arch
+description: "Frequently asked questions about Tech Media Arch: what the blog covers, how often new articles are published and how to find them."
 published: 2025-10-03T19:25:00.000+02:00
 updated: 2026-03-29T15:26:59.808+02:00
 bloggerId: "7104141226660280480"

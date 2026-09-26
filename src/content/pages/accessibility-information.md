@@ -1,6 +1,6 @@
 ---
 title: Accessibility Information
-description: Accessibility Information Tech Media Archive
+description: "How Tech Media Arch works to make its website accessible to everyone, and how to tell us about accessibility problems."
 published: 2025-03-03T17:05:00.000+01:00
 updated: 2025-03-03T17:05:33.720+01:00
 bloggerId: "3319326911589587240"

@@ -1,5 +1,6 @@
 ---
 title: "Google's Gamble: New AI-Powered Labels Aim to Revive User Trust"
+seoTitle: "Google's New AI Labels Aim to Win Back User Trust"
 description: Google AI-powered labels, their impact on user trust, and future SEO trends.
 published: 2024-09-19T15:00:00.021+02:00
 updated: 2026-04-08T09:47:04.878+02:00

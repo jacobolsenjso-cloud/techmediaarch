@@ -1,5 +1,6 @@
 ---
 title: "eToro US Pays the Price: Agrees to $1.5M Fine and Trading Curbs in SEC Settlement"
+seoTitle: "eToro US Agrees to $1.5M SEC Fine and Trading Curbs"
 description: eToro US settles with SEC for $1.5M, limits trading to Bitcoin, Bitcoin Cash, and Ether. Impact on operations and market
 published: 2024-09-15T15:29:00.008+02:00
 updated: 2026-05-18T11:57:56.297+02:00

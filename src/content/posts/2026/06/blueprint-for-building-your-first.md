@@ -1,5 +1,6 @@
 ---
 title: "Blueprint for Building Your First Profitable AI Agent: Direct, Data-Driven Strategy from the Ground Up"
+seoTitle: "How to Build Your First Profitable AI Agent"
 description: Mannis AI agentic automation and algorithmic leverage reshape business productivity, with actionable, original analysis on AI's true cost.
 published: 2026-06-03T12:31:34.149+02:00
 updated: 2026-06-03T12:31:34.149+02:00

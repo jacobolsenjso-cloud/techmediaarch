@@ -1,5 +1,6 @@
 ---
 title: "Quantum Threats to Encryption: 7 Actions Security Teams Should Take Before 2027"
+seoTitle: "Quantum Threats to Encryption: 7 Steps to Take Before 2027"
 description: Celebrate World Quantum Day by understanding Quantum Computing. Learn how qubits, superposition, and entanglement will redefine tech.
 published: 2026-05-22T11:00:00.000+02:00
 updated: 2026-05-22T11:00:00.210+02:00

@@ -1,5 +1,6 @@
 ---
 title: Checking EU AI Guidelines Laws, Major Tech Companies Found To Be Non-compliant
+seoTitle: "Major Tech Companies Found Non-Compliant With EU AI Rules"
 description: Major tech firms struggle with EU AI guidelines, revealing gaps in cybersecurity and discrimination standards.
 published: 2024-10-17T03:00:00.010+02:00
 updated: 2026-04-08T11:14:20.994+02:00

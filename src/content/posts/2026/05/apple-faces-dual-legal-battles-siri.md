@@ -1,5 +1,6 @@
 ---
 title: "Apple Faces Dual Legal Battles: Siri Privacy Settlement Payouts and New AI Advertising Lawsuits"
+seoTitle: "Apple Faces Siri Privacy Payouts and New AI Ad Lawsuits"
 description: Apple is facing a $95 million Siri privacy settlement payout and new lawsuits alleging false advertising about iPhone 16 AI capabilities.
 published: 2026-05-08T15:00:00.000+02:00
 updated: 2026-05-08T15:00:00.121+02:00

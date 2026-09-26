@@ -1,5 +1,6 @@
 ---
 title: "BitMEX CEO: US Crypto by Sector to Take a Different Route, Diverging from Global Trends"
+seoTitle: "BitMEX CEO: US Crypto Will Diverge From Global Trends"
 description: How US crypto regulations diverge from global trends, impacting BitMEX and the broader market landscape crypto by sector
 published: 2024-09-29T19:00:00.010+02:00
 updated: 2026-05-20T19:48:44.913+02:00

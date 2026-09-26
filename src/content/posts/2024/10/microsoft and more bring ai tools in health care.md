@@ -1,5 +1,6 @@
 ---
 title: Las Vegas Bound - Nvidia, Google, Microsoft, and More Bring AI tools in health care
+seoTitle: "Nvidia, Google and Microsoft Bring AI Tools to Health Care"
 description: How Nvidia, Google, Microsoft, and Broadcom are revolutionizing AI tools in health care.
 published: 2024-10-20T03:00:00.011+02:00
 updated: 2026-04-08T11:39:36.431+02:00

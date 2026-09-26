@@ -18,7 +18,7 @@ const schema = {
   mainEntity: { '@type': 'ItemList', itemListElement: liste.slice(0, 30).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `https://www.techmediaarch.com${p.href}` })) },
 };
 ---
-<MainLayout title={`${e.navn}: articles and guides`} description={`All Tech Media Arch articles about ${e.navn} — ${liste.length} article${liste.length === 1 ? '' : 's'}, newest first.`}
+<MainLayout title={`${e.navn}: articles and guides`} description={`Articles, guides and explainers about ${e.navn} from Tech Media Arch — ${liste.length} article${liste.length === 1 ? '' : 's'}, newest first.`}
   noindex={liste.length < TYND_GRAENSE} schema={schema} breadcrumb={[{ navn: e.navn, href: emneUrl(e) }]}>
   <div class="page-wrapper" style="padding-top: 24px;">
     <EmneChips aktiv={e.slug} />

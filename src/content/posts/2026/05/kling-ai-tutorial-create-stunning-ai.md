@@ -1,5 +1,6 @@
 ---
 title: "Kling AI Tutorial: Create Stunning AI Videos Step-by-Step (Prompts, Styles, Pro Tips)"
+seoTitle: "Kling AI Tutorial: Stunning AI Videos Step by Step"
 description: Dive into the Kling AI video generator. Learn how to turn simple text prompts into hyper-realistic videos with granular control and advanced features.
 published: 2026-05-16T20:00:00.000+02:00
 updated: 2026-05-16T20:00:00.111+02:00

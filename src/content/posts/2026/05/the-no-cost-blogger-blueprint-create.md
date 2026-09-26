@@ -1,5 +1,6 @@
 ---
 title: "The No-Cost Blogger Blueprint: Create and Publish a Video Course in One Afternoon"
+seoTitle: "The No-Cost Blogger Blueprint: A Video Course in an Afternoon"
 description: Want to launch a video course without the cost? Analysis shows you how to create a free video course on Blogger in minutes using a simple script.
 published: 2026-05-15T14:00:00.000+02:00
 updated: 2026-05-15T14:00:00.192+02:00

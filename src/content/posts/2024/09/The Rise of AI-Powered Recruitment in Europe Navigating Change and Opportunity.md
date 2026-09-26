@@ -1,5 +1,6 @@
 ---
 title: "The Rise of AI-Powered Recruitment in Europe: Navigating Change and Opportunity"
+seoTitle: "The Rise of AI-Powered Recruitment in Europe"
 description: AI-Powered transformative impact of AI in Europe's recruitment landscape, highlighting opportunities and challenges.
 published: 2024-09-26T21:00:00.006+02:00
 updated: 2026-04-08T09:47:04.133+02:00

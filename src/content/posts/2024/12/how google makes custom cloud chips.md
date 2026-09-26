@@ -1,5 +1,6 @@
 ---
 title: How Google Makes Custom Cloud Chips That Power Apple AI And Gemini
+seoTitle: "How Google Makes the Cloud Chips Behind Apple AI and Gemini"
 description: Google was the first cloud provider to make its custom AI chips, called TPUs when they first came out in 2015 - a trend both Amazon and Microsoft
 published: 2024-12-15T16:00:00.028+01:00
 updated: 2026-04-08T18:04:55.681+02:00

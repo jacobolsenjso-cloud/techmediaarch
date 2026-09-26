@@ -1,5 +1,6 @@
 ---
 title: Find Long Lost Friends and Family with a Single Photo facecheck id
+seoTitle: "FaceCheck.ID: Find Lost Friends and Family From a Photo"
 description: Reconnect with loved ones using FaceCheck ID's facial recognition technology. Find friends with just a photo.
 published: 2024-12-22T20:00:00.021+01:00
 updated: 2026-04-08T11:14:20.992+02:00

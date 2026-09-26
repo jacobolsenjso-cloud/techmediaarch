@@ -1,5 +1,6 @@
 ---
 title: "AI Shocks Again: Claude & Alexa, Smarter Robots, OpenAI ASI, Llama 3.2 & More"
+seoTitle: "AI News: Claude, Alexa, Smarter Robots and Llama 3.2"
 description: AI has made some major moves this month, and you're about to find out why. From Alexa turning into Claude AI, to Google's DeepMind.
 published: 2024-10-07T20:30:00.001+02:00
 updated: 2026-05-18T11:56:43.103+02:00

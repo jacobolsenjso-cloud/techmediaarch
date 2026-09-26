@@ -1,5 +1,6 @@
 ---
 title: Inside Spencer Pratt’s AI video gambit in L.A.’s mayoral contest—and why it matters now
+seoTitle: "Spencer Pratt's AI Video Gambit in the LA Mayoral Race"
 description: Spencer Pratt's AI video, a viral sensation in the LA mayoral race. Analyze its impact, technology, and implications for future political campaigns.
 published: 2026-05-14T22:00:00.000+02:00
 updated: 2026-05-14T22:00:00.216+02:00

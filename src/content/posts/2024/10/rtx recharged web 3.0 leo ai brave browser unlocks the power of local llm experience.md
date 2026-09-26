@@ -1,5 +1,6 @@
 ---
 title: "RTX-Recharged Web 3.0: Leo AI Brave Browser Unlocks the Power of Local LLM Experience"
+seoTitle: "Brave's Leo AI Brings Local LLMs to RTX PCs"
 description: Leo AI Brave Browser and Leo AI enhance privacy and local LLM experiences in Web 3.0.
 published: 2024-10-08T03:00:00.002+02:00
 updated: 2026-04-08T09:47:04.880+02:00

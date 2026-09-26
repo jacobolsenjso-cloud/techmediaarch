@@ -1,5 +1,6 @@
 ---
 title: "Gemma 4 Explained: Pricing, Limits, and Who Can Use Google’s New AI Right Now"
+seoTitle: "Gemma 4 Explained: Pricing, Limits and Who Can Use It"
 description: Google just released Gemma 4, a powerful family of open-source AI models based on Gemini tech. Discover what this means for free AI and how to use it.
 published: 2026-04-10T23:00:00.005+02:00
 updated: 2026-04-11T00:12:13.078+02:00

@@ -1,5 +1,6 @@
 ---
 title: Meta surpasses Q2 forecasts but warns of major spending increase in 2025, driven by AI investments.
+seoTitle: "Meta Beats Q2 Forecasts but Warns of Higher AI Spending"
 description: Meta surpasses Q2 forecasts but warns of major spending increase in 2025, driven by AI investments.
 published: 2024-08-01T14:33:00.002+02:00
 updated: 2026-04-07T19:32:49.523+02:00

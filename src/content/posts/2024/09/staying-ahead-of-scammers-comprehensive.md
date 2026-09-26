@@ -1,5 +1,6 @@
 ---
 title: "Staying Ahead of Scammers: A Comprehensive Analysis of scam-detector.com's scam detector validator tool"
+seoTitle: "Scam-Detector.com's Scam Detector Tool: An Analysis"
 description: "Home office setting. Photographic image by: TechMediaArcive. In today's digital world, online scams are a growing concern. With various scams targeting…"
 published: 2024-09-28T16:00:00.042+02:00
 updated: 2026-05-18T12:00:39.204+02:00

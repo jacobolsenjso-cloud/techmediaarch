@@ -40,7 +40,8 @@ const toc = p.overskrifter.length < 3 ? [] : p.overskrifter.length > 14 ? p.over
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: p.title,
+  // Google godtager højst 110 tegn i headline — længere titler bruger søgetitlen
+  headline: p.title.length > 110 ? p.seoTitle : p.title,
   description: p.description,
   datePublished: p.published,
   dateModified: p.updated,
@@ -56,7 +57,7 @@ const schema = {
 const faq = faqSchema(p.faqHtml);
 const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
 ---
-<MainLayout title={p.title} description={p.description} image={p.image} schema={faq ? [schema, faq] : schema} ogType="article" breadcrumb={crumbs}>
+<MainLayout title={p.title} seoTitle={p.seoTitle} description={p.description} image={p.image} schema={faq ? [schema, faq] : schema} ogType="article" breadcrumb={crumbs}>
   <style is:global>
     .article-layout { display: flex; gap: 25px; max-width: 1200px; margin: 0 auto; padding: 30px 20px; box-sizing: border-box; align-items: flex-start; width: 100%; }
     .article-primary { flex: 1; min-width: 0; width: 100%; max-width: 100%; }

@@ -1,5 +1,6 @@
 ---
 title: News Corp Takes Aim at Perplexity Pro in High-Stakes Plagiarism Lawsuit
+seoTitle: "News Corp Sues Perplexity Over Alleged Plagiarism"
 description: News Corp's lawsuit against Perplexity Pro raises crucial questions about AI, copyright, and plagiarism.
 published: 2024-10-22T03:00:00.019+02:00
 updated: 2026-04-08T11:20:49.504+02:00

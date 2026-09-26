@@ -1,5 +1,6 @@
 ---
 title: "Create 15 Minute Videos with FREE AI: A Deep Dive into FREE AI video creation"
+seoTitle: "How to Create 15-Minute Videos With Free AI Tools"
 description: Discover how Google's NotebookLM lets you create 15-minute YouTube videos from text for free. No script, no editing—just powerful AI video creation.
 published: 2026-05-09T18:28:08.924+02:00
 updated: 2026-05-09T18:28:08.925+02:00

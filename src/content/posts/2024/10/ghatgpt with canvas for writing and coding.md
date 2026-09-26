@@ -1,5 +1,6 @@
 ---
 title: "OpenAI Unveils Canvas: A New Ghatgpt with Canvas for Writing and Coding Perfection"
+seoTitle: "OpenAI Canvas: ChatGPT's New Tool for Writing and Coding"
 description: OpenAI's ChatGPT with Canvas is a revolutionary tool for writers and coders enhancing productivity and collaboration.
 published: 2024-10-09T19:30:00.002+02:00
 updated: 2026-04-08T09:47:04.137+02:00

@@ -1,5 +1,6 @@
 ---
 title: "Free Open-Source WhatsApp CRM: A Technical Analysis of the Step-by-Step Setup"
+seoTitle: "Free Open-Source WhatsApp CRM: Step-by-Step Setup"
 description: Free open-source WhatsApp CRM. We break down its technical setup, features, limitations, and whether it can replace paid solutions.
 published: 2026-05-28T14:00:00.000+02:00
 updated: 2026-05-28T14:00:00.118+02:00

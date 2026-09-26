@@ -1,5 +1,6 @@
 ---
 title: I Built a Free AI Posture Coach with Google's Gemma 4 — Here's How You Can Too
+seoTitle: "How I Built a Free AI Posture Coach With Gemma 4"
 description: Learn how to build a free, private AI posture analyzer on your Mac using Google's Gemma 4. No coding skills needed—the AI writes the code for you!
 published: 2026-04-14T13:00:00.002+02:00
 updated: 2026-04-23T11:49:10.274+02:00

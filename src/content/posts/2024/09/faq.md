@@ -1,6 +1,6 @@
 ---
 title: FAQ
-description: faq Tech Media Archive
+description: "Answers to common questions about Tech Media Archive: what the blog covers, how often new articles are published, and what topics to expect."
 published: 2024-09-30T15:43:00.070+02:00
 updated: 2026-04-08T09:47:04.132+02:00
 labels:

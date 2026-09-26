@@ -1,5 +1,6 @@
 ---
 title: "Google Workspace Studio: An Analyst's Take on Google's Agentic AI"
+seoTitle: "Google Workspace Studio: An Analyst's Take on Agentic AI"
 description: Google Workspace Studio, Google's new agentic AI automation platform. Discover its capabilities, how it challenges Zapier, and its impact on business.
 published: 2026-05-27T13:00:00.896+02:00
 updated: 2026-05-27T13:00:00.896+02:00
