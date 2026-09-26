@@ -53,12 +53,17 @@ const indeks = lavIndeks(arkiv.filter((a) => a.sti.startsWith('/20')));
 const linkKand = [];
 for (const q of [valgt.hoved, ...valgt.beslaegtede]) for (const m of mestEns(q, indeks, 6)) if (!linkKand.some((k) => k.sti === m.sti)) linkKand.push(m);
 const titelAf = (s) => arkiv.find((a) => a.sti === s)?.titel || s;
-const kandListe = linkKand.slice(0, 12).map((m) => ({ href: kodet(m.sti), sti: m.sti, titel: titelAf(m.sti) }));
+// Kandidater: de 12 med flest fælles ord + alle artikler i samme emne. Målt 26/9
+// (kørsel #11): ordlisten alene fandt ingen LLM-artikler til en LLM-artikel,
+// fordi titlerne siger "DeepSeek", "ChatGPT", "Claude" — ikke "language model".
+const iEmne = arkiv.filter((a) => a.sti.startsWith('/20') && a.labels.includes(valgt.emne)).map((a) => ({ sti: a.sti }));
+const kandListe = [...linkKand.slice(0, 12), ...iEmne].filter((m, i, arr) => arr.findIndex((x) => x.sti === m.sti) === i)
+  .slice(0, 40).map((m) => ({ href: kodet(m.sti), sti: m.sti, titel: titelAf(m.sti) }));
 // Kun artikler, der reelt handler om det samme. Prøveartikel 2 (26/9) fik tvunget
 // 3 links ind via ordet "market" (bl.a. Trump/Stargate) — relevans vinder over antal.
 let interne = [];
 if (kandListe.length) {
-  const rel = await json(`New article topic: "${valgt.hoved}". Which of these existing articles would a reader of the new article genuinely find relevant? Be strict: a shared word is not enough.
+  const rel = await json(`New article topic: "${valgt.hoved}". Which of these existing articles would a reader of the new article find genuinely useful to click through to? They must be about a closely related subject — sharing a generic word like "AI", "market" or "tech" is not enough.
 Return JSON {"relevant":[numbers, most relevant first]}
 ${kandListe.map((k, i) => `${i + 1}. ${k.titel}`).join('\n')}`);
   interne = (rel.relevant || []).map((n) => kandListe[n - 1]).filter(Boolean).slice(0, 5);
