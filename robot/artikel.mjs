@@ -9,7 +9,7 @@
 //  2. Gemini skriver artiklen MED Google-søgning. Uden mindst 2 kontrollerede
 //     kilder afvises artiklen (Gemini søger ellers ikke altid — målt 26/9).
 //  3. Interne links: 3-5 til eksisterende artikler (kun adresser, der findes).
-//  4. To billeder, lavet med både Cloudflare og Gemini til sammenligning.
+//  4. To billeder med Gemini (Cloudflare som reserve) — Jacobs valg 26/9.
 //  5. Video i ca. 60 % af artiklerne (fast ud fra adressen), kun hvis Gemini
 //     finder en video relevant. Artikler med video får etiketten "Video" (Watch-siden).
 import fs from 'node:fs';
@@ -17,7 +17,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { skriv, json } from './lib/gemini.mjs';
-import { begge } from './lib/billeder.mjs';
+import { lav } from './lib/billeder.mjs';
 import { kontrollerKilder, kildeliste } from './lib/links.mjs';
 import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
@@ -147,14 +147,12 @@ Return JSON with:
 const titel = String(meta.title).trim();
 const slug = String(meta.slug || titel).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
 
-// --- 5. Billeder (begge motorer) --------------------------------------------
+// --- 6. Billeder (Gemini, Cloudflare som reserve) ---------------------------
 // Fast tilføjelse til begge billed-prompts. Prøveartikel 1-2 (26/9) fik tekst i
 // billederne, et falsk diagram med tal, og et motiv beskåret i toppen.
-const BILLEDREGLER = ' Wide 16:9 landscape composition, main subject centered with generous empty margins on all sides. Absolutely no text, no letters, no words, no numbers, no labels, no charts or graphs, no logos, no real people.';
-const b1 = await begge(meta.image1 + BILLEDREGLER);
-const b2 = await begge(meta.image2 + BILLEDREGLER);
-const valgBillede = (b) => (b.cf?.fil ? b.cf : b.gm);
-const hero = valgBillede(b1); const mid = valgBillede(b2);
+const BILLEDREGLER = ' Wide 16:9 landscape composition, main subject centered with generous empty margins on all sides. Absolutely no text, no letters, no words, no numbers, no labels, no charts or graphs, no logos, no brand or product symbols (e.g. no programming-language logos), no real people.';
+const hero = await lav(meta.image1 + BILLEDREGLER);
+const mid = await lav(meta.image2 + BILLEDREGLER);
 if (!hero?.fil || !mid?.fil) throw new Error('Mindst ét af billederne kunne ikke laves');
 const figur = (b, alt) => `<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="${esc(alt)}" height="768" src="${b.fil}" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">${esc(alt)}</td></tr></tbody></table>`;
 
@@ -202,7 +200,7 @@ const fm = ['---', `title: ${yamlStr(titel)}`, `description: ${yamlStr(meta.desc
 fs.writeFileSync(sti(`src/content/posts/${aar}/${md}/${navn}.md`), `${fm}\n${html}\n`);
 
 log(`\n**Titel:** ${titel}  \n**Adresse:** /${aar}/${md}/${navn}.html  \n**Ord:** ${ord} · **Interne links:** ${antalInterne} · **Kilder:** ${kildeLinks.length} (afvist ${kildeAfvist.length}) · **Video:** ${video ? 'ja' : 'nej'}`);
-log(`\n**Billeder:** 1: Cloudflare ${b1.cf?.fil || 'FEJL ' + b1.cf?.fejl} · Gemini ${b1.gm?.fil || 'FEJL ' + b1.gm?.fejl}  \n2: Cloudflare ${b2.cf?.fil || 'FEJL ' + b2.cf?.fejl} · Gemini ${b2.gm?.fil || 'FEJL ' + b2.gm?.fejl}`);
+log(`\n**Billeder:** 1: ${hero.fil} (${hero.motor})  \n2: ${mid.fil} (${mid.motor})`);
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
-fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}.html`, ord, antalInterne, kildeLinks, kildeAfvist, video, billeder: { b1, b2 } }, null, 1));
+fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}.html`, ord, antalInterne, kildeLinks, kildeAfvist, video, billeder: { hero, mid } }, null, 1));
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, rapport.join('\n') + '\n');

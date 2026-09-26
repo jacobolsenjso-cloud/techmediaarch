@@ -31,7 +31,18 @@ export async function gem(buf, kilde) {
   return { fil, bytes: jpg.length };
 }
 
-// Lav ét billede med begge motorer (til sammenligning i prøveartiklerne).
+// Jacobs valg 26/9-2026 efter 3 prøveartikler: Gemini laver billederne; fejler
+// Gemini (fx beløbsloftet nået), laver Cloudflare billedet, så artiklen stadig
+// kan udgives. Returnerer { fil, bytes, motor }.
+export async function lav(prompt) {
+  try { return { ...(await gem(await geminiBillede(prompt), 'gm')), motor: 'Gemini' }; }
+  catch (e) {
+    const r = await gem(await cloudflare(prompt), 'cf');
+    return { ...r, motor: `Cloudflare (Gemini fejlede: ${String(e.message).slice(0, 80)})` };
+  }
+}
+
+// Lav ét billede med begge motorer (bruges kun til sammenligning).
 export async function begge(prompt) {
   const ud = {};
   for (const [kilde, lav] of [['cf', cloudflare], ['gm', geminiBillede]]) {
