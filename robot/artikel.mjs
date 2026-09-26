@@ -66,7 +66,11 @@ if (kandListe.length) {
   const rel = await json(`New article topic: "${valgt.hoved}". Which of these existing articles would a reader of the new article find genuinely useful to click through to? They must be about a closely related subject — sharing a generic word like "AI", "market" or "tech" is not enough.
 Return JSON {"relevant":[numbers, most relevant first]}
 ${kandListe.map((k, i) => `${i + 1}. ${k.titel}`).join('\n')}`);
-  interne = (rel.relevant || []).map((n) => kandListe[n - 1]).filter(Boolean).slice(0, 5);
+  log(`- Geminis svar (interne): ${JSON.stringify(rel).slice(0, 200)}`);
+  // Gemini svarer af og til med tekst i stedet for tal ("3", "3.", titel) — accepter begge.
+  interne = (Array.isArray(rel.relevant) ? rel.relevant : [])
+    .map((n) => (typeof n === 'number' || /^\d+/.test(String(n)) ? kandListe[parseInt(n, 10) - 1] : kandListe.find((k) => k.titel === String(n))))
+    .filter(Boolean).filter((k, i, a) => a.indexOf(k) === i).slice(0, 5);
 }
 log(`- Interne link-kandidater: ${kandListe.length}, relevante ifølge Gemini: ${interne.length}`);
 
@@ -199,6 +203,7 @@ Sources:
 ${kildeLinks.map((k, i) => `${i + 1}. ${k.titel} (${k.url})`).join('\n')}
 Article text:
 ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
+  log(`- Geminis svar (eksterne): ${JSON.stringify(fr).slice(0, 300)}`);
   for (const l of (fr.links || []).slice(0, 3)) {
     const k = kildeLinks[l.n - 1]; if (!k) continue;
     const ny = linkIndsaet(html, l.phrase, k.url.replace(/"/g, '%22'), { ekstern: true });
