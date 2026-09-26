@@ -79,7 +79,9 @@ if (arg === '--tjek') {
   const [nyeste] = robotArtikler();
   if (!nyeste) { summary('Ingen robotartikler endnu.'); process.exit(0); }
   const timer = (Date.now() - nyeste.udgivet) / 36e5;
-  let live = 0; try { live = (await fetch(SITE + nyeste.sti, { redirect: 'manual' })).status; } catch {}
+  // Navngiven anmodning: Cloudflare svarer 403 til navnløse anmodninger fra GitHubs
+  // maskiner (målt 26/9 i kørsel #2 — samme fælde som techfeedwatch 23/9, d424bb93).
+  let live = 0; try { live = (await fetch(SITE + nyeste.sti, { redirect: 'manual', headers: { 'user-agent': 'techmediaarch-robot/1.0 (+https://www.techmediaarch.com)' } })).status; } catch {}
   summary(`**Nyeste robotartikel:** ${nyeste.sti} — for ${timer.toFixed(1)} timer siden, svarer ${live} live (grænse ${TOMGANG_TIMER} timer)`);
   if (timer > TOMGANG_TIMER) { summary(`**ALARM:** ingen ny artikel i ${timer.toFixed(0)} timer.`); process.exitCode = 1; }
   if (live !== 200) { summary(`**ALARM:** den nyeste artikel svarer ${live}, ikke 200 — Cloudflare har måske ikke bygget.`); process.exitCode = 1; }
