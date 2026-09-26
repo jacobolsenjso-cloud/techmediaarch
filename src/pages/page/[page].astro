@@ -17,7 +17,7 @@ const liste = INDLAEG.slice((side - 1) * PR_SIDE, side * PR_SIDE);
 <MainLayout title={`All articles – page ${side}`} description={`Tech Media Arch articles, page ${side} of ${antal}.`} noindex breadcrumb={[{ navn: `Page ${side}`, href: `/page/${side}.html` }]}>
   <div class="page-wrapper" style="padding-top: 24px;">
     <div class="section-heading"><h1>All articles</h1><span class="section-note">Page {side} of {antal}</span></div>
-    <div class="card-grid">{liste.map((p) => <ArticleCard p={p} />)}</div>
+    <div class="card-grid">{liste.map((p) => <ArticleCard p={p} niveau={2} />)}</div>
     <Pagination side={side} antal={antal} />
   </div>
 </MainLayout>

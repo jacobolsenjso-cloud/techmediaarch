@@ -15,7 +15,7 @@ const flere = INDLAEG.length > PR_SIDE;
   <div class="page-wrapper" style="padding-top: 24px;">
     <EmneChips />
     <div class="section-heading"><h1>Trending</h1><span class="section-note">The latest {liste.length} articles, newest first</span></div>
-    <div class="card-grid">{liste.map((p, i) => <ArticleCard p={p} eager={i < 3} />)}</div>
+    <div class="card-grid">{liste.map((p, i) => <ArticleCard p={p} eager={i < 3} niveau={2} />)}</div>
     {flere && <p style="text-align: center; margin: 0 0 40px;"><a class="pagination-btn" href="/page/2.html">More articles →</a></p>}
   </div>
 </MainLayout>

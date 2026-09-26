@@ -37,6 +37,29 @@ function del(raa: string) {
 const tilId = (s: string) => s.toLowerCase().replace(/<[^>]+>/g, '').replace(/&[a-z#0-9]+;/g, ' ')
   .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70) || 'afsnit';
 
+// Overskrifternes niveauer uden spring (LLM-/SEO-gennemgangen 27/9-2026, Jacobs ok):
+// siden har selv <h1> (titlen), så teksten skal starte på h2 og aldrig springe et
+// niveau over. Målt: 146 artikler sprang, 114 af dem fordi "Key Takeaways" stod som
+// h3 før første h2 (Blogger-indhold). Kun tag-navnet ændres — aldrig et ord.
+//  1. Ingen h2 i teksten: alle overskrifter rykkes op, så den højeste bliver h2.
+//  2. Overskrifter før første h2, der er dybere end h2, bliver h2.
+//  3. Resten: et spring (fx h2 → h4) rettes til ét niveau under den forrige.
+function udenSpring(html: string) {
+  const niv = [...html.matchAll(/<h([2-6])[\s>]/gi)].map((m) => Number(m[1]));
+  if (!niv.length) return html;
+  const ingenH2 = !niv.includes(2);
+  const ryk = ingenH2 ? Math.min(...niv) - 2 : 0;
+  let forrige = 1; let foerH2 = !ingenH2;
+  return html.replace(/<(\/?)h([2-6])(\s[^>]*)?>/gi, (hel, slut, n, attrs = '') => {
+    if (slut) return hel; // sluttags rettes nedenfor, så de passer til starttagget
+    let ny = Number(n) - ryk;
+    if (foerH2) { if (Number(n) === 2) foerH2 = false; else ny = 2; }
+    if (ny > forrige + 1) ny = forrige + 1;
+    forrige = ny;
+    return `<h${ny}${attrs} data-h="${n}">`;
+  }).replace(/<h([2-6])([^>]*) data-h="(\d)">([\s\S]*?)<\/h\3>/gi, (hel, ny, attrs, gl, indre) => `<h${ny}${attrs}>${indre}</h${ny}>`);
+}
+
 // Giver h2/h3 et id (hvis de mangler) og samler dem til indholdsfortegnelsen.
 function overskrifter(html: string) {
   const liste: Indlaeg['overskrifter'] = [];
@@ -74,7 +97,7 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
   // og videoer uploadet til Blogger afspilles fra vores egen kopi — se temakoder.mjs
   const body = youtubeLazy(bloggerVideo(temaKoder(raaBody)));
   // Vandmærket på billederne (som Blogger-temaets script) — se temakoder.mjs
-  const { html, liste } = overskrifter(vandmaerke(body));
+  const { html, liste } = overskrifter(udenSpring(vandmaerke(body)));
   const labels: string[] = data.labels || [];
   const sti = `/${aar}/${maaned}/${navn}.html`;
   return {
@@ -96,7 +119,7 @@ export const SIDER: Side[] = Object.entries(sideFiler).map(([fil, raa]) => {
   const body = youtubeLazy(bloggerVideo(temaKoder(raaBody)));
   const sti = `/p/${navn}.html`;
   return { navn, sti, href: kodet(sti), title: data.title, description: data.description || '',
-    published: data.published, updated: data.updated || data.published, html: vandmaerke(body), feedHtml: bloggerVideo(raaBody), faqHtml: body, bloggerId: String(data.bloggerId || '') };
+    published: data.published, updated: data.updated || data.published, html: navn === 'watch' ? vandmaerke(body) : udenSpring(vandmaerke(body)), feedHtml: bloggerVideo(raaBody), faqHtml: body, bloggerId: String(data.bloggerId || '') };
 });
 
 export const iEmne = (e: Emne) => INDLAEG.filter((p) => p.emner.some((x) => x.slug === e.slug));

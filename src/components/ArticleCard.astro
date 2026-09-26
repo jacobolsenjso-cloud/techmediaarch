@@ -4,8 +4,11 @@
 import type { Indlaeg } from '../lib/indhold';
 import { datoTekst, udsnit } from '../lib/indhold';
 import Maerke from './Maerke.astro';
-interface Props { p: Indlaeg; eager?: boolean; }
-const { p, eager = false } = Astro.props;
+// niveau: kortets overskrift er h2 direkte under sidens h1 (oversigter), h3 under en h2 (forsiden).
+// Udseendet styres af .card-title, så niveauet ændrer intet visuelt (27/9-2026).
+interface Props { p: Indlaeg; eager?: boolean; niveau?: 2 | 3; }
+const { p, eager = false, niveau = 3 } = Astro.props;
+const H = niveau === 2 ? 'h2' : 'h3';
 const emne = p.emner[0];
 ---
 <a href={p.href} class="article-card" style={emne ? `--tag-accent: ${emne.farve}` : undefined}>
@@ -16,7 +19,7 @@ const emne = p.emner[0];
       <Maerke id={`c${p.aar}${p.maaned}`} />
     </div>
   )}
-  <h3 class="card-title">{p.title}</h3>
+  <H class="card-title">{p.title}</H>
   <p class="card-excerpt">{udsnit(p.description)}</p>
   <p class="card-meta">
     {emne && <span class="card-topic">{emne.navn}</span>}

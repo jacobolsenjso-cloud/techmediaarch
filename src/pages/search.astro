@@ -33,7 +33,7 @@ import MainLayout from '../layouts/MainLayout.astro';
         out.innerHTML = hits.length ? hits.map(function (a) {
           return '<a class="article-card" href="' + a.u + '">' +
             (a.i ? '<div class="card-thumb is-loaded"><img src="' + a.i + '" alt="" loading="lazy"></div>' : '<div class="card-thumb card-thumb-empty"></div>') +
-            '<h3 class="card-title">' + esc(a.t) + '</h3><p class="card-excerpt">' + esc(a.d) + '</p><p class="card-meta"><span>' + esc(a.p) + '</span></p></a>';
+            '<h2 class="card-title">' + esc(a.t) + '</h2><p class="card-excerpt">' + esc(a.d) + '</p><p class="card-meta"><span>' + esc(a.p) + '</span></p></a>';
         }).join('') : '<p style="color: var(--muted);">No articles match your search. Try fewer or different words.</p>';
       });
     })();
