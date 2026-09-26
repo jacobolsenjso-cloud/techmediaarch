@@ -21,6 +21,7 @@ import { lav } from './lib/billeder.mjs';
 import { kontrollerKilder, kildeliste } from './lib/links.mjs';
 import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
+import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
 const EMNE = arg('emne');
@@ -52,7 +53,7 @@ const indeks = lavIndeks(arkiv.filter((a) => a.sti.startsWith('/20')));
 const linkKand = [];
 for (const q of [valgt.hoved, ...valgt.beslaegtede]) for (const m of mestEns(q, indeks, 6)) if (!linkKand.some((k) => k.sti === m.sti)) linkKand.push(m);
 const titelAf = (s) => arkiv.find((a) => a.sti === s)?.titel || s;
-const kandListe = linkKand.slice(0, 12).map((m) => ({ href: kodet(m.sti), titel: titelAf(m.sti) }));
+const kandListe = linkKand.slice(0, 12).map((m) => ({ href: kodet(m.sti), sti: m.sti, titel: titelAf(m.sti) }));
 // Kun artikler, der reelt handler om det samme. Prøveartikel 2 (26/9) fik tvunget
 // 3 links ind via ordet "market" (bl.a. Trump/Stargate) — relevans vinder over antal.
 let interne = [];
@@ -182,6 +183,25 @@ if (video) {
   html = efter ? html.slice(0, efter) + iframe + html.slice(efter) : html + iframe;
 }
 
+// Eksterne links INDE i teksten (Jacobs ønske 26/9): Gemini foreslår for hver
+// kontrolleret kilde en frase, der står ordret i teksten; linket sættes kun, hvis
+// frasen findes, og teksten er ord for ord uændret bagefter. Kildelisten bliver.
+let eksterneITekst = 0;
+try {
+  const fr = await json(`For each numbered source, pick ONE exact phrase of 2-6 words that appears verbatim in the article text below and that the source is specifically about. Skip a source if no phrase fits well. Use each phrase once.
+Return JSON {"links":[{"n": number, "phrase": "..."}]}
+Sources:
+${kildeLinks.map((k, i) => `${i + 1}. ${k.titel} (${k.url})`).join('\n')}
+Article text:
+${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
+  for (const l of (fr.links || []).slice(0, 3)) {
+    const k = kildeLinks[l.n - 1]; if (!k) continue;
+    const ny = linkIndsaet(html, l.phrase, k.url.replace(/"/g, '%22'), { ekstern: true });
+    if (ny && udenLinks(ny) === udenLinks(html)) { html = ny; eksterneITekst++; }
+  }
+} catch (e) { log(`- Eksterne links i teksten: sprunget over (${e.message.slice(0, 80)})`); }
+log(`- Eksterne links inde i teksten: ${eksterneITekst}`);
+
 html += kildeliste(kildeLinks);
 
 const ord = html.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
@@ -198,6 +218,30 @@ const yamlStr = (s) => JSON.stringify(String(s));
 const fm = ['---', `title: ${yamlStr(titel)}`, `description: ${yamlStr(meta.description)}`, `published: ${nu.toISOString()}`, `updated: ${nu.toISOString()}`,
   'labels:', ...labels.map((l) => `  - ${l}`), `image: ${hero.fil}`, `keyword: ${yamlStr(valgt.hoved)}`, 'relatedKeywords:', ...valgt.beslaegtede.map((k) => `  - ${yamlStr(k)}`), 'robot: true', '---'].join('\n');
 fs.writeFileSync(sti(`src/content/posts/${aar}/${md}/${navn}.md`), `${fm}\n${html}\n`);
+
+// --- 8. Links FRA ældre artikler til den nye (Jacobs ønske 26/9) --------------
+// Kun de artikler, Gemini vurderede relevante (trin 2), højst 3. I hver foreslår
+// Gemini en frase, der står ordret i den gamle tekst; linket sættes kun, hvis
+// frasen findes, og den gamle tekst er ord for ord uændret bagefter. Ingen
+// updated-dato, fordi ingen ord er ændret (samme regel som techfeedwatch 23/9).
+const nyHref = kodet(`/${aar}/${md}/${navn}.html`);
+const tilbage = [];
+for (const g of interne.slice(0, 3)) {
+  try {
+    const [, ga, gm, gn] = g.sti.match(/^\/(\d{4})\/(\d{2})\/(.+)\.html$/) || [];
+    if (!ga) continue;
+    const fil = sti(`src/content/posts/${ga}/${gm}/${gn}.md`);
+    const raa = fs.readFileSync(fil, 'utf8');
+    const del = raa.match(/^(---\r?\n[\s\S]*?\r?\n---\r?\n?)([\s\S]*)$/);
+    if (!del || del[2].includes(nyHref)) continue;
+    const f = await json(`A new article titled "${titel}" (topic: "${valgt.hoved}") was published. In the older article text below, find ONE exact phrase of 2-6 words that appears verbatim and would be a natural anchor for a link to the new article. Return JSON {"phrase": "..."} or {"phrase": ""} if nothing fits naturally.
+Text:
+${del[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
+    const ny = linkIndsaet(del[2], f.phrase, nyHref);
+    if (ny && udenLinks(ny) === udenLinks(del[2])) { fs.writeFileSync(fil, del[1] + ny); tilbage.push(`${g.titel} ("${f.phrase}")`); }
+  } catch (e) { log(`- Tilbagelink fra "${g.titel}": sprunget over (${e.message.slice(0, 60)})`); }
+}
+log(`- Links fra ældre artikler til den nye: ${tilbage.length}${tilbage.length ? ' — ' + tilbage.join(' · ') : ''}`);
 
 log(`\n**Titel:** ${titel}  \n**Adresse:** /${aar}/${md}/${navn}.html  \n**Ord:** ${ord} · **Interne links:** ${antalInterne} · **Kilder:** ${kildeLinks.length} (afvist ${kildeAfvist.length}) · **Video:** ${video ? 'ja' : 'nej'}`);
 log(`\n**Billeder:** 1: ${hero.fil} (${hero.motor})  \n2: ${mid.fil} (${mid.motor})`);
