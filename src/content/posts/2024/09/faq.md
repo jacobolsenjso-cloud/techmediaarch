@@ -18,7 +18,7 @@ image: /images/d121f30112576ae2.jpg
 bloggerId: "1603456626607930560"
 hadToc: false
 ---
-<div class="separator" style="clear: both;"><a href="/" style="clear: left; display: block; float: left; margin-bottom: 1em; margin-right: 1em; padding: 1em 0px; text-align: center;" target="_blank"><img alt="" border="0" data-original-height="512" data-original-width="1024" height="320" src="/images/d121f30112576ae2.jpg" width="640" /></a></div><span id="docs-internal-guid-fc89ccbd-7fff-d206-03a8-4794892702a1"><div style="text-align: center;"><a href="/p/about-us.html" style="font-family: Arial, sans-serif; font-size: 14pt; font-weight: 700; white-space-collapse: preserve;" target="_blank">{getButton} $text={Read About Us Here} $icon={link} $color={#0d1eb9}</a></div></span><details><summary>What is Tech Media Archive about?</summary>
+<div class="separator" style="clear: both;"><a href="/" style="clear: left; display: block; float: left; margin-bottom: 1em; margin-right: 1em; padding: 1em 0px; text-align: center;" target="_blank"><img alt="FAQ" border="0" data-original-height="512" data-original-width="1024" height="320" src="/images/d121f30112576ae2.jpg" width="640" /></a></div><span id="docs-internal-guid-fc89ccbd-7fff-d206-03a8-4794892702a1"><div style="text-align: center;"><a href="/p/about-us.html" style="font-family: Arial, sans-serif; font-size: 14pt; font-weight: 700; white-space-collapse: preserve;" target="_blank">{getButton} $text={Read About Us Here} $icon={link} $color={#0d1eb9}</a></div></span><details><summary>What is Tech Media Archive about?</summary>
   <div>
     <p>Tech Media Archive is a blog that provides insights, reviews, and news about the latest technology trends, gadgets, software, and media developments.
 </p>

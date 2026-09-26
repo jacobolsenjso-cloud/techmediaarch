@@ -1,0 +1,4 @@
+Contact: mailto:info@techmediaarch.com
+Expires: 2027-01-01T12:00:00.000Z
+Preferred-Languages: en, da
+Canonical: https://www.techmediaarch.com/.well-known/security.txt

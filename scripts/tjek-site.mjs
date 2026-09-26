@@ -26,7 +26,10 @@ const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', '#39'
 const tekst = (h) => h.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
   .replace(/<[^>]+>/g, ' ').replace(/&(#\d+|#x[0-9a-f]+|\w+);/gi, (m, k) => k[0] === '#'
     ? String.fromCodePoint(k[1].toLowerCase() === 'x' ? parseInt(k.slice(2), 16) : parseInt(k.slice(1), 10)) : (ENT[k] ?? m))
-  .replace(/\s+/g, ' ').trim();
+  .replace(/\s+/g, ' ')
+  // Mellemrum før tegnsætning tæller ikke: et fjernet link ("<a>ord</a>.") gav ellers "ord ." før og "ord." efter
+  // — samme ord, kun et mellemrum, som tag→mellemrum selv skaber (målt 27/9, 31 døde links rettet).
+  .replace(/ ([.,;:!?)—])/g, '$1').trim();
 
 // Alle filer i dist
 const filer = new Set();

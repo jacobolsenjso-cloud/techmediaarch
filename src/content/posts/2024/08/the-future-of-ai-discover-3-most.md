@@ -1,6 +1,6 @@
 ---
 title: "The Future of AI: Discover the 3 Most Innovative"
-description: ""
+description: "Three AI innovations shaping the future: multimodal AI that understands text, images and audio, generative AI that creates new content, and AI-powered gadgets."
 published: 2024-08-12T16:18:00.008+02:00
 updated: 2026-05-15T21:58:19.877+02:00
 labels:

@@ -35,9 +35,9 @@ The DJI Neo is set to become a favorite for both vloggers and nosy neighbors, th
 <blockquote>
 The Lenovo Auto Twist AI PC is one of the more innovative laptop concepts seen in years, showcasing how AI can transform everyday gadgets.
 </blockquote>
-<p>Additionally, the lid will automatically close when it detects that you've stepped away, adding an extra layer of security and privacy. This makes it a standout device in the realm of <a href="/2024/08/Artificial%20Intelligence%20AI%20is%20transforming%20our%20world.html" rel="noopener noreferrer" target="_blank">AI-powered gadgets</a>.</p>
+<p>Additionally, the lid will automatically close when it detects that you've stepped away, adding an extra layer of security and privacy. This makes it a standout device in the realm of AI-powered gadgets.</p>
 <h2>3. Alef Aeronautics Model A</h2>
-<p>The <strong>Alef Aeronautics Model A</strong> is a groundbreaking <a href="/2024/08/blog-post.html" rel="noopener noreferrer" target="_blank">flying car</a> that has captured the imagination of tech enthusiasts and futurists alike. This two-seater vehicle is not just a concept; it already boasts over 2,850 preorders, with production slated to begin by the end of 2025. At IFA Berlin 2024, attendees will get a close look at a stationary model of this <a href="https://www.bastillepost.com/global/article/4142980-electric-flying-car-innovative-household-robots-impress-visitors-at-ifa-berlin-2024" rel="noopener noreferrer" target="_blank">innovative car</a>.</p>
+<p>The <strong>Alef Aeronautics Model A</strong> is a groundbreaking flying car that has captured the imagination of tech enthusiasts and futurists alike. This two-seater vehicle is not just a concept; it already boasts over 2,850 preorders, with production slated to begin by the end of 2025. At IFA Berlin 2024, attendees will get a close look at a stationary model of this <a href="https://www.bastillepost.com/global/article/4142980-electric-flying-car-innovative-household-robots-impress-visitors-at-ifa-berlin-2024" rel="noopener noreferrer" target="_blank">innovative car</a>.</p>
 <blockquote>
 Engineers have teased us about flying cars for decades, but the Alef Aeronautics Model A feels closer to reality than ever before.
 </blockquote>
