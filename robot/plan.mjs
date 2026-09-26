@@ -79,9 +79,15 @@ if (arg === '--tjek') {
   const [nyeste] = robotArtikler();
   if (!nyeste) { summary('Ingen robotartikler endnu.'); process.exit(0); }
   const timer = (Date.now() - nyeste.udgivet) / 36e5;
-  // Navngiven anmodning: Cloudflare svarer 403 til navnløse anmodninger fra GitHubs
-  // maskiner (målt 26/9 i kørsel #2 — samme fælde som techfeedwatch 23/9, d424bb93).
-  let live = 0; try { live = (await fetch(SITE + nyeste.sti, { redirect: 'manual', headers: { 'user-agent': 'techmediaarch-robot/1.0 (+https://www.techmediaarch.com)' } })).status; } catch {}
+  // Navngiven anmodning + op til 3 forsøg med 5 sekunders pause: Cloudflare svarer
+  // 403 til en ukendt maskine første gang og lukker op bagefter. Samme opskrift som
+  // techfeedwatch (tjek-tomgang.mjs / indexnow.mjs). Målt 26/9: kun navnet → 403.
+  let live = 0;
+  for (let forsoeg = 0; forsoeg < 3; forsoeg++) {
+    if (forsoeg) await new Promise((r) => setTimeout(r, 5000));
+    try { live = (await fetch(`${SITE}${nyeste.sti}?t=${Date.now()}`, { redirect: 'manual', signal: AbortSignal.timeout(30000), headers: { 'user-agent': 'techmediaarch-tomgang/1.0 (+https://www.techmediaarch.com)' } })).status; } catch { live = 0; }
+    if (![0, 403, 429, 503].includes(live)) break;   // 200 eller en ægte fejl som 404: stop
+  }
   summary(`**Nyeste robotartikel:** ${nyeste.sti} — for ${timer.toFixed(1)} timer siden, svarer ${live} live (grænse ${TOMGANG_TIMER} timer)`);
   if (timer > TOMGANG_TIMER) { summary(`**ALARM:** ingen ny artikel i ${timer.toFixed(0)} timer.`); process.exitCode = 1; }
   if (live !== 200) { summary(`**ALARM:** den nyeste artikel svarer ${live}, ikke 200 — Cloudflare har måske ikke bygget.`); process.exitCode = 1; }
