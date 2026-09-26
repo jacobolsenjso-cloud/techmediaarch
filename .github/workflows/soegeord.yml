@@ -1,0 +1,47 @@
+# TRIN 1 — søgeordsliste. Startes kun med hånden (knappen "Run workflow").
+# Laver en læseliste over forslag til nye artikler; udgiver intet og
+# committer intet. Listen ses i kørslens oversigt og kan hentes som fil.
+name: Søgeordsliste
+
+on:
+  workflow_dispatch:
+    inputs:
+      emne:
+        description: 'Kun ét emne (fx AI) — tomt = alle'
+        required: false
+        default: ''
+      pakker:
+        description: 'Pakker pr. emne'
+        required: false
+        default: '3'
+
+permissions:
+  contents: read
+
+jobs:
+  liste:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Lav søgeordslisten
+        env:
+          # Kun-læse-nøgle til Search Console. Skrives aldrig ud.
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          # Til lag 3 (Gemini). Findes ikke endnu — så springes laget over.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Input sendes som miljøvariabler, ikke direkte ind i kommandoen.
+          EMNE: ${{ inputs.emne }}
+          PAKKER: ${{ inputs.pakker }}
+        run: |
+          if [ -n "$EMNE" ]; then node robot/soegeord.mjs --pakker "$PAKKER" --emne "$EMNE" > /dev/null
+          else node robot/soegeord.mjs --pakker "$PAKKER" > /dev/null; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: soegeordsliste
+          path: robot/ud/
