@@ -64,7 +64,7 @@ The EU's strict penalties aim to ensure that companies take AI regulations serio
 </blockquote>
 
 
-<h2><br /></h2><h2>Support for SMEs Through Regulatory Sandboxes</h2>
+<p><br /></p><h2>Support for SMEs Through Regulatory Sandboxes</h2>
 
 <h3>Purpose of Regulatory Sandboxes</h3>
 <p>The EU AI Act encourages innovation by setting up regulatory sandboxes. These sandboxes provide a <strong>safe environment</strong> for small and medium-sized enterprises (SMEs) to develop and test AI solutions before they hit the market. This initiative aims to create a <a href="https://ec.europa.eu/commission/presscorner/detail/en/IP_24_4123" rel="noopener noreferrer" target="_blank">supportive environment</a> for AI technology.</p>

@@ -41,7 +41,7 @@ The Lenovo Auto Twist AI PC is one of the more innovative laptop concepts seen i
 <blockquote>
 Engineers have teased us about flying cars for decades, but the Alef Aeronautics Model A feels closer to reality than ever before.
 </blockquote>
-<p><a href="https://www.ifa-berlin.com/speakers-library/jim-dukhovny" rel="noopener noreferrer" target="_blank">Jim Dukhovny</a> led the development of the Alef Model A project, which features an unusual configuration where the car's hollow body and slab-like sides transform. This unique design is expected to make waves in the automotive and aviation industries.</p>
+<p>Jim Dukhovny led the development of the Alef Model A project, which features an unusual configuration where the car's hollow body and slab-like sides transform. This unique design is expected to make waves in the automotive and aviation industries.</p>
 <h2>4. Honor Magic V3</h2>
 <p>The <strong>Honor Magic V3</strong> is a game-changer in the world of foldable smartphones. Weighing just 226g and only 9.2mm thick when folded, it is designed for both portability and durability. Built with a Special Fiber and HONOR Super Steel Hinge, it can endure up to 500,000 folds, making it highly impact-resistant.</p>
 <p>The device features dual displays: a 6.43-inch external screen and a 7.92-inch internal foldable screen. Powered by a 5150mAh battery with fast charging, it ensures you stay connected longer. The HONOR Falcon Camera System adds to its appeal, offering advanced photography capabilities.</p>

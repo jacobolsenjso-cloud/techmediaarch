@@ -32,6 +32,26 @@ const tekst = (h) => h.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<sty
   // — samme ord, kun et mellemrum, som tag→mellemrum selv skaber (målt 27/9, 31 døde links rettet).
   .replace(/ ([.,;:!?)—])/g, '$1').trim();
 
+// Bevidste rettelser 28/9-2026 (robot/ud/_ret-gennemgang.mjs): synlige billed-/link-instrukser
+// "[IMAGE PLACEHOLDER: …]", gentagne afsnit og én overskrift. Kilden ændres på samme måde, så
+// resten af teksten stadig skal være ord for ord ens — og findes en rettelse ikke, er det en fejl.
+const RETTELSER = JSON.parse(fs.readFileSync(path.resolve('scripts/bevidste-rettelser.json'), 'utf8'));
+const PLADS = /\[(?:FEATURED IMAGE PLACEHOLDER|IMAGE PLACEHOLDER|EXTERNAL LINK):[^\]]*\]/g;
+function rettet(sti, k) {
+  k = k.replace(PLADS, ' ');
+  for (const r of RETTELSER.filter((x) => x.sti === sti)) {
+    if (r.type === 'fjern') {
+      const x = tekst(r.html); const i = k.lastIndexOf(x);
+      if (i < 0) { fejl.push(`RETTELSE findes ikke i kilden: ${sti}: ${x.slice(0, 50)}`); continue; }
+      k = k.slice(0, i) + ' ' + k.slice(i + x.length);
+    } else if (r.type === 'omdoeb') {
+      if (!k.includes(r.fra)) { fejl.push(`RETTELSE findes ikke i kilden: ${sti}: ${r.fra}`); continue; }
+      k = k.replace(r.fra, r.til);
+    }
+  }
+  return k.replace(/\s+/g, ' ').replace(/ ([.,;:!?)—])/g, '$1').trim();
+}
+
 // Alle filer i dist
 const filer = new Set();
 (function gaa(d) { for (const n of fs.readdirSync(d)) { const p = path.join(d, n); fs.statSync(p).isDirectory() ? gaa(p) : filer.add('/' + path.relative(DIST, p).split(path.sep).join('/')); } })(DIST);
@@ -53,11 +73,11 @@ for (const p of [...posts, ...pages]) {
   // Kilden minus det, konverteren bevidst fjerner (TOC-knap og feed-fodnote), og med
   // temaets genvejskoder og vandmærker vist som på Blogger ({getButton} blev til en knap)
   // Rå markdown-rester "[ord](adresse)" fra Blogger er bevidst rettet til almindelig tekst/link (28/9, 7 artikler)
-  const kilde = tekst(vandmaerke(temaKoder(p.content.$t.replace(/<div class=["']mbtTOC2["']>[\s\S]*?<div id=["']mbtTOC2["']><\/div>\s*<\/div>/gi, '')
+  const kilde = rettet(sti, tekst(vandmaerke(temaKoder(p.content.$t.replace(/<div class=["']mbtTOC2["']>[\s\S]*?<div id=["']mbtTOC2["']><\/div>\s*<\/div>/gi, '')
     .replace(/<div class=["']blogger-post-footer["']>[\s\S]*?<\/div>\s*$/i, '')
     .replace(/\[((?:[^\[\]\n<]|<[^>]+>){2,300}?)\]\((https?:\/\/[^)\s"<>]+)\)/g, '$1')
     // og søgeords-rester med understregning i Fintech-artiklen ("fintech_banks" -> "fintech banks", 28/9)
-    .replace(/\b([Ff]intech)_(companies|Companies|meaning|banks)\b/g, '$1 $2'))));
+    .replace(/\b([Ff]intech)_(companies|Companies|meaning|banks)\b/g, '$1 $2')))));
   const ny = tekst(m[1]);
   if (kilde === ny) tekstOk++;
   else {

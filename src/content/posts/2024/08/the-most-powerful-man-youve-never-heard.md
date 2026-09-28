@@ -22,7 +22,7 @@ hadToc: false
 <li>There are ethical concerns and potential misuse of AI that need to be addressed.</li>
 <li>Altman's vision for AI is seen by some as either a hopeful future or a dystopian one.</li>
 <li>His influence extends to politics and global security, raising further concerns.</li></ul>
-<h2><br /></h2><h2>The Rise of Sam Altman: From Startup Founder to AI Mogul</h2>
+<p><br /></p><h2>The Rise of Sam Altman: From Startup Founder to AI Mogul</h2>
 
 <h3>Early Ventures and Y Combinator</h3>
 <p>Raised in St. Louis, Missouri, Sam Altman showed an early knack for technology and entrepreneurship. He dropped out of Stanford University to pursue his dreams, quickly making a name for himself in Silicon Valley. Before he turned 30, he became the president of Y Combinator, a startup incubator that has launched many successful companies. <a href="https://m.economictimes.com/news/international/us/how-did-openai-ceo-sam-altman-amass-2-billion-in-wealth-heres-what-you-should-know/articleshow/111642886.cms" rel="noopener noreferrer" target="_blank">Altman's leadership at Y Combinator was transformative</a>, helping to shape the future of tech startups.</p>
@@ -79,7 +79,7 @@ The rise of AI is not just a technological shift; it's an economic revolution th
 
 <div data-youtube-video=""><iframe height="270" src="https://www.youtube.com/embed/9pfo9j_Eq9U" width="480"></iframe></div>
 
-<h2><br /></h2><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="float: left; margin-right: 1em; text-align: left;"><tbody><tr><td style="text-align: center;"><img alt="Sam Altman with AI and dark clouds" height="200" src="/images/49b05bfbdf4e198f.jpg" style="margin-left: auto; margin-right: auto; max-height: 200px; max-width: 100%;" title="Sam Altman with AI and dark clouds." width="640" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Sam Altman with AI and dark clouds.&nbsp;<br />Photographic image by: TechMediaArcive.<br /><br /></td></tr></tbody></table><h2>The Dark Side of AI: Risks and Ethical Concerns</h2>
+<p><br /></p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="float: left; margin-right: 1em; text-align: left;"><tbody><tr><td style="text-align: center;"><img alt="Sam Altman with AI and dark clouds" height="200" src="/images/49b05bfbdf4e198f.jpg" style="margin-left: auto; margin-right: auto; max-height: 200px; max-width: 100%;" title="Sam Altman with AI and dark clouds." width="640" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Sam Altman with AI and dark clouds.&nbsp;<br />Photographic image by: TechMediaArcive.<br /><br /></td></tr></tbody></table><h2>The Dark Side of AI: Risks and Ethical Concerns</h2>
 
 
 
