@@ -20,11 +20,20 @@ const schema = {
 ---
 <MainLayout title={`${e.navn}: articles and guides`} description={`Articles, guides and explainers about ${e.navn} from Tech Media Arch — ${liste.length} article${liste.length === 1 ? '' : 's'}, newest first.`}
   noindex={liste.length < TYND_GRAENSE} schema={schema} breadcrumb={[{ navn: e.navn, href: emneUrl(e) }]}>
+  <style>
+    .topic-disclosure { font-size: 0.88rem; line-height: 1.6; color: var(--muted); background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 18px; margin: 0 0 24px 0; }
+    .topic-disclosure strong { color: var(--text-color); }
+    .topic-disclosure a { color: var(--teal-text); font-weight: 600; }
+  </style>
   <div class="page-wrapper" style="padding-top: 24px;">
     <EmneChips aktiv={e.slug} />
     <div class="section-heading" style={`--tag-accent: ${e.farve}`}>
       <h1>{e.navn}</h1><span class="section-note">{liste.length} article{liste.length === 1 ? '' : 's'}, newest first</span>
     </div>
+    {/* Resources samler artikler med affiliate-/henvisningslinks: oplysningen står øverst (Jacob 28/9) */}
+    {e.slug === 'resources' && (
+      <p class="topic-disclosure"><strong>Disclosure:</strong> The articles in Resources cover tools and services we may have an affiliate or referral relationship with. If you sign up or buy through links in these articles, Tech Media Arch may earn a commission at no extra cost to you. Partners cannot pay for a positive review, and nothing here is financial or investment advice. Read our full <a href="/p/disclosure.html">Disclosure</a>.</p>
+    )}
     <div class="card-grid">{liste.map((p, i) => <ArticleCard p={p} eager={i < 3} niveau={2} />)}</div>
   </div>
 </MainLayout>

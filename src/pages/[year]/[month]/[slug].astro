@@ -16,6 +16,8 @@ export function getStaticPaths() {
 const { p } = Astro.props;
 const SITE = 'https://www.techmediaarch.com';
 const emne = p.emner[0];
+// Artikler under menupunktet Resources (etiketten Resources) får affiliate-oplysningen øverst
+const erResources = p.labels.includes('Resources');
 
 // "Updated" vises kun, når indlægget reelt er ændret senere (mere end et døgn efter)
 const opdateret = new Date(p.updated).getTime() - new Date(p.published).getTime() > 86400000;
@@ -93,6 +95,8 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .toc-list a:hover { color: var(--teal-text); }
     .disclosure-box { font-size: 0.85rem; line-height: 1.6; color: var(--muted); background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 18px; margin: 0 0 30px 0; }
     .disclosure-box strong { color: var(--text-color); }
+    .disclosure-box a { color: var(--teal-text); font-weight: 600; }
+    .disclosure-top { margin: 0 0 25px 0; }
     .share-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px 24px; margin-bottom: 40px; }
     .share-cta-title { font-weight: 700; font-size: 1.05rem; margin: 0 0 4px 0; }
     .share-cta-sub { font-size: 0.9rem; color: var(--muted); margin: 0; }
@@ -167,6 +171,12 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
         </div>
       )}
 
+      {/* Resources-artikler har affiliate-/henvisningslinks: oplysningen skal stå FØR linkene,
+          ikke kun nederst (Jacob 28/9). Gælder også fremtidige artikler med etiketten Resources. */}
+      {erResources && (
+        <p class="disclosure-box disclosure-top"><strong>Affiliate disclosure:</strong> This article contains affiliate or referral links. If you sign up or buy through them, Tech Media Arch may earn a commission at no extra cost to you. Partners cannot pay for a positive review, and nothing here is financial or investment advice. Read our full <a href="/p/disclosure.html">Disclosure</a>.</p>
+      )}
+
       {toc.length > 0 && (
         <nav class="toc-container" aria-label="Table of contents">
           <div class="toc-title">Table of Contents</div>
@@ -178,8 +188,8 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
 
       <article class="post-body" set:html={p.html} />
 
-      {/* Stod før som fodnote i hvert indlæg (Blogger-feedets fodnote). */}
-      <p class="disclosure-box"><strong>Affiliate disclosure:</strong> Please note that some links on TechMediaArch.com are affiliate links. We may receive a commission, at no extra cost to you, if you click through our links and make a purchase from one of our partners.</p>
+      {/* Stod før som fodnote i hvert indlæg (Blogger-feedets fodnote). Resources-artikler har den øverst i stedet. */}
+      {!erResources && <p class="disclosure-box"><strong>Affiliate disclosure:</strong> Please note that some links on TechMediaArch.com are affiliate links. We may receive a commission, at no extra cost to you, if you click through our links and make a purchase from one of our partners.</p>}
 
       <div class="share-cta">
         <div>
