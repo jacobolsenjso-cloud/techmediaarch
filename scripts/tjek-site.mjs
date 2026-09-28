@@ -48,8 +48,10 @@ for (const p of [...posts, ...pages]) {
   if (!m) { fejl.push(`INGEN brødtekst: ${sti}`); continue; }
   // Kilden minus det, konverteren bevidst fjerner (TOC-knap og feed-fodnote), og med
   // temaets genvejskoder og vandmærker vist som på Blogger ({getButton} blev til en knap)
+  // Rå markdown-rester "[ord](adresse)" fra Blogger er bevidst rettet til almindelig tekst/link (28/9, 7 artikler)
   const kilde = tekst(vandmaerke(temaKoder(p.content.$t.replace(/<div class=["']mbtTOC2["']>[\s\S]*?<div id=["']mbtTOC2["']><\/div>\s*<\/div>/gi, '')
-    .replace(/<div class=["']blogger-post-footer["']>[\s\S]*?<\/div>\s*$/i, ''))));
+    .replace(/<div class=["']blogger-post-footer["']>[\s\S]*?<\/div>\s*$/i, '')
+    .replace(/\[((?:[^\[\]\n<]|<[^>]+>){2,300}?)\]\((https?:\/\/[^)\s"<>]+)\)/g, '$1'))));
   const ny = tekst(m[1]);
   if (kilde === ny) tekstOk++;
   else {

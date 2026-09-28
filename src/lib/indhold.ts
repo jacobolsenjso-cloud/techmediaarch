@@ -5,7 +5,7 @@
 // set:html i stedet for at gå gennem Astros markdown-motor, som ville kunne
 // ændre i HTML'en.
 import { parse } from 'yaml';
-import { EMNER, type Emne } from './emner';
+import { EMNER, emneEtiket, type Emne } from './emner';
 import { temaKoder, youtubeLazy, vandmaerke, bloggerVideo } from './temakoder.mjs';
 
 export interface Indlaeg {
@@ -105,7 +105,7 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
     aar, maaned, navn, sti, href: kodet(sti),
     title: data.title, description: data.description || '', seoTitle: data.seoTitle || data.title,
     published: data.published, updated: data.updated || data.published,
-    labels, emner: EMNER.filter((e) => labels.includes(e.navn)),
+    labels, emner: EMNER.filter((e) => labels.includes(emneEtiket(e))),
     // Uden eget billede bruges miniaturen af den første indlejrede YouTube-video
     image: data.image || youtubeBillede(raaBody),
     bloggerId: String(data.bloggerId || ''),

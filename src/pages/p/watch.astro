@@ -47,8 +47,11 @@ if (!s) throw new Error('Watch-siden mangler i src/content/pages');
       transform: none !important; margin-top: 0 !important;
     }
     @media (max-width: 768px) { .tma-blogger-scope { padding: 20px 0 10px; } }
+    .tma-blogger-scope h1.tma-watch-h1 { font-family: "Inter Variable", -apple-system, "Segoe UI", Roboto, Arial, sans-serif; font-size: 1.5rem; font-weight: 700; line-height: 1.25; color: var(--title-color); margin: 0 15px 14px; letter-spacing: -0.02em; }
+    @media (max-width: 768px) { .tma-blogger-scope h1.tma-watch-h1 { font-size: 1.3rem; margin: 0 15px 10px; } }
   </style>
   <style is:inline set:html={raaRegler} />
   {/* .tma-pb svarer til temaets .post-body (se src/styles/blogger-watch.css) */}
-  <div class="tma-blogger-scope"><div class="tma-pb" set:html={s.html} /></div>
+  {/* Synlig hovedoverskrift (Jacob 28/9): Blogger skjulte sidens titel, så siden havde ingen h1 */}
+  <div class="tma-blogger-scope"><h1 class="tma-watch-h1">Watch: Tech Video Library</h1><div class="tma-pb" set:html={s.html} /></div>
 </MainLayout>

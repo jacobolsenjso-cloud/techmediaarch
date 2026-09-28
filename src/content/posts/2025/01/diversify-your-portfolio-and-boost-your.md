@@ -1,6 +1,6 @@
 ---
 title: Diversify Your Portfolio and Boost Your Returns with Mintos
-description: boost-returns-with-mintos-lending.-diversify-your-portfolio-for-consistent-income
+description: "How Mintos lets you invest in loans from many lenders: how it works, the returns, the risks, and how to spread your money across loans."
 published: 2025-01-25T22:30:00.031+01:00
 updated: 2026-05-20T19:19:43.303+02:00
 labels:

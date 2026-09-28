@@ -380,14 +380,14 @@ html.is-dark .rec-card:hover { background: var(--rgba-33, #333); }
 
     <div class="watch-controls-container">
         <div id="filter-container"></div>
-        <input class="watch-search-input" id="video-search" placeholder="Søg videoer..." type="text" />
+        <input class="watch-search-input" id="video-search" placeholder="Search videos..." type="text" />
     </div>
     
     <div class="tma-watch-layout" id="tma-watch-layout">
         <div class="tma-video-column">
             <div class="tma-video-wrapper" id="video-wrapper"></div>
             <div style="align-items: flex-start; display: flex; flex-direction: column; margin-top: 15px;">
-                <h2 class="tma-main-title" id="current-video-title">Vælg en video...</h2>
+                <h2 class="tma-main-title" id="current-video-title">Select a video...</h2>
                 <button class="tma-copy-btn-wide" id="copy-video-link-btn" style="display: none;">
                     <svg fill="currentColor" height="18" viewbox="0 0 16 16" width="18"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"></path></svg>
                     <span id="copy-btn-text"> Share this video</span>
@@ -406,7 +406,7 @@ html.is-dark .rec-card:hover { background: var(--rgba-33, #333); }
             </div>
             <div class="tma-recommended-column">
                 <div id="recommended-videos-container">
-                    <p class="rec-container-text">Indlæser anbefalinger...</p>
+                    <p class="rec-container-text">Loading recommendations...</p>
                 </div>
             </div>
         </div>
@@ -420,7 +420,7 @@ html.is-dark .rec-card:hover { background: var(--rgba-33, #333); }
     </div>
 
     <div id="dynamic-watch-grid">
-        <p class="rec-container-text">Indlæser bibliotek...</p>
+        <p class="rec-container-text">Loading library...</p>
     </div>
 </div>
 

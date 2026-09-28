@@ -7,15 +7,7 @@ bloggerId: "1645160759921631795"
 ---
 <h1><span style="font-size: medium;">Last updated: August 03, 2024</span></h1>
 
-<!--Google tag (gtag.js)-->
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-TYEFKDE05L"></script><div class="cky-audit-table-element"></div>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-TYEFKDE05L');
-</script>
 
 <p>This Privacy Policy describes our policies and procedures on the collection, use, and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
 <p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy. This Privacy Policy has been created with the help of the Privacy Policy Generator.</p>

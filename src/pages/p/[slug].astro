@@ -23,6 +23,9 @@ const faq = faqSchema(s.faqHtml);
     .static-page { max-width: 860px; margin: 0 auto; padding: 30px 20px 10px; box-sizing: border-box; width: 100%; }
     .static-page h1.page-title { font-size: 2rem; line-height: 1.2; margin: 0 0 20px; }
     @media (max-width: 768px) { .static-page { padding: 20px 15px 10px; } .static-page h1.page-title { font-size: 1.5rem; } }
+    /* Sitemap-siden: Bloggers beholder var 100vw bred og trukket ud til begge kanter.
+       Med sidemenuen her stak den 22 px ud under rullebjælken (målt 28/9) — holdes i kolonnen, som Watch */
+    body .static-page .tma-sitemap-container { width: 100% !important; max-width: 100% !important; left: auto !important; transform: none !important; margin-top: 0 !important; }
   </style>
   <div class="static-page">
     {!egenH1 && <h1 class="page-title">{s.title}</h1>}

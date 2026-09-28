@@ -6,7 +6,8 @@
 //
 // Farverne bruges som accent (prik, kant) — aldrig som tekst eller som baggrund
 // under hvid tekst, samme regel som på techfeedwatch.
-export interface Emne { navn: string; slug: string; farve: string; egenMenu?: boolean; }
+// etiket: Blogger-etiketten i indlæggenes data, når den er stavet anderledes end det viste navn
+export interface Emne { navn: string; slug: string; farve: string; egenMenu?: boolean; etiket?: string; }
 
 export const EMNER: Emne[] = [
   { navn: 'AI', slug: 'ai', farve: '#06b6d4' },
@@ -14,7 +15,8 @@ export const EMNER: Emne[] = [
   { navn: 'Data', slug: 'data', farve: '#14b8a6' },
   { navn: 'DevOps', slug: 'devops', farve: '#2563eb' },
   { navn: 'Dev', slug: 'dev', farve: '#0ea5e9' },
-  { navn: 'It', slug: 'it', farve: '#64748b' },
+  // Vises som "IT" (Jacob 28/9); etiketten i indlæggene hedder stadig "It", og adressen er uændret
+  { navn: 'IT', slug: 'it', farve: '#64748b', etiket: 'It' },
   { navn: 'Design', slug: 'design', farve: '#db2777' },
   { navn: 'Marketing', slug: 'marketing', farve: '#8b5cf6' },
   { navn: 'Product', slug: 'product', farve: '#ea580c' },
@@ -32,7 +34,8 @@ export const EMNER: Emne[] = [
 // Emnerne under "Topics" og i emne-chipsene (Bloggers "Categories")
 export const KATEGORIER = EMNER.filter((e) => !e.egenMenu);
 
-export const emneFraNavn = (navn: string) => EMNER.find((e) => e.navn === navn);
+export const emneEtiket = (e: Emne) => e.etiket ?? e.navn;
+export const emneFraNavn = (navn: string) => EMNER.find((e) => e.navn === navn || emneEtiket(e) === navn);
 export const emneFraSlug = (slug: string) => EMNER.find((e) => e.slug === slug);
 export const emneUrl = (e: Emne) => `/topic/${e.slug}.html`;
 

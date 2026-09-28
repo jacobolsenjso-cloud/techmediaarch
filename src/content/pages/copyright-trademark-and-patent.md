@@ -11,15 +11,7 @@ bloggerId: "7794866190860597204"
   
   <span style="color: #1a1a1a; white-space-collapse: preserve;"> Society, </span><span style="color: #1a1a1a; font-size: 14.6667px; white-space-collapse: preserve;">TechMediaArch</span>
   
-  <!--Google tag (gtag.js)-->
-<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-TYEFKDE05L"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-TYEFKDE05L');
-</script>
+  
   
   <span style="color: #1a1a1a; white-space-collapse: preserve;"> Community.</span></span></p><p dir="ltr" style="line-height: 1.38; margin-bottom: 12pt; margin-top: 0pt;"><span style="background-color: white; font-family: arial;"><span style="color: #1a1a1a; font-variant-alternates: normal; font-variant-east-asian: normal; font-variant-numeric: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;">Our Work is Copyrighted All the content in our domain is the property of </span><span style="color: #1a1a1a; font-size: 14.6667px; white-space-collapse: preserve;">Tech Media Arch</span><span style="color: #1a1a1a; white-space-collapse: preserve;">, LLC. and is protected by copyright. None of the material may be reproduced without our written permission, except for downloading or printing a single copy for personal offline viewing.</span></span></p><p dir="ltr" style="line-height: 1.38; margin-bottom: 12pt; margin-top: 0pt;"><span style="background-color: white; font-family: arial;"><span style="color: #1a1a1a; font-variant-alternates: normal; font-variant-east-asian: normal; font-variant-numeric: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;">This copyright applies to original </span><span style="color: #1a1a1a; font-size: 14.6667px; white-space-collapse: preserve;">TechMediaArch</span><span style="color: #1a1a1a; white-space-collapse: preserve;"> material, the unaltered compilations of posts in our stock folders, and the edited and filtered compilations of posts that we sell and distribute.</span></span></p><p dir="ltr" style="line-height: 1.38; margin-bottom: 12pt; margin-top: 0pt;"><span style="background-color: white; font-family: arial;">
   
