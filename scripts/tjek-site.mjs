@@ -39,6 +39,9 @@ const RETTELSER = JSON.parse(fs.readFileSync(path.resolve('scripts/bevidste-rett
 const PLADS = /\[(?:FEATURED IMAGE PLACEHOLDER|IMAGE PLACEHOLDER|EXTERNAL LINK):[^\]]*\]/g;
 function rettet(sti, k) {
   k = k.replace(PLADS, ' ');
+  // Sitets navn er kun "Tech Media Arch" (Jacob 28/9): "TechMediaArcive", "Tech Media Archive" m.fl. er rettet
+  // i indholdet (ikke inde i adresser, som ikke er en del af teksten her)
+  k = k.replace(/Tech[\s_-]*Media[\s_-]*Arc[h]?[i]?[v]?e\b/gi, (m, pos, hel) => ('=/.@-_'.includes(hel[pos - 1] || '') ? m : 'Tech Media Arch'));
   for (const r of RETTELSER.filter((x) => x.sti === sti)) {
     if (r.type === 'fjern') {
       const x = tekst(r.html); const i = k.lastIndexOf(x);

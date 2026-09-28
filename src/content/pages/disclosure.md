@@ -1,6 +1,6 @@
 ---
 title: Disclosure
-description: Disclosure, Techmediaarchive is an independent publisher service and not an investment advisor.
+description: Disclosure, Tech Media Arch is an independent publisher service and not an investment advisor.
 published: 2025-03-03T17:06:00.000+01:00
 updated: 2025-03-03T17:06:43.219+01:00
 bloggerId: "5548633430174376872"
