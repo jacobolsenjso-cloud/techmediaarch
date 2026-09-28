@@ -51,7 +51,9 @@ for (const p of [...posts, ...pages]) {
   // Rå markdown-rester "[ord](adresse)" fra Blogger er bevidst rettet til almindelig tekst/link (28/9, 7 artikler)
   const kilde = tekst(vandmaerke(temaKoder(p.content.$t.replace(/<div class=["']mbtTOC2["']>[\s\S]*?<div id=["']mbtTOC2["']><\/div>\s*<\/div>/gi, '')
     .replace(/<div class=["']blogger-post-footer["']>[\s\S]*?<\/div>\s*$/i, '')
-    .replace(/\[((?:[^\[\]\n<]|<[^>]+>){2,300}?)\]\((https?:\/\/[^)\s"<>]+)\)/g, '$1'))));
+    .replace(/\[((?:[^\[\]\n<]|<[^>]+>){2,300}?)\]\((https?:\/\/[^)\s"<>]+)\)/g, '$1')
+    // og søgeords-rester med understregning i Fintech-artiklen ("fintech_banks" -> "fintech banks", 28/9)
+    .replace(/\b([Ff]intech)_(companies|Companies|meaning|banks)\b/g, '$1 $2'))));
   const ny = tekst(m[1]);
   if (kilde === ny) tekstOk++;
   else {
