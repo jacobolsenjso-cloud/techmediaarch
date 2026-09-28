@@ -13,6 +13,7 @@
 // Afslutter med kode 1, hvis noget fejler.
 import fs from 'node:fs';
 import path from 'node:path';
+import { SLETTEDE } from '../worker/slettede.js';
 
 const BASE = (process.argv[2] || '').replace(/\/$/, '');
 const EKS = process.argv[3];
@@ -24,7 +25,9 @@ const hent = (sti, opt = {}) => fetch(BASE + sti, { redirect: 'manual', ...opt }
 // Bloggers adresser, kodet som browseren sender dem
 const laes = (f) => JSON.parse(fs.readFileSync(path.join(EKS, f), 'utf8'));
 const alt = (p) => p.link.find((l) => l.rel === 'alternate').href;
-const stier = [...laes('posts.json'), ...laes('pages.json')].map((p) => new URL(alt(p)).pathname);
+const stier = [...laes('posts.json'), ...laes('pages.json')].map((p) => new URL(alt(p)).pathname)
+  // Slettede artikler svarer 301 (tjekkes under 3), ikke 200
+  .filter((s) => !SLETTEDE[decodeURI(s)]);
 
 // 1: alle adresser, 8 ad gangen
 let ok = 0, noindex = 0;
@@ -65,6 +68,8 @@ const forventet = [
   ['/feeds/posts/default', 301, '/rss.xml'],
   ['/2024/10/', 301, '/'],
   ['/findes-ikke-123.html', 404, null],
+  // Slettede artikler (worker/slettede.js) -> 301 til nærmeste levende artikel
+  ...Object.entries(SLETTEDE).map(([s, til]) => [s, 301, til]),
 ];
 for (const [s, status, til] of forventet) {
   const r = await hent(s); await r.arrayBuffer();

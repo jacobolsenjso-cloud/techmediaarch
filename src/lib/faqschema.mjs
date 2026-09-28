@@ -27,6 +27,25 @@ function naesteElement(n) {
   return null;
 }
 
+// Tilføjet 28/9-2026: nogle indlæg (fx fra 2026) skriver FAQ'en som
+//   <p><strong>Spørgsmål?</strong><br>Svar …</p>
+// altså spørgsmål og svar i SAMME afsnit. Temaets regel så kun <strong> som selvstændigt
+// element og fik derfor 0 spørgsmål ud af dem — læseren så en FAQ, Google fik ingen.
+// Her genkendes kun et afsnit, der STARTER med fed tekst, som ender på "?";
+// alt andet følger den gamle regel uændret.
+function fedtSpoergsmaal(n) {
+  if (n.tagName !== 'p') return null;
+  const boern = (n.childNodes || []).filter((c) => !(c.nodeName === '#text' && !c.value.trim()));
+  const foerste = boern[0];
+  if (!foerste || foerste.tagName !== 'strong') return null;
+  const q = tekstIndhold(foerste).trim();
+  if (!q.endsWith('?')) return null;
+  let rest = boern.slice(1);
+  while (rest.length && rest[0].tagName === 'br') rest = rest.slice(1);
+  const a = serialize({ nodeName: '#document-fragment', childNodes: rest }).trim();
+  return a ? { q, a: `<p>${a}</p>` } : null;
+}
+
 export function faqSchema(html) {
   if (/"@type"\s*:\s*"FAQPage"/.test(html)) return null;
   const rod = parseFragment(html);
@@ -37,7 +56,9 @@ export function faqSchema(html) {
   const gem = (q, a) => { if (q && a) spoergsmaal.push({ '@type': 'Question', name: q.trim(), acceptedAnswer: { '@type': 'Answer', text: a.trim() } }); };
   let q = '', a = '';
   for (let n = naesteElement(faq); n && n.tagName !== 'h2'; n = naesteElement(n)) {
+    const fed = fedtSpoergsmaal(n);
     if (n.tagName === 'h3' || n.tagName === 'strong') { gem(q, a); q = tekstIndhold(n); a = ''; }
+    else if (fed) { gem(q, a); q = fed.q; a = fed.a + ' '; }
     else if (n.tagName === 'p' || n.tagName === 'ul') { if (q) a += serialize(n) + ' '; }
   }
   gem(q, a);

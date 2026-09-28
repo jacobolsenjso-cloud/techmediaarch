@@ -10,6 +10,7 @@
 // Undtagelse: /video/* går ALTID gennem workeren (run_worker_first), så den kan
 // sende videoen i stykker til Safari — se video() nedenfor.
 const PROD = 'www.techmediaarch.com';
+import { SLETTEDE } from './slettede.js';
 
 // Blogger-menuens emner -> ny emneside. Skal matche src/lib/emner.ts.
 const EMNER = {
@@ -115,6 +116,9 @@ async function haandter(request, env) {
   }
   // Månedsarkiver: /2024/10/ eller /2024/ -> forsiden
   if (/^\/\d{4}(\/\d{2})?\/?$/.test(sti)) return flyt(url, '/');
+
+  // Slettede artikler (worker/slettede.js): 301 til nærmeste levende artikel
+  if (SLETTEDE[sti]) return flyt(url, SLETTEDE[sti]);
 
   // Ukendt adresse: vis 404-siden med den rigtige statuskode
   const side404 = await env.ASSETS.fetch(new Request(new URL('/404.html', url), request));

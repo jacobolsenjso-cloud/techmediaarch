@@ -14,6 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { temaKoder, vandmaerke, RAA_KODE } from '../src/lib/temakoder.mjs';
+import { SLETTEDE } from '../worker/slettede.js';
 
 const EKS = process.argv[2];
 const DIST = path.resolve('dist');
@@ -37,7 +38,10 @@ const filer = new Set();
 const html = [...filer].filter((f) => f.endsWith('.html'));
 
 // 1 + 2: Bloggers adresser og teksten
-const posts = laes('posts.json'), pages = laes('pages.json');
+const posts = laes('posts.json').filter((p) => !SLETTEDE[decodeURI(alt(p).replace('https://www.techmediaarch.com', ''))]), pages = laes('pages.json');
+// Slettede artikler (worker/slettede.js) må IKKE længere ligge som fil — ellers svarer de 200, ikke 301
+for (const s of Object.keys(SLETTEDE)) if (filer.has(s)) fejl.push(`SLETTET artikel findes stadig: ${s}`);
+for (const [s, til] of Object.entries(SLETTEDE)) if (!filer.has(til)) fejl.push(`SLETTET artikels mål findes ikke: ${s} -> ${til}`);
 let tekstOk = 0;
 for (const p of [...posts, ...pages]) {
   const sti = decodeURI(alt(p).replace('https://www.techmediaarch.com', ''));

@@ -63,7 +63,7 @@ html.is-dark .tma-sh-topics a:hover,html.is-dark .tma-sh-cards a:hover,html.is-d
   <h2>A few good places to start</h2>
   <p class="tma-sh-sub">Hand-picked articles that give a sense of what the site does.</p>
   <ul class="tma-sh-cards">
-    <li><a href="/2026/06/beyond-hype-technical-breakdown-of-new.html">Beyond the Hype: A Technical Breakdown of the New Google AI and Its Real-World Efficacy</a></li>
+    <li><a href="/2026/05/google-workspace-studio-analysts-take.html">Google Workspace Studio: An Analyst's Take on Google's Agentic AI</a></li>
     <li><a href="/2026/05/free-open-source-whatsapp-crm-technical.html">Free Open-Source WhatsApp CRM: A Technical Analysis of the Step-by-Step Setup</a></li>
     <li><a href="/2026/05/unpacking-grubby-ai-is-this-humanizer.html">Unpacking Grubby AI: Is This Humanizer Tool Worth Your Time?</a></li>
     <li><a href="/2026/06/agentic-ai-vs-ai-agents-technical.html">Agentic AI vs. AI Agents: A Technical Comparison</a></li>
