@@ -526,10 +526,7 @@ html.is-dark .rec-card:hover { background: var(--rgba-33, #333); }
             
             var controlsSection = document.querySelector('.watch-controls-container');
             if (controlsSection) {
-                var headerOffset = 100; 
-                var elementPosition = controlsSection.getBoundingClientRect().top;
-                var offsetPosition = elementPosition + (window.scrollY || window.pageYOffset) - headerOffset;
-                customSmoothScrollTo(offsetPosition, 800); 
+                customSmoothScrollTo(tmaTargetY(controlsSection, 100), 800); 
             }
         } else {
             var coverHtml = '<div class="tma-lazy-cover" style="background-image:url(https://img.youtube.com/vi/' + id + '/maxresdefault.jpg);"><div class="tma-play-btn"><svg width="35" height="35" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></div></div>';
@@ -700,10 +697,18 @@ html.is-dark .rec-card:hover { background: var(--rgba-33, #333); }
         renderGrid(filtered);
     }
 
+    // Astro-sitet ruller inde i boksen .content-area, ikke i vinduet (som på Blogger).
+    // Derfor rulles boksen, hvis den findes; ellers vinduet som før.
+    function tmaScroller() { return document.querySelector('.content-area'); }
+    function tmaScrollY() { var b = tmaScroller(); return b ? b.scrollTop : (window.scrollY || window.pageYOffset); }
+    // Rul-position, der lægger elementet headerOffset px under skærmens top (samme luft som på Blogger)
+    function tmaTargetY(el, headerOffset) { return el.getBoundingClientRect().top + tmaScrollY() - headerOffset; }
+
     function customSmoothScrollTo(targetY, duration) {
-        var startY = window.scrollY || window.pageYOffset;
+        var startY = tmaScrollY();
         var difference = targetY - startY;
         var startTime = null;
+        var scroller = tmaScroller();
 
         function step(currentTime) {
             if (!startTime) startTime = currentTime;
@@ -712,7 +717,9 @@ html.is-dark .rec-card:hover { background: var(--rgba-33, #333); }
             
             var ease = percentage < 0.5 ? 2 * percentage * percentage : -1 + (4 - 2 * percentage) * percentage;
             
-            window.scrollTo(0, startY + difference * ease);
+            // 'instant', fordi boksen selv har scroll-behavior: smooth, som ellers ville kæmpe imod
+            if (scroller) scroller.scrollTo({ top: startY + difference * ease, behavior: 'instant' });
+            else window.scrollTo(0, startY + difference * ease);
             
             if (progress < duration) {
                 window.requestAnimationFrame(step);
@@ -725,11 +732,7 @@ html.is-dark .rec-card:hover { background: var(--rgba-33, #333); }
         setTimeout(function() {
             var gridContainer = document.getElementById('dynamic-watch-grid');
             if (gridContainer) {
-                var headerOffset = 100; 
-                var elementPosition = gridContainer.getBoundingClientRect().top;
-                var offsetPosition = elementPosition + (window.scrollY || window.pageYOffset) - headerOffset;
-                
-                customSmoothScrollTo(offsetPosition, 800); 
+                customSmoothScrollTo(tmaTargetY(gridContainer, 100), 800); 
             }
         }, 50); 
     }
