@@ -6,6 +6,7 @@ import ArticleCard from '../components/ArticleCard.astro';
 import EmneChips from '../components/EmneChips.astro';
 import Pagination from '../components/Pagination.astro';
 import { INDLAEG, datoTekst, udsnit } from '../lib/indhold';
+import { somSporgsmaal } from '../lib/sporgsmaal.mjs';
 
 export const PR_SIDE = 24;
 const side1 = INDLAEG.slice(0, PR_SIDE);
@@ -13,6 +14,13 @@ const antalSider = Math.max(1, Math.ceil(INDLAEG.length / PR_SIDE));
 const hoved = side1[0];
 const sideHistorier = side1.slice(1, 5);
 const resten = side1.slice(5);
+
+// "Questions people are asking" (29/9, Jacobs ønske): de nyeste robotartiklers Google-søgespørgsmål som genveje.
+// Undertitlen lover "this week" — den står kun, når ALLE viste spørgsmål er højst 7 dage gamle (ellers "recently").
+const UGE = 7 * 24 * 3600 * 1000;
+const sporgsmaal = INDLAEG.filter((p) => p.robot && p.keyword).slice(0, 8)
+  .map((p) => ({ href: p.href, tekst: somSporgsmaal(p.keyword), farve: p.emner[0]?.farve || '#0891b2', dato: new Date(p.published).getTime() }));
+const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q.dato <= UGE);
 ---
 <MainLayout description="Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.">
   <style is:global>
@@ -45,6 +53,18 @@ const resten = side1.slice(5);
     .lead-mini:hover .lead-mini-title { color: var(--teal-text); }
     @media (max-width: 900px) { .lead-section { grid-template-columns: 1fr; gap: 30px; } .lead-title { font-size: 1.45rem; } }
     @media (max-width: 520px) { .lead-mini { grid-template-columns: 110px 1fr; gap: 12px; } .lead-title { font-size: 1.3rem; } .lead-excerpt { -webkit-line-clamp: 2; font-size: 0.95rem; } }
+
+    /* "Questions people are asking" (29/9) — samme udseende som på Jacobs andet site */
+    .home-questions { margin: 6px 0 36px; }
+    .home-questions-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 22px; }
+    .home-question { display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 12px; text-decoration: none; color: var(--text-color); border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
+    .home-question:hover { background: var(--hover-bg); border-color: var(--border-color); transform: translateX(3px); }
+    .home-question-mark { flex: none; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: #fff; background: var(--tag-accent); }
+    .home-question-text { font-weight: 600; font-size: 0.95rem; line-height: 1.35; }
+    .home-question-arrow { margin-left: auto; color: #9ca3af; transition: transform 0.15s, color 0.2s; }
+    .home-question:hover .home-question-arrow { transform: translateX(3px); color: var(--teal-text); }
+    @media (max-width: 768px) { .home-questions-list { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { .home-question:hover, .home-question:hover .home-question-arrow { transform: none; } }
   </style>
 
   <section class="home-hero">
@@ -82,6 +102,26 @@ const resten = side1.slice(5);
             </a>
           ))}
         </div>
+      </section>
+    )}
+
+    {sporgsmaal.length > 0 && (
+      <section class="home-questions" aria-labelledby="home-questions-heading">
+        <div class="section-heading">
+          <h2 id="home-questions-heading">Questions people are asking</h2>
+          <span class="section-note">{denneUge ? 'Real Google searches, answered this week.' : 'Real Google searches, answered recently.'}</span>
+        </div>
+        <ul class="home-questions-list">
+          {sporgsmaal.map((q) => (
+            <li>
+              <a href={q.href} class="home-question">
+                <span class="home-question-mark" style={`--tag-accent: ${q.farve}`} aria-hidden="true">?</span>
+                <span class="home-question-text">{q.tekst}</span>
+                <span class="home-question-arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
     )}
 
