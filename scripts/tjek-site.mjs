@@ -42,6 +42,8 @@ function rettet(sti, k) {
   // Sitets navn er kun "Tech Media Arch" (Jacob 28/9): "TechMediaArcive", "Tech Media Archive" m.fl. er rettet
   // i indholdet (ikke inde i adresser, som ikke er en del af teksten her)
   k = k.replace(/Tech[\s_-]*Media[\s_-]*Arc[h]?[i]?[v]?e\b/gi, (m, pos, hel) => ('=/.@-_'.includes(hel[pos - 1] || '') ? m : 'Tech Media Arch'));
+  // 29/9: også "TechMediaArch" skrevet i ét ord som navn (ikke domænet TechMediaArch.com, ikke i adresser)
+  k = k.replace(/\bTechMediaArch\b(?![.\w]*\.com|\w)/g, (m, pos, hel) => ('=/.@-_#'.includes(hel[pos - 1] || '') ? m : 'Tech Media Arch'));
   for (const r of RETTELSER.filter((x) => x.sti === sti)) {
     if (r.type === 'fjern') {
       const x = tekst(r.html); const i = k.lastIndexOf(x);
@@ -81,7 +83,11 @@ for (const p of [...posts, ...pages]) {
     .replace(/\[((?:[^\[\]\n<]|<[^>]+>){2,300}?)\]\((https?:\/\/[^)\s"<>]+)\)/g, '$1')
     // og søgeords-rester med understregning i Fintech-artiklen ("fintech_banks" -> "fintech banks", 28/9)
     .replace(/\b([Ff]intech)_(companies|Companies|meaning|banks)\b/g, '$1 $2')))));
-  const ny = tekst(m[1]);
+  const ny = tekst(m[1]
+    // FAQ-boksens EKSTRA spørgsmål (frontmatter "faq:", lib/faqboks.mjs) findes ikke på Blogger og tælles ikke med;
+    // artiklens egne FAQ-spørgsmål står i boksen med de samme ord og SKAL stadig være ens
+    .replace(/<section class="faq-box" data-ekstra="1">[\s\S]*?<\/section>/g, ' ')
+    .replace(/<details class="faq-item" data-ekstra="1">[\s\S]*?<\/details>/g, ' '));
   if (kilde === ny) tekstOk++;
   else {
     let i = 0; while (i < kilde.length && kilde[i] === ny[i]) i++;

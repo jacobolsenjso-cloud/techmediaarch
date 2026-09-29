@@ -24,6 +24,7 @@ import { kontrollerKilder, kildeliste } from './lib/links.mjs';
 import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
+import { faqSchema } from '../src/lib/faqschema.mjs';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
 const EMNE = arg('emne');
@@ -110,9 +111,13 @@ Base all factual claims on these researched facts (do not add other numbers, dat
 ${fakta}
 
 Rules:
-- At least 1600 words, 8-10 sections with <h2> (and <h3> where useful), each section 150-250 words. Plain, clear language for curious non-experts.
+- At least 1600 words, 8-10 sections with <h2> (and <h3> where useful), each section 150-250 words.
+- Write like a technology journalist at a news publication, not like an analyst or a marketer (Jacob 28/9-2026):
+  lead with the most important facts, attribute facts to their source in the sentence ("according to IBM", "NIST defines ..."),
+  short paragraphs, concrete examples, neutral tone, no hype words, no "our analysis", "the verdict" or "key takeaways" framing.
 - Answer the main keyword directly in the first paragraph.
-- Include one FAQ section (<h2>FAQ</h2> with <h3> questions) built from the related keywords.
+- Include one FAQ section (<h2>FAQ</h2>) with AT LEAST 5 questions as <h3>, each followed by a 2-4 sentence answer in <p>.
+  Phrase the questions the way people type them into Google, built from the related keywords; every question must be different.
 - Never claim personal testing or experience ("I tested", "in my experience", "we tried").
 - Link to 3-5 of these existing articles where relevant, using the exact href and a natural anchor text:
 ${interne.map((l) => `  ${l.href}  (${l.titel})`).join('\n') || '  (none)'}
@@ -147,6 +152,24 @@ const antalInterne = [...new Set([...html.matchAll(/<a href="([^"]+)">/g)].map((
 // Første-persons-påstande er forbudt — stop hellere end at udgive dem.
 const forbudt = html.match(/\b(I tested|I tried|in my experience|we tested|we tried|I've used|I have used)\b/i);
 if (forbudt) throw new Error(`Artiklen indeholder en førstepersons-påstand: "${forbudt[0]}"`);
+
+// FAQ: mindst 5 spørgsmål (Jacob 29/9). Tælles med sitets egen regel (src/lib/faqschema.mjs), så robot og
+// site er enige. Er der færre, skrives KUN FAQ-afsnittet om én gang; lykkes det ikke, afvises artiklen.
+const antalFaq = (h) => (faqSchema(h)?.mainEntity || []).length;
+if (antalFaq(html) < 5) {
+  log(`- FAQ: ${antalFaq(html)} spørgsmål - beder Gemini om mindst 5.`);
+  const m = html.match(/<h2[^>]*>\s*(?:FAQ|Frequently Asked Questions)\s*<\/h2>[\s\S]*?(?=<h2\b|$)/i);
+  const ny = await skriv(`Rewrite this FAQ section of an article about "${valgt.hoved}" so it has AT LEAST 5 different questions as <h3>, each followed by a 2-4 sentence answer in <p>.
+Keep the existing questions and answers; add new ones built from these search phrases: ${valgt.beslaegtede.map((k) => `"${k}"`).join(', ')}.
+Base answers only on these researched facts (no other numbers, dates or quotes):\n${fakta}
+Journalistic, neutral tone. No links. Start with <h2>FAQ</h2>. Output ONLY the HTML of the FAQ section.
+
+${m ? m[0] : '<h2>FAQ</h2>'}`);
+  const faqNy = ny.tekst.replace(/^```html?\s*|```\s*$/g, '').trim();
+  if (antalFaq(faqNy) >= 5) html = m ? html.replace(m[0], () => faqNy) : html + faqNy;
+}
+if (antalFaq(html) < 5) throw new Error(`FAQ har kun ${antalFaq(html)} spørgsmål (mindst 5) - artiklen afvist`);
+log(`- FAQ: ${antalFaq(html)} spørgsmål.`);
 
 // Kilder: følg Googles omdirigering, kontrollér live, højst 4, ét pr. domæne.
 const { sat: kildeLinks, afvist: kildeAfvist } = await kontrollerKilder(kilder, 4);
