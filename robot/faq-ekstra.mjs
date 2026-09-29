@@ -92,7 +92,38 @@ function fremmedNavn(q, art) {
 // Tilføjet efter kørsel #16 (29/9):
 // En FAQ taler ikke om "the text"/"the article" ("What is the viral video mentioned in the text used for?")
 // (ikke "the text-to-speech tool" eller "the text file" — de er ikke henvisninger til artiklen)
-const META = /according to the (text|article)|(mentioned|described|discussed|referenced|highlighted|noted|considered) (in|by) the (text|article)\b(?![-\w]| file)|\b(in|from) the (text|article)(?=[?.,]|$)/i;
+const META = /according to the (text|article|video)|(mentioned|described|discussed|referenced|highlighted|noted|considered|shown) (in|by) the (text|article|video)\b(?![-\w]| file)|\b(in|from) the (text|article|video)(?=[?.,]|$)/i;
+// Efter kørsel #17: et svar, der ikke svarer ("The article lacks any financial details …"), duer ikke
+// (ikke "the video game", "the video editor", "the text prompt" — kun når svaret henviser til sin kilde)
+// ("running the text through Rephrasy" og "does not include a friendly installer" er almindelige sætninger)
+const IKKESVAR = /\b(the|this) (article|text|video|source) (explains|outlines|lacks|states|says|notes|mentions|describes|does|provides|highlights|suggests|covers|shows)\b|\b(in|from|according to) the (article|text|video|source)\b|\bdoes not (mention|specify|disclose|say|state)\b|\bnot (mentioned|specified|disclosed|stated)\b|\black(s|ing)? (any )?(details|information|specifics)\b|\bomitted\b/i;
+// Spørger spørgsmålet om et navn ("Who …?", "What is the name of …?"), skal svaret nævne et navn, der ikke står i spørgsmålet
+// ("What is the name of NVIDIA's latest chip?" -> svar uden "Blackwell" duer ikke)
+const NAVNSPM = /^(Who\b|What is the name|What are the names|Which (company|companies|brand|brands|tool|tools|app|apps|model|models|chip|platform|service|institutions?|organi[sz]ations?|person|people|firm|firms|startup|startups)\b)/i;
+// Almindelige ord, der står med stort i starten af en sætning, er ikke navne
+const IKKENAVN = new Set(('The This That These Those It Its They Their There In On At By For With While Although However Both Each Many Most Some '
+  + 'Users Specifically Additionally Furthermore Moreover A An As After Before When If Because Such According Unlike Through Following '
+  + 'Despite Instead Rather Currently Today Yes No Its Once Over Under Among Several Various Other Another Every All Key One Two').split(' '));
+// Er ordet et navn i artiklen? = står med stort midt i en sætning (ordet før står med småt)
+function navnIArtikel(w, brod) {
+  for (const m of brod.matchAll(new RegExp(`(^|[^A-Za-z0-9])(${w})(?=$|[^A-Za-z0-9])`, 'g'))) {
+    const foer = brod.slice(Math.max(0, m.index - 40), m.index + m[1].length);
+    if (/[a-z][a-z'’-]*[,;]?\s+$/.test(foer)) return true;
+  }
+  return false;
+}
+// Et ord med stort midt i svaret er et navn; står det først i en sætning ("Oppo is …", "Industry experts …"),
+// tæller det kun, hvis artiklen også skriver det som navn (efter kørsel #17: "Industry" blev taget for et navn)
+function navnISvar(q, a, brod = '') {
+  const iq = q.toLowerCase();
+  for (const m of a.matchAll(/\b([A-Z][A-Za-z0-9-]*[A-Za-z0-9])/g)) {
+    const w = m[1];
+    if (w.length < 2 || IKKENAVN.has(w) || iq.includes(w.toLowerCase())) continue;
+    const start = m.index === 0 || /[.!?]\s+$/.test(a.slice(0, m.index));
+    if (!start || /[A-Z].*[A-Z]|[a-z][A-Z]|\d/.test(w.slice(1)) || navnIArtikel(w, brod)) return true;
+  }
+  return false;
+}
 // Søgestøj fra autoforslag ("What is artificial intelligence bbc news?") — kun tilladt, hvis ordet står i artiklen
 const STOEJ = /\b(bbc|cnn|reddit|quora|wikipedia|pdf|ppt|near me|news)\b/i;
 // Spørger spørgsmålet om et tal eller en dato, skal svaret give det ("What percentage …?" -> "only a minority" duer ikke)
@@ -107,6 +138,8 @@ function afvisGrund(x, ctx, allerede) {
   if (META.test(q)) return 'henviser til "teksten"/"artiklen"';
   const st = q.match(STOEJ); if (st && !new RegExp(`\\b${st[0]}\\b`, 'i').test(ctx.art)) return `søgestøj ("${st[0]}")`;
   if (TALSPM.test(q) && !HARTAL.test(a)) return 'spørger om et tal/en dato, men svaret giver ingen';
+  if (IKKESVAR.test(a)) return 'svaret svarer ikke (henviser til kilden eller siger, at oplysningen mangler)';
+  if (NAVNSPM.test(q) && !navnISvar(q, a, ctx.brod)) return 'spørger om et navn, men svaret giver intet';
   if (q.length < 15 || q.length > 130) return 'spørgsmålets længde';
   const s = stavefejl(q, ctx.brod); if (s) return `stavning ("${s}" skrives med stort i artiklen)`;
   const n = fremmedNavn(q, ctx.art); if (n) return `navnet "${n}" står ikke i artiklen`;
@@ -162,8 +195,9 @@ ${afvist.length ? `Rejected earlier, do not reuse: ${JSON.stringify(afvist.slice
 ${JSON.stringify(kandidater)}
 Rewrite each search into a correct, natural English question: start with What/How/Why/Is/Are/Can/Does/Do/Who/When/Which/Should/Will,
 capital first letter, correct capitalisation of names and acronyms exactly as the article writes them (AI, SEO, Google, ChatGPT), end with "?".
-Only use names that appear in the article. Never refer to "the text" or "the article" in a question. If a question asks for a number,
-percentage, price or date, the answer MUST state it exactly as the article does; if the article does not give it, do not ask that question. If fewer searches are answered by the article, write other questions a reader would type into Google that THIS ARTICLE answers.
+Only use names that appear in the article. Never refer to "the text", "the article" or "the video" — not in questions and not in answers.
+If a question asks for a number, percentage, price, date or a name, the answer MUST state it exactly as the article does; if the article
+does not give it, do not ask that question. Never write an answer saying that something is not mentioned. If fewer searches are answered by the article, write other questions a reader would type into Google that THIS ARTICLE answers.
 Answers: 2-4 sentences, 25-90 words, journalistic and neutral, based ONLY on the article text below — no outside facts, no numbers that are not in the article, no first person, no links.
 For each item include "citat": one sentence copied EXACTLY, word for word, from the article that the answer is based on.
 Return JSON {"faq":[{"q":"...","a":"...","citat":"..."}]}

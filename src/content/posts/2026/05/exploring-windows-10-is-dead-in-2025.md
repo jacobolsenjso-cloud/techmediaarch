@@ -19,8 +19,6 @@ faq:
     a: When support concludes, the operating system will receive no further security updates from the creator. This leaves numerous users facing difficult decisions about their hardware and digital security. Fortunately, alternative methods exist to keep the system running safely without paying for extended coverage.
   - q: How to use Windows 10 safely after support ends?
     a: Users can maintain safety by hardening their installation and treating the operating system as a specialized, part-time tool rather than an everyday environment. Key strategies include setting up a dual-boot system with Linux and shifting risky activities like web browsing and email away from Windows. Additionally, utilizing specific enterprise versions allows the system to wipe away unauthorized changes upon rebooting.
-  - q: What is Windows 10 extended support cost?
-    a: The article outlines a method to continue running the operating system safely and securely without paying any fees for extended support. By transforming the environment into a specialized tool, users can bypass official paid options entirely. This approach provides a free alternative to official continuation programs.
   - q: Why is Windows 10 support stopping?
     a: The official support cycle for the operating system is concluding as Microsoft transitions focus toward newer ecosystems like Windows 11. This shift leaves users dealing with hardware compatibility barriers and concerns over built-in tracking features in newer software. Consequently, alternative security strategies are required for those wishing to keep their current hardware.
 ---
