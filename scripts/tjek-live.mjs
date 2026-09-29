@@ -101,6 +101,16 @@ for (const [s, status, til] of forventet) {
   if (!godt) fejl.push(`${s}: ventede ${status} ${til || ''}, fik ${r.status} ${loc || ''}`);
 }
 
+// 3b: security.txt skal være sitets egen fil (public/.well-known/security.txt). 29/9-2026: Cloudflares egen
+//     security.txt-funktion (Security → Settings) serverede en anden udgave med forkert mail og er slået FRA
+{
+  const r = await hent('/.well-known/security.txt'); const t = await r.text();
+  const egen = fs.readFileSync(path.resolve('public/.well-known/security.txt'), 'utf8').trim();
+  const godt = r.status === 200 && t.trim() === egen;
+  console.log(`/.well-known/security.txt: ${r.status}${godt ? ' · samme som public/' : '  <-- FORKERT (Cloudflares udgave slået til igen?)'}`);
+  if (!godt) fejl.push('security.txt er ikke sitets egen fil');
+}
+
 // 4: Bloggers JSON-feeds
 for (const s of ['/feeds/posts/default/-/Video?alt=json&max-results=5', '/feeds/posts/summary?alt=json&max-results=5', '/feeds/pages/default?alt=json']) {
   const r = await hent(s);
