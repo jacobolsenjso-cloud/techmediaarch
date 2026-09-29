@@ -124,7 +124,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       :root { --bg-color: #f8fafc; --text-color: #111; --card-bg: #fff; --border-color: #e5e7eb; --sidebar-bg: #fff; --hover-bg: #f1f5f9; --teal: #0891b2; --teal-text: #0e7490; --muted: #6b7280; }
       body.dark-mode { --bg-color: #141317; --text-color: #f4f2f0; --card-bg: #1f1d24; --border-color: #322e39; --sidebar-bg: #141317; --hover-bg: #262230; --teal: #0891b2; --teal-text: #38bdf8; --muted: #9ca3af; }
       body.dark-mode [style*="#1e3a8a"] { --tag-accent: #6d9eff; }
-      body { background: var(--bg-color); color: var(--text-color); margin: 0; font-family: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+      body { background: var(--bg-color); color: var(--text-color); margin: 0; font-family: "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
       * { -webkit-tap-highlight-color: transparent; }
       /* Ikke inde i Watch-siden: den skal se ud som på Blogger (se p/watch.astro) */
       :where(h1, h2, h3, h4):not(:where(.tma-blogger-scope *)) { letter-spacing: -0.02em; }
@@ -168,9 +168,23 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .logo-mark { height: 34px; width: auto; display: block; flex-shrink: 0; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.28)); }
       body.dark-mode .logo-mark { filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55)); }
 
-      /* --- Layout: sidemenu + indhold (siden ruller i .content-area, ikke i dokumentet) --- */
-      .main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
-      .sidebar { width: 220px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; z-index: 20; transition: left 0.3s ease; box-sizing: border-box; }
+      /* --- Layout: sidemenu + indhold ---
+         29/9-2026: siden ruller i VINDUET (før i en indre boks). Googles svævende "Privacy and cookie
+         settings"-boble folder sig kun ud ved bunden af siden, målt på vinduets rulning; med den indre
+         boks var vinduet altid "ved bunden", så boblen foldede sig ud på hver side. Topbaren (sticky)
+         og sidemenuen (sticky, egen rulning) står fast som før. Indholdsboksen hedder nu .content-main,
+         så Watch-sidens eget script (der ruller .content-area, hvis den findes) ruller vinduet. */
+      html { overflow-y: scroll; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: #cbd5e1 var(--bg-color); }
+      html::-webkit-scrollbar { width: 14px; }
+      html::-webkit-scrollbar-track { background: var(--bg-color); }
+      html::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; border: 3px solid var(--bg-color); }
+      html:has(body.dark-mode) { scrollbar-color: #475569 #0f1115; }
+      html:has(body.dark-mode)::-webkit-scrollbar-track { background: #0f1115; }
+      html:has(body.dark-mode)::-webkit-scrollbar-thumb { background-color: #475569; border: 3px solid #0f1115; }
+      /* Hop til en overskrift (indholdsfortegnelse, #links) må ikke gemme den under den faste topbar */
+      [id] { scroll-margin-top: 80px; }
+      .main-layout { display: flex; flex: 1; position: relative; align-items: flex-start; }
+      .sidebar { width: 220px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); padding: 15px 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; z-index: 20; transition: left 0.3s ease; box-sizing: border-box; position: sticky; top: 60px; height: calc(100vh - 60px); flex-shrink: 0; }
       .nav-item { padding: 10px 15px; min-height: 44px; box-sizing: border-box; text-decoration: none; color: var(--text-color); border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease; }
       .nav-item:hover, .nav-item.active { background: var(--hover-bg); color: var(--teal-text); }
       .nav-item:hover { transform: translateX(3px); }
@@ -179,16 +193,10 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tag-accent); flex-shrink: 0; margin: 0 5px 0 5px; }
       .nav-heading { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 6px 15px 2px; }
       .nav-sep { width: 100%; border: 0; border-top: 1px solid var(--border-color); margin: 10px 0; }
-      .content-area { flex: 1; background: var(--bg-color); position: relative; display: flex; flex-direction: column; scroll-behavior: smooth; overflow-y: scroll !important; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: #cbd5e1 var(--bg-color); }
-      .content-area::-webkit-scrollbar { width: 14px; }
-      .content-area::-webkit-scrollbar-track { background: var(--bg-color); }
-      .content-area::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; border: 3px solid var(--bg-color); }
-      body.dark-mode .content-area { scrollbar-color: #475569 #0f1115; }
-      body.dark-mode .content-area::-webkit-scrollbar-track { background: #0f1115; }
-      body.dark-mode .content-area::-webkit-scrollbar-thumb { background-color: #475569; border: 3px solid #0f1115; }
+      .content-main { flex: 1; min-width: 0; min-height: calc(100vh - 60px); background: var(--bg-color); position: relative; display: flex; flex-direction: column; overflow-x: clip; }
       @keyframes tmaFadeIn { from { opacity: 0; } to { opacity: 1; } }
-      .content-area { animation: tmaFadeIn 0.4s ease backwards; }
-      @media (prefers-reduced-motion: reduce) { .content-area { animation: none; } .nav-item:hover { transform: none; } }
+      .content-main { animation: tmaFadeIn 0.4s ease backwards; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .content-main { animation: none; } .nav-item:hover { transform: none; } }
 
       /* --- Footer --- */
       .site-footer { padding: 20px; text-align: center; border-top: 1px solid var(--border-color); font-size: 14px; color: var(--muted); margin-top: auto; }
@@ -225,8 +233,9 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
          faktisk bruger: tabeller (116 indlæg), citater (121), YouTube-rammer (129),
          billeder med billedtekst (tr-caption-container) og centrerede billeder (separator). */
       .post-body { line-height: 1.8; font-size: 1.05rem; margin-bottom: 30px; overflow-wrap: break-word; }
-      .post-body h2 { font-size: 1.5rem; line-height: 1.3; margin: 2em 0 0.6em; scroll-margin-top: 20px; }
-      .post-body h3 { font-size: 1.2rem; line-height: 1.35; margin: 1.6em 0 0.5em; scroll-margin-top: 20px; }
+      /* scroll-margin 80 px = 60 px fast topbar + 20 px luft (siden ruller i vinduet fra 29/9) */
+      .post-body h2 { font-size: 1.5rem; line-height: 1.3; margin: 2em 0 0.6em; scroll-margin-top: 80px; }
+      .post-body h3 { font-size: 1.2rem; line-height: 1.35; margin: 1.6em 0 0.5em; scroll-margin-top: 80px; }
       .post-body h4 { font-size: 1.05rem; margin: 1.4em 0 0.4em; }
       .post-body p { margin: 0 0 1.1em; }
       .post-body li > p { margin: 0 0 0.4em; }
@@ -415,7 +424,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
         </a>
       </aside>
 
-      <main class="content-area">
+      <main class="content-main">
         <slot />
 
         <footer class="site-footer">
@@ -552,21 +561,20 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
           });
         }
 
-        // Siden ruller i .content-area, ikke i vinduet — mål og ryk der.
-        var box = document.querySelector('.content-area');
+        // Siden ruller i vinduet (29/9-2026, se CSS'en ved .main-layout) — mål og ryk der.
+        var box = document.querySelector('.content-main');
         var topBtn = document.getElementById('scrollTopBtn');
         var bar = document.getElementById('tmaProgress');
+        var rod = document.scrollingElement || document.documentElement;
         var onScroll = function () {
-          var st = box.scrollTop, max = box.scrollHeight - box.clientHeight;
+          var st = window.scrollY || rod.scrollTop, hoejde = window.innerHeight, max = rod.scrollHeight - hoejde;
           if (bar) bar.style.width = (max > 0 ? (st / max) * 100 : 0) + '%';
-          if (topBtn) topBtn.classList.toggle('visible', st > 400 && st + box.clientHeight < box.scrollHeight - 120);
+          if (topBtn) topBtn.classList.toggle('visible', st > 400 && st + hoejde < rod.scrollHeight - 120);
         };
-        if (box) {
-          box.addEventListener('scroll', onScroll, { passive: true });
-          window.addEventListener('resize', onScroll);
-          onScroll();
-          if (topBtn) topBtn.addEventListener('click', function () { box.scrollTo({ top: 0, behavior: 'smooth' }); });
-        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll);
+        onScroll();
+        if (topBtn) topBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
         // Kort fader blidt ind, når de rulles i syne
         if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && box) {
@@ -577,7 +585,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
               var el = en.target; el.classList.add('is-visible'); obs.unobserve(el);
               setTimeout(function () { el.classList.remove('tma-reveal', 'is-visible'); }, 750);
             });
-          }, { root: box, rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+          }, { root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
           els.forEach(function (el) { el.classList.add('tma-reveal'); obs.observe(el); });
         }
 

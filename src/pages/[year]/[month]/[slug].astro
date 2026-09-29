@@ -66,7 +66,7 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
   <style is:global>
     .article-layout { display: flex; gap: 25px; max-width: 1200px; margin: 0 auto; padding: 30px 20px; box-sizing: border-box; align-items: flex-start; width: 100%; }
     .article-primary { flex: 1; min-width: 0; width: 100%; max-width: 100%; }
-    .article-secondary { width: 340px; flex-shrink: 0; position: sticky; top: 20px; max-height: calc(100vh - 100px); overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; }
+    .article-secondary { width: 340px; flex-shrink: 0; position: sticky; top: 80px; max-height: calc(100vh - 100px); /* top: 60 px topbar + 20 px luft (siden ruller i vinduet fra 29/9) */ overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; }
     .breadcrumbs-bar { background: var(--hover-bg); padding: 0 18px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; }
     .breadcrumbs-bar a { color: var(--teal-text); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
     .article-title { margin: 0 0 15px 0; font-size: 2rem; line-height: 1.2; }
