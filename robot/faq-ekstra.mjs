@@ -92,7 +92,8 @@ function fremmedNavn(q, art) {
 // Tilføjet efter kørsel #16 (29/9):
 // En FAQ taler ikke om "the text"/"the article" ("What is the viral video mentioned in the text used for?")
 // (ikke "the text-to-speech tool" eller "the text file" — de er ikke henvisninger til artiklen)
-const META = /according to the (text|article|video|guide|post|story)|(mentioned|described|discussed|referenced|highlighted|noted|considered|shown) (in|by) the (text|article|video)\b(?![-\w]| file)|\b(in|from) the (text|article|video)(?=[?.,]|$)/i;
+// (efter kørsel #18/#19 også "the guide"/"the post"/"the story" - i alle tre former)
+const META = /according to the (text|article|video|guide|post|story)|(mentioned|described|discussed|referenced|highlighted|noted|considered|shown|listed|featured|covered) (in|by) the (text|article|video|guide|post|story)\b(?![-\w]| file)|\b(in|from) the (text|article|video|guide|post|story)(?=[?.,]|$)/i;
 // Efter kørsel #17: et svar, der ikke svarer ("The article lacks any financial details …"), duer ikke
 // (ikke "the video game", "the video editor", "the text prompt" — kun når svaret henviser til sin kilde)
 // ("running the text through Rephrasy" og "does not include a friendly installer" er almindelige sætninger)
@@ -210,7 +211,7 @@ ${afvist.length ? `Rejected earlier, do not reuse: ${JSON.stringify(afvist.slice
 ${JSON.stringify(kandidater)}
 Rewrite each search into a correct, natural English question: start with What/How/Why/Is/Are/Can/Does/Do/Who/When/Which/Should/Will,
 capital first letter, correct capitalisation of names and acronyms exactly as the article writes them (AI, SEO, Google, ChatGPT), end with "?".
-Only use names that appear in the article. Never refer to "the text", "the article" or "the video" — not in questions and not in answers.
+Only use names that appear in the article. Never refer to "the text", "the article", "the guide", "the post" or "the video" — not in questions and not in answers.
 If a question asks for a number, percentage, price, date or a name, the answer MUST state it exactly as the article does; if the article
 does not give it, do not ask that question. Never write an answer saying that something is not mentioned. If fewer searches are answered by the article, write other questions a reader would type into Google that THIS ARTICLE answers.
 Answers: 2-4 sentences, 25-90 words, journalistic and neutral, based ONLY on the article text below — no outside facts, no numbers that are not in the article, no first person, no links.
