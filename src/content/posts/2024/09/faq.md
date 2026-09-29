@@ -60,7 +60,7 @@ hadToc: false
 <details>
   <summary>How can I provide feedback on your articles?</summary>
   <div>
-  <p>We appreciate the feedback from our readers! But for now, we do not yet have openings for individual articles. But you are welcome to send us an email: at techmediaarch.com@gmail.com with your feedback directly to us. </p>
+  <p>We appreciate the feedback from our readers! But for now, we do not yet have openings for individual articles. But you are welcome to send us an email: at info@techmediaarch.com with your feedback directly to us. </p>
   </div>
 </details>
 <script type="application/ld+json">{
@@ -73,6 +73,6 @@ hadToc: false
       {"@type":"Question","name":"Do you provide reviews for all types of gadgets?","acceptedAnswer":{"@type":"Answer","text":"Yes, We review a variety of gadgets, not all of them, so that our readers can make informed buying decisions."}},
       {"@type":"Question","name":"Do you cover media-related topics as well?","acceptedAnswer":{"@type":"Answer","text":"Yes, we explore various media topics including digital content creation tools, and industry news related to media technology."}},
       {"@type":"Question","name":"Can I contribute an article to Tech Media Arch?","acceptedAnswer":{"@type":"Answer","text":"We are open to guest contributions! If you have a unique perspective or expertise in technology or media, please reach out through our contact page with your ideas."}},
-      {"@type":"Question","name":"How can I provide feedback on your articles?","acceptedAnswer":{"@type":"Answer","text":"We appreciate the feedback from our readers! But for now, we do not yet have openings for individual articles. But you are welcome to send us an email: at techmediaarch.com@gmail.com with your feedback directly to us."}}
+      {"@type":"Question","name":"How can I provide feedback on your articles?","acceptedAnswer":{"@type":"Answer","text":"We appreciate the feedback from our readers! But for now, we do not yet have openings for individual articles. But you are welcome to send us an email: at info@techmediaarch.com with your feedback directly to us."}}
     ]
   }</script>
