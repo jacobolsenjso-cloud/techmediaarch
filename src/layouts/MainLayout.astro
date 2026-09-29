@@ -184,9 +184,10 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       /* Hop til en overskrift (indholdsfortegnelse, #links) må ikke gemme den under den faste topbar */
       [id] { scroll-margin-top: 80px; }
       .main-layout { display: flex; flex: 1; position: relative; align-items: flex-start; }
-      /* padding-bund 120 px: Googles cookie-skjold (fast nederst til venstre, 55-105 px over bunden) må ikke dække
-         menuens sidste punkter, når menuen er rullet helt ned (målt 29/9 med robot/ud/_skjold-menu.mjs) */
-      .sidebar { width: 220px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); padding: 15px 10px 120px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; z-index: 20; transition: left 0.3s ease; box-sizing: border-box; position: sticky; top: 60px; height: calc(100vh - 60px); flex-shrink: 0; }
+      /* padding-bund 160 px: Googles cookie-skjold (55-105 px over bunden) og dets udfoldede tekst (op til 120 px over
+         bunden på desktop, 142 px på mobil) må ikke dække menuens sidste punkter, når menuen er rullet helt ned
+         (målt 29/9 med robot/ud/_skjold-menu.mjs) */
+      .sidebar { width: 220px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); padding: 15px 10px 160px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; z-index: 20; transition: left 0.3s ease; box-sizing: border-box; position: sticky; top: 60px; height: calc(100vh - 60px); flex-shrink: 0; }
       .nav-item { padding: 10px 15px; min-height: 44px; box-sizing: border-box; text-decoration: none; color: var(--text-color); border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease; }
       .nav-item:hover, .nav-item.active { background: var(--hover-bg); color: var(--teal-text); }
       .nav-item:hover { transform: translateX(3px); }
