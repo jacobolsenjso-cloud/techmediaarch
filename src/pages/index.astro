@@ -18,8 +18,11 @@ const resten = side1.slice(5);
 // "Questions people are asking" (29/9, Jacobs ønske): de nyeste robotartiklers Google-søgespørgsmål som genveje.
 // Undertitlen lover "this week" — den står kun, når ALLE viste spørgsmål er højst 7 dage gamle (ellers "recently").
 const UGE = 7 * 24 * 3600 * 1000;
+// "?" skal kunne læses på emnefarven: hvid, medmindre kontrasten mod hvid er under 3 (lyse farver som #06b6d4 gav 2,4) — så mørk
+const lum = (hex: string) => { const v = hex.replace('#', '').match(/../g)!.map((x) => { const c = parseInt(x, 16) / 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+const tegnFarve = (hex: string) => (1.05 / (lum(hex) + 0.05) < 3 ? '#0f172a' : '#fff');
 const sporgsmaal = INDLAEG.filter((p) => p.robot && p.keyword).slice(0, 8)
-  .map((p) => ({ href: p.href, tekst: somSporgsmaal(p.keyword), farve: p.emner[0]?.farve || '#0891b2', dato: new Date(p.published).getTime() }));
+  .map((p) => { const farve = p.emner[0]?.farve || '#0891b2'; return { href: p.href, tekst: somSporgsmaal(p.keyword), farve, tegn: tegnFarve(farve), dato: new Date(p.published).getTime() }; });
 const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q.dato <= UGE);
 ---
 <MainLayout description="Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.">
@@ -115,7 +118,7 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
           {sporgsmaal.map((q) => (
             <li>
               <a href={q.href} class="home-question">
-                <span class="home-question-mark" style={`--tag-accent: ${q.farve}`} aria-hidden="true">?</span>
+                <span class="home-question-mark" style={`--tag-accent: ${q.farve}; color: ${q.tegn}`} aria-hidden="true">?</span>
                 <span class="home-question-text">{q.tekst}</span>
                 <span class="home-question-arrow" aria-hidden="true">→</span>
               </a>
