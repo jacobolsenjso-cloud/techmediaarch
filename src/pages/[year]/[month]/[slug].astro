@@ -55,8 +55,11 @@ const schema = {
   publisher: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/icon-512.png' } },
   ...(p.labels.length ? { keywords: p.labels.join(', ') } : {}),
 };
-// FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs)
-const faq = faqSchema(p.faqHtml);
+// FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs) + de ekstra spørgsmål fra frontmatter,
+// så Google får præcis de spørgsmål, læseren ser i FAQ-boksen
+const egneFaq = faqSchema(p.faqHtml);
+const ekstraQ = p.faqEkstra.map((x) => ({ '@type': 'Question', name: x.q, acceptedAnswer: { '@type': 'Answer', text: x.a } }));
+const faq = egneFaq || ekstraQ.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [...(egneFaq?.mainEntity || []), ...ekstraQ] } : null;
 const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
 ---
 <MainLayout title={p.title} seoTitle={p.seoTitle} description={p.description} image={p.image} schema={faq ? [schema, faq] : schema} ogType="article" breadcrumb={crumbs}>
@@ -67,6 +70,17 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .breadcrumbs-bar { background: var(--hover-bg); padding: 0 18px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; }
     .breadcrumbs-bar a { color: var(--teal-text); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
     .article-title { margin: 0 0 15px 0; font-size: 2rem; line-height: 1.2; }
+    /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
+    .post-body .faq-box { background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 6px 20px 10px; margin: 32px 0; }
+    .post-body .faq-box > h2 { margin: 14px 0 6px; }
+    /* Hvert spørgsmål er et kort — rammen kommer fra den fælles .post-body details-regel i MainLayout */
+    .post-body .faq-box .faq-item { background: var(--card-bg); margin: 10px 0; }
+    .post-body .faq-item > summary { list-style: none; cursor: pointer; position: relative; padding: 14px 34px 14px 0; font-weight: 600; font-size: 1.02rem; line-height: 1.45; min-height: 24px; }
+    .post-body .faq-item > summary::-webkit-details-marker { display: none; }
+    .post-body .faq-item > summary::after { content: '+'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; font-weight: 400; color: var(--teal-text); }
+    .post-body .faq-item[open] > summary::after { content: '\2212'; }
+    .post-body .faq-answer { padding: 0 0 12px; }
+    .post-body .faq-answer > :first-child { margin-top: 0; }
     .article-byline { display: flex; align-items: center; gap: 12px; margin: 0 0 18px 0; }
     .byline-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; background: var(--hover-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; }
     .byline-avatar svg { width: 24px; height: auto; }

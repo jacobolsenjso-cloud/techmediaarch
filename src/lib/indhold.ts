@@ -7,6 +7,7 @@
 import { parse } from 'yaml';
 import { EMNER, emneEtiket, type Emne } from './emner';
 import { temaKoder, youtubeLazy, vandmaerke, bloggerVideo } from './temakoder.mjs';
+import { faqBoks } from './faqboks.mjs';
 
 export interface Indlaeg {
   aar: string; maaned: string; navn: string;
@@ -23,6 +24,9 @@ export interface Indlaeg {
   faqHtml: string;      // indholdet før vandmærket — FAQ-data laves af det (som på Blogger)
   overskrifter: { niveau: number; tekst: string; id: string }[];
   minutter: number;
+  faqEkstra: { q: string; a: string }[]; // ekstra FAQ-spørgsmål fra frontmatter "faq:" (vises nederst i boksen)
+  faqStatus: string;    // 'boks' | 'uroert' | 'ny' | 'ingen' — se faqboks.mjs
+  faqEgne: number;      // antal af artiklens egne FAQ-spørgsmål, der står i boksen
 }
 export interface Side {
   navn: string; sti: string; href: string;
@@ -98,7 +102,10 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
   // og videoer uploadet til Blogger afspilles fra vores egen kopi — se temakoder.mjs
   const body = youtubeLazy(bloggerVideo(temaKoder(raaBody)));
   // Vandmærket på billederne (som Blogger-temaets script) — se temakoder.mjs
-  const { html, liste } = overskrifter(udenSpring(vandmaerke(body)));
+  // FAQ-boksen (faqboks.mjs): artiklens egen FAQ foldes ud på stedet + ekstra spørgsmål fra frontmatter "faq:"
+  const ekstraFaq: { q: string; a: string }[] = Array.isArray(data.faq) ? data.faq.filter((x: any) => x && x.q && x.a) : [];
+  const fb = faqBoks(vandmaerke(body), ekstraFaq);
+  const { html, liste } = overskrifter(udenSpring(fb.html));
   const labels: string[] = data.labels || [];
   const sti = `/${aar}/${maaned}/${navn}.html`;
   return {
@@ -110,6 +117,7 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
     image: data.image || youtubeBillede(raaBody),
     bloggerId: String(data.bloggerId || ''),
     html, feedHtml: bloggerVideo(raaBody), faqHtml: body, overskrifter: liste, minutter: minutter(body),
+    faqEkstra: ekstraFaq, faqStatus: fb.status, faqEgne: fb.egne,
   };
 // Sorteres som tidspunkter, ikke som tekst: datoerne har forskellig tidszone (+01:00/+02:00)
 }).sort((a, b) => new Date(b.published).getTime() - new Date(a.published).getTime());
