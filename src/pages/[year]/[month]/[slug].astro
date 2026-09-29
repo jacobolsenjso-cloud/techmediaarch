@@ -117,12 +117,17 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .share-cta-btn { display: inline-flex; align-items: center; gap: 8px; background: #0e7490; color: #fff; border: none; border-radius: 8px; padding: 11px 20px; min-height: 44px; font-size: 0.95rem; font-weight: 600; cursor: pointer; flex-shrink: 0; font-family: inherit; transition: background 0.2s, transform 0.2s; }
     .share-cta-btn:hover { background: #155e75; transform: translateY(-1px); }
     .share-cta-btn svg { width: 16px; height: 16px; }
-    .publisher-box { display: flex; gap: 20px; align-items: flex-start; background: var(--hover-bg); border: 1px solid var(--border-color); border-left: 4px solid #0891b2; border-radius: 10px; padding: 24px; margin: 10px 0 30px; }
-    .publisher-mark { width: 64px; height: 64px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .publisher-mark svg { width: 38px; height: auto; }
-    .publisher-name { font-weight: 700; font-size: 1.1rem; margin: 0 0 8px; }
-    .publisher-text { font-size: 0.97rem; line-height: 1.65; margin: 0; }
-    .publisher-text a { color: var(--teal-text); font-weight: 600; text-decoration: none; }
+    /* Forfatterboks (29/9, Jacobs ønske): samme udseende som på techfeedwatch, egen tekst til Tech Media Arch */
+    .author-box { display: flex; gap: 20px; align-items: flex-start; width: 100%; box-sizing: border-box; background: var(--hover-bg); border: 1px solid var(--border-color); border-left: 4px solid #0891b2; border-radius: 10px; padding: 28px; margin: 10px 0 30px; }
+    .author-box-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; object-position: center top; flex-shrink: 0; }
+    .author-box-name { font-weight: 700; font-size: 1.15rem; margin: 0; }
+    .author-box-title { font-size: 0.9rem; font-weight: 600; color: var(--teal-text); margin: 4px 0 14px 0; }
+    body.dark-mode .author-box-title { color: #22d3ee; }
+    .author-box-bio { font-size: 1rem; line-height: 1.7; margin: 0 0 16px 0; }
+    .author-box-ai-note { font-size: 0.82rem; font-style: italic; color: #6b7280; margin: 0; padding-top: 16px; margin-top: 4px; border-top: 1px solid var(--border-color); }
+    body.dark-mode .author-box-ai-note { color: #9ca3af; }
+    .author-box-ai-note a { color: var(--teal-text); text-decoration: none; font-weight: 600; font-style: normal; }
+    .author-box-ai-note a:hover { text-decoration: underline; }
     .nav-row { display: flex; gap: 20px; border-top: 1px solid var(--border-color); padding-top: 25px; margin-bottom: 40px; }
     .nav-card { flex: 1; background: var(--card-bg); border: 2px solid var(--border-color); padding: 15px 20px; border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.2s ease; display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; overflow: hidden; min-width: 0; }
     .nav-card:hover { transform: translateY(-3px); border-color: var(--teal-text); box-shadow: 0 6px 24px rgba(0,0,0,0.06); }
@@ -146,7 +151,12 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
       .nav-row { flex-direction: column; gap: 12px; }
       .share-cta { flex-direction: column; align-items: flex-start; }
       .share-cta-btn { width: 100%; justify-content: center; }
-      .publisher-box { flex-direction: column; padding: 18px; gap: 12px; }
+      .author-box { padding: 18px; gap: 12px; flex-direction: column; align-items: flex-start; }
+      .author-box-photo { width: 56px; height: 56px; }
+      .author-box-name { font-size: 1.05rem; }
+      .author-box-title { font-size: 0.85rem; margin: 3px 0 12px 0; }
+      .author-box-bio { font-size: 0.92rem; line-height: 1.6; margin-bottom: 12px; }
+      .author-box-ai-note { font-size: 0.78rem; padding-top: 12px; }
       .related-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
     }
   </style>
@@ -216,11 +226,23 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
         </button>
       </div>
 
-      <div class="publisher-box">
-        <span class="publisher-mark" aria-hidden="true"><Maerke id="pub" /></span>
+      {/* Forfatterboks (29/9): teksten skal være sand for artiklens slags — robotartikler og de ældre artikler er lavet forskelligt (Jacob 29/9) */}
+      <div class="author-box">
+        <img src="/jacob-olsen.png" alt="Jacob S. Olsen" class="author-box-photo" width="80" height="80" loading="lazy" />
         <div>
-          <p class="publisher-name">Tech Media Arch</p>
-          <p class="publisher-text">News, guides and analysis on AI and technology. <a href="/p/about-us">About us</a> · <a href="/p/start-here">Start here</a></p>
+          <p class="author-box-name">Jacob S. Olsen</p>
+          <p class="author-box-title">Runs Tech Media Arch, from Denmark</p>
+          {p.robot ? (
+            <>
+              <p class="author-box-bio">How this article was made: it starts from a question people search for on Google. A language model researches it on the web and writes the article; it is only published if at least two sources check out. It publishes automatically — I do not read every article before it goes live.</p>
+              <p class="author-box-ai-note">What is mine is the machinery and the rules it follows: which subjects, which sources, what gets rejected. <a href="/p/about-us">More on that here</a>.</p>
+            </>
+          ) : (
+            <>
+              <p class="author-box-bio">How this article was made: I chose the subject myself — one main phrase people search for on Google and five related ones — and the article was written to answer them.</p>
+              <p class="author-box-ai-note">What is mine is the choice of subject and of the search phrases the article answers. <a href="/p/about-us">More about Tech Media Arch</a>.</p>
+            </>
+          )}
         </div>
       </div>
 

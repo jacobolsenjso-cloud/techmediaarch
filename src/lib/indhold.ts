@@ -20,6 +20,7 @@ export interface Indlaeg {
   labels: string[]; emner: Emne[];
   image: string | null;
   bloggerId: string;
+  robot: boolean;       // skrevet af robotten (frontmatter "robot: true") — styrer teksten i forfatterboksen
   html: string;
   feedHtml: string;     // indholdet som i Blogger-eksporten (kun Blogger-videoer peger på vores kopi) — til /feeds/-svarene
   faqHtml: string;      // indholdet før vandmærket — FAQ-data laves af det (som på Blogger)
@@ -118,6 +119,7 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
     // Uden eget billede bruges miniaturen af den første indlejrede YouTube-video
     image: data.image || youtubeBillede(raaBody),
     bloggerId: String(data.bloggerId || ''),
+    robot: data.robot === true,
     html, feedHtml: interneLinks(bloggerVideo(raaBody)), faqHtml: body, overskrifter: liste, minutter: minutter(body),
     faqEkstra: ekstraFaq, faqStatus: fb.status, faqEgne: fb.egne,
   };
