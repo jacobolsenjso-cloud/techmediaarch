@@ -28,9 +28,11 @@ const opdateret = new Date(p.updated).getTime() - new Date(p.published).getTime(
 // Boksen er mærket data-ekstra, så tjek-site ser bort fra den, når brødteksten bevises ord for ord mod Blogger.
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const paa = ogsaaSpurgt(p, INDLAEG, 3);
-const paaHtml = paa.length ? `<aside class="paa" data-ekstra="1" aria-labelledby="paa-heading"><p class="paa-title" id="paa-heading">People also ask</p><p class="paa-sub">Related questions answered on this site.</p><ul class="paa-list">${
-  paa.map((q) => `<li><a href="${esc(q.href)}" class="paa-link"><span class="paa-mark" style="--tag-accent: ${q.farve}; color: ${tegnFarve(q.farve)}" aria-hidden="true">?</span><span class="paa-text">${esc(q.q)}</span><span class="paa-arrow" aria-hidden="true">→</span></a></li>`).join('')
-}</ul></aside>` : '';
+// Uden <ul>/<li>: Googles Auto-annoncer satte en annonceplads ind MELLEM listepunkterne (målt live 29/9: 280 px hul i boksen).
+// Linkene står derfor i én <nav> uden listepunkter; overskrift og undertekst som <span>, så der ikke er afsnit at sætte ind mellem.
+const paaHtml = paa.length ? `<aside class="paa" data-ekstra="1" aria-labelledby="paa-heading"><span class="paa-title" id="paa-heading">People also ask</span><span class="paa-sub">Related questions answered on this site.</span><nav class="paa-list" aria-label="People also ask">${
+  paa.map((q) => `<a href="${esc(q.href)}" class="paa-link"><span class="paa-mark" style="--tag-accent: ${q.farve}; color: ${tegnFarve(q.farve)}" aria-hidden="true">?</span><span class="paa-text">${esc(q.q)}</span><span class="paa-arrow" aria-hidden="true">→</span></a>`).join('')
+}</nav></aside>` : '';
 const faqStart = p.html.indexOf('<section class="faq-box"');
 const broedtekst = faqStart >= 0 ? p.html.slice(0, faqStart) + paaHtml + p.html.slice(faqStart) : p.html + paaHtml;
 
@@ -85,8 +87,8 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
     /* People also ask (29/9) — samme udseende som på Jacobs andet site; nulstiller brødtekstens link- og listestil */
     .post-body .paa { margin: 32px 0 10px; padding: 22px 24px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 14px; }
-    .post-body .paa-title { margin: 0 0 4px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
-    .post-body .paa-sub { margin: 0 0 14px; font-size: 0.85rem; color: #6b7280; line-height: 1.4; }
+    .post-body .paa-title { display: block; margin: 0 0 4px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
+    .post-body .paa-sub { display: block; margin: 0 0 14px; font-size: 0.85rem; color: #6b7280; line-height: 1.4; }
     body.dark-mode .post-body .paa-sub { color: #9ca3af; }
     .post-body .paa-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
     .post-body .paa-list li { margin: 0; }
