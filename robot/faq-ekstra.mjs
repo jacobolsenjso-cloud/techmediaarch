@@ -89,11 +89,24 @@ function fremmedNavn(q, art) {
   }
   return null;
 }
+// Tilføjet efter kørsel #16 (29/9):
+// En FAQ taler ikke om "the text"/"the article" ("What is the viral video mentioned in the text used for?")
+// (ikke "the text-to-speech tool" eller "the text file" — de er ikke henvisninger til artiklen)
+const META = /according to the (text|article)|(mentioned|described|discussed|referenced|highlighted|noted|considered) (in|by) the (text|article)\b(?![-\w]| file)|\b(in|from) the (text|article)(?=[?.,]|$)/i;
+// Søgestøj fra autoforslag ("What is artificial intelligence bbc news?") — kun tilladt, hvis ordet står i artiklen
+const STOEJ = /\b(bbc|cnn|reddit|quora|wikipedia|pdf|ppt|near me|news)\b/i;
+// Spørger spørgsmålet om et tal eller en dato, skal svaret give det ("What percentage …?" -> "only a minority" duer ikke)
+// ("When is/was/will …" spørger om en dato; "When does Google recommend …" om en situation)
+const TALSPM = /^(What (percentage|proportion|share|date|year|month|price)|How (much|many|long|often|old)|When (is|was|will|did)\b)/i;
+const HARTAL = /\d|\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|hundred|thousand|million|billion|trillion|percent|half|third|quarter|dozen|daily|weekly|monthly|yearly|annually|free|seconds?|minutes?|hours?|days?|weeks?|months?|years?|january|february|march|april|may|june|july|august|september|october|november|december|spring|summer|fall|autumn|winter)\b/i;
 // ctx = { art: hele teksten, brod: teksten uden overskrifter, emneOrd }
 function afvisGrund(x, ctx, allerede) {
   const q = String(x.q || '').trim(), a = String(x.a || '').trim(), c = String(x.citat || '').trim();
   if (!q.endsWith('?')) return 'ikke et spørgsmål';
   if (!START.test(q)) return 'starter ikke som et rigtigt spørgsmål';
+  if (META.test(q)) return 'henviser til "teksten"/"artiklen"';
+  const st = q.match(STOEJ); if (st && !new RegExp(`\\b${st[0]}\\b`, 'i').test(ctx.art)) return `søgestøj ("${st[0]}")`;
+  if (TALSPM.test(q) && !HARTAL.test(a)) return 'spørger om et tal/en dato, men svaret giver ingen';
   if (q.length < 15 || q.length > 130) return 'spørgsmålets længde';
   const s = stavefejl(q, ctx.brod); if (s) return `stavning ("${s}" skrives med stort i artiklen)`;
   const n = fremmedNavn(q, ctx.art); if (n) return `navnet "${n}" står ikke i artiklen`;
@@ -149,7 +162,8 @@ ${afvist.length ? `Rejected earlier, do not reuse: ${JSON.stringify(afvist.slice
 ${JSON.stringify(kandidater)}
 Rewrite each search into a correct, natural English question: start with What/How/Why/Is/Are/Can/Does/Do/Who/When/Which/Should/Will,
 capital first letter, correct capitalisation of names and acronyms exactly as the article writes them (AI, SEO, Google, ChatGPT), end with "?".
-Only use names that appear in the article. If fewer searches are answered by the article, write other questions a reader would type into Google that THIS ARTICLE answers.
+Only use names that appear in the article. Never refer to "the text" or "the article" in a question. If a question asks for a number,
+percentage, price or date, the answer MUST state it exactly as the article does; if the article does not give it, do not ask that question. If fewer searches are answered by the article, write other questions a reader would type into Google that THIS ARTICLE answers.
 Answers: 2-4 sentences, 25-90 words, journalistic and neutral, based ONLY on the article text below — no outside facts, no numbers that are not in the article, no first person, no links.
 For each item include "citat": one sentence copied EXACTLY, word for word, from the article that the answer is based on.
 Return JSON {"faq":[{"q":"...","a":"...","citat":"..."}]}
