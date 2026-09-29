@@ -16,7 +16,7 @@ export function GET() {
     `Articles: ${INDLAEG.length}. Every article has a publication date and, where relevant, a list of sources. Full list of addresses: ${SITE}/sitemap.xml`,
     '',
     '## About',
-    ...SIDER.filter((s) => ['about-us', 'start-here', 'faq', 'disclosure'].includes(s.navn)).map((s) => `- [${linje(s.title)}](${SITE}${s.href}): ${linje(s.description)}`),
+    ...SIDER.filter((s) => ['about-us', 'start-here', 'faq', 'disclosure', 'contact-us'].includes(s.navn)).map((s) => `- [${linje(s.title)}](${SITE}${s.href}): ${linje(s.description)}`),
     '',
     '## Topics',
     ...KATEGORIER.map((e) => `- [${e.navn}](${SITE}${emneUrl(e)})`),
