@@ -236,6 +236,13 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
          faktisk bruger: tabeller (116 indlæg), citater (121), YouTube-rammer (129),
          billeder med billedtekst (tr-caption-container) og centrerede billeder (separator). */
       .post-body { line-height: 1.8; font-size: 1.05rem; margin-bottom: 30px; overflow-wrap: break-word; }
+      /* Mørk tilstand (29/9): Blogger lagde hvid baggrund og mørk tekstfarve direkte i teksten (style="…").
+         I mørk tilstand gav det lys tekst på hvide felter (kontrast 1,1). Kun Bloggers faste værdier nulstilles
+         — alle forekomster er talt med robot/ud/_inline-farver.mjs; røde/blå farver røres ikke. */
+      body.dark-mode :is(.post-body, .static-page) :is([style*="background-color: white"], [style*="background-color:white"], [style*="border-box white"]) { background-color: transparent !important; background-image: none !important; }
+      body.dark-mode :is(.post-body, .static-page) :is([style*="color: #1b1c1d"], [style*="color: #1a1a1a"], [style*="color: #252525"], [style*="color: #210803"], [style*="color: black"], [style*="color: #444444"], [style*="color: #333"]) { color: inherit !important; }
+      /* Google Docs' mørkeblå links (#1155cc) har kontrast 2,8 på mørk baggrund — brug sitets linkfarve */
+      body.dark-mode :is(.post-body, .static-page) [style*="color: #1155cc"] { color: var(--teal-text) !important; }
       /* scroll-margin 80 px = 60 px fast topbar + 20 px luft (siden ruller i vinduet fra 29/9) */
       .post-body h2 { font-size: 1.5rem; line-height: 1.3; margin: 2em 0 0.6em; scroll-margin-top: 80px; }
       .post-body h3 { font-size: 1.2rem; line-height: 1.35; margin: 1.6em 0 0.5em; scroll-margin-top: 80px; }
