@@ -1,10 +1,13 @@
 # Robottens MANUELLE knap (GitHub → Actions → "Robot (manuel)" → Run workflow).
 # Én fil til alle håndstartede opgaver, så Jacob ikke skal flytte en ny
 # workflow-fil ind for hver ny opgave (Claude må ikke skrive i .github/workflows).
-#   soegeord      — læseliste med søgeordspakker (trin 1). Udgiver intet.
-#   noegletjek    — tjekker at nøglerne virker. Skriver aldrig nøglerne ud.
-#   proeveartikel — skriver ÉN prøveartikel på en egen gren (udkast-...), ikke
+#   soegeord      - læseliste med søgeordspakker (trin 1). Udgiver intet.
+#   noegletjek    - tjekker at nøglerne virker. Skriver aldrig nøglerne ud.
+#   proeveartikel - skriver ÉN prøveartikel på en egen gren (udkast-...), ikke
 #                   på main, så intet udgives, før Jacob har godkendt (trin 2).
+#   faq-ekstra    - (29/9-2026) skriver de manglende FAQ-spørgsmål (mindst 5 pr. artikel) som
+#                   frontmatter "faq:" på en egen gren (faq-ekstra-...), ikke på main. Claude
+#                   tjekker grenen og fletter den ind. Kan køres igen: færdige artikler springes over.
 # Versioner låst som på techfeedwatch (26/9-2026): Node 24-udgaverne af
 # handlingerne (målt i hver actions action.yml) og Ubuntu 24.04, så GitHubs
 # skift til Ubuntu 26 den 19/10 ikke ændrer noget uden varsel.
@@ -16,10 +19,10 @@ on:
       opgave:
         description: 'Hvad skal robotten gøre?'
         type: choice
-        options: [soegeord, noegletjek, proeveartikel]
+        options: [soegeord, noegletjek, proeveartikel, faq-ekstra]
         default: soegeord
       emne:
-        description: 'Emne (fx AI) — tomt = alle / robotten vælger'
+        description: 'Emne (fx AI) - tomt = alle / robotten vælger'
         required: false
         default: ''
       pakker:
@@ -37,7 +40,7 @@ permissions:
 jobs:
   robot:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -66,6 +69,9 @@ jobs:
               node robot/noegletjek.mjs > /dev/null ;;
             proeveartikel)
               node robot/artikel.mjs --emne "$EMNE" --hoved "$HOVED" ;;
+            faq-ekstra)
+              # 32 minutter, så der er tid til at gemme grenen inden jobbets loft på 40
+              node robot/faq-ekstra.mjs --minutter 32 ;;
             *) echo "Ukendt opgave"; exit 1 ;;
           esac
       - name: Gem prøveartiklen på en egen gren (ikke main)
@@ -77,6 +83,15 @@ jobs:
           git add src/content public robot/data
           git commit -m "Draft article from robot run ${{ github.run_number }}" || { echo "Intet at gemme"; exit 0; }
           git push origin "udkast-${{ github.run_number }}"
+      - name: Gem FAQ-spørgsmålene på en egen gren (ikke main)
+        if: inputs.opgave == 'faq-ekstra'
+        run: |
+          git config user.name "techmediaarch-robot"
+          git config user.email "robot@techmediaarch.com"
+          git checkout -b "faq-ekstra-${{ github.run_number }}"
+          git add src/content/posts
+          git commit -m "Extra FAQ questions from robot run ${{ github.run_number }}" || { echo "Intet at gemme"; exit 0; }
+          git push origin "faq-ekstra-${{ github.run_number }}"
       - uses: actions/upload-artifact@v6
         if: always()
         with:

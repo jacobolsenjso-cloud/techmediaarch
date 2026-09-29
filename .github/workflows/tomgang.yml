@@ -1,0 +1,31 @@
+# TOMGANGSALARM — eget workflow (Jacob 28/9-2026).
+# Før lå alarmen i "Robot (tidsplan)" sammen med robotten. Sprang GitHub robottens
+# planlagte kørsler over (som 28/9), blev alarmen sprunget over med — så ingen mail.
+# Nu har den sin egen tidsplan og sin egen kø, og den kigger 3 gange i døgnet
+# (samme mønster som techfeedwatch): kl. 05:43, 13:43 og 21:43 UTC
+# = 7:43, 15:43 og 23:43 dansk sommertid (6:43, 14:43, 22:43 vintertid).
+# Minuttallet er skævt med vilje: GitHub er mest bagud på hele og halve timer.
+# Rød kørsel = mail til Jacob, hvis der ikke er kommet en ny artikel i 60 timer,
+# eller den nyeste ikke svarer live (robot/plan.mjs --tomgang).
+name: Tomgangsalarm
+
+on:
+  schedule:
+    - cron: '43 5,13,21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tomgang:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: node robot/plan.mjs --tomgang

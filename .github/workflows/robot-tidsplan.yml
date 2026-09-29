@@ -4,20 +4,19 @@
 # Minuttallet er skævt med vilje: GitHub er mest bagud på hele og halve timer.
 # robot/plan.mjs tjekker loft og fridage igen, fordi GitHub kan være timer
 # forsinket, og fordi knappen kan trykkes i hånden.
-# Tomgangsalarmen kører hver dag kl. 05:43 UTC: rød kørsel = mail til Jacob,
-# hvis der ikke er kommet en ny artikel i 60 timer, eller den nyeste ikke svarer live.
+# Tomgangsalarmen ligger i sit eget workflow (tomgang.yml, 28/9): lå den her, blev den
+# sprunget over sammen med robotten, når GitHub sprang robottens kørsler over.
 name: Robot (tidsplan)
 
 on:
   schedule:
     - cron: '17 7,15 * * 0,1,3,4,6'
-    - cron: '43 5 * * *'
   workflow_dispatch:
     inputs:
       opgave:
         description: 'Hvad skal robotten gøre? (loft og fridage gælder også her)'
         type: choice
-        options: [artikel, tomgang]
+        options: [artikel]
         default: artikel
 
 permissions:
@@ -72,16 +71,3 @@ jobs:
           name: robot-ud
           path: robot/ud/
           if-no-files-found: ignore
-
-  tomgang:
-    if: github.event.schedule == '43 5 * * *' || inputs.opgave == 'tomgang'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - run: node robot/plan.mjs --tomgang
