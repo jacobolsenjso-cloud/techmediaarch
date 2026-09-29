@@ -36,7 +36,8 @@ export function artikler() {
     for (const f of fs.readdirSync(mappe).filter((x) => x.endsWith('.md'))) {
       const d = frontmatter(path.join(mappe, f));
       ud.push({
-        titel: String(d.title || ''), sti: `/${aar}/${md}/${f.replace(/\.md$/, '')}.html`, labels: d.labels || [],
+        // Adresser uden .html (Jacob 29/9-2026) — samme som sitet (src/lib/adresse.mjs)
+        titel: String(d.title || ''), sti: `/${aar}/${md}/${f.replace(/\.md$/, '')}`, labels: d.labels || [],
         soegeord: [d.keyword, ...(d.relatedKeywords || [])].filter(Boolean).map(String),
       });
     }
@@ -44,7 +45,7 @@ export function artikler() {
   const sider = sti('src/content/pages');
   for (const f of fs.readdirSync(sider).filter((x) => x.endsWith('.md'))) {
     const d = frontmatter(path.join(sider, f));
-    ud.push({ titel: String(d.title || ''), sti: `/p/${f.replace(/\.md$/, '')}.html`, labels: [], soegeord: [] });
+    ud.push({ titel: String(d.title || ''), sti: `/p/${f.replace(/\.md$/, '')}`, labels: [], soegeord: [] });
   }
   return ud;
 }

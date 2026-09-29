@@ -37,7 +37,7 @@ export const KATEGORIER = EMNER.filter((e) => !e.egenMenu);
 export const emneEtiket = (e: Emne) => e.etiket ?? e.navn;
 export const emneFraNavn = (navn: string) => EMNER.find((e) => e.navn === navn || emneEtiket(e) === navn);
 export const emneFraSlug = (slug: string) => EMNER.find((e) => e.slug === slug);
-export const emneUrl = (e: Emne) => `/topic/${e.slug}.html`;
+export const emneUrl = (e: Emne) => `/topic/${e.slug}`;
 
 // Et emne med under 3 artikler er en tynd side: den findes (Blogger havde den),
 // men beder ikke Google om at indeksere den.

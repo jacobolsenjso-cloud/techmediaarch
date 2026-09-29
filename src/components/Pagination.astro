@@ -1,8 +1,8 @@
 ---
-// Sidenavigation. Side 1 er forsiden (/), side 2+ ligger på /page/N.html.
+// Sidenavigation. Side 1 er forsiden (/), side 2+ ligger på /page/N.
 interface Props { side: number; antal: number; }
 const { side, antal } = Astro.props;
-const url = (n: number) => (n === 1 ? '/' : `/page/${n}.html`);
+const url = (n: number) => (n === 1 ? '/' : `/page/${n}`);
 ---
 {antal > 1 && (
   <nav class="pagination" aria-label="Pages">

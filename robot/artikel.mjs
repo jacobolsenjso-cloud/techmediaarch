@@ -272,11 +272,11 @@ fs.writeFileSync(sti(`src/content/posts/${aar}/${md}/${navn}.md`), `${fm}\n${htm
 // Gemini en frase, der står ordret i den gamle tekst; linket sættes kun, hvis
 // frasen findes, og den gamle tekst er ord for ord uændret bagefter. Ingen
 // updated-dato, fordi ingen ord er ændret (samme regel som techfeedwatch 23/9).
-const nyHref = kodet(`/${aar}/${md}/${navn}.html`);
+const nyHref = kodet(`/${aar}/${md}/${navn}`);   // uden .html (29/9-2026)
 const tilbage = [];
 for (const g of interne.slice(0, 3)) {
   try {
-    const [, ga, gm, gn] = g.sti.match(/^\/(\d{4})\/(\d{2})\/(.+)\.html$/) || [];
+    const [, ga, gm, gn] = g.sti.match(/^\/(\d{4})\/(\d{2})\/(.+?)(?:\.html)?$/) || [];
     if (!ga) continue;
     const fil = sti(`src/content/posts/${ga}/${gm}/${gn}.md`);
     const raa = fs.readFileSync(fil, 'utf8');
@@ -293,8 +293,8 @@ ${del[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
 }
 log(`- Links fra ældre artikler til den nye: ${tilbage.length}${tilbage.length ? ' — ' + tilbage.join(' · ') : ''}`);
 
-log(`\n**Titel:** ${titel}  \n**Adresse:** /${aar}/${md}/${navn}.html  \n**Ord:** ${ord} · **Interne links:** ${antalInterne} · **Kilder:** ${kildeLinks.length} (afvist ${kildeAfvist.length}) · **Video:** ${video ? 'ja' : 'nej'}`);
+log(`\n**Titel:** ${titel}  \n**Adresse:** /${aar}/${md}/${navn}  \n**Ord:** ${ord} · **Interne links:** ${antalInterne} · **Kilder:** ${kildeLinks.length} (afvist ${kildeAfvist.length}) · **Video:** ${video ? 'ja' : 'nej'}`);
 log(`\n**Billeder:** 1: ${hero.fil} (${hero.motor})  \n2: ${mid.fil} (${mid.motor})`);
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
-fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}.html`, ord, antalInterne, kildeLinks, kildeAfvist, video, billeder: { hero, mid } }, null, 1));
+fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}`, ord, antalInterne, kildeLinks, kildeAfvist, video, billeder: { hero, mid } }, null, 1));
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, rapport.join('\n') + '\n');

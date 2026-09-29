@@ -2,7 +2,8 @@
 //   node scripts/tjek-live.mjs <adresse> <eksportmappe>
 //   fx node scripts/tjek-live.mjs https://techmediaarch.jacobolsenjso.workers.dev C:\Users\jacob\techmediaarch-eksport
 // Tjekker:
-//  1. Alle Bloggers adresser (178 indlæg + 15 sider) svarer 200 med HTML
+//  1. Alle Bloggers adresser (178 indlæg + 15 sider): /navn.html svarer 301 til /navn, og /navn svarer
+//     200 med HTML (adresser uden .html fra 29/9-2026)
 //  2. Test-adressen er lukket for Google: robots.txt = "Disallow: /" og
 //     X-Robots-Tag: noindex på både sider, billeder og workerens egne svar.
 //     (På www.techmediaarch.com er det omvendt: åben robots.txt og ingen noindex.)
@@ -29,21 +30,27 @@ const stier = [...laes('posts.json'), ...laes('pages.json')].map((p) => new URL(
   // Slettede artikler svarer 301 (tjekkes under 3), ikke 200
   .filter((s) => !SLETTEDE[decodeURI(s)]);
 
-// 1: alle adresser, 8 ad gangen
-let ok = 0, noindex = 0;
+// 1: alle adresser, 8 ad gangen. Fra 29/9-2026 er adresserne UDEN .html (Jacobs beslutning):
+//    Bloggers /navn.html skal svare 301 til /navn, og /navn skal svare 200 med HTML
+let ok = 0, flyttet = 0, noindex = 0;
 for (let i = 0; i < stier.length; i += 8) {
   await Promise.all(stier.slice(i, i + 8).map(async (s) => {
     try {
-      const r = await hent(s);
+      const gl = await hent(s); await gl.arrayBuffer();
+      const ny = s.replace(/\.html$/, '');
+      const loc = gl.headers.get('location') ? new URL(gl.headers.get('location'), BASE).pathname : null;
+      if (gl.status === 301 && loc === ny) flyttet++;
+      else fejl.push(`gammel adresse: ventede 301 til ${ny}, fik ${gl.status} ${loc || ''}: ${s}`);
+      const r = await hent(ny);
       const type = r.headers.get('content-type') || '';
       if (r.status === 200 && type.includes('text/html')) ok++;
-      else fejl.push(`${r.status} ${type}: ${s}`);
+      else fejl.push(`${r.status} ${type}: ${ny}`);
       if ((r.headers.get('x-robots-tag') || '').includes('noindex')) noindex++;
       await r.arrayBuffer();
     } catch (e) { fejl.push(`FEJL ${s}: ${e.message}`); }
   }));
 }
-console.log(`Blogger-adresser: ${ok} af ${stier.length} svarer 200 · med noindex: ${noindex}`);
+console.log(`Blogger-adresser: ${flyttet} af ${stier.length} .html giver 301 · ${ok} af ${stier.length} nye adresser svarer 200 · med noindex: ${noindex}`);
 if (!PROD && noindex !== stier.length) fejl.push(`noindex mangler på ${stier.length - noindex} sider`);
 if (PROD && noindex) fejl.push(`noindex på ${noindex} sider på det RIGTIGE domæne`);
 
@@ -61,15 +68,30 @@ for (const s of ['/', '/images/15d326138cfb576f.png', '/rss.xml', '/findes-ikke-
 
 // 3: omdirigeringer og 404
 const forventet = [
-  ['/search/label/AI', 301, '/topic/ai.html'],
-  ['/search?q=claude', 301, '/search.html?q=claude'],
-  ['/search', 301, '/trending.html'],
-  ['/search/label/Resources', 301, '/topic/resources.html'],
+  ['/search/label/AI', 301, '/topic/ai'],
+  ['/search/label/Resources', 301, '/topic/resources'],
+  ['/search/label/Findes-ikke', 301, '/'],
+  // /search er nu selve søgesiden (29/9-2026); andre /search/… fra Blogger -> /trending
+  ['/search?q=claude', 200, null],
+  ['/search/x', 301, '/trending'],
   ['/feeds/posts/default', 301, '/rss.xml'],
   ['/2024/10/', 301, '/'],
   ['/findes-ikke-123.html', 404, null],
-  // Slettede artikler (worker/slettede.js) -> 301 til nærmeste levende artikel
-  ...Object.entries(SLETTEDE).map(([s, til]) => [s, 301, til]),
+  ['/findes-ikke-123', 404, null],
+  // .html-sider uden for Bloggers liste og med søgedel (Bloggers mobilvisning ?m=1)
+  ['/index.html', 301, '/'],
+  ['/trending.html', 301, '/trending'],
+  ['/search.html?q=claude', 301, '/search?q=claude'],
+  ['/topic/ai.html', 301, '/topic/ai'],
+  ['/page/2.html', 301, '/page/2'],
+  ['/2024/09/faq.html?m=1', 301, '/2024/09/faq?m=1'],
+  ['/trending', 200, null],
+  ['/topic/ai', 200, null],
+  ['/page/2', 200, null],
+  // "/" til sidst: Cloudflare selv sender videre til adressen uden (307)
+  ['/topic/ai/', 307, '/topic/ai'],
+  // Slettede artikler (worker/slettede.js) -> 301 til nærmeste levende artikel (gammel og ny form)
+  ...Object.entries(SLETTEDE).flatMap(([s, til]) => [[s, 301, til], [s.replace(/\.html$/, ''), 301, til]]),
 ];
 for (const [s, status, til] of forventet) {
   const r = await hent(s); await r.arrayBuffer();

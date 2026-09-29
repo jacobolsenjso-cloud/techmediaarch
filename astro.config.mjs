@@ -1,9 +1,9 @@
 import { defineConfig } from 'astro/config';
 
-// Adresserne SKAL være de samme som på Blogger: /2024/10/navn.html og /p/navn.html.
-// build.format 'file' får Astro til at skrive navn.html i stedet for navn/index.html.
-// Den anden halvdel af aftalen står i wrangler.jsonc (html_handling: "none"),
-// ellers ville Cloudflare omdirigere /navn.html til /navn.
+// Adresserne er /2024/10/navn og /p/navn - uden .html (Jacob 29/9-2026, src/lib/adresse.mjs).
+// build.format 'file' får Astro til at skrive navn.html i stedet for navn/index.html;
+// Cloudflare serverer /navn fra navn.html (wrangler.jsonc: html_handling "drop-trailing-slash"),
+// og workeren sender Bloggers gamle /navn.html videre med 301.
 export default defineConfig({
   site: 'https://www.techmediaarch.com',
   trailingSlash: 'never',

@@ -1,5 +1,5 @@
 ---
-// Emneside: /topic/ai.html osv. Erstatter Bloggers /search/label/AI (workeren
+// Emneside: /topic/ai osv. Erstatter Bloggers /search/label/AI (workeren
 // sender de gamle adresser hertil med 301).
 import MainLayout from '../../layouts/MainLayout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
@@ -32,7 +32,7 @@ const schema = {
     </div>
     {/* Resources samler artikler med affiliate-/henvisningslinks: oplysningen står øverst (Jacob 28/9) */}
     {e.slug === 'resources' && (
-      <p class="topic-disclosure"><strong>Disclosure:</strong> The articles in Resources cover tools and services we may have an affiliate or referral relationship with. If you sign up or buy through links in these articles, Tech Media Arch may earn a commission at no extra cost to you. Partners cannot pay for a positive review, and nothing here is financial or investment advice. Read our full <a href="/p/disclosure.html">Disclosure</a>.</p>
+      <p class="topic-disclosure"><strong>Disclosure:</strong> The articles in Resources cover tools and services we may have an affiliate or referral relationship with. If you sign up or buy through links in these articles, Tech Media Arch may earn a commission at no extra cost to you. Partners cannot pay for a positive review, and nothing here is financial or investment advice. Read our full <a href="/p/disclosure">Disclosure</a>.</p>
     )}
     <div class="card-grid">{liste.map((p, i) => <ArticleCard p={p} eager={i < 3} niveau={2} />)}</div>
   </div>

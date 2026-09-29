@@ -175,8 +175,8 @@ const rapport = ['# FAQ-ekstra', '', `Kørt ${new Date().toISOString()}`, ''];
 let behandlet = 0, skrevet = 0, sprunget = 0, under5 = 0;
 for (const fil of filer) {
   if (Date.now() > slut || behandlet >= ANTAL) { rapport.push(`\nStoppet efter ${behandlet} artikler (tid/antal) — kør igen for resten.`); break; }
-  const sti = '/' + path.relative(rod, fil).replace(/\\/g, '/').replace(/\.md$/, '.html');
-  if (KUN && sti !== KUN) continue;
+  const sti = '/' + path.relative(rod, fil).replace(/\\/g, '/').replace(/\.md$/, '');   // adresse uden .html (29/9-2026)
+  if (KUN && sti !== KUN.replace(/\.html$/, '')) continue;   // --kun virker med og uden .html
   const raa = fs.readFileSync(fil, 'utf8');
   const m = raa.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (!m) continue;

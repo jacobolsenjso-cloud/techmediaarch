@@ -1,16 +1,21 @@
 // Worker foran de statiske filer.
 //
-// Cloudflare kører kun denne kode, når en adresse IKKE svarer til en fil i dist/
-// (html_handling "none" i wrangler.jsonc). Artikler, sider, billeder og CSS
-// serveres altså direkte og hurtigt; workeren tager sig kun af resten:
-//   1. "/" og mapper      -> index.html (Workers gør det ikke selv med html_handling "none")
-//   2. Bloggers gamle adresser (etiketter, søgning, feeds, arkiver) -> 301 til den nye
+// Adresserne er UDEN .html (Jacob 29/9-2026): /2026/05/navn serveres fra navn.html af
+// Cloudflare selv (html_handling "drop-trailing-slash" i wrangler.jsonc). Billeder, CSS og
+// sider uden .html serveres altså direkte og hurtigt; workeren tager sig kun af resten:
+//   1. Gamle .html-adresser (alle Bloggers) -> 301 til samme adresse uden .html.
+//      Cloudflare ville selv svare 307 ("midlertidigt"); Google skal have 301 ("permanent").
+//      Derfor går *.html altid gennem workeren først (run_worker_first).
+//   2. Bloggers øvrige gamle adresser (etiketter, søgning, feeds, arkiver) -> 301 til den nye
 //   3. robots.txt          -> lukket på testadressen, åben på det rigtige domæne
 //   4. alt andet           -> 404-siden med status 404
-// Undtagelse: /video/* går ALTID gennem workeren (run_worker_first), så den kan
-// sende videoen i stykker til Safari — se video() nedenfor.
+// /video/* går også gennem workeren (run_worker_first), så den kan sende videoen i
+// stykker til Safari — se video() nedenfor.
 const PROD = 'www.techmediaarch.com';
 import { SLETTEDE } from './slettede.js';
+
+// "/2026/05/navn.html" -> "/2026/05/navn"; "/index.html" -> "/" (samme regel som src/lib/adresse.mjs)
+const udenHtml = (sti) => sti.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
 
 // Blogger-menuens emner -> ny emneside. Skal matche src/lib/emner.ts.
 const EMNER = {
@@ -88,25 +93,34 @@ async function haandter(request, env) {
     return new Response(robots(host), { headers: { 'content-type': 'text/plain; charset=utf-8' } });
   }
 
-  // Forsiden og mapper
-  if (sti === '/' || sti.endsWith('/')) {
-    const index = await env.ASSETS.fetch(new Request(new URL(url.pathname + 'index.html', url), request));
-    if (index.status === 200) return index;
+  // Slettede artikler (worker/slettede.js): 301 til nærmeste levende artikel — både den
+  // gamle .html-adresse og den nye uden
+  if (SLETTEDE[sti]) return flyt(url, SLETTEDE[sti]);
+  if (SLETTEDE[sti + '.html']) return flyt(url, SLETTEDE[sti + '.html']);
+
+  // Gamle .html-adresser -> samme adresse uden .html (301), hvis siden findes.
+  // Søgedelen (?m=1 fra Bloggers mobilvisning, ?q= på søgesiden) følger med.
+  if (sti.endsWith('.html') && sti !== '/404.html') {
+    const ny = udenHtml(url.pathname);
+    const findes = await env.ASSETS.fetch(new Request(new URL(ny, url), { method: 'GET' }));
+    await findes.body?.cancel();
+    if (findes.status === 200) return flyt(url, ny + url.search);
+  } else {
+    // Sikkerhedsnet: når en adresse uden .html alligevel workeren først, serveres filen
+    const fil = await env.ASSETS.fetch(request);
+    if (fil.status !== 404) return fil;
   }
 
   // --- Bloggers gamle adresser ---
-  // Etiketsider: /search/label/AI -> /topic/ai.html (kun menuens emner har en side)
+  // Etiketsider: /search/label/AI -> /topic/ai (kun menuens emner har en side)
   const label = sti.match(/^\/search\/label\/([^/?]+)/);
   if (label) {
     const slug = EMNER[label[1].toLowerCase()];
-    return flyt(url, slug ? `/topic/${slug}.html` : '/');
+    return flyt(url, slug ? `/topic/${slug}` : '/');
   }
-  // Søgning: /search?q=x -> /search.html?q=x ; /search uden ord -> /trending.html
-  // (på Blogger viste /search de nyeste indlæg — menupunkterne "Trending" og "Feed")
-  if (sti === '/search' || sti.startsWith('/search/')) {
-    const q = url.searchParams.get('q');
-    return flyt(url, q ? `/search.html?q=${encodeURIComponent(q)}` : '/trending.html');
-  }
+  // Søgning: /search?q=x er nu selve søgesiden (search.html serveres direkte som /search).
+  // Andre /search/…-adresser fra Blogger -> /trending (på Blogger viste de de nyeste indlæg)
+  if (sti.startsWith('/search/')) return flyt(url, '/trending');
   // Feeds: JSON-udgaven (alt=json / alt=json-in-script) efterlignes, så Watch- og
   // Sitemap-siden virker uændret. Alt andet (feedlæsere, alt=rss) -> /rss.xml.
   if (sti.startsWith('/feeds/')) {
@@ -117,11 +131,9 @@ async function haandter(request, env) {
   // Månedsarkiver: /2024/10/ eller /2024/ -> forsiden
   if (/^\/\d{4}(\/\d{2})?\/?$/.test(sti)) return flyt(url, '/');
 
-  // Slettede artikler (worker/slettede.js): 301 til nærmeste levende artikel
-  if (SLETTEDE[sti]) return flyt(url, SLETTEDE[sti]);
-
   // Ukendt adresse: vis 404-siden med den rigtige statuskode
-  const side404 = await env.ASSETS.fetch(new Request(new URL('/404.html', url), request));
+  // ("/404" - med drop-trailing-slash ville "/404.html" give en omdirigering)
+  const side404 = await env.ASSETS.fetch(new Request(new URL('/404', url), request));
   return new Response(side404.body, { status: 404, headers: side404.headers });
 }
 

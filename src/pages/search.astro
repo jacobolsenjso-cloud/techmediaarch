@@ -1,13 +1,13 @@
 ---
-// Søgeside: /search.html?q=… (Bloggers /search?q= sendes hertil af workeren).
+// Søgeside: /search?q=… (Bloggers /search?q= sendes hertil af workeren).
 // Søgningen sker i browseren mod search-index.json, så siden har intet indhold
 // uden JavaScript — derfor noindex.
 import MainLayout from '../layouts/MainLayout.astro';
 ---
-<MainLayout title="Search" description="Search all Tech Media Arch articles." noindex breadcrumb={[{ navn: 'Search', href: '/search.html' }]}>
+<MainLayout title="Search" description="Search all Tech Media Arch articles." noindex breadcrumb={[{ navn: 'Search', href: '/search' }]}>
   <div class="page-wrapper" style="padding-top: 24px;">
     <div class="section-heading"><h1 id="searchHeading">Search</h1><span class="section-note" id="searchCount"></span></div>
-    <form action="/search.html" method="get" style="margin: 0 0 24px; display: flex; gap: 10px; max-width: 620px;">
+    <form action="/search" method="get" style="margin: 0 0 24px; display: flex; gap: 10px; max-width: 620px;">
       <input type="search" name="q" id="searchPageInput" placeholder="Search articles..." aria-label="Search articles"
         style="flex: 1; padding: 12px 16px; border-radius: 22px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); font-size: 1rem; font-family: inherit; min-height: 44px; box-sizing: border-box;" />
       <button type="submit" class="chip active" style="border: 0; cursor: pointer; font-family: inherit;">Search</button>

@@ -9,5 +9,8 @@ export function GET(context: any) {
     site: context.site,
     items: INDLAEG.slice(0, 50).map((p) => ({ title: p.title, link: p.href, pubDate: new Date(p.published), description: p.description })),
     customData: '<language>en</language>',
+    // Adresserne er uden .html og uden "/" til sidst (29/9-2026) — ellers sætter @astrojs/rss "/" på,
+    // og Cloudflare sender /navn/ videre til /navn med en omvej
+    trailingSlash: false,
   });
 }

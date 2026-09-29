@@ -66,7 +66,7 @@ const html = [...filer].filter((f) => f.endsWith('.html'));
 const posts = laes('posts.json').filter((p) => !SLETTEDE[decodeURI(alt(p).replace('https://www.techmediaarch.com', ''))]), pages = laes('pages.json');
 // Slettede artikler (worker/slettede.js) må IKKE længere ligge som fil — ellers svarer de 200, ikke 301
 for (const s of Object.keys(SLETTEDE)) if (filer.has(s)) fejl.push(`SLETTET artikel findes stadig: ${s}`);
-for (const [s, til] of Object.entries(SLETTEDE)) if (!filer.has(til)) fejl.push(`SLETTET artikels mål findes ikke: ${s} -> ${til}`);
+for (const [s, til] of Object.entries(SLETTEDE)) if (!filer.has(til + '.html')) fejl.push(`SLETTET artikels mål findes ikke: ${s} -> ${til}`);
 let tekstOk = 0;
 for (const p of [...posts, ...pages]) {
   const sti = decodeURI(alt(p).replace('https://www.techmediaarch.com', ''));
@@ -107,7 +107,8 @@ const findes = (url) => {
   const ren = url.split('#')[0].split('?')[0];
   if (!ren) return true;
   let d; try { d = decodeURI(ren); } catch { d = ren; }
-  return filer.has(d) || WORKER.some((r) => r.test(url)) || filer.has(d.replace(/\/$/, '') + '/index.html');
+  // Adresser uden .html (29/9-2026): /2026/05/navn serveres fra navn.html
+  return filer.has(d) || filer.has(d + '.html') || WORKER.some((r) => r.test(url)) || filer.has(d.replace(/\/$/, '') + '/index.html');
 };
 for (const f of html) {
   const s = fs.readFileSync(path.join(DIST, f), 'utf8');
@@ -115,6 +116,11 @@ for (const f of html) {
   const kanon = (s.match(/rel="canonical"/g) || []).length;
   if (titler !== 1) fejl.push(`${titler} <title>: ${f}`);
   if (kanon !== (f === '/404.html' ? 0 : 1)) fejl.push(`${kanon} canonical: ${f}`);
+  // Adresser uden .html (Jacob 29/9-2026): ingen canonical, og-adresse, JSON-LD-adresse eller internt
+  // link må pege på en .html-adresse på sitet (de ville give en 301-omvej)
+  for (const [u] of s.matchAll(/(?:href|content)="(?:https:\/\/www\.techmediaarch\.com)?\/[^"]*?\.html(?:[?#][^"]*)?"/g)) fejl.push(`.HTML-adresse i ${f}: ${u}`);
+  for (const [u] of s.matchAll(/href="(?:https:\/\/www\.techmediaarch\.com)?\/(?:\d{4}\/\d{2}|p|topic|page)\/[^"]+\/"/g)) fejl.push(`adresse med "/" til sidst i ${f}: ${u}`);
+  for (const [u] of s.matchAll(/https:\/\/(?:www\.)?techmediaarch\.com\/[^"\s<>]*?\.html\b/g)) if (!/\/p\/contact\.html$/.test(u)) fejl.push(`.HTML-adresse (fuld) i ${f}: ${u}`);
   // Kun det læseren ser: <body> uden scripts (feed-data og JSON-LD er ikke synlige)
   const krop = tekst((s.match(/<body[\s\S]*<\/body>/) || [''])[0]);
   const raa = krop.match(RAA_KODE);
@@ -138,6 +144,16 @@ for (const f of html) {
     if (u.startsWith('/share-widget') && KENDTE.has('/share-widget?w=poi')) { kendteFundet.add('/share-widget?w=poi'); continue; }
     fejl.push(`MANGLER fil i ${f}: ${u}`);
   }
+}
+// Adresser uden .html (29/9-2026) også i sitemap, RSS, llms.txt, søgeindeks og feed-data
+for (const f of [...filer].filter((x) => /\.(xml|txt|json)$/.test(x))) {
+  const s = fs.readFileSync(path.join(DIST, f), 'utf8');
+  // Undtagelse: security.txt-sidens synlige tekst "Contact: …/p/contact.html" (Blogger-tekst, ikke et link)
+  const n = (s.replace(/\/p\/contact\.html/g, '').match(/(?:techmediaarch\.com|["'(>\s])\/(?:\d{4}\/\d{2}|p|topic|page)\/[^"'<>)\s]*?\.html\b|\/(?:search|trending|index)\.html\b/g) || []).length;
+  if (n) fejl.push(`.HTML-adresser i ${f}: ${n}`);
+  // … og ingen sideadresse med "/" til sidst (Cloudflare ville sende den videre med 307)
+  const skraa = (s.match(/techmediaarch\.com\/(?:\d{4}\/\d{2}|p|topic|page)\/[^"'<>)\s]+\/(?=["'<)\s])/g) || []).length;
+  if (skraa) fejl.push(`adresser med "/" til sidst i ${f}: ${skraa}`);
 }
 const unik = [...new Set(fejl)];
 console.log(`sider: ${html.length} · Blogger-adresser: ${posts.length + pages.length} · tekst ens: ${tekstOk} af ${posts.length}`);

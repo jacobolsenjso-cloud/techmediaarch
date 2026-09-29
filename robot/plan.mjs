@@ -31,7 +31,9 @@ export function robotArtikler() {
     for (const f of fs.readdirSync(path.join(posts, aar, md)).filter((x) => x.endsWith('.md'))) {
       const m = fs.readFileSync(path.join(posts, aar, md, f), 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/);
       const d = m ? (parse(m[1]) || {}) : {};
-      if (d.robot === true && d.published) ud.push({ sti: `/${aar}/${md}/${f.replace(/\.md$/, '')}.html`, udgivet: new Date(String(d.published)) });
+      // Uden .html (29/9-2026): tomgangstjekket henter adressen uden at følge omdirigeringer,
+      // så den gamle .html-adresse (301) ville give falsk alarm
+      if (d.robot === true && d.published) ud.push({ sti: `/${aar}/${md}/${f.replace(/\.md$/, '')}`, udgivet: new Date(String(d.published)) });
     }
   }
   return ud.sort((a, b) => b.udgivet - a.udgivet);

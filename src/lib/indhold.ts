@@ -8,10 +8,11 @@ import { parse } from 'yaml';
 import { EMNER, emneEtiket, type Emne } from './emner';
 import { temaKoder, youtubeLazy, vandmaerke, bloggerVideo } from './temakoder.mjs';
 import { faqBoks } from './faqboks.mjs';
+import { interneLinks } from './adresse.mjs';
 
 export interface Indlaeg {
   aar: string; maaned: string; navn: string;
-  sti: string;         // /2024/10/navn.html — som Blogger, uden kodning
+  sti: string;         // /2024/10/navn — Bloggers adresse uden .html (29/9-2026), uden kodning
   href: string;        // samme sti, kodet til brug i links (mellemrum -> %20)
   title: string; description: string;
   seoTitle: string;     // kort søgetitel til <title> (højst ~600 px i Google), ellers = title
@@ -105,9 +106,10 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
   // FAQ-boksen (faqboks.mjs): artiklens egen FAQ foldes ud på stedet + ekstra spørgsmål fra frontmatter "faq:"
   const ekstraFaq: { q: string; a: string }[] = Array.isArray(data.faq) ? data.faq.filter((x: any) => x && x.q && x.a) : [];
   const fb = faqBoks(vandmaerke(body), ekstraFaq);
-  const { html, liste } = overskrifter(udenSpring(fb.html));
+  // Interne links mister .html (adresse.mjs)
+  const { html, liste } = overskrifter(udenSpring(interneLinks(fb.html)));
   const labels: string[] = data.labels || [];
-  const sti = `/${aar}/${maaned}/${navn}.html`;
+  const sti = `/${aar}/${maaned}/${navn}`;
   return {
     aar, maaned, navn, sti, href: kodet(sti),
     title: data.title, description: data.description || '', seoTitle: data.seoTitle || data.title,
@@ -116,7 +118,7 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
     // Uden eget billede bruges miniaturen af den første indlejrede YouTube-video
     image: data.image || youtubeBillede(raaBody),
     bloggerId: String(data.bloggerId || ''),
-    html, feedHtml: bloggerVideo(raaBody), faqHtml: body, overskrifter: liste, minutter: minutter(body),
+    html, feedHtml: interneLinks(bloggerVideo(raaBody)), faqHtml: body, overskrifter: liste, minutter: minutter(body),
     faqEkstra: ekstraFaq, faqStatus: fb.status, faqEgne: fb.egne,
   };
 // Sorteres som tidspunkter, ikke som tekst: datoerne har forskellig tidszone (+01:00/+02:00)
@@ -126,9 +128,9 @@ export const SIDER: Side[] = Object.entries(sideFiler).map(([fil, raa]) => {
   const navn = fil.match(/\/pages\/(.+)\.md$/)![1];
   const { data, body: raaBody } = del(raa);
   const body = youtubeLazy(bloggerVideo(temaKoder(raaBody)));
-  const sti = `/p/${navn}.html`;
+  const sti = `/p/${navn}`;
   return { navn, sti, href: kodet(sti), title: data.title, description: data.description || '',
-    published: data.published, updated: data.updated || data.published, html: navn === 'watch' ? vandmaerke(body) : udenSpring(vandmaerke(body)), feedHtml: bloggerVideo(raaBody), faqHtml: body, bloggerId: String(data.bloggerId || '') };
+    published: data.published, updated: data.updated || data.published, html: interneLinks(navn === 'watch' ? vandmaerke(body) : udenSpring(vandmaerke(body))), feedHtml: interneLinks(bloggerVideo(raaBody)), faqHtml: body, bloggerId: String(data.bloggerId || '') };
 });
 
 export const iEmne = (e: Emne) => INDLAEG.filter((p) => p.emner.some((x) => x.slug === e.slug));

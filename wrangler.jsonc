@@ -1,12 +1,9 @@
 // Cloudflare Workers: statiske filer fra dist/ + en lille worker (worker/index.js).
 //
-// Hvorfor Workers og ikke Pages (som techfeedwatch bruger): Pages omdirigerer
-// ALTID /navn.html til /navn. Bloggers adresser ender på .html, og de skal blive
-// ved med at svare 200 direkte — ellers skal Google flytte alle 193 adresser.
-// Med html_handling "none" serverer Workers /navn.html præcis som den er.
-//
-// Prisen: "/" og mapper finder ikke index.html af sig selv. Det klarer workeren,
-// som også står for omdirigeringer fra Bloggers gamle adresser og robots.txt.
+// Fra 25/9 til 29/9-2026 beholdt sitet Bloggers .html-adresser (html_handling "none").
+// 29/9-2026 besluttede Jacob, at .html skal væk: /navn.html svarer nu 301 til /navn.
+// Workers (ikke Pages) er stadig valgt, fordi workeren styrer omdirigeringerne selv
+// (301, ikke Cloudflares 307), Bloggers gamle adresser, feeds og robots.txt.
 {
   "name": "techmediaarch",
   "main": "worker/index.js",
@@ -14,11 +11,14 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "html_handling": "none",
+    // 29/9-2026 (Jacob): adresserne er UDEN .html. "drop-trailing-slash" serverer
+    // /2026/05/navn fra navn.html. De gamle /navn.html-adresser går gennem workeren
+    // først, som svarer 301 (permanent) — Cloudflare selv ville svare 307 (midlertidig).
+    "html_handling": "drop-trailing-slash",
     "not_found_handling": "none",
     // Videoer går gennem workeren, som kan sende dem i stykker (206) — Safari kræver
     // det. De statiske filer alene svarer altid med hele filen. Se video() i worker/index.js.
-    "run_worker_first": ["/video/*"]
+    "run_worker_first": ["/video/*", "/*.html"]
   },
   // Test-adressen techmediaarch.<konto>.workers.dev er slået til (trin 4).
   // Forhåndsvisnings-adresser pr. version slås fra: de ville ikke være dækket af

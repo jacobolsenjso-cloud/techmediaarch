@@ -5,6 +5,7 @@
 import '@fontsource-variable/inter';
 import interLatinWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
 import { KATEGORIER, emneUrl } from '../lib/emner';
+import { udenHtml } from '../lib/adresse.mjs';
 import Maerke from '../components/Maerke.astro';
 
 interface Props {
@@ -22,7 +23,8 @@ const { title, seoTitle, description, image, schema, noindex, nocanonical, ogTyp
 const SITE = 'https://www.techmediaarch.com';
 const BRAND = 'Tech Media Arch';
 // Med build.format 'file' kalder Astro forsiden /index.html — den rigtige adresse er /
-const currentPath = Astro.url.pathname.replace(/\/index\.html$/, '/');
+// Adresserne er uden .html (Jacob 29/9-2026, lib/adresse.mjs): /…/navn.html -> /…/navn
+const currentPath = udenHtml(Astro.url.pathname);
 
 const defaultDesc = 'Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.';
 const desc = description || defaultDesc;
@@ -42,7 +44,7 @@ const breadcrumbSchema = {
 };
 const siteSchema = [
   { '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, url: SITE + '/',
-    potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${SITE}/search.html?q={search_term_string}` }, 'query-input': 'required name=search_term_string' } },
+    potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${SITE}/search?q={search_term_string}` }, 'query-input': 'required name=search_term_string' } },
   { '@context': 'https://schema.org', '@type': 'Organization', '@id': `${SITE}/#organization`, name: BRAND, url: SITE + '/',
     logo: `${SITE}/icon-512.png` },
 ];
@@ -373,20 +375,20 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
           Home
         </a>
-        <a href="/p/start-here.html" class={`nav-item ${aktiv('/p/start-here.html') ? 'active' : ''}`}>
+        <a href="/p/start-here" class={`nav-item ${aktiv('/p/start-here') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
           Start here
         </a>
-        <a href="/p/watch.html" class={`nav-item ${aktiv('/p/watch.html') ? 'active' : ''}`}>
+        <a href="/p/watch" class={`nav-item ${aktiv('/p/watch') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>
           Watch
         </a>
         {/* Trending og Resources var egne menupunkter på Blogger */}
-        <a href="/trending.html" class={`nav-item ${aktiv('/trending.html') ? 'active' : ''}`}>
+        <a href="/trending" class={`nav-item ${aktiv('/trending') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
           Trending
         </a>
-        <a href="/topic/resources.html" class={`nav-item ${aktiv('/topic/resources.html') ? 'active' : ''}`}>
+        <a href="/topic/resources" class={`nav-item ${aktiv('/topic/resources') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M8 7h7"/></svg>
           Resources
         </a>
@@ -399,15 +401,15 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
           </a>
         ))}
         <hr class="nav-sep" />
-        <a href="/p/sitemap.html" class={`nav-item ${aktiv('/p/sitemap.html') ? 'active' : ''}`}>
+        <a href="/p/sitemap" class={`nav-item ${aktiv('/p/sitemap') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
           All articles
         </a>
-        <a href="/p/about-us.html" class={`nav-item ${aktiv('/p/about-us.html') ? 'active' : ''}`}>
+        <a href="/p/about-us" class={`nav-item ${aktiv('/p/about-us') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
           About
         </a>
-        <a href="/p/disclosure.html" class={`nav-item ${aktiv('/p/disclosure.html') ? 'active' : ''}`}>
+        <a href="/p/disclosure" class={`nav-item ${aktiv('/p/disclosure') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 7.5v.5"/></svg>
           Disclosure
         </a>
@@ -422,17 +424,17 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
             <div class="footer-links">
               {/* Samme links og rækkefølge som Bloggers footer (LinkList204, sorteret alfabetisk).
                   "Report Abuse" er udeladt: det var Bloggers egen side. */}
-              <a href="/p/about-us.html" class="footer-link">About Us</a><span class="footer-sep">|</span>
-              <a href="/p/accessibility-information.html" class="footer-link">Accessibility Information</a><span class="footer-sep">|</span>
-              <a href="/p/copyright-trademark-and-patent.html" class="footer-link">Copyright &amp; Trademark</a><span class="footer-sep">|</span>
-              <a href="/p/disclosure.html" class="footer-link">Disclosure</a><span class="footer-sep">|</span>
-              <a href="/p/faq.html" class="footer-link">F.A.Q.</a><span class="footer-sep">|</span>
-              <a href="/p/privacy-policy.html" class="footer-link">Privacy Policy</a><span class="footer-sep">|</span>
+              <a href="/p/about-us" class="footer-link">About Us</a><span class="footer-sep">|</span>
+              <a href="/p/accessibility-information" class="footer-link">Accessibility Information</a><span class="footer-sep">|</span>
+              <a href="/p/copyright-trademark-and-patent" class="footer-link">Copyright &amp; Trademark</a><span class="footer-sep">|</span>
+              <a href="/p/disclosure" class="footer-link">Disclosure</a><span class="footer-sep">|</span>
+              <a href="/p/faq" class="footer-link">F.A.Q.</a><span class="footer-sep">|</span>
+              <a href="/p/privacy-policy" class="footer-link">Privacy Policy</a><span class="footer-sep">|</span>
               <a href="/rss.xml" class="footer-link">RSS</a><span class="footer-sep">|</span>
-              <a href="/p/sitemap.html" class="footer-link">Sitemap</a><span class="footer-sep">|</span>
-              <a href="/p/start-here.html" class="footer-link">Start Here</a><span class="footer-sep">|</span>
-              <a href="/p/terms-conditions.html" class="footer-link">Terms &amp; Conditions</a><span class="footer-sep">|</span>
-              <a href="/p/we-not-sell-your-personal-information.html" class="footer-link">Do Not Sell My Personal Information</a>
+              <a href="/p/sitemap" class="footer-link">Sitemap</a><span class="footer-sep">|</span>
+              <a href="/p/start-here" class="footer-link">Start Here</a><span class="footer-sep">|</span>
+              <a href="/p/terms-conditions" class="footer-link">Terms &amp; Conditions</a><span class="footer-sep">|</span>
+              <a href="/p/we-not-sell-your-personal-information" class="footer-link">Do Not Sell My Personal Information</a>
               <span class="footer-sep" id="cookieSettingsSep" hidden>|</span><a href="#" id="cookieSettingsLink" class="footer-link" hidden>Privacy and cookie settings</a>
             </div>
           </div>
@@ -507,7 +509,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
           var norm = function (s) { return String(s || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9#+.]+/g, ' '); };
           var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); };
           var hide = function () { suggest.classList.remove('active'); suggest.innerHTML = ''; idx = -1; };
-          var go = function () { var q = input.value.trim(); if (q) location.href = '/search.html?q=' + encodeURIComponent(q); };
+          var go = function () { var q = input.value.trim(); if (q) location.href = '/search?q=' + encodeURIComponent(q); };
           var load = function () {
             if (data || loading) return; loading = true;
             fetch('/search-index.json').then(function (r) { return r.json(); }).then(function (d) { data = d; loading = false; if (document.activeElement === input) render(); }).catch(function () { loading = false; });
@@ -522,7 +524,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
             if (!hits.length) { suggest.innerHTML = '<div class="search-suggest-empty">No matches. Press Enter to search anyway.</div>'; suggest.classList.add('active'); return; }
             suggest.innerHTML = hits.map(function (a) {
               return '<a class="search-suggest-item" href="' + a.u + '">' + (a.i ? '<img class="search-suggest-thumb" src="' + a.i + '" alt="" loading="lazy">' : '<span class="search-suggest-thumb"></span>') + '<span class="search-suggest-title">' + esc(a.t) + '</span></a>';
-            }).join('') + '<a class="search-suggest-footer" href="/search.html?q=' + encodeURIComponent(q) + '">See all results →</a>';
+            }).join('') + '<a class="search-suggest-footer" href="/search?q=' + encodeURIComponent(q) + '">See all results →</a>';
             suggest.classList.add('active');
           };
           input.addEventListener('focus', load);

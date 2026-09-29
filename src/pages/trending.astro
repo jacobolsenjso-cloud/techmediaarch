@@ -11,11 +11,11 @@ const PR_SIDE = 24;
 const liste = INDLAEG.slice(0, PR_SIDE);
 const flere = INDLAEG.length > PR_SIDE;
 ---
-<MainLayout title="Trending: the latest articles" description="The newest articles on Tech Media Arch — AI, tech news, guides and analysis, newest first." breadcrumb={[{ navn: 'Trending', href: '/trending.html' }]}>
+<MainLayout title="Trending: the latest articles" description="The newest articles on Tech Media Arch — AI, tech news, guides and analysis, newest first." breadcrumb={[{ navn: 'Trending', href: '/trending' }]}>
   <div class="page-wrapper" style="padding-top: 24px;">
     <EmneChips />
     <div class="section-heading"><h1>Trending</h1><span class="section-note">The latest {liste.length} articles, newest first</span></div>
     <div class="card-grid">{liste.map((p, i) => <ArticleCard p={p} eager={i < 3} niveau={2} />)}</div>
-    {flere && <p style="text-align: center; margin: 0 0 40px;"><a class="pagination-btn" href="/page/2.html">More articles →</a></p>}
+    {flere && <p style="text-align: center; margin: 0 0 40px;"><a class="pagination-btn" href="/page/2">More articles →</a></p>}
   </div>
 </MainLayout>

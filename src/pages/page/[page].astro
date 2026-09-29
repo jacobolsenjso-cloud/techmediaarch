@@ -1,5 +1,5 @@
 ---
-// Side 2, 3 … af artikellisten: /page/2.html osv.
+// Side 2, 3 … af artikellisten: /page/2 osv.
 import MainLayout from '../../layouts/MainLayout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import Pagination from '../../components/Pagination.astro';
@@ -14,7 +14,7 @@ const side = Number(Astro.params.page);
 const antal = Math.ceil(INDLAEG.length / PR_SIDE);
 const liste = INDLAEG.slice((side - 1) * PR_SIDE, side * PR_SIDE);
 ---
-<MainLayout title={`All articles – page ${side}`} description={`Tech Media Arch articles, page ${side} of ${antal}.`} noindex breadcrumb={[{ navn: `Page ${side}`, href: `/page/${side}.html` }]}>
+<MainLayout title={`All articles – page ${side}`} description={`Tech Media Arch articles, page ${side} of ${antal}.`} noindex breadcrumb={[{ navn: `Page ${side}`, href: `/page/${side}` }]}>
   <div class="page-wrapper" style="padding-top: 24px;">
     <div class="section-heading"><h1>All articles</h1><span class="section-note">Page {side} of {antal}</span></div>
     <div class="card-grid">{liste.map((p) => <ArticleCard p={p} niveau={2} />)}</div>
