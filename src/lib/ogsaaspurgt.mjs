@@ -57,6 +57,30 @@ function forbered(alle) {
 export const MIN_SCORE = 4.0; // mindst 2 fælles kerneord, tilsammen så sjældne som ét ord i ~3 artikler
 export const STAERK = 6.0;    // stærkt match: gælder også uden fælles ord i titlen
 
+// Kandidater til Gemini (29/9, Jacobs valg): samme ordsammenligning, men løsere — mindst 1 fælles kerneord,
+// ingen minimumsscore — så Gemini har ~20 spørgsmål at vælge de bedste 3 imellem. Gemini vælger KUN fra listen.
+export function kandidater(p, alle, antal = 20) {
+  forbered(alle);
+  const mål = new Set(kerne(`${p.title} ${p.keyword || ''} ${p.description || ''} ${faqSpoergsmaal(p.html).join(' ')}`));
+  const titelOrd = new Set(kerne(`${p.title} ${p.keyword || ''}`));
+  const egne = new Set(faqSpoergsmaal(p.html).map((q) => q.toLowerCase()));
+  const ud = [];
+  for (const { a, qs } of PULJE) {
+    if (a.href === p.href) continue;
+    let bedst = null;
+    for (const x of qs) {
+      if (egne.has(x.q.toLowerCase())) continue;
+      const faelles = x.ord.filter((w) => mål.has(w));
+      if (!faelles.length) continue;
+      const score = faelles.reduce((s, w) => s + IDF(w) * (titelOrd.has(w) ? 1.5 : 1), 0);
+      if (!bedst || score > bedst.score) bedst = { q: x.q, href: a.href, titel: a.title, score };
+    }
+    if (bedst) ud.push(bedst);
+  }
+  const set = new Set();
+  return ud.sort((x, y) => y.score - x.score).filter((k) => { const n = k.q.toLowerCase(); if (set.has(n)) return false; set.add(n); return true; }).slice(0, antal);
+}
+
 // Returnerer op til `antal` { q, href, farve } for artiklen p
 export function ogsaaSpurgt(p, alle, antal = 3) {
   forbered(alle);

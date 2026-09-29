@@ -77,6 +77,11 @@ if (arg === '--tjek') {
     if (AFVIST.test(fejl)) summary(`**Ingen artikel denne gang** (kvalitetskontrollen sagde nej): ${fejl}${valgt ? ` — "${valgt.hoved}" hviler i 30 dage` : ''}`);
     else { summary(`**FEJL:** ${fejl}`); process.exitCode = 1; }
   }
+  // "People also ask" valgt af Gemini (29/9, Jacobs valg): 60 artikler pr. kørsel — den nye artikel og dem uden valg først.
+  // Gemmes i robot/data/ogsaa-spurgt.json og kommer med i robottens commit. Fejl her stopper aldrig artiklen.
+  const o = spawnSync('node', ['robot/ogsaa-spurgt.mjs', '--antal', '60'], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 10 * 60 * 1000 });
+  process.stderr.write(o.stderr || '');
+  summary(`**People also ask:** ${((o.stdout || '').trim().split('\n').pop() || `sluttede med kode ${o.status}`).slice(0, 300)}`);
 } else if (arg === '--tomgang') {
   const [nyeste] = robotArtikler();
   if (!nyeste) { summary('Ingen robotartikler endnu.'); process.exit(0); }

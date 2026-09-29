@@ -11,6 +11,7 @@ import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
 import { tegnFarve } from '../../../lib/sporgsmaal.mjs';
+import OGSAA_SPURGT from '../../../../robot/data/ogsaa-spurgt.json';
 
 export function getStaticPaths() {
   return INDLAEG.map((p) => ({ params: { year: p.aar, month: p.maaned, slug: p.navn }, props: { p } }));
@@ -27,7 +28,12 @@ const opdateret = new Date(p.updated).getTime() - new Date(p.published).getTime(
 // "People also ask" (29/9, Jacob): 3 spørgsmål besvaret i andre artikler, lige over FAQ-boksen (ellers nederst i teksten).
 // Boksen er mærket data-ekstra, så tjek-site ser bort fra den, når brødteksten bevises ord for ord mod Blogger.
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-const paa = ogsaaSpurgt(p, INDLAEG, 3);
+// Geminis valg (robot/ogsaa-spurgt.mjs, gemt af robotten) bruges, når det findes — også når Gemini valgte ingen.
+// Ellers sitets egen ordsammenligning. Et valg, der peger på en artikel, som ikke findes mere, springes over.
+const geminiValg = (OGSAA_SPURGT as Record<string, { valg: { q: string; sti: string }[] }>)[p.sti];
+const paa = geminiValg
+  ? geminiValg.valg.map((v) => { const a = INDLAEG.find((x) => x.sti === v.sti); return a ? { q: v.q, href: a.href, farve: a.emner[0]?.farve || '#0891b2' } : null; }).filter(Boolean).slice(0, 3) as { q: string; href: string; farve: string }[]
+  : ogsaaSpurgt(p, INDLAEG, 3);
 // Uden <ul>/<li>: Googles Auto-annoncer satte en annonceplads ind MELLEM listepunkterne (målt live 29/9: 280 px hul i boksen).
 // Linkene står derfor i én <nav> uden listepunkter; overskrift og undertekst som <span>, så der ikke er afsnit at sætte ind mellem.
 const paaHtml = paa.length ? `<aside class="paa" data-ekstra="1" aria-labelledby="paa-heading"><span class="paa-title" id="paa-heading">People also ask</span><span class="paa-sub">Related questions answered on this site.</span><nav class="paa-list" aria-label="People also ask">${
