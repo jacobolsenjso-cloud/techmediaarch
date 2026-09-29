@@ -92,7 +92,7 @@ function fremmedNavn(q, art) {
 // Tilføjet efter kørsel #16 (29/9):
 // En FAQ taler ikke om "the text"/"the article" ("What is the viral video mentioned in the text used for?")
 // (ikke "the text-to-speech tool" eller "the text file" — de er ikke henvisninger til artiklen)
-const META = /according to the (text|article|video)|(mentioned|described|discussed|referenced|highlighted|noted|considered|shown) (in|by) the (text|article|video)\b(?![-\w]| file)|\b(in|from) the (text|article|video)(?=[?.,]|$)/i;
+const META = /according to the (text|article|video|guide|post|story)|(mentioned|described|discussed|referenced|highlighted|noted|considered|shown) (in|by) the (text|article|video)\b(?![-\w]| file)|\b(in|from) the (text|article|video)(?=[?.,]|$)/i;
 // Efter kørsel #17: et svar, der ikke svarer ("The article lacks any financial details …"), duer ikke
 // (ikke "the video game", "the video editor", "the text prompt" — kun når svaret henviser til sin kilde)
 // ("running the text through Rephrasy" og "does not include a friendly installer" er almindelige sætninger)
@@ -130,14 +130,26 @@ const STOEJ = /\b(bbc|cnn|reddit|quora|wikipedia|pdf|ppt|near me|news)\b/i;
 // ("When is/was/will …" spørger om en dato; "When does Google recommend …" om en situation)
 const TALSPM = /^(What (percentage|proportion|share|date|year|month|price)|How (much|many|long|often|old)|When (is|was|will|did)\b)/i;
 const HARTAL = /\d|\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|hundred|thousand|million|billion|trillion|percent|half|third|quarter|dozen|daily|weekly|monthly|yearly|annually|free|seconds?|minutes?|hours?|days?|weeks?|months?|years?|january|february|march|april|may|june|july|august|september|october|november|december|spring|summer|fall|autumn|winter)\b/i;
-// ctx = { art: hele teksten, brod: teksten uden overskrifter, emneOrd }
-function afvisGrund(x, ctx, allerede) {
+// Spørger spørgsmålet om en pris, skal svaret give et beløb. "free" alene tæller ikke: efter kørsel #18 svarede
+// "How much does Windows 10 extended support cost?" med "completely free", men artiklen nævner ingen pris
+const PRISSPM = /^(How much (does|do|will|would|is|are)\b.*\b(cost|charge|pay)\b|What (is|are) the (price|pricing|cost)|How much is\b)/i;
+// Samme svar som et andet spørgsmål: 8 ord i træk ens (efter kørsel #18: to forskellige spørgsmål fik begge
+// svaret "Microsoft hired Inflection AI's CEO Mustafa Suleyman … part of a broader industry trend …")
+function sammeSvar(a, b) {
+  const A = norm(a).split(' '), B = ` ${norm(b)} `;
+  for (let i = 0; i + 8 <= A.length; i++) if (B.includes(` ${A.slice(i, i + 8).join(' ')} `)) return true;
+  return false;
+}
+// ctx = { art: hele teksten, brod: teksten uden overskrifter, emneOrd }; svarHar = svarene, der allerede står i FAQ'en
+function afvisGrund(x, ctx, allerede, svarHar = []) {
   const q = String(x.q || '').trim(), a = String(x.a || '').trim(), c = String(x.citat || '').trim();
   if (!q.endsWith('?')) return 'ikke et spørgsmål';
   if (!START.test(q)) return 'starter ikke som et rigtigt spørgsmål';
   if (META.test(q)) return 'henviser til "teksten"/"artiklen"';
   const st = q.match(STOEJ); if (st && !new RegExp(`\\b${st[0]}\\b`, 'i').test(ctx.art)) return `søgestøj ("${st[0]}")`;
   if (TALSPM.test(q) && !HARTAL.test(a)) return 'spørger om et tal/en dato, men svaret giver ingen';
+  // (tal fra spørgsmålet tæller ikke: "Windows 10" er ikke en pris; "twenty dollars" tæller)
+  if (PRISSPM.test(q) && !/[$€£]|\b(dollars?|euros?|cents?|pounds?|kroner|usd|eur)\b/i.test(a) && !(a.match(/\d[\d.,]*/g) || []).some((t) => !(q.match(/\d[\d.,]*/g) || []).includes(t))) return 'spørger om en pris, men svaret giver intet beløb';
   if (IKKESVAR.test(a)) return 'svaret svarer ikke (henviser til kilden eller siger, at oplysningen mangler)';
   if (NAVNSPM.test(q) && !navnISvar(q, a, ctx.brod)) return 'spørger om et navn, men svaret giver intet';
   if (q.length < 15 || q.length > 130) return 'spørgsmålets længde';
@@ -146,6 +158,7 @@ function afvisGrund(x, ctx, allerede) {
   if (ord(a) < 20 || ord(a) > 100) return `svarets længde (${ord(a)} ord)`;
   if (/<|https?:\/\/|\bwe (tested|tried)\b|\bI (tested|tried)\b|\bour (tests|testing|analysis)\b/i.test(a)) return 'link/førsteperson';
   const d = allerede.find((h) => ligner(h, q, ctx.emneOrd)); if (d) return `samme spørgsmål som «${d}»`;
+  if (svarHar.some((h) => sammeSvar(a, h))) return 'samme svar som et spørgsmål, der allerede står i FAQ\'en';
   if (c.length < 30 || !norm(ctx.art).includes(norm(c))) return 'citatet står ikke i artiklen';
   return null;
 }
@@ -169,8 +182,10 @@ for (const fil of filer) {
   const data = parse(m[1]) || {};
   const body = raa.slice(m[0].length);
   if (/"@type"\s*:\s*"FAQPage"/.test(body)) continue; // siden har sine egne FAQ-data (fx /2024/09/faq.html)
-  const egne = (faqSchema(body)?.mainEntity || []).map((q) => q.name);
+  const egneFaq = faqSchema(body)?.mainEntity || [];
+  const egne = egneFaq.map((q) => q.name);
   const har = [...egne, ...(Array.isArray(data.faq) ? data.faq.map((x) => x.q) : [])];
+  const harSvar = [...egneFaq.map((q) => String(q.acceptedAnswer?.text || '')), ...(Array.isArray(data.faq) ? data.faq.map((x) => x.a) : [])];
   if (har.length >= MAAL) continue;
   behandlet++;
   const mangler = MAAL - har.length;
@@ -206,7 +221,8 @@ ARTICLE:
 ${artikel.slice(0, 14000)}`);
       const nyeRunde = [];
       for (const x of svar.faq || []) {
-        const grund = afvisGrund(x, ctx, [...har, ...godkendt.map((g) => g.q), ...nyeRunde.map((g) => g.q)]);
+        const grund = afvisGrund(x, ctx, [...har, ...godkendt.map((g) => g.q), ...nyeRunde.map((g) => g.q)],
+          [...harSvar, ...godkendt.map((g) => g.a), ...nyeRunde.map((g) => g.a)]);
         grund ? afvist.push(`${String(x.q || '').trim()} — ${grund}`) : nyeRunde.push({ q: String(x.q).trim(), a: String(x.a).trim() });
       }
       // 4. Gemini tjekker, at svaret kun siger det, artiklen siger, og besvarer spørgsmålet
