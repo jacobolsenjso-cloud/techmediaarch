@@ -14,6 +14,17 @@ labels:
 image: /images/dc70e37a2a610994.jpg
 bloggerId: "1900085278309215593"
 hadToc: false
+faq:
+  - q: When is Meta's Q2 earnings report?
+    a: Meta Platforms Inc. reported its second-quarter financial results on Wednesday, detailing a strong revenue performance that surpassed market expectations. The announcement drove the company's shares higher in after-hours trading as investors reacted positively to the figures.
+  - q: How did Meta perform in its Q2 2024 financial results?
+    a: Meta outperformed expectations for its Q2 2024 financial performance with a revenue of $39.07 billion, representing a 22% increase year-over-year. This impressive growth was largely driven by robust digital ad spending across the company's social media platforms.
+  - q: What are Meta's spending plans for artificial intelligence?
+    a: Meta is preparing for a major push in artificial intelligence and expects a significant increase in capital expenditures for 2025. The company also raised its 2024 capital spending forecast to a range between $35 billion and $40 billion due to accelerated AI infrastructure investments.
+  - q: What is the financial status of Meta's Reality Labs division?
+    a: Meta's Reality Labs division, which focuses on AR, VR, and metaverse projects, continues to post losses. During the second quarter, the division reported $353 million in revenue alongside a substantial operating loss of $4.48 billion.
+  - q: What regulatory challenges is Meta facing in the U.S. and EU?
+    a: Meta is navigating a complex legal landscape involving regulatory challenges from both the European Union and the United States. These hurdles include heightened scrutiny over user privacy, data security, and new rules demanding greater transparency.
 ---
 <div class="separator" style="clear: both; text-align: center;"><a href="/images/dc70e37a2a610994.jpg" style="margin-left: 1em; margin-right: 1em;"><img alt="Meta logo with financial charts and upward trend arrow" border="0" data-original-height="512" data-original-width="1024" height="320" src="/images/dc70e37a2a610994.jpg" width="640" /></a></div><p><b>Meta has outperformed expectations for its Q2 2024 financial performance, showing strong revenue growth. </b>However, the company has also cautioned about a significant increase in spending for its artificial intelligence (AI) division in 2025. This news comes as Meta continues to face losses in its Reality Labs division and navigates regulatory challenges both in the U.S. and the EU.</p>
 <h3>Key Takeaways</h3>

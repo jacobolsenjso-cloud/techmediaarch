@@ -15,6 +15,13 @@ labels:
 image: /images/83269fd94fd97781.jpg
 bloggerId: "1551738885739353135"
 hadToc: true
+faq:
+  - q: What legal challenges is Perplexity currently facing?
+    a: Perplexity and its leadership are dealing with significant legal troubles, including accusations of scraping content without permission. This has resulted in lawsuits from major entities like News Corp over alleged intellectual property violations.
+  - q: How is the competition affecting Perplexity's market position?
+    a: The rise of new AI competitors and startups is making it difficult for Perplexity to maintain its edge in the search engine market. In response, the company is rethinking its strategies, focusing on fast and accurate search results, and investing in new technologies.
+  - q: What are Perplexity's current financial and funding goals?
+    a: Perplexity is currently supported by a valuation of $8 billion and is actively seeking $500 million in funding. This capital is intended to help the company expand its services, reach more customers, and strengthen its position against rivals.
 ---
 <table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><a href="/images/83269fd94fd97781.jpg" style="margin-left: auto; margin-right: auto;"><img alt="Executives in a tense boardroom discussion over Perplexity." border="0" data-original-height="768" data-original-width="1344" height="183" src="/images/83269fd94fd97781.jpg" title="Executives in meting." width="320" /></a></td></tr><tr><td class="tr-caption" style="text-align: center;">Executives in meeting. Photographic: Tech Media Arch.<br /><br /></td></tr></tbody></table><p>Perplexity, a rising star in the AI search engine market, has recently appointed a new CEO who is already facing significant challenges. With legal issues looming and fierce competition from other tech giants, the road ahead is not easy. This article explores the implications of these challenges and what they mean for the company’s future. <b>See the video below.</b></p><h3>
   

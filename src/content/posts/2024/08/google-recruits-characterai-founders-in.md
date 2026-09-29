@@ -16,6 +16,17 @@ labels:
 image: /images/15126abbdd79bd53.jpg
 bloggerId: "2850830989565492126"
 hadToc: false
+faq:
+  - q: Is Character AI owned by Google?
+    a: Google does not completely own Character AI, but rather secured a non-exclusive licensing agreement for its technology alongside hiring the startup's co-founders. Consequently, Character AI will maintain its independent operations under the leadership of interim CEO Dominic Perella.
+  - q: Who did Google hire from Character AI?
+    a: Google successfully hired Character AI co-founders Noam Shazeer and Daniel De Freitas, along with several members of their team. Both individuals are former Google researchers returning to the tech giant in this strategic talent acquisition.
+  - q: How is the deal between Google and Character AI structured?
+    a: The agreement avoids a traditional corporate acquisition format by utilizing a non-exclusive licensing deal for Character AI's large language model technology. This structure enables the startup to keep functioning independently while accessing resources and expertise from Google.
+  - q: Who is leading Character AI after the founders left?
+    a: Following the departure of the founding team to Google, Character AI will continue developing its platform under the guidance of interim CEO Dominic Perella. The company remains dedicated to its core mission of offering personalized AI companions to its users.
+  - q: What is Character AI known for?
+    a: Character AI gained significant industry prominence through its versatile chatbots that enable users to interact directly with artificial intelligence versions of both real and fictional characters. The startup focuses on personalized AI companions and creating innovative user experiences.
 ---
 <table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="float: left; margin-right: 1em; text-align: left;"><tbody><tr><td style="text-align: center;"><a href="/images/15126abbdd79bd53.jpg" style="margin-left: auto; margin-right: auto;"><img alt="Google hires Character.AI founders in AI talent acquisition" border="0" data-original-height="900" data-original-width="1200" height="480" src="/images/15126abbdd79bd53.jpg" width="640" /></a></td></tr><tr><td class="tr-caption" style="text-align: center;">Google hires Character AI founders in AI talent acquisition.&nbsp;<br /><span style="background-color: white; color: #210803; font-family: &quot;Open Sans&quot;, sans-serif; font-size: 12px;">Photographic image by: Tech Media Arch.<br /><br /></span></td></tr></tbody></table><p><span>In a significant move, Google has hired the co-founders of Character.</span><b>&nbsp;</b>AI, Noam Shazeer, and Daniel De Freitas, along with some of their team members. This strategic acquisition includes a licensing deal for Character.AI's technology, highlighting the fierce competition for AI talent and innovation among tech giants.</p>
 <h3>Key Takeaways</h3>

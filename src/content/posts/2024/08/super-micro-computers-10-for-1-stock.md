@@ -12,6 +12,17 @@ labels:
 image: /images/46b72b9450ab4b91.jpg
 bloggerId: "111356181559661564"
 hadToc: false
+faq:
+  - q: What is the ratio and effective date for Super Micro Computer's stock split?
+    a: Super Micro Computer has approved a 10-for-1 forward stock split that will become effective in the fall. Shareholders will receive nine additional shares for every share they currently own after the market closes. The company's stock will officially begin trading on a split-adjusted basis shortly after the transaction is handled by brokerage houses.
+  - q: How did Super Micro's fourth-quarter revenue and earnings per share perform?
+    a: During the fiscal fourth quarter, the company reported record revenue that surged significantly compared to the previous year. However, the reported earnings per share failed to meet the expectations set by analysts. This shortfall was primarily blamed on a shortage of specific server components and shifting product mixes.
+  - q: Why did Super Micro's stock price drop following its earnings report?
+    a: The stock price experienced a notable decline primarily due to growing investor concerns regarding compressed profit margins. These margins dropped significantly compared to the same period a year prior due to rising costs and product mix shifts. Even strong revenue guidance and the stock split announcement could not prevent the sell-off.
+  - q: What factors are expected to improve Super Micro's profitability in the future?
+    a: The technology firm anticipates that its profitability will recover and grow as it ramps up production capacity. Specifically, leadership expects a new production facility in Malaysia to help address ongoing supply chain issues. These operational improvements are projected to enhance margins over the course of the next fiscal year.
+  - q: What is Super Micro Computer's revenue forecast for the full fiscal year?
+    a: Looking ahead, the company remains highly optimistic about its financial trajectory and future market opportunities. It has forecasted full-year fiscal revenue to land between specific multi-billion dollar targets. This anticipated range represents a potential doubling of revenue compared to the previous fiscal year.
 ---
 <div class="separator" style="clear: both; text-align: center;"><a href="/images/46b72b9450ab4b91.jpg" style="clear: left; float: left; margin-bottom: 1em; margin-right: 1em;"><img alt="Investor analyzing stock charts on computer" border="0" data-original-height="900" data-original-width="1200" height="480" src="/images/46b72b9450ab4b91.jpg" width="640" /></a></div><p><span><b>Super </b>Micro Computer (SMCI) has announced a 10-for-1 stock split, a move that has generated significant interest among investors. </span>This decision comes on the heels of the company's impressive revenue growth, driven by the booming demand for AI hardware. However, the announcement has also raised questions about the company's future profitability and competitive landscape.</p>
 <h3>Key Takeaways</h3>
