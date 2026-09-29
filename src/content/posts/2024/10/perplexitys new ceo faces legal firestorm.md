@@ -15,6 +15,17 @@ labels:
 image: /images/83269fd94fd97781.jpg
 bloggerId: "1551738885739353135"
 hadToc: true
+faq:
+  - q: What is the name of the new CEO who recently took over at Perplexity?
+    a: Perplexity appointed a new CEO named Aravind Srinivas, who is stepping into a challenging leadership role. His arrival has brought shifts in company strategy, differing from previous leadership styles. This new direction involves pushing for bold changes while facing significant scrutiny.
+  - q: What legal issues and lawsuits is Perplexity currently facing?
+    a: Perplexity is currently dealing with serious legal scrutiny regarding allegations of scraping content without permission. Major organizations like News Corp have filed lawsuits claiming that these actions represent a blatant abuse of intellectual property. Such legal troubles pose a significant threat to the company's reputation and financial stability.
+  - q: How is the media currently portraying Perplexity and its leadership?
+    a: Media coverage has heavily focused on the company's ongoing legal troubles and controversies surrounding leadership. Because of these negative highlights, the media has specifically labeled the firm as adversarial. This consistent press has created widespread uncertainty regarding the brand and its future.
+  - q: What valuation does Perplexity currently hold in the market?
+    a: Perplexity currently maintains a notable market valuation of eight billion dollars. This strong financial standing places the company in a favorable position to attract new investments. Leadership is actively seeking additional funding to further expand services and reach a broader customer base.
+  - q: How are investors reacting to Perplexity's ongoing legal challenges?
+    a: Investor confidence has become notably shaky as ongoing legal threats and lawsuits loom over the business. Many investors are holding back on providing further capital due to fears of potential financial losses. This uncertainty has created a rollercoaster ride for the company's shares and overall market support.
 ---
 <table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><a href="/images/83269fd94fd97781.jpg" style="margin-left: auto; margin-right: auto;"><img alt="Executives in a tense boardroom discussion over Perplexity." border="0" data-original-height="768" data-original-width="1344" height="183" src="/images/83269fd94fd97781.jpg" title="Executives in meting." width="320" /></a></td></tr><tr><td class="tr-caption" style="text-align: center;">Executives in meeting. Photographic: Tech Media Arch.<br /><br /></td></tr></tbody></table><p>Perplexity, a rising star in the AI search engine market, has recently appointed a new CEO who is already facing significant challenges. With legal issues looming and fierce competition from other tech giants, the road ahead is not easy. This article explores the implications of these challenges and what they mean for the company’s future. <b>See the video below.</b></p><h3>
   
