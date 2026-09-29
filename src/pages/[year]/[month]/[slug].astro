@@ -9,6 +9,8 @@ import { INDLAEG, datoTekst } from '../../../lib/indhold';
 import { emneUrl } from '../../../lib/emner';
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
+import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
+import { tegnFarve } from '../../../lib/sporgsmaal.mjs';
 
 export function getStaticPaths() {
   return INDLAEG.map((p) => ({ params: { year: p.aar, month: p.maaned, slug: p.navn }, props: { p } }));
@@ -21,6 +23,16 @@ const erResources = p.labels.includes('Resources');
 
 // "Updated" vises kun, når indlægget reelt er ændret senere (mere end et døgn efter)
 const opdateret = new Date(p.updated).getTime() - new Date(p.published).getTime() > 86400000;
+
+// "People also ask" (29/9, Jacob): 3 spørgsmål besvaret i andre artikler, lige over FAQ-boksen (ellers nederst i teksten).
+// Boksen er mærket data-ekstra, så tjek-site ser bort fra den, når brødteksten bevises ord for ord mod Blogger.
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const paa = ogsaaSpurgt(p, INDLAEG, 3);
+const paaHtml = paa.length ? `<aside class="paa" data-ekstra="1" aria-labelledby="paa-heading"><p class="paa-title" id="paa-heading">People also ask</p><p class="paa-sub">Related questions answered on this site.</p><ul class="paa-list">${
+  paa.map((q) => `<li><a href="${esc(q.href)}" class="paa-link"><span class="paa-mark" style="--tag-accent: ${q.farve}; color: ${tegnFarve(q.farve)}" aria-hidden="true">?</span><span class="paa-text">${esc(q.q)}</span><span class="paa-arrow" aria-hidden="true">→</span></a></li>`).join('')
+}</ul></aside>` : '';
+const faqStart = p.html.indexOf('<section class="faq-box"');
+const broedtekst = faqStart >= 0 ? p.html.slice(0, faqStart) + paaHtml + p.html.slice(faqStart) : p.html + paaHtml;
 
 const i = INDLAEG.indexOf(p);
 const nyere = INDLAEG[i - 1];
@@ -71,6 +83,21 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .breadcrumbs-bar a { color: var(--teal-text); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
     .article-title { margin: 0 0 15px 0; font-size: 2rem; line-height: 1.2; }
     /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
+    /* People also ask (29/9) — samme udseende som på Jacobs andet site; nulstiller brødtekstens link- og listestil */
+    .post-body .paa { margin: 32px 0 10px; padding: 22px 24px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 14px; }
+    .post-body .paa-title { margin: 0 0 4px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
+    .post-body .paa-sub { margin: 0 0 14px; font-size: 0.85rem; color: #6b7280; line-height: 1.4; }
+    body.dark-mode .post-body .paa-sub { color: #9ca3af; }
+    .post-body .paa-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+    .post-body .paa-list li { margin: 0; }
+    .post-body a.paa-link { display: flex; align-items: center; gap: 12px; padding: 9px 10px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: var(--text-color); font-weight: 400; border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
+    .post-body a.paa-link:hover { background: var(--card-bg); border-color: var(--border-color); transform: translateX(3px); }
+    .post-body .paa-mark { flex: none; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; background: var(--tag-accent); }
+    .post-body .paa-text { font-weight: 600; font-size: 0.95rem; line-height: 1.35; }
+    .post-body .paa-arrow { margin-left: auto; color: #9ca3af; transition: transform 0.15s, color 0.2s; }
+    .post-body a.paa-link:hover .paa-arrow { transform: translateX(3px); color: var(--teal-text); }
+    @media (prefers-reduced-motion: reduce) { .post-body a.paa-link:hover, .post-body a.paa-link:hover .paa-arrow { transform: none; } }
+    @media (max-width: 900px) { .post-body .paa { padding: 16px 14px; } }
     .post-body .faq-box { background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 6px 20px 10px; margin: 32px 0; }
     .post-body .faq-box > h2 { margin: 14px 0 6px; }
     /* Hvert spørgsmål er et kort — rammen kommer fra den fælles .post-body details-regel i MainLayout */
@@ -210,7 +237,7 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
         </nav>
       )}
 
-      <article class="post-body" set:html={p.html} />
+      <article class="post-body" set:html={broedtekst} />
 
       {/* Stod før som fodnote i hvert indlæg (Blogger-feedets fodnote). Resources-artikler har den øverst i stedet. */}
       {!erResources && <p class="disclosure-box"><strong>Affiliate disclosure:</strong> Please note that some links on TechMediaArch.com are affiliate links. We may receive a commission, at no extra cost to you, if you click through our links and make a purchase from one of our partners.</p>}

@@ -92,6 +92,8 @@ for (const p of [...posts, ...pages]) {
     // FAQ-boksens EKSTRA spørgsmål (frontmatter "faq:", lib/faqboks.mjs) findes ikke på Blogger og tælles ikke med;
     // artiklens egne FAQ-spørgsmål står i boksen med de samme ord og SKAL stadig være ens
     .replace(/<section class="faq-box" data-ekstra="1">[\s\S]*?<\/section>/g, ' ')
+    // "People also ask" (29/9) er sitets egen boks, ikke Blogger-tekst
+    .replace(/<aside class="paa" data-ekstra="1"[\s\S]*?<\/aside>/g, ' ')
     .replace(/<details class="faq-item" data-ekstra="1">[\s\S]*?<\/details>/g, ' '));
   if (kilde === ny) tekstOk++;
   else {
