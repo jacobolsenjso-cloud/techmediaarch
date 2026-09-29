@@ -120,7 +120,7 @@ for (const f of html) {
   // link må pege på en .html-adresse på sitet (de ville give en 301-omvej)
   for (const [u] of s.matchAll(/(?:href|content)="(?:https:\/\/www\.techmediaarch\.com)?\/[^"]*?\.html(?:[?#][^"]*)?"/g)) fejl.push(`.HTML-adresse i ${f}: ${u}`);
   for (const [u] of s.matchAll(/href="(?:https:\/\/www\.techmediaarch\.com)?\/(?:\d{4}\/\d{2}|p|topic|page)\/[^"]+\/"/g)) fejl.push(`adresse med "/" til sidst i ${f}: ${u}`);
-  for (const [u] of s.matchAll(/https:\/\/(?:www\.)?techmediaarch\.com\/[^"\s<>]*?\.html\b/g)) if (!/\/p\/contact\.html$/.test(u)) fejl.push(`.HTML-adresse (fuld) i ${f}: ${u}`);
+  for (const [u] of s.matchAll(/https:\/\/(?:www\.)?techmediaarch\.com\/[^"\s<>]*?\.html\b/g)) fejl.push(`.HTML-adresse (fuld) i ${f}: ${u}`);
   // Kun det læseren ser: <body> uden scripts (feed-data og JSON-LD er ikke synlige)
   const krop = tekst((s.match(/<body[\s\S]*<\/body>/) || [''])[0]);
   const raa = krop.match(RAA_KODE);
@@ -148,12 +148,18 @@ for (const f of html) {
 // Adresser uden .html (29/9-2026) også i sitemap, RSS, llms.txt, søgeindeks og feed-data
 for (const f of [...filer].filter((x) => /\.(xml|txt|json)$/.test(x))) {
   const s = fs.readFileSync(path.join(DIST, f), 'utf8');
-  // Undtagelse: security.txt-sidens synlige tekst "Contact: …/p/contact.html" (Blogger-tekst, ikke et link)
-  const n = (s.replace(/\/p\/contact\.html/g, '').match(/(?:techmediaarch\.com|["'(>\s])\/(?:\d{4}\/\d{2}|p|topic|page)\/[^"'<>)\s]*?\.html\b|\/(?:search|trending|index)\.html\b/g) || []).length;
+  const n = (s.match(/(?:techmediaarch\.com|["'(>\s])\/(?:\d{4}\/\d{2}|p|topic|page)\/[^"'<>)\s]*?\.html\b|\/(?:search|trending|index)\.html\b/g) || []).length;
   if (n) fejl.push(`.HTML-adresser i ${f}: ${n}`);
   // … og ingen sideadresse med "/" til sidst (Cloudflare ville sende den videre med 307)
   const skraa = (s.match(/techmediaarch\.com\/(?:\d{4}\/\d{2}|p|topic|page)\/[^"'<>)\s]+\/(?=["'<)\s])/g) || []).length;
   if (skraa) fejl.push(`adresser med "/" til sidst i ${f}: ${skraa}`);
+}
+// Siden /p/securitytxt skal vise præcis den rigtige fil /.well-known/security.txt (29/9-2026: siden nævnte
+// en kontaktside, der aldrig har fandtes, og Cloudflare serverede en tredje udgave)
+{
+  const fil = fs.readFileSync(path.join(DIST, '.well-known/security.txt'), 'utf8').trim().split(/\r?\n/).map((l) => l.trim());
+  const side = tekst((fs.readFileSync(path.join(DIST, 'p/securitytxt.html'), 'utf8').match(/<pre[^>]*>([\s\S]*?)<\/pre>/) || [, ''])[1]);
+  if (side !== fil.join(' ')) fejl.push(`/p/securitytxt viser ikke det samme som /.well-known/security.txt: «${side}» / «${fil.join(' ')}»`);
 }
 const unik = [...new Set(fejl)];
 console.log(`sider: ${html.length} · Blogger-adresser: ${posts.length + pages.length} · tekst ens: ${tekstOk} af ${posts.length}`);
