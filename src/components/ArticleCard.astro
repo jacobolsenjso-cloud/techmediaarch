@@ -6,10 +6,13 @@ import { datoTekst, udsnit } from '../lib/indhold';
 import Maerke from './Maerke.astro';
 // niveau: kortets overskrift er h2 direkte under sidens h1 (oversigter), h3 under en h2 (forsiden).
 // Udseendet styres af .card-title, så niveauet ændrer intet visuelt (27/9-2026).
-// badge: lille mærke øverst til venstre på billedet (fx "42 clicks" på Best of each topic); udenUdsnit: kun titel og meta
-interface Props { p: Indlaeg; eager?: boolean; niveau?: 2 | 3; badge?: string; udenUdsnit?: boolean; }
-const { p, eager = false, niveau = 3, badge, udenUdsnit = false } = Astro.props;
-const H = niveau === 2 ? 'h2' : 'h3';
+// badge: lille mærke øverst til venstre på billedet (fx "#1" på Trending); udenUdsnit: kun titel og meta
+// udenAnkre (30/9): ingen overskrift og ingen <p> i kortet. Googles Auto-annoncer sætter annoncer ind efter
+// overskrifter og afsnit — i "Related articles" landede de midt i kortene (samme løsning som "People also ask").
+interface Props { p: Indlaeg; eager?: boolean; niveau?: 2 | 3; badge?: string; udenUdsnit?: boolean; udenAnkre?: boolean; }
+const { p, eager = false, niveau = 3, badge, udenUdsnit = false, udenAnkre = false } = Astro.props;
+const H = udenAnkre ? 'span' : niveau === 2 ? 'h2' : 'h3';
+const A = udenAnkre ? 'span' : 'p';
 const emne = p.emner[0];
 ---
 <a href={p.href} class="article-card" style={emne ? `--tag-accent: ${emne.farve}` : undefined}>
@@ -21,12 +24,12 @@ const emne = p.emner[0];
     </div>
   )}
   <H class="card-title">{p.title}</H>
-  {!udenUdsnit && <p class="card-excerpt">{udsnit(p.description)}</p>}
-  <p class="card-meta">
+  {!udenUdsnit && <A class="card-excerpt">{udsnit(p.description)}</A>}
+  <A class="card-meta">
     {emne && <span class="card-topic">{emne.navn}</span>}
     {emne && <span aria-hidden="true">·</span>}
     <span>{datoTekst(p.published)}</span>
     <span aria-hidden="true">·</span>
     <span>{p.minutter} min read</span>
-  </p>
+  </A>
 </a>

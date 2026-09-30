@@ -1,16 +1,17 @@
 ---
-// Best of each topic (30/9-2026, Jacobs valg A): pr. emne de 4 artikler (Jacob 30/9; var 5), der fik flest klik fra Google Search
-// de sidste 90 dage. Sat op som techfeedwatchs /popular: sektion pr. emne, mærke på kortet, "See all N →"
-// og en boks, der ærligt siger, hvad der måles, og hvad der ikke gør. Tallene: src/lib/bedste.ts.
+// Best of each topic (30/9-2026): pr. emne de 4 mest læste artikler de sidste 90 dage, målt med Google Analytics
+// (Jacobs valg; først Search Console-klik, men der var kun 7 på 90 dage). Sat op som techfeedwatchs /popular:
+// sektion pr. emne, mærke på kortet, "See all N →" og en boks, der ærligt siger, hvad der måles, og hvad der ikke gør.
+// Ingen tal på kortene (kun rang), fordi Analytics kun tæller besøgende, der siger ja til cookies. Tallene: src/lib/bedste.ts.
 import MainLayout from '../layouts/MainLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import EmneChips from '../components/EmneChips.astro';
 import { emneUrl } from '../lib/emner';
-import { BEDSTE, SEKTIONER, HAR_BEDSTE, PR_EMNE, klikTekst, kortDato } from '../lib/bedste';
+import { BEDSTE, SEKTIONER, HAR_BEDSTE, PR_EMNE, kortDato } from '../lib/bedste';
 
 const SITE = 'https://www.techmediaarch.com';
 const title = 'Best of each topic';
-const description = 'The most-read Tech Media Arch articles in each topic, ranked by clicks from Google Search over the last 90 days. Four per topic.';
+const description = 'The most-read Tech Media Arch articles in each topic over the last 90 days. Four per topic.';
 const fra = kortDato(BEDSTE.fra), til = kortDato(BEDSTE.til), hentet = kortDato(BEDSTE.hentet);
 
 // CollectionPage + ItemList: kun det siden faktisk viser. En artikel i to emner står kun én gang i listen.
@@ -47,10 +48,10 @@ const schema = HAR_BEDSTE ? {
   <div class="page-wrapper" style="padding-top: 24px;">
     <EmneChips />
     <div class="section-heading"><h1>Best of each topic</h1></div>
-    <p class="best-sub">The articles people actually chose to read from Google Search. For each topic, the four that got the most clicks over the last 90 days.</p>
+    <p class="best-sub">The articles people actually read. For each topic, the four that were read most over the last 90 days.</p>
     <div class="best-method">
-      <p><strong>How this is ranked.</strong> Clicks from Google Search to each article over the last 90 days, as reported by Google Search Console. When two articles have the same number of clicks, the one Google showed more often comes first. Articles without a single click are left out.</p>
-      <p><strong>What it does not measure.</strong> Only visits from Google Search count — not readers who came from the front page, social media, newsletters or other search engines. Newer articles have had less time to collect clicks, and a click says someone chose to open the article, not that it was good.{HAR_BEDSTE && fra && ` Clicks from ${fra} to ${til}, refreshed ${hentet}.`}</p>
+      <p><strong>How this is ranked.</strong> How many times each article was read over the last 90 days, measured with Google Analytics. When two articles were read equally often, the one with more different readers comes first. Articles nobody read are left out.</p>
+      <p><strong>What it does not measure.</strong> Only visitors who accept analytics cookies are counted, so the ranking shows what is read most, not exact numbers. Newer articles have had less time to be read, and being read often says people chose to open an article, not that it was good.{HAR_BEDSTE && fra && ` Reads from ${fra} to ${til}, refreshed ${hentet}.`}</p>
     </div>
     {HAR_BEDSTE ? SEKTIONER.map((s) => (
       <section class="best-section" style={`--tag-accent: ${s.emne.farve}`}>
@@ -58,10 +59,10 @@ const schema = HAR_BEDSTE ? {
           <h2>{s.emne.navn}</h2>
           <a href={emneUrl(s.emne)}>See all {s.total} →</a>
         </div>
-        <div class="best-grid">{s.artikler.slice(0, PR_EMNE).map((p) => <ArticleCard p={p} niveau={3} badge={klikTekst(p.klik)} udenUdsnit />)}</div>
+        <div class="best-grid">{s.artikler.slice(0, PR_EMNE).map((p, i) => <ArticleCard p={p} niveau={3} badge={`#${i + 1}`} udenUdsnit />)}</div>
       </section>
     )) : (
-      <p class="best-tom">The rankings are being collected. They appear here after the next update from Google Search Console.</p>
+      <p class="best-tom">The rankings are being collected. They appear here after the next update from Google Analytics.</p>
     )}
   </div>
 </MainLayout>
