@@ -92,9 +92,14 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .article-title { margin: 0 0 15px 0; font-size: 2rem; line-height: 1.2; }
     /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
     /* People also ask (29/9) — samme udseende som på Jacobs andet site; nulstiller brødtekstens link- og listestil */
-    .post-body .paa { margin: 32px 0 10px; padding: 22px 24px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 14px; }
-    .post-body .paa-title { display: block; margin: 0 0 4px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
-    .post-body .paa-sub { display: block; margin: 0 0 14px; font-size: 0.85rem; color: #6b7280; line-height: 1.4; }
+    /* 30/9 (Jacobs valg A): boksen flød ind i teksten. Nu tyk turkis kant i venstre side og en let turkis tone,
+       samme stil som forklaringsboksen på Best of each topic — også i mørk tilstand (tonen blandes med kortfarven) */
+    .post-body .paa { margin: 32px 0 10px; padding: 22px 24px; background: color-mix(in srgb, var(--teal) 9%, var(--card-bg)); border: 1px solid color-mix(in srgb, var(--teal) 35%, var(--border-color)); border-left: 5px solid var(--teal); border-radius: 14px; }
+    .post-body .paa-title { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
+    /* Lille turkis "?" foran titlen (pseudo-element: ingen ekstra tags, som Auto-annoncer kan hæfte sig på) */
+    .post-body .paa-title::before { content: '?'; flex: none; width: 22px; height: 22px; border-radius: 50%; background: #0e7490; color: #fff; font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+    /* #4b5563 på den turkise tone giver over 4,5:1 (#6b7280 gav ca. 4,4:1) */
+    .post-body .paa-sub { display: block; margin: 0 0 14px; font-size: 0.85rem; color: #4b5563; line-height: 1.4; }
     body.dark-mode .post-body .paa-sub { color: #9ca3af; }
     .post-body .paa-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
     .post-body .paa-list li { margin: 0; }
