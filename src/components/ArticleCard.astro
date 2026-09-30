@@ -6,21 +6,22 @@ import { datoTekst, udsnit } from '../lib/indhold';
 import Maerke from './Maerke.astro';
 // niveau: kortets overskrift er h2 direkte under sidens h1 (oversigter), h3 under en h2 (forsiden).
 // Udseendet styres af .card-title, så niveauet ændrer intet visuelt (27/9-2026).
-interface Props { p: Indlaeg; eager?: boolean; niveau?: 2 | 3; }
-const { p, eager = false, niveau = 3 } = Astro.props;
+// badge: lille mærke øverst til venstre på billedet (fx "42 clicks" på Best of each topic); udenUdsnit: kun titel og meta
+interface Props { p: Indlaeg; eager?: boolean; niveau?: 2 | 3; badge?: string; udenUdsnit?: boolean; }
+const { p, eager = false, niveau = 3, badge, udenUdsnit = false } = Astro.props;
 const H = niveau === 2 ? 'h2' : 'h3';
 const emne = p.emner[0];
 ---
 <a href={p.href} class="article-card" style={emne ? `--tag-accent: ${emne.farve}` : undefined}>
   {p.image ? (
-    <div class="card-thumb"><img src={p.image} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" /></div>
+    <div class="card-thumb"><img src={p.image} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" />{badge && <span class="card-badge">{badge}</span>}</div>
   ) : (
-    <div class="card-thumb card-thumb-empty" aria-hidden="true">
-      <Maerke id={`c${p.aar}${p.maaned}`} />
+    <div class="card-thumb card-thumb-empty" aria-hidden={badge ? undefined : 'true'}>
+      <Maerke id={`c${p.aar}${p.maaned}`} />{badge && <span class="card-badge">{badge}</span>}
     </div>
   )}
   <H class="card-title">{p.title}</H>
-  <p class="card-excerpt">{udsnit(p.description)}</p>
+  {!udenUdsnit && <p class="card-excerpt">{udsnit(p.description)}</p>}
   <p class="card-meta">
     {emne && <span class="card-topic">{emne.navn}</span>}
     {emne && <span aria-hidden="true">·</span>}

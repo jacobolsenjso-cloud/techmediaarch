@@ -53,3 +53,19 @@ export async function hentSoegninger({ dage = 90, raekker = 5000 } = {}) {
     q: x.keys[0], side: x.keys[1], klik: x.clicks, visninger: x.impressions, placering: Math.round(x.position * 10) / 10,
   }));
 }
+
+// Klik og visninger pr. side de sidste `dage` dage — til "Best of each topic" (30/9-2026).
+// Samme periode som hentSoegninger (Search Console er ~2 dage bagud). Returnerer { fra, til, sider: [{ side, klik, visninger }] }.
+export async function hentSider({ dage = 90, raekker = 25000 } = {}) {
+  const bevis = await hentAdgangsbevis();
+  const dato = (d) => new Date(Date.now() - d * 864e5).toISOString().slice(0, 10);
+  const fra = dato(dage + 2), til = dato(2);
+  const r = await fetch(`https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(EJENDOM)}/searchAnalytics/query`, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${bevis}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ startDate: fra, endDate: til, dimensions: ['page'], rowLimit: raekker }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(`Search Console svarede ${r.status} ${j.error?.status || ''}`);
+  return { fra, til, sider: (j.rows || []).map((x) => ({ side: x.keys[0], klik: x.clicks, visninger: x.impressions })) };
+}

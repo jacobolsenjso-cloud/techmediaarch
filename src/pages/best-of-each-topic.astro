@@ -1,0 +1,69 @@
+---
+// Best of each topic (30/9-2026, Jacobs valg A): pr. emne de 5 artikler, der fik flest klik fra Google Search
+// de sidste 90 dage. Sat op som techfeedwatchs /popular: sektion pr. emne, mærke på kortet, "See all N →"
+// og en boks, der ærligt siger, hvad der måles, og hvad der ikke gør. Tallene: src/lib/bedste.ts.
+import MainLayout from '../layouts/MainLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import EmneChips from '../components/EmneChips.astro';
+import { emneUrl } from '../lib/emner';
+import { BEDSTE, SEKTIONER, HAR_BEDSTE, PR_EMNE, klikTekst, kortDato } from '../lib/bedste';
+
+const SITE = 'https://www.techmediaarch.com';
+const title = 'Best of each topic';
+const description = 'The most-read Tech Media Arch articles in each topic, ranked by clicks from Google Search over the last 90 days. Five per topic.';
+const fra = kortDato(BEDSTE.fra), til = kortDato(BEDSTE.til), hentet = kortDato(BEDSTE.hentet);
+
+// CollectionPage + ItemList: kun det siden faktisk viser. En artikel i to emner står kun én gang i listen.
+const viste = [...new Map(SEKTIONER.flatMap((s) => s.artikler).map((p) => [p.sti, p])).values()];
+const schema = HAR_BEDSTE ? {
+  '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, url: `${SITE}/best-of-each-topic`, description,
+  isPartOf: { '@type': 'WebSite', name: 'Tech Media Arch', url: `${SITE}/` },
+  publisher: { '@id': `${SITE}/#organization` },
+  mainEntity: { '@type': 'ItemList', numberOfItems: viste.length,
+    itemListElement: viste.map((p, n) => ({ '@type': 'ListItem', position: n + 1, url: SITE + p.href, name: p.title })) },
+} : null;
+---
+<MainLayout title={title} description={description} schema={schema} noindex={!HAR_BEDSTE} breadcrumb={[{ navn: 'Best of each topic', href: '/best-of-each-topic' }]}>
+  <style is:global>
+    .best-sub { color: var(--muted); font-size: 1.02rem; line-height: 1.6; margin: 0 0 20px; max-width: 780px; }
+    .best-method { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--teal); border-radius: 12px; padding: 16px 20px; margin: 0 0 34px; max-width: 900px; }
+    .best-method p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); margin: 0 0 8px; }
+    .best-method p:last-child { margin-bottom: 0; }
+    .best-method strong { color: var(--text-color); }
+    .best-section { margin-bottom: 36px; }
+    .best-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 12px; }
+    .best-head h2 { font-size: 1.3rem; margin: 0; display: flex; align-items: center; gap: 8px; }
+    .best-head h2::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--tag-accent); }
+    /* padding og min-height gør linket til et tryk-mål på mindst 24x24 (WCAG 2.2 AA), som på techfeedwatch */
+    .best-head a { font-size: 0.85rem; color: var(--teal-text); text-decoration: none; font-weight: 600; padding: 4px 2px; min-height: 44px; display: inline-flex; align-items: center; }
+    .best-head a:hover { text-decoration: underline; }
+    /* Fem faste kolonner, så et emnes fem kort står på én række (auto-fill gav fire plus en enlig) */
+    .best-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
+    @media (max-width: 1400px) { .best-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 900px) { .best-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .best-grid { grid-template-columns: 1fr; } }
+    /* #0e7490 med hvid tekst: 5,4:1 — 12px fed er ikke "stor tekst", så kravet er 4,5:1 */
+    .card-badge { position: absolute; top: 8px; left: 8px; background: rgba(14,116,144,0.96); color: #fff; padding: 3px 9px; border-radius: 20px; font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .best-tom { background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: 12px; padding: 22px; max-width: 900px; color: var(--muted); }
+  </style>
+  <div class="page-wrapper" style="padding-top: 24px;">
+    <EmneChips />
+    <div class="section-heading"><h1>Best of each topic</h1></div>
+    <p class="best-sub">The articles people actually chose to read from Google Search. For each topic, the five that got the most clicks over the last 90 days.</p>
+    <div class="best-method">
+      <p><strong>How this is ranked.</strong> Clicks from Google Search to each article over the last 90 days, as reported by Google Search Console. When two articles have the same number of clicks, the one Google showed more often comes first. Articles without a single click are left out.</p>
+      <p><strong>What it does not measure.</strong> Only visits from Google Search count — not readers who came from the front page, social media, newsletters or other search engines. Newer articles have had less time to collect clicks, and a click says someone chose to open the article, not that it was good.{HAR_BEDSTE && fra && ` Clicks from ${fra} to ${til}, refreshed ${hentet}.`}</p>
+    </div>
+    {HAR_BEDSTE ? SEKTIONER.map((s) => (
+      <section class="best-section" style={`--tag-accent: ${s.emne.farve}`}>
+        <div class="best-head">
+          <h2>{s.emne.navn}</h2>
+          <a href={emneUrl(s.emne)}>See all {s.total} →</a>
+        </div>
+        <div class="best-grid">{s.artikler.slice(0, PR_EMNE).map((p) => <ArticleCard p={p} niveau={3} badge={klikTekst(p.klik)} udenUdsnit />)}</div>
+      </section>
+    )) : (
+      <p class="best-tom">The rankings are being collected. They appear here after the next update from Google Search Console.</p>
+    )}
+  </div>
+</MainLayout>
