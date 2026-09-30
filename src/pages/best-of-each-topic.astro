@@ -1,5 +1,5 @@
 ---
-// Best of each topic (30/9-2026, Jacobs valg A): pr. emne de 5 artikler, der fik flest klik fra Google Search
+// Best of each topic (30/9-2026, Jacobs valg A): pr. emne de 4 artikler (Jacob 30/9; var 5), der fik flest klik fra Google Search
 // de sidste 90 dage. Sat op som techfeedwatchs /popular: sektion pr. emne, mærke på kortet, "See all N →"
 // og en boks, der ærligt siger, hvad der måles, og hvad der ikke gør. Tallene: src/lib/bedste.ts.
 import MainLayout from '../layouts/MainLayout.astro';
@@ -10,7 +10,7 @@ import { BEDSTE, SEKTIONER, HAR_BEDSTE, PR_EMNE, klikTekst, kortDato } from '../
 
 const SITE = 'https://www.techmediaarch.com';
 const title = 'Best of each topic';
-const description = 'The most-read Tech Media Arch articles in each topic, ranked by clicks from Google Search over the last 90 days. Five per topic.';
+const description = 'The most-read Tech Media Arch articles in each topic, ranked by clicks from Google Search over the last 90 days. Four per topic.';
 const fra = kortDato(BEDSTE.fra), til = kortDato(BEDSTE.til), hentet = kortDato(BEDSTE.hentet);
 
 // CollectionPage + ItemList: kun det siden faktisk viser. En artikel i to emner står kun én gang i listen.
@@ -37,11 +37,11 @@ const schema = HAR_BEDSTE ? {
     /* padding og min-height gør linket til et tryk-mål på mindst 24x24 (WCAG 2.2 AA), som på techfeedwatch */
     .best-head a { font-size: 0.85rem; color: var(--teal-text); text-decoration: none; font-weight: 600; padding: 4px 2px; min-height: 44px; display: inline-flex; align-items: center; }
     .best-head a:hover { text-decoration: underline; }
-    /* Fem faste kolonner, så et emnes fem kort står på én række (auto-fill gav fire plus en enlig) */
-    .best-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
-    @media (max-width: 1400px) { .best-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 900px) { .best-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 600px) { .best-grid { grid-template-columns: 1fr; } }
+    /* 4 kort pr. emne (Jacob 30/9): 4 på én række på computer, 2 x 2 på mobil og smalle skærme — aldrig en enlig på sidste række */
+    .best-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    @media (max-width: 1000px) { .best-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+    /* I de smalle kort er der ikke plads til læsetiden: den brød ud på en ny linje med en løs "·" for enden (målt 30/9) */
+    @media (max-width: 600px) { .best-grid .card-meta > :nth-last-child(-n+2) { display: none; } }
     /* #0e7490 med hvid tekst: 5,4:1 — 12px fed er ikke "stor tekst", så kravet er 4,5:1 */
     .card-badge { position: absolute; top: 8px; left: 8px; background: rgba(14,116,144,0.96); color: #fff; padding: 3px 9px; border-radius: 20px; font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
     .best-tom { background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: 12px; padding: 22px; max-width: 900px; color: var(--muted); }
@@ -49,7 +49,7 @@ const schema = HAR_BEDSTE ? {
   <div class="page-wrapper" style="padding-top: 24px;">
     <EmneChips />
     <div class="section-heading"><h1>Best of each topic</h1></div>
-    <p class="best-sub">The articles people actually chose to read from Google Search. For each topic, the five that got the most clicks over the last 90 days.</p>
+    <p class="best-sub">The articles people actually chose to read from Google Search. For each topic, the four that got the most clicks over the last 90 days.</p>
     <div class="best-method">
       <p><strong>How this is ranked.</strong> Clicks from Google Search to each article over the last 90 days, as reported by Google Search Console. When two articles have the same number of clicks, the one Google showed more often comes first. Articles without a single click are left out.</p>
       <p><strong>What it does not measure.</strong> Only visits from Google Search count — not readers who came from the front page, social media, newsletters or other search engines. Newer articles have had less time to collect clicks, and a click says someone chose to open the article, not that it was good.{HAR_BEDSTE && fra && ` Clicks from ${fra} to ${til}, refreshed ${hentet}.`}</p>

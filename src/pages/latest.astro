@@ -1,0 +1,94 @@
+---
+// Latest (30/9-2026, Jacobs ønske: "ligesom" techfeedwatchs /latest): de 12 nyeste artikler i grupperne
+// Today, Yesterday og Recently added, med tal ved hver overskrift og et NEW-mærke på dagens artikler.
+//
+// Hvorfor dagene sættes i browseren: sitet bygges kun, når robotten udgiver (ikke tirsdag og fredag).
+// Et "Today" regnet ved bygning ville stå forkert dagen efter. Derfor bygges siden med datoer som
+// overskrifter (virker uden JavaScript), og et lille script grupperer om efter besøgendes egen dato.
+import MainLayout from '../layouts/MainLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { INDLAEG, datoTekst } from '../lib/indhold';
+
+const SITE = 'https://www.techmediaarch.com';
+const ANTAL = 12;
+const nyeste = INDLAEG.slice(0, ANTAL);   // INDLAEG er sorteret nyeste først
+const description = 'The newest articles on Tech Media Arch — AI, tech news, guides and analysis — grouped by the day they were published.';
+
+// Reserve uden JavaScript: én gruppe pr. udgivelsesdag (UTC), med datoen som overskrift
+const dage: { dag: string; artikler: typeof nyeste }[] = [];
+for (const p of nyeste) {
+  const dag = new Date(p.published).toISOString().slice(0, 10);
+  const sidste = dage[dage.length - 1];
+  if (sidste && sidste.dag === dag) sidste.artikler.push(p); else dage.push({ dag, artikler: [p] });
+}
+
+// CollectionPage + ItemList: præcis de artikler, siden viser
+const schema = {
+  '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Latest', url: `${SITE}/latest`, description,
+  isPartOf: { '@type': 'WebSite', name: 'Tech Media Arch', url: `${SITE}/` },
+  publisher: { '@id': `${SITE}/#organization` },
+  mainEntity: { '@type': 'ItemList', numberOfItems: nyeste.length,
+    itemListElement: nyeste.map((p, n) => ({ '@type': 'ListItem', position: n + 1, url: SITE + p.href, name: p.title })) },
+};
+---
+<MainLayout title="Latest" description={description} schema={schema} breadcrumb={[{ navn: 'Latest', href: '/latest' }]}>
+  <style is:global>
+    .latest-header { font-size: 2.1rem; margin: 0 0 8px; display: flex; align-items: center; gap: 12px; }
+    .latest-sub { color: var(--muted); font-size: 1.05rem; line-height: 1.6; margin: 0 0 30px; }
+    .latest-section { margin-bottom: 40px; }
+    .latest-day-title { font-size: 1.4rem; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; gap: 10px; }
+    .latest-count { font-size: 0.85rem; font-weight: 600; color: var(--muted); background: var(--hover-bg); border-radius: 20px; padding: 2px 10px; }
+    .latest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+    /* 2 kort pr. række på mobil (samme som Best of each topic, Jacob 30/9) */
+    @media (max-width: 600px) { .latest-header { font-size: 1.7rem; } .latest-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+    /* I de smalle kort er der ikke plads til læsetiden: den brød ud på en ny linje med en løs "·" for enden (målt 30/9) */
+    @media (max-width: 600px) { .latest-grid .card-meta > :nth-last-child(-n+2) { display: none; } }
+    /* NEW-mærket: #a21caf med hvid tekst giver 6,6:1 (techfeedwatchs lysere #d926c8 gav under 4,5:1 ved 11px) */
+    .latest-ny { position: absolute; top: 8px; left: 8px; background: #a21caf; color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.3px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .latest-more { margin: 4px 0 30px; font-size: 0.95rem; color: var(--muted); line-height: 1.6; }
+    .latest-more a { color: var(--teal-text); text-decoration: none; font-weight: 600; }
+    .latest-more a:hover { text-decoration: underline; }
+  </style>
+  <div class="page-wrapper" style="padding-top: 24px;">
+    <h1 class="latest-header"><span aria-hidden="true">🆕</span> Latest</h1>
+    <p class="latest-sub">The {nyeste.length} newest articles — AI, tech news, guides and analysis — grouped by the day they were published.</p>
+    <div id="latestListe">
+      {dage.map((d) => (
+        <section class="latest-section">
+          <h2 class="latest-day-title">{datoTekst(d.dag)} <span class="latest-count">{d.artikler.length}</span></h2>
+          <div class="latest-grid">{d.artikler.map((p, i) => <div class="latest-item" data-tid={p.published}><ArticleCard p={p} eager={i < 4} niveau={3} udenUdsnit /></div>)}</div>
+        </section>
+      ))}
+    </div>
+    <script is:inline>
+      // Grupperer om efter besøgendes egen dato: Today, Yesterday, Recently added (som techfeedwatch).
+      // Kører lige efter listen, så der ikke nås at blive vist datoer først.
+      (() => {
+        const rod = document.getElementById('latestListe'); if (!rod) return;
+        const dag = (d) => { const x = new Date(d); return `${x.getFullYear()}-${x.getMonth()}-${x.getDate()}`; };
+        const nu = new Date();
+        const iDag = dag(nu), iGaar = dag(new Date(nu.getFullYear(), nu.getMonth(), nu.getDate() - 1));
+        const kort = [...rod.querySelectorAll('.latest-item')];
+        const grupper = [
+          ['Today', kort.filter((k) => dag(k.dataset.tid) === iDag)],
+          ['Yesterday', kort.filter((k) => dag(k.dataset.tid) === iGaar)],
+          ['Recently added', kort.filter((k) => ![iDag, iGaar].includes(dag(k.dataset.tid)))],
+        ];
+        rod.textContent = '';
+        for (const [navn, liste] of grupper) {
+          if (!liste.length) continue;
+          const sek = document.createElement('section'); sek.className = 'latest-section';
+          const h = document.createElement('h2'); h.className = 'latest-day-title'; h.textContent = navn + ' ';
+          const t = document.createElement('span'); t.className = 'latest-count'; t.textContent = liste.length; h.append(t);
+          const g = document.createElement('div'); g.className = 'latest-grid';
+          for (const k of liste) {
+            if (navn === 'Today') { const m = document.createElement('span'); m.className = 'latest-ny'; m.textContent = 'NEW'; k.querySelector('.card-thumb')?.append(m); }
+            g.append(k);
+          }
+          sek.append(h, g); rod.append(sek);
+        }
+      })();
+    </script>
+    <p class="latest-more">That is the {nyeste.length} newest. <a href="/trending">Keep reading in Trending</a>, or browse every article in <a href="/p/sitemap">All articles</a>.</p>
+  </div>
+</MainLayout>

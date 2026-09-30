@@ -9,12 +9,12 @@ interface Tal { klik: number; visninger: number }
 interface Data { hentet?: string; fra?: string; til?: string; dage?: number; sider?: Record<string, Tal> }
 export const BEDSTE = BEDSTE_RAA as Data;
 
-export const PR_EMNE = 5;
+export const PR_EMNE = 4;   // Jacob 30/9: 4 pr. emne (var 5), så to hele rækker à 2 på mobil
 export const MIN_KLIK = 1;   // en artikel uden et eneste klik er ikke "bedst" til noget
 
 const tal = (p: Indlaeg): Tal => BEDSTE.sider?.[p.sti] ?? { klik: 0, visninger: 0 };
 
-// Én sektion pr. emne; de store emner først (flest artikler i alt), men alle får højst 5 pladser.
+// Én sektion pr. emne; de store emner først (flest artikler i alt), men alle får højst PR_EMNE pladser.
 // Rangering: klik, og ved lige mange klik: visninger.
 export const SEKTIONER: { emne: Emne; total: number; artikler: (Indlaeg & Tal)[] }[] = KATEGORIER
   .map((emne) => {
