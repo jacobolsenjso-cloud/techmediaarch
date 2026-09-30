@@ -195,6 +195,14 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .nav-item.active .nav-icon, .nav-item:hover .nav-icon { opacity: 1; }
       .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tag-accent); flex-shrink: 0; margin: 0 5px 0 5px; }
       .nav-heading { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 6px 15px 2px; }
+      /* Topics som fold-ud (30/9) */
+      .nav-topics { display: flex; flex-direction: column; gap: 5px; }
+      .nav-topics > summary { list-style: none; cursor: pointer; }
+      .nav-topics > summary::-webkit-details-marker { display: none; }
+      .nav-topics-pil { width: 16px; height: 16px; margin-left: auto; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; transition: transform 0.2s ease; }
+      .nav-topics[open] .nav-topics-pil { transform: rotate(90deg); }
+      .nav-topics > .nav-item:not(summary) { padding-left: 22px; }
+      @media (prefers-reduced-motion: reduce) { .nav-topics-pil { transition: none; } }
       .nav-sep { width: 100%; border: 0; border-top: 1px solid var(--border-color); margin: 10px 0; }
       .content-main { flex: 1; min-width: 0; min-height: calc(100vh - 60px); background: var(--bg-color); position: relative; display: flex; flex-direction: column; overflow-x: clip; }
       @keyframes tmaFadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -412,13 +420,21 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
           Resources
         </a>
         <hr class="nav-sep" />
-        <div class="nav-heading">Topics</div>
-        {KATEGORIER.map((e) => (
-          <a href={emneUrl(e)} class={`nav-item ${aktiv(emneUrl(e)) ? 'active' : ''}`} style={`--tag-accent: ${e.farve}`}>
-            <span class="nav-dot" aria-hidden="true"></span>
-            {e.navn}
-          </a>
-        ))}
+        {/* Topics foldet sammen (30/9, Jacobs valg C): emne-knapperne står øverst på forsiden, emnesiderne og Trending,
+            men i artikler og på mobil er menuen eneste vej til emnerne — derfor foldet, ikke slettet. Åben på en emneside. */}
+        <details class="nav-topics" open={KATEGORIER.some((e) => aktiv(emneUrl(e)))}>
+          <summary class="nav-item nav-topics-knap">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
+            Topics
+            <svg class="nav-topics-pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+          </summary>
+          {KATEGORIER.map((e) => (
+            <a href={emneUrl(e)} class={`nav-item ${aktiv(emneUrl(e)) ? 'active' : ''}`} style={`--tag-accent: ${e.farve}`}>
+              <span class="nav-dot" aria-hidden="true"></span>
+              {e.navn}
+            </a>
+          ))}
+        </details>
         <hr class="nav-sep" />
         <a href="/p/sitemap" class={`nav-item ${aktiv('/p/sitemap') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
