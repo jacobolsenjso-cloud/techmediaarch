@@ -1,21 +1,33 @@
 ---
-// Trending: de nyeste artikler. Svarer til Bloggers menupunkt "Trending" (mega-menu
-// med de nyeste indlæg) og "Feed" (/search) — begge viste de seneste indlæg.
-// Bloggers /search uden søgeord sendes hertil af workeren.
+// Trending (30/9-2026, Jacobs valg): de mest læste artikler de sidste 7 dage, målt med Google Analytics
+// (robot/mest-laest.mjs -> robot/data/mest-laest.json -> src/lib/mestlaest.ts). Før viste siden de nyeste;
+// det gør /latest nu. Er der for få tal endnu, vises de nyeste, og siden siger det.
 import MainLayout from '../layouts/MainLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import EmneChips from '../components/EmneChips.astro';
 import { INDLAEG } from '../lib/indhold';
+import { MEST, MEST_LAESTE, HAR_MEST_LAESTE, ANTAL } from '../lib/mestlaest';
+import { kortDato } from '../lib/bedste';
 
-const PR_SIDE = 24;
-const liste = INDLAEG.slice(0, PR_SIDE);
-const flere = INDLAEG.length > PR_SIDE;
+const liste = HAR_MEST_LAESTE ? MEST_LAESTE : INDLAEG.slice(0, ANTAL);
+const opdateret = kortDato(MEST.hentet);
+const description = HAR_MEST_LAESTE
+  ? 'The most-read articles on Tech Media Arch over the last 7 days — AI, tech news, guides and analysis.'
+  : 'The newest articles on Tech Media Arch — AI, tech news, guides and analysis.';
 ---
-<MainLayout title="Trending: the latest articles" description="The newest articles on Tech Media Arch — AI, tech news, guides and analysis, newest first." breadcrumb={[{ navn: 'Trending', href: '/trending' }]}>
+<MainLayout title="Trending: the most-read articles this week" description={description} breadcrumb={[{ navn: 'Trending', href: '/trending' }]}>
+  <style is:global>
+    .trend-note { color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin: -6px 0 20px; max-width: 820px; }
+  </style>
   <div class="page-wrapper" style="padding-top: 24px;">
     <EmneChips />
-    <div class="section-heading"><h1>Trending</h1><span class="section-note">The latest {liste.length} articles, newest first</span></div>
-    <div class="card-grid">{liste.map((p, i) => <ArticleCard p={p} eager={i < 3} niveau={2} />)}</div>
-    {flere && <p style="text-align: center; margin: 0 0 40px;"><a class="pagination-btn" href="/page/2">More articles →</a></p>}
+    <div class="section-heading"><h1>Trending</h1><span class="section-note">{HAR_MEST_LAESTE ? `The ${liste.length} most-read articles this week` : `The latest ${liste.length} articles`}</span></div>
+    {HAR_MEST_LAESTE ? (
+      <p class="trend-note">Ranked by how many times each article was read over the last 7 days, measured with Google Analytics{opdateret && `, refreshed ${opdateret}`}. Only visitors who accept analytics cookies are counted, so it shows what is read most, not exact numbers.</p>
+    ) : (
+      <p class="trend-note">The most-read ranking is being collected. Until it is ready, these are the newest articles.</p>
+    )}
+    <div class="card-grid">{liste.map((p, i) => <ArticleCard p={p} eager={i < 3} niveau={2} badge={HAR_MEST_LAESTE ? `#${i + 1}` : undefined} />)}</div>
+    <p style="text-align: center; margin: 0 0 40px;"><a class="pagination-btn" href="/latest">Newest articles →</a></p>
   </div>
 </MainLayout>

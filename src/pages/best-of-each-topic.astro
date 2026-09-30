@@ -42,8 +42,6 @@ const schema = HAR_BEDSTE ? {
     @media (max-width: 1000px) { .best-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
     /* I de smalle kort er der ikke plads til læsetiden: den brød ud på en ny linje med en løs "·" for enden (målt 30/9) */
     @media (max-width: 600px) { .best-grid .card-meta > :nth-last-child(-n+2) { display: none; } }
-    /* #0e7490 med hvid tekst: 5,4:1 — 12px fed er ikke "stor tekst", så kravet er 4,5:1 */
-    .card-badge { position: absolute; top: 8px; left: 8px; background: rgba(14,116,144,0.96); color: #fff; padding: 3px 9px; border-radius: 20px; font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
     .best-tom { background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: 12px; padding: 22px; max-width: 900px; color: var(--muted); }
   </style>
   <div class="page-wrapper" style="padding-top: 24px;">

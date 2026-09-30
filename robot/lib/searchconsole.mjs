@@ -18,14 +18,15 @@ export function harAdgang() {
   return Boolean(process.env.GSC_SERVICE_ACCOUNT_JSON);
 }
 
-async function hentAdgangsbevis() {
+// omfang: hvad beviset må (Search Console som standard; Analytics bruger samme konto med sit eget omfang, 30/9)
+export async function hentAdgangsbevis(omfang = OMFANG) {
   let konto;
   try { konto = JSON.parse(process.env.GSC_SERVICE_ACCOUNT_JSON); }
   catch { throw new Error('GSC_SERVICE_ACCOUNT_JSON kunne ikke læses som JSON'); }
   if (!konto.client_email || !konto.private_key) throw new Error('nøglen mangler client_email eller private_key');
   const nu = Math.floor(Date.now() / 1000);
   const hoved = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
-  const krop = b64url(JSON.stringify({ iss: konto.client_email, scope: OMFANG, aud: 'https://oauth2.googleapis.com/token', iat: nu, exp: nu + 3600 }));
+  const krop = b64url(JSON.stringify({ iss: konto.client_email, scope: omfang, aud: 'https://oauth2.googleapis.com/token', iat: nu, exp: nu + 3600 }));
   const signatur = b64url(crypto.createSign('RSA-SHA256').update(`${hoved}.${krop}`).sign(konto.private_key));
   const r = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',

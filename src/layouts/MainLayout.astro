@@ -337,6 +337,8 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .card-meta { font-size: 13px; color: var(--muted); margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
       .card-topic { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
       .card-topic::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
+      /* Mærke på kortets billede (ArticleCard badge: "42 clicks", "#1"). #0e7490 med hvid tekst: 5,4:1 — 12px fed kræver 4,5:1 */
+      .card-badge { position: absolute; top: 8px; left: 8px; background: rgba(14,116,144,0.96); color: #fff; padding: 3px 9px; border-radius: 20px; font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 1; }
       @media (prefers-reduced-motion: reduce) { .card-thumb { animation: none; } .card-thumb img { transition: none; } .article-card:hover .card-thumb img { transform: none; } }
 
       /* Emne-chips: pille-design med farveprik, som techfeedwatchs emnefilter */

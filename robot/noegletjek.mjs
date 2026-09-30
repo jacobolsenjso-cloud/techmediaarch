@@ -76,6 +76,17 @@ else {
   meld('Cloudflare billede (flux-1-schnell)', Boolean(r.ok && img), r.ok ? (img ? `billede på ${Math.round(img.length * 0.75 / 1024)} KB` : 'svar uden billede') : `HTTP ${r.status} ${skjul(r.json?.errors?.[0]?.message || '')}`);
 }
 
+// 7-8. Search Console og Google Analytics med tjenestekontoen (30/9: Best of each topic og Trending bruger dem)
+if (!process.env.GSC_SERVICE_ACCOUNT_JSON) meld('Search Console / Analytics', false, 'GSC_SERVICE_ACCOUNT_JSON mangler');
+else {
+  const { hentSider } = await import('./lib/searchconsole.mjs');
+  const { hentSidevisninger, EJENDOM_ID } = await import('./lib/analytics.mjs');
+  try { const s = await hentSider({ dage: 90 }); meld('Search Console (klik pr. side, 90 dage)', true, `${s.sider.length} sider, ${s.sider.reduce((a, x) => a + x.klik, 0)} klik`); }
+  catch (e) { meld('Search Console (klik pr. side, 90 dage)', false, skjul(e.message || e)); }
+  try { const a = await hentSidevisninger({ dage: 7 }); meld(`Google Analytics (ejendom ${EJENDOM_ID}, 7 dage)`, true, `${a.sider.length} sider, ${a.sider.reduce((x, y) => x + y.visninger, 0)} sidevisninger`); }
+  catch (e) { meld(`Google Analytics (ejendom ${EJENDOM_ID}, 7 dage)`, false, skjul(e.message || e)); }
+}
+
 const md = linjer.join('\n') + '\n';
 console.log(md);
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);

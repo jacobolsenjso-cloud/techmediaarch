@@ -86,6 +86,10 @@ if (arg === '--tjek') {
   const b = spawnSync('node', ['robot/bedste.mjs'], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 3 * 60 * 1000 });
   process.stderr.write(b.stderr || '');
   summary(`**Best of each topic:** ${((b.stdout || '').trim().split('\n').pop() || `sluttede med kode ${b.status}`).slice(0, 300)}`);
+  // Trending = mest læste (30/9, Jacobs valg: Google Analytics, 7 dage) -> robot/data/mest-laest.json. Fejl stopper aldrig artiklen.
+  const m = spawnSync('node', ['robot/mest-laest.mjs'], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 3 * 60 * 1000 });
+  process.stderr.write(m.stderr || '');
+  summary(`**Trending (mest læste):** ${((m.stdout || '').trim().split('\n').pop() || `sluttede med kode ${m.status}`).slice(0, 300)}`);
 } else if (arg === '--tomgang') {
   const [nyeste] = robotArtikler();
   if (!nyeste) { summary('Ingen robotartikler endnu.'); process.exit(0); }

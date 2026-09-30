@@ -119,8 +119,8 @@ async function haandter(request, env) {
     return flyt(url, slug ? `/topic/${slug}` : '/');
   }
   // Søgning: /search?q=x er nu selve søgesiden (search.html serveres direkte som /search).
-  // Andre /search/…-adresser fra Blogger -> /trending (på Blogger viste de de nyeste indlæg)
-  if (sti.startsWith('/search/')) return flyt(url, '/trending');
+  // Andre /search/…-adresser fra Blogger -> /latest (på Blogger viste de de nyeste indlæg; 30/9: Trending er nu "mest læste")
+  if (sti.startsWith('/search/')) return flyt(url, '/latest');
   // Feeds: JSON-udgaven (alt=json / alt=json-in-script) efterlignes, så Watch- og
   // Sitemap-siden virker uændret. Alt andet (feedlæsere, alt=rss) -> /rss.xml.
   if (sti.startsWith('/feeds/')) {

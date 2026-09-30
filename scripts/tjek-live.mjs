@@ -71,9 +71,10 @@ const forventet = [
   ['/search/label/AI', 301, '/topic/ai'],
   ['/search/label/Resources', 301, '/topic/resources'],
   ['/search/label/Findes-ikke', 301, '/'],
-  // /search er nu selve søgesiden (29/9-2026); andre /search/… fra Blogger -> /trending
+  // /search er nu selve søgesiden (29/9-2026); andre /search/… fra Blogger -> /latest (30/9; før /trending)
   ['/search?q=claude', 200, null],
-  ['/search/x', 301, '/trending'],
+  ['/search/x', 301, '/latest'],
+  ['/latest', 200, null],
   ['/feeds/posts/default', 301, '/rss.xml'],
   ['/2024/10/', 301, '/'],
   ['/findes-ikke-123.html', 404, null],

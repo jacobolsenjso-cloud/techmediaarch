@@ -7,33 +7,15 @@
 //   node robot/bedste.mjs                      rigtige tal (kræver GSC_SERVICE_ACCOUNT_JSON)
 //   node robot/bedste.mjs --falsk --fil X      opdigtede tal KUN til at prøve siden lokalt — aldrig i robottens fil
 import fs from 'node:fs';
-import path from 'node:path';
 import { sti } from './lib/arkiv.mjs';
 import { harAdgang, hentSider } from './lib/searchconsole.mjs';
+import { alleStier, tilSti } from './lib/artikelstier.mjs';   // fælles med mest-laest.mjs (30/9)
 
 const arg = (n, std) => { const i = process.argv.indexOf(`--${n}`); return i > 0 ? process.argv[i + 1] : std; };
 const DAGE = 90;
 const FALSK = process.argv.includes('--falsk');
 const FIL = sti(arg('fil', 'robot/data/bedste.json'));
 if (FALSK && !process.argv.includes('--fil')) throw new Error('--falsk kræver --fil, så robottens rigtige fil aldrig får falske tal');
-
-// Alle artiklers stier (/2024/10/navn), som sitet kender dem
-function alleStier() {
-  const ud = new Set();
-  const rod = sti('src/content/posts');
-  for (const aar of fs.readdirSync(rod)) for (const md of fs.readdirSync(path.join(rod, aar)))
-    for (const f of fs.readdirSync(path.join(rod, aar, md)).filter((x) => x.endsWith('.md'))) ud.add(`/${aar}/${md}/${f.replace(/\.md$/, '')}`);
-  return ud;
-}
-
-// Search Console-adresse -> artiklens sti. Samme artikel kan stå som både .html (Blogger) og uden (nu), med og uden www,
-// og med kodede tegn — alt lægges sammen på én sti.
-function tilSti(url) {
-  let s;
-  try { s = new URL(url).pathname; } catch { return null; }
-  try { s = decodeURIComponent(s); } catch { /* ukodet i forvejen */ }
-  return s.replace(/\/+$/, '').replace(/\.html$/, '') || '/';
-}
 
 const stier = alleStier();
 let data;
@@ -45,7 +27,9 @@ if (FALSK) {
   data = { hentet: new Date().toISOString(), fra: 'falsk', til: 'falsk', dage: DAGE, sider };
 } else {
   if (!harAdgang()) { console.log('Best of each topic: ingen Search Console-nøgle her - intet ændret'); process.exit(0); }
-  const { fra, til, sider: raekker } = await hentSider({ dage: DAGE });
+  // Fejlen skrives som én linje på stdout, så den står læsbart i robottens resumé (ellers kun Nodes stakspor)
+  const svar = await hentSider({ dage: DAGE }).catch((e) => { console.log(`Best of each topic: FEJL - ${String(e.message || e).slice(0, 200)}`); process.exit(1); });
+  const { fra, til, sider: raekker } = svar;
   const sider = {}; let udenfor = 0;
   for (const r of raekker) {
     const s = tilSti(r.side);
