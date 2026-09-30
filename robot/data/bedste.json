@@ -1,1 +1,353 @@
-{}
+{
+ "hentet": "2026-09-30T13:51:41.360Z",
+ "fra": "2026-07-03",
+ "til": "2026-09-30",
+ "dage": 90,
+ "kilde": "analytics",
+ "sider": {
+  "/2026/05/free-open-source-whatsapp-crm-technical": {
+   "visninger": 28,
+   "brugere": 26
+  },
+  "/2026/06/agentic-ai-vs-ai-agents-technical": {
+   "visninger": 26,
+   "brugere": 6
+  },
+  "/2024/10/the future of examples of passive income.": {
+   "visninger": 8,
+   "brugere": 7
+  },
+  "/2026/05/the-impact-of-googles-new-video-model": {
+   "visninger": 8,
+   "brugere": 6
+  },
+  "/2026/05/unpacking-grubby-ai-is-this-humanizer": {
+   "visninger": 9,
+   "brugere": 6
+  },
+  "/2024/09/faq": {
+   "visninger": 6,
+   "brugere": 2
+  },
+  "/2024/08/tube-magic-ai-tools-for-growing-on": {
+   "visninger": 5,
+   "brugere": 1
+  },
+  "/2026/05/the-real-arch-linux-myths-trade-offs": {
+   "visninger": 5,
+   "brugere": 2
+  },
+  "/2026/04/mastering-chatgpt": {
+   "visninger": 4,
+   "brugere": 4
+  },
+  "/2026/05/hcl-tech-today-real-time-price-ai": {
+   "visninger": 4,
+   "brugere": 2
+  },
+  "/2026/05/kling-ai-tutorial-create-stunning-ai": {
+   "visninger": 5,
+   "brugere": 3
+  },
+  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
+   "visninger": 6,
+   "brugere": 4
+  },
+  "/2026/09/what-are-phishing-emails": {
+   "visninger": 4,
+   "brugere": 1
+  },
+  "/2024/09/AI Giant OpenAI Poised for Radical Transformation into For-Profit Empire": {
+   "visninger": 3,
+   "brugere": 3
+  },
+  "/2026/05/inside-tmobiles-airan-partnership-how": {
+   "visninger": 3,
+   "brugere": 2
+  },
+  "/2026/09/product-roadmap-vs-backlog": {
+   "visninger": 4,
+   "brugere": 2
+  },
+  "/2026/09/what-is-ransomware-cyber-security": {
+   "visninger": 5,
+   "brugere": 4
+  },
+  "/2024/08/experience-future-of-financial": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2024/08/google-recruits-characterai-founders-in": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2024/09/blog-post": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2024/10/ai-shocks-again-claude-alexa-smarter": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/03/guide-to-databricks-success": {
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
+   "visninger": 3,
+   "brugere": 3
+  },
+  "/2026/04/nvidia-egpus-and-mac": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/04/your-windows-pc-has-secret-cleaning": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/05/apple-faces-dual-legal-battles-siri": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/05/decoding-power-of-fintech-what": {
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/05/google-workspace-studio-analysts-take": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/05/kling-ai-in-action-10-creative": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/05/made-viral-podcast-clips-with-ai-in-30": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/05/quantum-computing-demystified-what-it": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/05/quantum-threats-to-encryption-7-actions": {
+   "visninger": 3,
+   "brugere": 3
+  },
+  "/2026/09/product-management-vs-marketing": {
+   "visninger": 3,
+   "brugere": 2
+  },
+  "/2026/09/what-are-zero-trust-security-models": {
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/09/what-is-python-used-for": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2024/07/articles-apple-releases-first-preview": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/07/ciscos-report-reveals-ai-and": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/07/google-ai-chatbot-avoids-trump": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/08/Cracking the Code A Beginners Guide to Cryptocurrency Basics": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/08/The internet is buzzing with a new trend": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/08/a-comprehensive-review-of-cyber": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/08/ai-oversight-unveiled-eu-introduces": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/08/comprehensive-review-of-brave-browser": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/08/explore-wirexs-vision-for-web3-payment": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/08/the-most-powerful-man-youve-never-heard": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/09/AI-powered tech aims for People with Speech Impairments": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/09/AMD has just unveiled its groundbreaking UDNA GPU": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/09/berlins-best-top-10-futuristic-gadgets": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/09/necro-trojan-infections-reach-11-million-android-users-warned-of-imminent-danger": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/AI Trumps Web3 as Fintech What is Defi and Web3": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/Googles rtt reveals the full extent of web rtt data logging": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/closure-completed-on-dragon": {
+   "visninger": 1,
+   "brugere": 2
+  },
+  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/midJourney editing photo has plan that allows": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/nvida-ai-predicts-that-ai-will-be-able-to-do-some-jobs": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/penguin random house slams the door on ai generated content": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/ted-ai-conference-shock-ai-expert": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/the fake gmail com inbox that fooled the world": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/the new ai aria is a multimodal ai free ": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/the-coming-wave-how-ai-will-change": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/10/write without boundaries ai story writing": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/12/web3s missing piece the grid aims to map blockchain": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2025/01/The-1-trillion-question-can-tech-stocks-recover-from-deepseeks-impact": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2025/01/ai revolution googles gemini takes the lead in next gen assistant wars": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2025/01/breakthrough-in-ai-deepseek-r1-matches-openais-o1-at-a-fraction-of-the-cost": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2025/01/chat on the brink army cio warns of high costs for genai": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2025/01/revolutionizing-tomorrow-how-ai-is-illuminating-a-brighter-future-with-google": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2025/01/the-clock-is-ticking-quantum-computing-on-the-brink-of-singularity": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/04/create-hollywood-style-films-with-this-free-ai-workflow": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/04/ex-amazon-ai-leader-one-year-until-ai": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/04/gemma-4-explained-pricing-limits-and": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/a-deep-dive-into-chinese-tech-brands": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/05/automate-backlinks-with-claude-in-10": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/build-your-own-webp-converter-website": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/chinas-new-free-ai-tools-are-beating": {
+   "visninger": 1,
+   "brugere": 2
+  },
+  "/2026/05/create-15-minute-videos-with-free-ai": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/ditch-linktree-build-better-link-in-bio": {
+   "visninger": 1,
+   "brugere": 2
+  },
+  "/2026/05/exploring-claude-just-changed-making": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/fintech-stocks-sober-analysis-of": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/how-claude-design-tool-is": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/rephrasy-ai-review-2026-real-world": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/05/the-10-best-ai-tools-to-revolutionize": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/zorin-os-vs-windows-11-real-world": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/06/blueprint-for-building-your-first": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2024/09/Eclipse Initiative Takes On Cybersecurity AI Regulations Industry to Take Note": {
+   "visninger": 0,
+   "brugere": 1
+  },
+  "/2024/10/Get ready to deploy a fleet of ai agents startups": {
+   "visninger": 0,
+   "brugere": 1
+  }
+ }
+}
