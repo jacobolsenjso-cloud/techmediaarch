@@ -1,7 +1,7 @@
 {
- "hentet": "2026-09-30T20:08:30.118Z",
- "fra": "2026-07-03",
- "til": "2026-09-30",
+ "hentet": "2026-10-01T14:34:45.672Z",
+ "fra": "2026-07-04",
+ "til": "2026-10-01",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -37,6 +37,14 @@
    "visninger": 5,
    "brugere": 2
   },
+  "/2026/09/what-are-phishing-emails": {
+   "visninger": 5,
+   "brugere": 3
+  },
+  "/2026/09/what-are-zero-trust-security-models": {
+   "visninger": 5,
+   "brugere": 1
+  },
   "/2026/04/mastering-chatgpt": {
    "visninger": 4,
    "brugere": 4
@@ -53,10 +61,6 @@
    "visninger": 6,
    "brugere": 4
   },
-  "/2026/09/what-are-phishing-emails": {
-   "visninger": 4,
-   "brugere": 1
-  },
   "/2024/09/AI Giant OpenAI Poised for Radical Transformation into For-Profit Empire": {
    "visninger": 3,
    "brugere": 3
@@ -67,6 +71,10 @@
   },
   "/2026/09/product-roadmap-vs-backlog": {
    "visninger": 4,
+   "brugere": 2
+  },
+  "/2026/09/what-is-mvp-software-development": {
+   "visninger": 3,
    "brugere": 2
   },
   "/2026/09/what-is-ransomware-cyber-security": {
@@ -93,16 +101,16 @@
    "visninger": 2,
    "brugere": 1
   },
-  "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
-   "visninger": 3,
-   "brugere": 3
-  },
   "/2026/04/nvidia-egpus-and-mac": {
    "visninger": 2,
    "brugere": 2
   },
   "/2026/04/your-windows-pc-has-secret-cleaning": {
    "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/05/a-deep-dive-into-chinese-tech-brands": {
+   "visninger": 3,
    "brugere": 2
   },
   "/2026/05/apple-faces-dual-legal-battles-siri": {
@@ -133,13 +141,13 @@
    "visninger": 3,
    "brugere": 3
   },
+  "/2026/09/how-content-marketing-helps-seo": {
+   "visninger": 2,
+   "brugere": 2
+  },
   "/2026/09/product-management-vs-marketing": {
    "visninger": 3,
    "brugere": 2
-  },
-  "/2026/09/what-are-zero-trust-security-models": {
-   "visninger": 2,
-   "brugere": 1
   },
   "/2026/09/what-is-python-used-for": {
    "visninger": 2,
@@ -205,17 +213,21 @@
    "visninger": 1,
    "brugere": 1
   },
+  "/2024/10/Get ready to deploy a fleet of ai agents startups": {
+   "visninger": 1,
+   "brugere": 1
+  },
   "/2024/10/Googles rtt reveals the full extent of web rtt data logging": {
    "visninger": 1,
    "brugere": 1
   },
   "/2024/10/closure-completed-on-dragon": {
-   "visninger": 1,
+   "visninger": 2,
    "brugere": 2
   },
   "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
-   "visninger": 1,
-   "brugere": 1
+   "visninger": 2,
+   "brugere": 2
   },
   "/2024/10/midJourney editing photo has plan that allows": {
    "visninger": 1,
@@ -289,7 +301,7 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/a-deep-dive-into-chinese-tech-brands": {
+  "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
    "visninger": 2,
    "brugere": 2
   },
@@ -310,7 +322,7 @@
    "brugere": 1
   },
   "/2026/05/ditch-linktree-build-better-link-in-bio": {
-   "visninger": 1,
+   "visninger": 2,
    "brugere": 2
   },
   "/2026/05/exploring-claude-just-changed-making": {
@@ -329,6 +341,10 @@
    "visninger": 2,
    "brugere": 2
   },
+  "/2026/05/stop-losing-rankings-how-to-find-and": {
+   "visninger": 1,
+   "brugere": 1
+  },
   "/2026/05/the-10-best-ai-tools-to-revolutionize": {
    "visninger": 1,
    "brugere": 1
@@ -342,10 +358,6 @@
    "brugere": 2
   },
   "/2024/09/Eclipse Initiative Takes On Cybersecurity AI Regulations Industry to Take Note": {
-   "visninger": 0,
-   "brugere": 1
-  },
-  "/2024/10/Get ready to deploy a fleet of ai agents startups": {
    "visninger": 0,
    "brugere": 1
   }
