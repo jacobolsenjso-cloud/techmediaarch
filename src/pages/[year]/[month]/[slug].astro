@@ -12,6 +12,8 @@ import { faqSchema } from '../../../lib/faqschema.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
 import { tegnFarve } from '../../../lib/sporgsmaal.mjs';
 import OGSAA_SPURGT from '../../../../robot/data/ogsaa-spurgt.json';
+import MEST_RAA from '../../../../robot/data/mest-laest.json';
+import { efterFoersteBillede, foranMidterOverskrift, indsaet } from '../../../lib/artikelbokse.mjs';
 
 export function getStaticPaths() {
   return INDLAEG.map((p) => ({ params: { year: p.aar, month: p.maaned, slug: p.navn }, props: { p } }));
@@ -40,7 +42,6 @@ const paaHtml = paa.length ? `<aside class="paa" data-ekstra="1" aria-labelledby
   paa.map((q) => `<a href="${esc(q.href)}" class="paa-link"><span class="paa-mark" style="--tag-accent: ${q.farve}; color: ${tegnFarve(q.farve)}" aria-hidden="true">?</span><span class="paa-text">${esc(q.q)}</span><span class="paa-arrow" aria-hidden="true">→</span></a>`).join('')
 }</nav></aside>` : '';
 const faqStart = p.html.indexOf('<section class="faq-box"');
-const broedtekst = faqStart >= 0 ? p.html.slice(0, faqStart) + paaHtml + p.html.slice(faqStart) : p.html + paaHtml;
 
 const i = INDLAEG.indexOf(p);
 const nyere = INDLAEG[i - 1];
@@ -48,7 +49,19 @@ const aeldre = INDLAEG[i + 1];
 
 // Relaterede: samme emne først, derefter de nyeste; aldrig artiklen selv
 const somEmne = emne ? INDLAEG.filter((x) => x !== p && x.emner.some((e) => e.slug === emne.slug)) : [];
-const relaterede = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].slice(0, 8);
+
+// "You might also like" (1/10, Jacob): 2 forslag midt i artiklen. Samme emne først, de mest læste (Analytics, 7 dage)
+// først, kun artikler med billede, og ikke dem, "People also ask" allerede peger på. De to står så ikke igen i Related.
+const paaHref = new Set(paa.map((q) => q.href));
+const laest = (x: typeof p) => (MEST_RAA as { sider?: Record<string, { visninger: number }> }).sider?.[x.sti]?.visninger ?? 0;
+const kandidater = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].filter((x) => x.image && !paaHref.has(x.href));
+// Samme emne vinder altid over et andet emne (målt 1/10: en Product-artikel fik ellers et Infosec-forslag, fordi det var læst mest)
+const sammeEmne = (x: typeof p) => (somEmne.includes(x) ? 1 : 0);
+const forslag = [...kandidater.slice(0, 12)].sort((a, b) => sammeEmne(b) - sammeEmne(a) || laest(b) - laest(a)).slice(0, 2);
+const forslagHtml = forslag.length === 2 ? `<aside class="ymal" data-ekstra="1" aria-label="You might also like"><span class="ymal-label">You might also like</span><span class="ymal-grid">${
+  forslag.map((x) => `<a href="${esc(x.href)}" class="ymal-card"><span class="ymal-thumb"><img src="${esc(x.image!)}" alt="" loading="lazy" decoding="async"></span><span class="ymal-title">${esc(x.title)}</span></a>`).join('')
+}</span></aside>` : '';
+const relaterede = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].filter((x) => !forslag.includes(x)).slice(0, 8);
 // Sidebaren lover "More in <emne>" — så den må kun vise det emne. Har emnet
 // for få artikler, hedder den "Latest articles" og viser de nyeste i stedet.
 const nokIEmne = somEmne.length >= 3;
@@ -58,6 +71,17 @@ const sidebarListe = (nokIEmne ? somEmne : INDLAEG.filter((x) => x !== p)).slice
 // Indholdsfortegnelse ved 3+ overskrifter. Bliver den lang (de ældre indlæg har
 // op til 40), vises kun hovedafsnittene (h2), så den ikke fylder en hel skærm.
 const toc = p.overskrifter.length < 3 ? [] : p.overskrifter.length > 14 ? p.overskrifter.filter((h) => h.niveau === 2) : p.overskrifter;
+// 1/10 (Jacob: "det skal være under billedet"): fortegnelsen står i brødteksten lige under det første billede
+// (ellers øverst). Uden <ul>/<li>, så Auto-annoncer ikke sætter annoncer ind mellem punkterne (som i People also ask).
+const tocHtml = toc.length ? `<nav class="toc-container" data-ekstra="1" aria-label="Table of contents"><span class="toc-title">Table of Contents</span><span class="toc-list">${
+  toc.map((h) => `<a class="toc-depth-${h.niveau}" href="#${esc(h.id)}">${esc(h.tekst)}</a>`).join('')
+}</span></nav>` : '';
+const slut = faqStart >= 0 ? faqStart : p.html.length;
+const broedtekst = indsaet(p.html, [
+  { pos: efterFoersteBillede(p.html, slut), html: tocHtml },
+  { pos: foranMidterOverskrift(p.html, slut), html: forslagHtml },
+  { pos: slut, html: paaHtml },
+]);
 
 const schema = {
   '@context': 'https://schema.org',
@@ -140,13 +164,28 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .tag-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
     body.dark-mode .tag-badge { background-color: #27272a; color: #d4d4d8; }
     .tag-badge:hover { background-color: #cbd5e1; color: #0f172a; transform: translateY(-1px); }
-    .toc-container { background: var(--hover-bg); border-radius: 8px; padding: 20px; margin-bottom: 30px; border: 1px solid var(--border-color); }
-    .toc-title { font-weight: bold; margin-bottom: 12px; font-size: 1.1rem; }
-    .toc-list { list-style: none; padding: 0; margin: 0; }
-    .toc-list li { margin-bottom: 8px; }
-    .toc-depth-3 { padding-left: 20px; font-size: 0.95rem; opacity: 0.9; }
-    .toc-list a { color: var(--text-color); text-decoration: none; font-weight: 500; }
-    .toc-list a:hover { color: var(--teal-text); }
+    /* Indholdsfortegnelsen står fra 1/10 INDE i brødteksten under første billede (lib/artikelbokse.mjs) — uden ul/li,
+       så punkterne er <a> i en <span>. Reglerne er knyttet til .post-body, så de vinder over brødtekstens linkstil. */
+    .post-body .toc-container { display: block; background: var(--hover-bg); border-radius: 8px; padding: 20px; margin: 26px 0 30px; border: 1px solid var(--border-color); }
+    .post-body .toc-title { display: block; font-weight: bold; margin-bottom: 12px; font-size: 1.1rem; }
+    .post-body .toc-list { display: flex; flex-direction: column; gap: 2px; }
+    .post-body .toc-list a { display: block; padding: 4px 0; color: var(--text-color); text-decoration: none; font-weight: 500; border-bottom: 0; line-height: 1.45; }
+    .post-body .toc-list a:hover { color: var(--teal-text); border-bottom: 0; }
+    .post-body .toc-list a.toc-depth-3 { padding-left: 20px; font-size: 0.95rem; opacity: 0.9; }
+    /* "You might also like" (1/10, som på techfeedwatch): 2 forslag midt i artiklen. Kun <span>/<a>, ingen afsnit. */
+    .post-body .ymal { display: block; margin: 30px 0; padding: 20px 22px 22px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 14px; }
+    .post-body .ymal-label { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .post-body .ymal-label::before { content: '🔎'; letter-spacing: 0; }
+    .post-body .ymal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .post-body a.ymal-card { display: block; color: var(--teal-text); font-weight: 700; border-bottom: 0; text-decoration: none; }
+    .post-body a.ymal-card:hover { border-bottom: 0; }
+    .post-body .ymal-thumb { display: block; aspect-ratio: 16/9; overflow: hidden; border-radius: 10px; margin-bottom: 10px; background: var(--border-color); }
+    .post-body .ymal-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 0; margin: 0; transition: transform 0.3s; }
+    .post-body a.ymal-card:hover .ymal-thumb img { transform: scale(1.04); }
+    .post-body .ymal-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 1rem; line-height: 1.4; }
+    .post-body a.ymal-card:hover .ymal-title { text-decoration: underline; }
+    @media (max-width: 600px) { .post-body .ymal { padding: 16px 14px; } .post-body .ymal-grid { gap: 12px; } .post-body .ymal-title { font-size: 0.92rem; } }
+    @media (prefers-reduced-motion: reduce) { .post-body a.ymal-card:hover .ymal-thumb img { transform: none; } }
     .disclosure-box { font-size: 0.85rem; line-height: 1.6; color: var(--muted); background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 18px; margin: 0 0 30px 0; }
     .disclosure-box strong { color: var(--text-color); }
     .disclosure-box a { color: var(--teal-text); font-weight: 600; }
@@ -247,15 +286,6 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
           ikke kun nederst (Jacob 28/9). Gælder også fremtidige artikler med etiketten Resources. */}
       {erResources && (
         <p class="disclosure-box disclosure-top"><strong>Affiliate disclosure:</strong> This article contains affiliate or referral links. If you sign up or buy through them, Tech Media Arch may earn a commission at no extra cost to you. Partners cannot pay for a positive review, and nothing here is financial or investment advice. Read our full <a href="/p/disclosure">Disclosure</a>.</p>
-      )}
-
-      {toc.length > 0 && (
-        <nav class="toc-container" aria-label="Table of contents">
-          <div class="toc-title">Table of Contents</div>
-          <ul class="toc-list">
-            {toc.map((h) => <li class={`toc-depth-${h.niveau}`}><a href={`#${h.id}`}>{h.tekst}</a></li>)}
-          </ul>
-        </nav>
       )}
 
       <article class="post-body" set:html={broedtekst} />
