@@ -1,5 +1,5 @@
 {
- "hentet": "2026-10-01T14:34:45.672Z",
+ "hentet": "2026-10-01T20:26:28.123Z",
  "fra": "2026-07-04",
  "til": "2026-10-01",
  "dage": 90,
@@ -25,21 +25,21 @@
    "visninger": 9,
    "brugere": 6
   },
+  "/2026/09/what-are-phishing-emails": {
+   "visninger": 7,
+   "brugere": 3
+  },
   "/2024/09/faq": {
+   "visninger": 7,
+   "brugere": 3
+  },
+  "/2026/05/the-real-arch-linux-myths-trade-offs": {
    "visninger": 6,
-   "brugere": 2
+   "brugere": 3
   },
   "/2024/08/tube-magic-ai-tools-for-growing-on": {
    "visninger": 5,
    "brugere": 1
-  },
-  "/2026/05/the-real-arch-linux-myths-trade-offs": {
-   "visninger": 5,
-   "brugere": 2
-  },
-  "/2026/09/what-are-phishing-emails": {
-   "visninger": 5,
-   "brugere": 3
   },
   "/2026/09/what-are-zero-trust-security-models": {
    "visninger": 5,
@@ -66,6 +66,10 @@
    "brugere": 3
   },
   "/2026/05/inside-tmobiles-airan-partnership-how": {
+   "visninger": 3,
+   "brugere": 2
+  },
+  "/2026/09/how-content-marketing-helps-seo": {
    "visninger": 3,
    "brugere": 2
   },
@@ -114,7 +118,7 @@
    "brugere": 2
   },
   "/2026/05/apple-faces-dual-legal-battles-siri": {
-   "visninger": 2,
+   "visninger": 3,
    "brugere": 2
   },
   "/2026/05/decoding-power-of-fintech-what": {
@@ -138,12 +142,8 @@
    "brugere": 2
   },
   "/2026/05/quantum-threats-to-encryption-7-actions": {
-   "visninger": 3,
+   "visninger": 4,
    "brugere": 3
-  },
-  "/2026/09/how-content-marketing-helps-seo": {
-   "visninger": 2,
-   "brugere": 2
   },
   "/2026/09/product-management-vs-marketing": {
    "visninger": 3,
@@ -198,6 +198,10 @@
    "brugere": 1
   },
   "/2024/09/AMD has just unveiled its groundbreaking UDNA GPU": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/09/Eclipse Initiative Takes On Cybersecurity AI Regulations Industry to Take Note": {
    "visninger": 1,
    "brugere": 1
   },
@@ -314,7 +318,7 @@
    "brugere": 1
   },
   "/2026/05/chinas-new-free-ai-tools-are-beating": {
-   "visninger": 1,
+   "visninger": 2,
    "brugere": 2
   },
   "/2026/05/create-15-minute-videos-with-free-ai": {
@@ -357,7 +361,7 @@
    "visninger": 2,
    "brugere": 2
   },
-  "/2024/09/Eclipse Initiative Takes On Cybersecurity AI Regulations Industry to Take Note": {
+  "/2026/10/what-are-ransomware-canary-files": {
    "visninger": 0,
    "brugere": 1
   }
