@@ -1,68 +1,64 @@
 {
- "hentet": "2026-10-01T20:26:28.660Z",
- "fra": "2026-09-25",
- "til": "2026-10-01",
+ "hentet": "2026-10-03T12:39:49.247Z",
+ "fra": "2026-09-27",
+ "til": "2026-10-03",
  "dage": 7,
  "sider": {
   "/2026/09/what-are-phishing-emails": {
    "visninger": 7,
-   "brugere": 3
-  },
-  "/2024/09/faq": {
-   "visninger": 7,
-   "brugere": 3
+   "brugere": 4
   },
   "/2026/05/the-real-arch-linux-myths-trade-offs": {
    "visninger": 6,
    "brugere": 3
   },
-  "/2024/08/tube-magic-ai-tools-for-growing-on": {
-   "visninger": 5,
-   "brugere": 1
+  "/2026/09/product-roadmap-vs-backlog": {
+   "visninger": 6,
+   "brugere": 3
   },
   "/2026/09/what-are-zero-trust-security-models": {
    "visninger": 5,
    "brugere": 1
+  },
+  "/2026/09/what-is-mvp-software-development": {
+   "visninger": 5,
+   "brugere": 2
   },
   "/2026/05/kling-ai-tutorial-create-stunning-ai": {
    "visninger": 5,
    "brugere": 3
   },
   "/2026/09/how-content-marketing-helps-seo": {
-   "visninger": 3,
-   "brugere": 2
-  },
-  "/2026/09/product-roadmap-vs-backlog": {
    "visninger": 4,
-   "brugere": 2
-  },
-  "/2026/09/what-is-mvp-software-development": {
-   "visninger": 3,
-   "brugere": 2
+   "brugere": 3
   },
   "/2026/09/what-is-ransomware-cyber-security": {
-   "visninger": 6,
-   "brugere": 4
+   "visninger": 5,
+   "brugere": 3
+  },
+  "/2026/10/why-web-development-career": {
+   "visninger": 3,
+   "brugere": 2
+  },
+  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
+   "visninger": 2,
+   "brugere": 2
   },
   "/2026/05/a-deep-dive-into-chinese-tech-brands": {
    "visninger": 3,
    "brugere": 2
   },
-  "/2026/05/made-viral-podcast-clips-with-ai-in-30": {
-   "visninger": 2,
-   "brugere": 2
-  },
   "/2026/05/quantum-threats-to-encryption-7-actions": {
-   "visninger": 3,
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/05/stop-losing-rankings-how-to-find-and": {
+   "visninger": 2,
    "brugere": 2
   },
   "/2026/05/the-best-ai-detector-free-tools-to-spot": {
    "visninger": 2,
    "brugere": 1
-  },
-  "/2026/05/the-impact-of-googles-new-video-model": {
-   "visninger": 2,
-   "brugere": 2
   },
   "/2026/05/unpacking-grubby-ai-is-this-humanizer": {
    "visninger": 3,
@@ -88,6 +84,10 @@
    "visninger": 1,
    "brugere": 1
   },
+  "/2024/09/faq": {
+   "visninger": 1,
+   "brugere": 1
+  },
   "/2024/10/Get ready to deploy a fleet of ai agents startups": {
    "visninger": 1,
    "brugere": 1
@@ -96,17 +96,17 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
-   "visninger": 2,
-   "brugere": 2
+  "/2024/10/meta-unveils-revolutionary-ai-video": {
+   "visninger": 1,
+   "brugere": 1
   },
   "/2024/10/the-coming-wave-how-ai-will-change": {
    "visninger": 1,
    "brugere": 1
   },
   "/2026/04/mastering-chatgpt": {
-   "visninger": 1,
-   "brugere": 1
+   "visninger": 2,
+   "brugere": 2
   },
   "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
    "visninger": 1,
@@ -120,23 +120,27 @@
    "visninger": 1,
    "brugere": 1
   },
+  "/2026/05/capabilities-of-claude-ai-deep-dive": {
+   "visninger": 1,
+   "brugere": 1
+  },
   "/2026/05/chinas-new-free-ai-tools-are-beating": {
-   "visninger": 2,
-   "brugere": 2
+   "visninger": 1,
+   "brugere": 1
   },
   "/2026/05/ditch-linktree-build-better-link-in-bio": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/fintech-stocks-sober-analysis-of": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/05/google-workspace-studio-analysts-take": {
+  "/2026/05/exploring-claude-just-changed-making": {
    "visninger": 1,
    "brugere": 1
   },
   "/2026/05/hcl-tech-today-real-time-price-ai": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/made-viral-podcast-clips-with-ai-in-30": {
    "visninger": 1,
    "brugere": 1
   },
@@ -148,16 +152,12 @@
    "visninger": 2,
    "brugere": 2
   },
-  "/2026/05/stop-losing-rankings-how-to-find-and": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/06/blueprint-for-building-your-first": {
    "visninger": 2,
    "brugere": 2
   },
   "/2026/10/what-are-ransomware-canary-files": {
-   "visninger": 0,
+   "visninger": 1,
    "brugere": 1
   }
  }
