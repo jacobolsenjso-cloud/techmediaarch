@@ -1,16 +1,20 @@
 {
- "hentet": "2026-10-03T12:39:49.247Z",
+ "hentet": "2026-10-03T18:46:22.627Z",
  "fra": "2026-09-27",
  "til": "2026-10-03",
  "dage": 7,
  "sider": {
   "/2026/09/what-are-phishing-emails": {
-   "visninger": 7,
+   "visninger": 9,
    "brugere": 4
   },
   "/2026/05/the-real-arch-linux-myths-trade-offs": {
    "visninger": 6,
    "brugere": 3
+  },
+  "/2026/09/how-content-marketing-helps-seo": {
+   "visninger": 5,
+   "brugere": 4
   },
   "/2026/09/product-roadmap-vs-backlog": {
    "visninger": 6,
@@ -28,17 +32,13 @@
    "visninger": 5,
    "brugere": 3
   },
-  "/2026/09/how-content-marketing-helps-seo": {
+  "/2026/10/why-web-development-career": {
    "visninger": 4,
-   "brugere": 3
+   "brugere": 2
   },
   "/2026/09/what-is-ransomware-cyber-security": {
    "visninger": 5,
    "brugere": 3
-  },
-  "/2026/10/why-web-development-career": {
-   "visninger": 3,
-   "brugere": 2
   },
   "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
    "visninger": 2,
@@ -157,6 +157,10 @@
    "brugere": 2
   },
   "/2026/10/what-are-ransomware-canary-files": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/why-seo-is-important": {
    "visninger": 1,
    "brugere": 1
   }

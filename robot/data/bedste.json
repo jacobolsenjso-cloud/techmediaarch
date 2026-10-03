@@ -1,5 +1,5 @@
 {
- "hentet": "2026-10-03T12:39:48.757Z",
+ "hentet": "2026-10-03T18:46:21.944Z",
  "fra": "2026-07-06",
  "til": "2026-10-03",
  "dage": 90,
@@ -13,6 +13,10 @@
    "visninger": 26,
    "brugere": 6
   },
+  "/2026/09/what-are-phishing-emails": {
+   "visninger": 9,
+   "brugere": 4
+  },
   "/2024/10/the future of examples of passive income.": {
    "visninger": 8,
    "brugere": 7
@@ -25,10 +29,6 @@
    "visninger": 9,
    "brugere": 6
   },
-  "/2026/09/what-are-phishing-emails": {
-   "visninger": 7,
-   "brugere": 4
-  },
   "/2024/09/faq": {
    "visninger": 7,
    "brugere": 3
@@ -40,6 +40,10 @@
   "/2024/08/tube-magic-ai-tools-for-growing-on": {
    "visninger": 5,
    "brugere": 1
+  },
+  "/2026/09/how-content-marketing-helps-seo": {
+   "visninger": 5,
+   "brugere": 4
   },
   "/2026/09/product-roadmap-vs-backlog": {
    "visninger": 6,
@@ -69,9 +73,9 @@
    "visninger": 6,
    "brugere": 4
   },
-  "/2026/09/how-content-marketing-helps-seo": {
+  "/2026/10/why-web-development-career": {
    "visninger": 4,
-   "brugere": 3
+   "brugere": 2
   },
   "/2024/09/AI Giant OpenAI Poised for Radical Transformation into For-Profit Empire": {
    "visninger": 3,
@@ -84,10 +88,6 @@
   "/2026/09/what-is-ransomware-cyber-security": {
    "visninger": 6,
    "brugere": 4
-  },
-  "/2026/10/why-web-development-career": {
-   "visninger": 3,
-   "brugere": 2
   },
   "/2024/08/experience-future-of-financial": {
    "visninger": 2,
@@ -374,6 +374,10 @@
    "brugere": 2
   },
   "/2026/10/what-are-ransomware-canary-files": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/why-seo-is-important": {
    "visninger": 1,
    "brugere": 1
   }
