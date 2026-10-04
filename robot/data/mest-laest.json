@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-03T18:46:22.627Z",
- "fra": "2026-09-27",
- "til": "2026-10-03",
+ "hentet": "2026-10-04T13:17:48.299Z",
+ "fra": "2026-09-28",
+ "til": "2026-10-04",
  "dage": 7,
  "sider": {
   "/2026/09/what-are-phishing-emails": {
@@ -60,16 +60,8 @@
    "visninger": 2,
    "brugere": 1
   },
-  "/2026/05/unpacking-grubby-ai-is-this-humanizer": {
-   "visninger": 3,
-   "brugere": 2
-  },
   "/2026/06/agentic-ai-vs-ai-agents-technical": {
    "visninger": 4,
-   "brugere": 2
-  },
-  "/2026/09/product-management-vs-marketing": {
-   "visninger": 3,
    "brugere": 2
   },
   "/2026/09/what-is-python-used-for": {
@@ -140,10 +132,6 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/made-viral-podcast-clips-with-ai-in-30": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/05/quantum-computing-demystified-what-it": {
    "visninger": 1,
    "brugere": 1
@@ -152,9 +140,17 @@
    "visninger": 2,
    "brugere": 2
   },
-  "/2026/06/blueprint-for-building-your-first": {
+  "/2026/05/unpacking-grubby-ai-is-this-humanizer": {
    "visninger": 2,
    "brugere": 2
+  },
+  "/2026/06/blueprint-for-building-your-first": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/09/product-management-vs-marketing": {
+   "visninger": 1,
+   "brugere": 1
   },
   "/2026/10/what-are-ransomware-canary-files": {
    "visninger": 1,
