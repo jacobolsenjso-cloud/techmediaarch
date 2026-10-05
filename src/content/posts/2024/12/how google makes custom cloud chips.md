@@ -3,7 +3,7 @@ title: How Google Makes Custom Cloud Chips That Power Apple AI And Gemini
 seoTitle: "How Google Makes the Cloud Chips Behind Apple AI and Gemini"
 description: Google was the first cloud provider to make its custom AI chips, called TPUs when they first came out in 2015 - a trend both Amazon and Microsoft
 published: 2024-12-15T16:00:00.028+01:00
-updated: 2026-10-05T11:12:16.551Z
+updated: 2026-10-05T17:08:36.045Z
 labels:
   - AI-Agents
   - AI-Ethics
@@ -15,7 +15,7 @@ bloggerId: "7049451469705357061"
 hadToc: false
 faq:
   - q: How does Google's market share for custom cloud AI chips compare to competitors?
-    a: Through early investments in custom hardware, Google has captured a substantial portion of the market, holding a dominant position in the custom cloud AI chip sector. Research indicates that Google TPUs command over half of this specialized market, placing the company ahead of competitors like Amazon and Microsoft in the cloud computing arena.
+    a: Through early investments in custom hardware, Google has captured a substantial portion of the market, holding a dominant position in the custom cloud AI chip sector. Google TPUs command over half of this specialized market, placing the company ahead of competitors like Amazon and Microsoft in the cloud computing arena.
   - q: Who manufactures Google's custom AI chips?
     a: Google collaborates with key industry partners to bring its hardware to production, relying on specific external companies for manufacturing and component development. TSMC is responsible for producing the actual chips, while Broadcom assists in developing peripheral components required for the hardware ecosystem.
   - q: Which major company uses Google's TPUs to train its AI models?
