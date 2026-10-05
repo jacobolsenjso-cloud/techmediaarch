@@ -25,7 +25,7 @@ import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
-import { delAfsnit } from './lib/afsnit.mjs';
+import { delAfsnit, fjernGentagelser } from './lib/afsnit.mjs';
 import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord } from './lib/sprog.mjs';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
@@ -119,11 +119,13 @@ Rules:
 - Write like a technology journalist at a news publication, not like an analyst or a marketer (Jacob 28/9-2026):
   lead with the most important facts, attribute facts to their source in the sentence ("according to IBM", "NIST defines ..."),
   short paragraphs, concrete examples, neutral tone, no hype words, no "our analysis", "the verdict" or "key takeaways" framing.
-- Paragraphs like a news site (Jacob 5/10-2026): 1-3 sentences and at most 40 words each. A one-sentence paragraph is fine.
+- Paragraphs like a news site (Jacob 5/10-2026): most paragraphs are 2-3 connected sentences, at most 40 words. Use a one-sentence paragraph only now and then for emphasis, never several in a row.
+- Attribute a fact once, where it first appears. Vary how sources are named and where ("CompTIA defines ...", "..., according to Coursera"); sentences that explain, compare or give context need no source. Never start most sentences with "X notes/reports/states that".
+- Never repeat a fact, number or sentence that already appears in another section (the FAQ may summarise).
 - Include at least 2 lists (<ul> or <ol>, 3-6 items each) where they genuinely help the reader: steps, options, key differences, benefits or risks. Introduce each list with one sentence.
 - The first paragraph is a short, direct answer to the main keyword: 2 sentences, at most 50 words, plain language. Context and numbers come after it.
 - Search phrases are often ungrammatical ("what is phishing attack", "how does seo work"). Never paste a keyword verbatim into a sentence where it reads wrongly; write correct English ("how phishing attacks work"). Never put keywords in bold, quotes or <strong>.
-- Every factual claim names its source from the facts (an organization, agency, company or publication). Never use vague attributions such as "experts say", "industry experts note", "researchers confirm", "analysts point out", "studies show" or "according to market research".
+- Every number, statistic and quoted definition names its source from the facts (an organization, agency, company or publication). Never use vague attributions such as "experts say", "industry experts note", "researchers confirm", "analysts point out", "studies show" or "according to market research".
 - Include one FAQ section (<h2>FAQ</h2>) with AT LEAST 5 questions as <h3>, each followed by a 2-4 sentence answer in <p>.
   Phrase the questions the way people type them into Google, built from the related keywords; every question must be different.
 - Never claim personal testing or experience ("I tested", "in my experience", "we tried").
@@ -139,7 +141,7 @@ const ordI = (h) => h.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).leng
 if (ordI(html) < 1500) {
   log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1500.`);
   const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1600 words by deepening the existing sections with concrete explanations, examples and practical guidance. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
-Keep the first paragraph exactly as it is (it is a short direct answer). Paragraphs of 1-3 sentences and at most 40 words; keep the existing lists. Name the source of every fact; no vague attributions ("experts say", "studies show"). Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
+Keep the first paragraph exactly as it is (it is a short direct answer). Most paragraphs 2-3 connected sentences, at most 40 words, never several one-sentence paragraphs in a row; keep the existing lists. Name the source of numbers and statistics once, varying how; no vague attributions ("experts say", "studies show"). Never repeat a fact or sentence that is already in the article. Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
 Output ONLY the full expanded article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>).
 
 ${html}`);
@@ -253,6 +255,7 @@ ${kandAfsnit.slice(0, 30).map((p, i) => `${i + 1}. ${p}`).join('\n')}`);
 
 // Korte afsnit (Jacob 5/10-2026): for lange afsnit deles mellem sætningerne (ingen ord ændres), robot/lib/afsnit.mjs
 { const d = delAfsnit(html); html = d.html; log(`- Afsnit delt: ${d.delt}`); }
+{ const g = fjernGentagelser(html); html = g.html; log(`- Gentagne afsnit fjernet: ${g.fjernet} · afsnit med kun én sætning: ${g.enSaetning} af ${g.afsnit}`); }
 
 // Kilder: følg Googles omdirigering, kontrollér live, højst 4, ét pr. domæne.
 const { sat: kildeLinks, afvist: kildeAfvist } = await kontrollerKilder(kilder, 4);

@@ -88,3 +88,22 @@ export function delAfsnit(html) {
   });
   return { html: ud, delt };
 }
+
+// Fjerner afsnit uden for FAQ, der ordret gentager et tidligere afsnit (målt 5/10: prøveartikel #23
+// havde 2 afsnit, der stod ens i to afsnit af artiklen). Sammenligner synlig tekst uden tags og tegnsætning.
+// Returnerer også, hvor mange afsnit der er én sætning, så loggen viser, om teksten er blevet hakket.
+export function fjernGentagelser(html) {
+  const faqStart = (() => { const m = String(html).match(/<h[23][^>]*>\s*(?:<[^>]+>\s*)*(?:FAQ|Frequently Asked Questions)/i); return m ? m.index : -1; })();
+  const faqSlut = faqStart < 0 ? -1 : (() => { const r = String(html).slice(faqStart + 4).search(/<h2\b/i); return r < 0 ? html.length : faqStart + 4 + r; })();
+  const set = new Set(); let fjernet = 0, afsnit = 0, enSaetning = 0;
+  const norm = (s) => s.replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').toLowerCase().replace(/[^a-z0-9$%]+/g, ' ').trim();
+  const ud = String(html).replace(/<p(\s[^>]*)?>((?:(?!<\/?p[\s>])[\s\S])*?)<\/p>/gi, (hel, attr, indre, pos) => {
+    if (faqStart >= 0 && pos > faqStart && pos < faqSlut) return hel;
+    const n = norm(indre);
+    if (n.split(' ').length >= 6 && set.has(n)) { fjernet++; return ''; }
+    set.add(n); afsnit++;
+    const s = saetninger(indre); if (s && s.length === 1) enSaetning++;
+    return hel;
+  });
+  return { html: ud, fjernet, afsnit, enSaetning };
+}
