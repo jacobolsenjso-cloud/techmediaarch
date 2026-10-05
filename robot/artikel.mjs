@@ -25,6 +25,7 @@ import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
+import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord } from './lib/sprog.mjs';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
 const EMNE = arg('emne');
@@ -91,7 +92,9 @@ log(`- Interne link-kandidater: ${kandListe.length}, relevante ifølge Gemini: $
 // ikke, prøves en større som reserve.
 const researchOpgave = `Use Google Search to research these questions for a factual explainer article:
 - ${[valgt.hoved, ...valgt.beslaegtede].join('\n- ')}
-Return 15-25 short bullet points of concrete, verified facts (definitions, how it works, examples, numbers with dates, best practices). Only include facts you found in search results.`;
+Return 15-25 short bullet points of concrete, verified facts (definitions, how it works, examples, numbers with dates, best practices). Only include facts you found in search results.
+Start every bullet with the name of the organization, agency, company or publication the fact comes from (e.g. "IBM: ...", "NIST: ...").`;
+// ↑ Kildenavnet i hvert punkt (5/10-2026): uden det skrev Gemini "industry experts note" (18 sætninger i 8 af 15 artikler).
 let fakta = ''; let kilder = [];
 for (const model of [undefined, undefined, 'gemini-3.5-flash', 'gemini-2.5-flash']) {
   try {
@@ -115,7 +118,9 @@ Rules:
 - Write like a technology journalist at a news publication, not like an analyst or a marketer (Jacob 28/9-2026):
   lead with the most important facts, attribute facts to their source in the sentence ("according to IBM", "NIST defines ..."),
   short paragraphs, concrete examples, neutral tone, no hype words, no "our analysis", "the verdict" or "key takeaways" framing.
-- Answer the main keyword directly in the first paragraph.
+- The first paragraph is a short, direct answer to the main keyword: 2 sentences, at most 50 words, plain language. Context and numbers come after it.
+- Search phrases are often ungrammatical ("what is phishing attack", "how does seo work"). Never paste a keyword verbatim into a sentence where it reads wrongly; write correct English ("how phishing attacks work"). Never put keywords in bold, quotes or <strong>.
+- Every factual claim names its source from the facts (an organization, agency, company or publication). Never use vague attributions such as "experts say", "industry experts note", "researchers confirm", "analysts point out", "studies show" or "according to market research".
 - Include one FAQ section (<h2>FAQ</h2>) with AT LEAST 5 questions as <h3>, each followed by a 2-4 sentence answer in <p>.
   Phrase the questions the way people type them into Google, built from the related keywords; every question must be different.
 - Never claim personal testing or experience ("I tested", "in my experience", "we tried").
@@ -124,17 +129,18 @@ ${interne.map((l) => `  ${l.href}  (${l.titel})`).join('\n') || '  (none)'}
 - No other links. No images. No markdown.
 Output ONLY the article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>). No <html>, no title, no code fences.`;
 const { tekst } = await skriv(opgave);
-let html = tekst.replace(/^```html?\s*|```\s*$/g, '').trim();
+let html = rensMarkdown(tekst.replace(/^```html?\s*|```\s*$/g, '').trim());
 // Gemini skriver kortere end bedt om (målt 26/9: 857 ord mod 1400-1900 bedt om).
 // Er udkastet under 1500 ord, får den det tilbage og skal uddybe — kun med de researchede fakta.
 const ordI = (h) => h.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
 if (ordI(html) < 1500) {
   log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1500.`);
   const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1600 words by deepening the existing sections with concrete explanations, examples and practical guidance. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
+Keep the first paragraph exactly as it is (it is a short direct answer). Name the source of every fact; no vague attributions ("experts say", "studies show"). Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
 Output ONLY the full expanded article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>).
 
 ${html}`);
-  const ny = udv.tekst.replace(/^```html?\s*|```\s*$/g, '').trim();
+  const ny = rensMarkdown(udv.tekst.replace(/^```html?\s*|```\s*$/g, '').trim());
   if (ordI(ny) > ordI(html)) html = ny;
   log(`- Efter uddybning: ${ordI(html)} ord.`);
 }
@@ -165,11 +171,59 @@ Base answers only on these researched facts (no other numbers, dates or quotes):
 Journalistic, neutral tone. No links. Start with <h2>FAQ</h2>. Output ONLY the HTML of the FAQ section.
 
 ${m ? m[0] : '<h2>FAQ</h2>'}`);
-  const faqNy = ny.tekst.replace(/^```html?\s*|```\s*$/g, '').trim();
+  const faqNy = rensMarkdown(ny.tekst.replace(/^```html?\s*|```\s*$/g, '').trim());
   if (antalFaq(faqNy) >= 5) html = m ? html.replace(m[0], () => faqNy) : html + faqNy;
 }
 if (antalFaq(html) < 5) throw new Error(`FAQ har kun ${antalFaq(html)} spørgsmål (mindst 5) - artiklen afvist`);
 log(`- FAQ: ${antalFaq(html)} spørgsmål.`);
+
+// --- 4b. Sproglig efterkontrol (Jacob 5/10-2026, forslag 3) -------------------
+// Reglerne står i opgaven, men Gemini følger dem ikke altid. Målt 5/10 på de 15
+// første robotartikler: første afsnit 70-170 ord (median 108), 24 sætninger med
+// klistrede søgeord, 18 med uklare kilder, 21 søgeord med fed skrift. Her
+// kontrolleres det, og KUN det, der fejler, sendes tilbage til Gemini.
+const soegeord = [valgt.hoved, ...valgt.beslaegtede];
+const fedFoer = (html.match(/<(strong|b)>/gi) || []).length;
+html = udenFedeSoegeord(html, soegeord);
+log(`- Fede søgeord pakket ud: ${fedFoer - (html.match(/<(strong|b)>/gi) || []).length}`);
+const hrefs = (h) => [...h.matchAll(/<a\b[^>]*>/gi)].map((m) => m[0]).sort().join('|');
+// Første afsnit: for langt → deles i et kort svar + et afsnit med resten (ingen fakta forsvinder).
+const foerste = foersteAfsnit(html);
+if (foerste && antalOrd(foerste) > FOERSTE_MAKS) {
+  try {
+    const d = await skriv(`Split this opening paragraph of an article about "${valgt.hoved}" into two paragraphs.
+The first paragraph is a direct answer to the topic: 2 sentences, at most 50 words, plain language, correct English (do not paste the search phrase if it is ungrammatical).
+The second paragraph keeps all remaining information from the original, with the wording as close to the original as possible.
+Keep every <a> tag exactly as it is. No markdown. Output ONLY the two <p> elements.
+
+${foerste}`);
+    const nyF = rensMarkdown(d.tekst.replace(/^```html?\s*|```\s*$/g, '').trim());
+    const ok = /^<p\b/i.test(nyF) && antalOrd(foersteAfsnit(nyF)) <= FOERSTE_MAKS && hrefs(nyF) === hrefs(foerste);
+    if (ok) html = html.replace(foerste, () => nyF);
+    log(`- Første afsnit: ${antalOrd(foerste)} ord → ${ok ? `${antalOrd(foersteAfsnit(nyF))} ord (delt i to)` : 'uændret (Geminis forslag bestod ikke kontrollen)'}`);
+  } catch (e) { log(`- Første afsnit: ${antalOrd(foerste)} ord, deling fejlede (${e.message.slice(0, 80)})`); }
+} else log(`- Første afsnit: ${antalOrd(foerste)} ord`);
+// Sætninger med uklare kilder eller klistrede søgeord → Gemini retter netop dem.
+const daarlige = () => saetninger(html).map((s) => ({ s, uklar: uklarKilde(s), klistret: klistretSoegeord(s, soegeord) })).filter((x) => x.uklar || x.klistret);
+const foerRet = daarlige();
+if (foerRet.length) {
+  try {
+    const r = await json(`Fix each numbered sentence from an article about "${valgt.hoved}".
+- If it uses a vague attribution (marked VAGUE), name the specific source from the facts below, or drop the attribution and keep the plain fact if no source fits.
+- If it contains a search phrase pasted in ungrammatically (marked PHRASE), rephrase it into correct, natural English.
+Keep every HTML tag (especially <a ...>...</a>) exactly as it is. Change nothing else.
+Facts with sources:\n${fakta}
+Return JSON {"fixes":[{"n": number, "new": "the corrected sentence with its HTML"}]}
+${foerRet.map((x, i) => `${i + 1}. [${[x.uklar && 'VAGUE', x.klistret && 'PHRASE'].filter(Boolean).join('+')}] ${x.s}`).join('\n')}`);
+    let rettet = 0;
+    for (const f of Array.isArray(r.fixes) ? r.fixes : []) {
+      const x = foerRet[parseInt(f.n, 10) - 1]; const ny = rensMarkdown(String(f.new || '').trim());
+      if (!x || !ny || hrefs(ny) !== hrefs(x.s) || uklarKilde(ny) || klistretSoegeord(ny, soegeord) || !html.includes(x.s)) continue;
+      html = html.replace(x.s, () => ny); rettet++;
+    }
+    log(`- Sætninger med uklare kilder/klistrede søgeord: ${foerRet.length} fundet, ${rettet} rettet, ${daarlige().length} tilbage`);
+  } catch (e) { log(`- Sætningsretning fejlede (${e.message.slice(0, 80)}) — ${foerRet.length} sætninger uændret`); }
+} else log('- Sætninger med uklare kilder/klistrede søgeord: 0');
 
 // Kilder: følg Googles omdirigering, kontrollér live, højst 4, ét pr. domæne.
 const { sat: kildeLinks, afvist: kildeAfvist } = await kontrollerKilder(kilder, 4);
@@ -251,6 +305,11 @@ ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
 log(`- Eksterne links inde i teksten: ${eksterneITekst}`);
 
 html += kildeliste(kildeLinks);
+
+// Sidste vagt (5/10-2026): ingen synlige markdown-rester må udgives. Rensningen ovenfor
+// fanger det normale; står der stadig noget, er det hellere en afvist artikel end en synlig fejl.
+const mdRest = markdownRest(html);
+if (mdRest) throw new Error(`Markdown-rest "${mdRest}" i artiklen — afvist`);
 
 const ord = html.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
 if (ord < 1000) throw new Error(`Artiklen er kun ${ord} ord — afvist (mindst 1000)`);
