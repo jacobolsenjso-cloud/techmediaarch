@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-04T18:43:42.882Z",
- "fra": "2026-09-28",
- "til": "2026-10-04",
+ "hentet": "2026-10-05T10:53:53.652Z",
+ "fra": "2026-09-29",
+ "til": "2026-10-05",
  "dage": 7,
  "sider": {
   "/2026/09/what-are-phishing-emails": {
@@ -12,13 +12,17 @@
    "visninger": 6,
    "brugere": 3
   },
+  "/2026/06/agentic-ai-vs-ai-agents-technical": {
+   "visninger": 5,
+   "brugere": 1
+  },
   "/2026/09/how-content-marketing-helps-seo": {
    "visninger": 5,
    "brugere": 4
   },
   "/2026/09/product-roadmap-vs-backlog": {
-   "visninger": 6,
-   "brugere": 3
+   "visninger": 5,
+   "brugere": 2
   },
   "/2026/09/what-are-zero-trust-security-models": {
    "visninger": 5,
@@ -32,25 +36,21 @@
    "visninger": 5,
    "brugere": 3
   },
-  "/2026/06/agentic-ai-vs-ai-agents-technical": {
-   "visninger": 6,
-   "brugere": 2
-  },
   "/2026/10/why-web-development-career": {
    "visninger": 4,
    "brugere": 2
   },
   "/2026/09/what-is-ransomware-cyber-security": {
-   "visninger": 5,
-   "brugere": 3
+   "visninger": 3,
+   "brugere": 2
   },
   "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
    "visninger": 2,
    "brugere": 2
   },
   "/2026/05/a-deep-dive-into-chinese-tech-brands": {
-   "visninger": 3,
-   "brugere": 2
+   "visninger": 2,
+   "brugere": 1
   },
   "/2026/05/quantum-threats-to-encryption-7-actions": {
    "visninger": 2,
@@ -70,10 +70,6 @@
   },
   "/2026/10/what-are-saas-product-companies": {
    "visninger": 2,
-   "brugere": 1
-  },
-  "/2024/08/experience-future-of-financial": {
-   "visninger": 1,
    "brugere": 1
   },
   "/2024/09/Eclipse Initiative Takes On Cybersecurity AI Regulations Industry to Take Note": {
@@ -101,8 +97,8 @@
    "brugere": 1
   },
   "/2026/04/mastering-chatgpt": {
-   "visninger": 2,
-   "brugere": 2
+   "visninger": 1,
+   "brugere": 1
   },
   "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
    "visninger": 1,
@@ -132,21 +128,13 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/hcl-tech-today-real-time-price-ai": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/05/quantum-computing-demystified-what-it": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/05/rephrasy-ai-review-2026-real-world": {
-   "visninger": 2,
-   "brugere": 2
+   "visninger": 1,
+   "brugere": 1
   },
   "/2026/05/unpacking-grubby-ai-is-this-humanizer": {
-   "visninger": 2,
-   "brugere": 2
+   "visninger": 1,
+   "brugere": 1
   },
   "/2026/06/blueprint-for-building-your-first": {
    "visninger": 1,

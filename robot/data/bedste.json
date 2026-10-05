@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-04T18:43:42.258Z",
- "fra": "2026-07-07",
- "til": "2026-10-04",
+ "hentet": "2026-10-05T10:53:53.057Z",
+ "fra": "2026-07-08",
+ "til": "2026-10-05",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -10,7 +10,7 @@
    "brugere": 26
   },
   "/2026/06/agentic-ai-vs-ai-agents-technical": {
-   "visninger": 28,
+   "visninger": 29,
    "brugere": 6
   },
   "/2026/09/what-are-phishing-emails": {
