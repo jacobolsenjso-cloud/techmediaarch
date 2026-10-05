@@ -137,6 +137,13 @@ if (PROD) {
   if (r.status !== 301 || loc !== 'https://www.techmediaarch.com/2024/09/faq.html?x=1') fejl.push(`uden www: ventede 301 til www, fik ${r.status} ${loc}`);
 }
 
+// 7: POST til ukendte adresser skal give 404, ikke 500 (5/10-2026: scannere gav "ReadableStream is disturbed")
+for (const s of ['/login', '/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php']) {
+  const r = await fetch(BASE + s, { method: 'POST', body: 'a=1', redirect: 'manual' }); await r.arrayBuffer();
+  console.log(`POST ${s}: ${r.status}`);
+  if (r.status !== 404) fejl.push(`POST ${s}: ventede 404, fik ${r.status}`);
+}
+
 console.log(`fejl: ${fejl.length}`);
 fejl.slice(0, 40).forEach((f) => console.log('  ' + f));
 process.exitCode = fejl.length ? 1 : 0;
