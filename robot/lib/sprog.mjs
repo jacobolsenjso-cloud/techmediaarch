@@ -55,7 +55,10 @@ export function uklarKilde(s) {
   const t = synlig(s).replace(/\s+/g, ' ').trim();
   for (const m of t.matchAll(VAG_IFLG)) return m[0];
   for (const m of t.matchAll(VAG_SUBJ)) {
-    const foer = t.slice(0, m.index).trim().split(' ').pop() || '';
+    const ord2 = t.slice(0, m.index).trim().split(' ').slice(-2);
+    const foer = ord2[ord2.length - 1] || '';
+    // Ejerform peger på en navngiven kilde: "The company's financial reports show" (5/10, gammel artikel)
+    if (ord2.some((w) => /(['’]s|s['’])$/i.test(w) || /^(its|their)$/i.test(w))) continue;
     if (/^(the|these|those|its|their|his|her|our|whose)$/i.test(foer)) continue;      // peger tilbage
     if (/^[A-Z0-9][\w&.'’-]*$/.test(foer) && !/[.!?:;]$/.test(foer)) continue;          // navngivet: "IBM researchers"
     return m[0];
