@@ -107,3 +107,33 @@ export function fjernGentagelser(html) {
   });
   return { html: ud, fjernet, afsnit, enSaetning };
 }
+
+// --- Fyldsætninger (Jacob 5/10-2026) -----------------------------------------
+// Prøve #24 havde sætninger, der intet siger ("Corporate executives depend on both disciplines ...").
+// Gemini udpeger dem i artikel.mjs; her findes de sætninger, der MÅ fjernes, og de fjernes uden at
+// noget omskrives. Kun brødtekst før FAQ, ikke første afsnit (det korte svar), ikke lister. Sætninger
+// med HTML (links, fed), tal, eller som slutter med ":" (indleder en liste) røres aldrig.
+function kropAfsnit(html) {
+  const faqPos = String(html).search(/<h[23][^>]*>\s*(?:<[^>]+>\s*)*(?:FAQ|Frequently Asked Questions)/i);
+  const alle = [...String(html).matchAll(/<p\b[^>]*>((?:(?!<\/?p[\s>])[\s\S])*?)<\/p>/gi)].filter((m) => faqPos < 0 || m.index < faqPos);
+  return alle.slice(1); // første afsnit = det korte svar
+}
+const delSaetninger = (indre) => indre.split(/(?<=[.!?])\s+(?=[A-Z"“])/).map((s) => s.trim()).filter(Boolean);
+export function fyldKandidater(html) {
+  const ud = [];
+  for (const m of kropAfsnit(html)) for (const s of delSaetninger(m[1])) if (!/[<>\d]/.test(s) && !/:\s*$/.test(s) && s.split(/\s+/).length >= 5 && !ud.includes(s)) ud.push(s);
+  return ud;
+}
+export function antalKropSaetninger(html) { return kropAfsnit(html).reduce((n, m) => n + delSaetninger(m[1]).length, 0); }
+// Fjerner de givne sætninger (højst maks), ét afsnit ad gangen; et afsnit, der bliver tomt, fjernes helt.
+export function fjernSaetninger(html, liste, maks) {
+  let ud = String(html), fjernet = 0;
+  for (const m of kropAfsnit(ud)) {
+    const dele = delSaetninger(m[1]); const behold = [];
+    for (const s of dele) { if (fjernet < maks && liste.includes(s)) fjernet++; else behold.push(s); }
+    if (behold.length === dele.length) continue;
+    const aabn = m[0].match(/^<p\b[^>]*>/i)[0];
+    ud = ud.replace(m[0], () => (behold.length ? `${aabn}${behold.join(' ')}</p>` : ''));
+  }
+  return { html: ud, fjernet };
+}

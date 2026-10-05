@@ -25,7 +25,7 @@ import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
-import { delAfsnit, fjernGentagelser } from './lib/afsnit.mjs';
+import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger } from './lib/afsnit.mjs';
 import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord } from './lib/sprog.mjs';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
@@ -70,6 +70,7 @@ const kandListe = [...linkKand.slice(0, 12), ...iEmne].filter((m, i, arr) => arr
 // Kun artikler, der reelt handler om det samme. Prøveartikel 2 (26/9) fik tvunget
 // 3 links ind via ordet "market" (bl.a. Trump/Stargate) — relevans vinder over antal.
 let interne = [];
+let relevante = []; // karakter 2-3: kun dem får et link TIL den nye artikel (trin 8)
 if (kandListe.length) {
   // Karakter 0-3 i stedet for ja/nej: målt 26/9 (kørsel #11-13) svarede den
   // billige model [] på et ja/nej-spørgsmål, selv med DeepSeek/ChatGPT-artikler
@@ -79,12 +80,24 @@ Rate each existing article for how useful it would be as a "further reading" lin
 3 = same subject, 2 = closely related subject a reader would likely want next, 1 = loosely related, 0 = unrelated (sharing a generic word like "AI" or "market" is not enough for 2).
 Return JSON {"ratings":[{"n": number, "score": 0-3}]} covering every article.
 ${kandListe.map((k, i) => `${i + 1}. ${k.titel}`).join('\n')}`);
-  const karakterer = (Array.isArray(rel.ratings) ? rel.ratings : []).map((r) => ({ k: kandListe[parseInt(r.n, 10) - 1], score: Number(r.score) || 0 }))
-    .filter((r) => r.k && r.score >= 2).sort((x, y) => y.score - x.score);
+  const alleKar = (Array.isArray(rel.ratings) ? rel.ratings : []).map((r) => ({ k: kandListe[parseInt(r.n, 10) - 1], score: Number(r.score) || 0 })).filter((r) => r.k);
+  const karakterer = alleKar.filter((r) => r.score >= 2).sort((x, y) => y.score - x.score);
   log(`- Karakterer ≥2: ${karakterer.map((r) => `${r.score}: ${r.k.titel.slice(0, 50)}`).join(' | ') || 'ingen'}`);
   interne = karakterer.map((r) => r.k).filter((k, i, arr) => arr.indexOf(k) === i).slice(0, 5);
+  relevante = [...interne];
+  // Mindst 2 interne links (Jacob 5/10-2026): prøve #23 og #24 fik 0, fordi ingen af 13 kandidater fik 2+.
+  // Fyldes op med karakter 1 ("løst beslægtet") fra SAMME emne, mest lignende først. Karakter 0 kommer
+  // aldrig med (26/9-reglen: hellere færre end forkerte). Links fra ældre artikler bruger kun de relevante.
+  if (interne.length < 2) {
+    const iEmneSti = new Set(iEmne.map((m) => m.sti));
+    const ekstra = alleKar.filter((r) => r.score === 1 && iEmneSti.has(r.k.sti) && !interne.includes(r.k))
+      .sort((x, y) => kandListe.indexOf(x.k) - kandListe.indexOf(y.k)).map((r) => r.k)
+      .filter((k, i, arr) => arr.indexOf(k) === i).slice(0, 2 - interne.length);
+    interne = [...interne, ...ekstra];
+    log(`- Løst beslægtede (karakter 1, samme emne) lagt til: ${ekstra.length}${ekstra.length ? ` (${ekstra.map((k) => k.titel.slice(0, 40)).join(' | ')})` : ''}`);
+  }
 }
-log(`- Interne link-kandidater: ${kandListe.length}, relevante ifølge Gemini: ${interne.length}`);
+log(`- Interne link-kandidater: ${kandListe.length}, relevante ifølge Gemini: ${relevante.length}, til artiklen i alt: ${interne.length}`);
 
 // --- 3. Research: søg og saml fakta med kilder ------------------------------
 // Målt 26/9: når Gemini både skal søge OG skrive, springer den ofte søgningen
@@ -122,6 +135,7 @@ Rules:
 - Paragraphs like a news site (Jacob 5/10-2026): most paragraphs are 2-3 connected sentences, at most 40 words. Use a one-sentence paragraph only now and then for emphasis, never several in a row.
 - Attribute a fact once, where it first appears. Vary how sources are named and where ("CompTIA defines ...", "..., according to Coursera"); sentences that explain, compare or give context need no source. Never start most sentences with "X notes/reports/states that".
 - Never repeat a fact, number or sentence that already appears in another section (the FAQ may summarise).
+- Every sentence must tell the reader something concrete: a fact, a definition, an example, a step or a clear comparison. No generic filler that could sit in any article on the topic ("Both roles are critical for modern organizations.", "Companies must invest in skilled personnel.").
 - Include at least 2 lists (<ul> or <ol>, 3-6 items each) where they genuinely help the reader: steps, options, key differences, benefits or risks. Introduce each list with one sentence.
 - The first paragraph is a short, direct answer to the main keyword: 2 sentences, at most 50 words, plain language. Context and numbers come after it.
 - Search phrases are often ungrammatical ("what is phishing attack", "how does seo work"). Never paste a keyword verbatim into a sentence where it reads wrongly; write correct English ("how phishing attacks work"). Never put keywords in bold, quotes or <strong>.
@@ -141,7 +155,7 @@ const ordI = (h) => h.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).leng
 if (ordI(html) < 1500) {
   log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1500.`);
   const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1600 words by deepening the existing sections with concrete explanations, examples and practical guidance. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
-Keep the first paragraph exactly as it is (it is a short direct answer). Most paragraphs 2-3 connected sentences, at most 40 words, never several one-sentence paragraphs in a row; keep the existing lists. Name the source of numbers and statistics once, varying how; no vague attributions ("experts say", "studies show"). Never repeat a fact or sentence that is already in the article. Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
+Keep the first paragraph exactly as it is (it is a short direct answer). Most paragraphs 2-3 connected sentences, at most 40 words, never several one-sentence paragraphs in a row; keep the existing lists. Name the source of numbers and statistics once, varying how; no vague attributions ("experts say", "studies show"). Never repeat a fact or sentence that is already in the article. Every new sentence must add something concrete (a fact, definition, example, step or comparison); no generic filler. Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
 Output ONLY the full expanded article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>).
 
 ${html}`);
@@ -256,6 +270,25 @@ ${kandAfsnit.slice(0, 30).map((p, i) => `${i + 1}. ${p}`).join('\n')}`);
 // Korte afsnit (Jacob 5/10-2026): for lange afsnit deles mellem sætningerne (ingen ord ændres), robot/lib/afsnit.mjs
 { const d = delAfsnit(html); html = d.html; log(`- Afsnit delt: ${d.delt}`); }
 { const g = fjernGentagelser(html); html = g.html; log(`- Gentagne afsnit fjernet: ${g.fjernet} · afsnit med kun én sætning: ${g.enSaetning} af ${g.afsnit}`); }
+// Fyldsætninger (Jacob 5/10-2026): Gemini udpeger sætninger, læseren intet lærer af; de fjernes uden omskrivning.
+// Højst hver 5. sætning i brødteksten, så en for ivrig vurdering ikke kan tømme artiklen. Se robot/lib/afsnit.mjs.
+{
+  const kand = fyldKandidater(html);
+  if (kand.length) {
+    try {
+      const r = await json(`Below are numbered sentences from an article about "${valgt.hoved}".
+Mark only the FILLER sentences: generic statements a reader learns nothing from, which could sit in any article on the topic, with no concrete fact, definition, example, step or comparison.
+Examples of filler: "Both roles are critical for modern organizations." "Companies must invest in skilled personnel." "Malicious actors constantly evolve their tactics."
+Do NOT mark sentences that explain how something works, define a term, compare two things, give an example or tell the reader what to do. When unsure, do not mark.
+Return JSON {"filler": [numbers]}.
+${kand.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
+      const valgte = [...new Set((Array.isArray(r.filler) ? r.filler : []).map((n) => parseInt(n, 10)))].filter((n) => n >= 1 && n <= kand.length).map((n) => kand[n - 1]);
+      const maks = Math.floor(antalKropSaetninger(html) / 5);
+      const f = fjernSaetninger(html, valgte, maks); html = f.html;
+      log(`- Fyldsætninger: ${valgte.length} udpeget, ${f.fjernet} fjernet (loft ${maks})${f.fjernet ? ` — fx "${valgte[0].slice(0, 90)}"` : ''}`);
+    } catch (e) { log(`- Fyldsætninger: tjek fejlede (${e.message.slice(0, 80)}) — intet fjernet`); }
+  } else log('- Fyldsætninger: ingen kandidater');
+}
 
 // Kilder: følg Googles omdirigering, kontrollér live, højst 4, ét pr. domæne.
 const { sat: kildeLinks, afvist: kildeAfvist } = await kontrollerKilder(kilder, 4);
@@ -365,7 +398,7 @@ fs.writeFileSync(sti(`src/content/posts/${aar}/${md}/${navn}.md`), `${fm}\n${htm
 // updated-dato, fordi ingen ord er ændret (samme regel som techfeedwatch 23/9).
 const nyHref = kodet(`/${aar}/${md}/${navn}`);   // uden .html (29/9-2026)
 const tilbage = [];
-for (const g of interne.slice(0, 3)) {
+for (const g of relevante.slice(0, 3)) {
   try {
     const [, ga, gm, gn] = g.sti.match(/^\/(\d{4})\/(\d{2})\/(.+?)(?:\.html)?$/) || [];
     if (!ga) continue;
