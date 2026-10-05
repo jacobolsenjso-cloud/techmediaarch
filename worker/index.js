@@ -133,7 +133,10 @@ async function haandter(request, env) {
 
   // Ukendt adresse: vis 404-siden med den rigtige statuskode
   // ("/404" - med drop-trailing-slash ville "/404.html" give en omdirigering)
-  const side404 = await env.ASSETS.fetch(new Request(new URL('/404', url), request));
+  // 5/10-2026: ny Request uden den oprindelige krop. Med `request` som skabelon gav POST (sårbarhedsscannere,
+  // fx /login og /vendor/phpunit/…) fejlen "ReadableStream is disturbed" og svar 500, fordi kroppen allerede
+  // var læst ovenfor (env.ASSETS.fetch(request)). Målt i Cloudflare Observability: 12 sådanne fejl 4/10.
+  const side404 = await env.ASSETS.fetch(new Request(new URL('/404', url), { method: request.method === 'HEAD' ? 'HEAD' : 'GET' }));
   return new Response(side404.body, { status: 404, headers: side404.headers });
 }
 
@@ -143,7 +146,7 @@ async function haandter(request, env) {
 // /feeds/pages/default, etiket-stien /-/Etiket, start-index, max-results og JSONP (callback).
 // Data er genereret ved buildet (src/pages/feed-data/*.json.ts).
 async function hentData(env, request, fil) {
-  const r = await env.ASSETS.fetch(new Request(new URL(fil, request.url), request));
+  const r = await env.ASSETS.fetch(new Request(new URL(fil, request.url), { method: 'GET' }));   // 5/10: uden krop, se 404 ovenfor
   return r.ok ? r.json() : [];
 }
 async function bloggerFeed(url, sti, alt, env, request) {
