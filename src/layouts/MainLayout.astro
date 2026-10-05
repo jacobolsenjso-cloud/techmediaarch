@@ -244,7 +244,10 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
          Indholdet er flyttet ordret, så her styles de elementer, Blogger-indlæggene
          faktisk bruger: tabeller (116 indlæg), citater (121), YouTube-rammer (129),
          billeder med billedtekst (tr-caption-container) og centrerede billeder (separator). */
-      .post-body { line-height: 1.8; font-size: 1.05rem; margin-bottom: 30px; overflow-wrap: break-word; }
+      .post-body { line-height: 1.65; font-size: 1.05rem; margin-bottom: 30px; overflow-wrap: break-word; }
+      /* Læsebredde (Jacob 5/10-2026, forslag 5): før 787 px ≈ 90 tegn pr. linje og linjeafstand 1,8. Nu højst
+         680 px ≈ 75 tegn og 1,65. Billeder, tabeller, video og sitets bokse bruger stadig hele bredden. */
+      .post-body :is(p, ul, ol, h2, h3, h4, blockquote) { max-width: 680px; }
       /* Mørk tilstand (29/9): Blogger lagde hvid baggrund og mørk tekstfarve direkte i teksten (style="…").
          I mørk tilstand gav det lys tekst på hvide felter (kontrast 1,1). Kun Bloggers faste værdier nulstilles
          — alle forekomster er talt med robot/ud/_inline-farver.mjs; røde/blå farver røres ikke. */
@@ -480,6 +483,8 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
               <a href="/p/contact-us" class="footer-link">Contact Us</a><span class="footer-sep">|</span>
               <a href="/p/copyright-trademark-and-patent" class="footer-link">Copyright &amp; Trademark</a><span class="footer-sep">|</span>
               <a href="/p/disclosure" class="footer-link">Disclosure</a><span class="footer-sep">|</span>
+              {/* Editorial Guidelines (5/10, Jacob): ny side, alfabetisk plads */}
+              <a href="/p/editorial-guidelines" class="footer-link">Editorial Guidelines</a><span class="footer-sep">|</span>
               <a href="/p/faq" class="footer-link">F.A.Q.</a><span class="footer-sep">|</span>
               <a href="/p/privacy-policy" class="footer-link">Privacy Policy</a><span class="footer-sep">|</span>
               <a href="/rss.xml" class="footer-link">RSS</a><span class="footer-sep">|</span>

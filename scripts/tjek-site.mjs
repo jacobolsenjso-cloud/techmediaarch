@@ -135,6 +135,9 @@ for (const f of html) {
   const krop = tekst((s.match(/<body[\s\S]*<\/body>/) || [''])[0]);
   const raa = krop.match(RAA_KODE);
   if (raa) fejl.push(`RÅ genvejskode ${raa[0]} synlig på ${f}`);
+  // Markdown-rester (5/10-2026: "**what is phishing attack**" stod synligt i en robotartikel)
+  const md = krop.match(/\*\*[^*]{1,200}\*\*|`[^`]{1,100}`/);
+  if (md) fejl.push(`MARKDOWN-rest «${md[0].slice(0, 60)}» synlig på ${f}`);
   for (const [, j] of s.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     ldJson++; if (j.includes('"FAQPage"')) faqSider.add(f);
     try { JSON.parse(j); } catch { fejl.push(`UGYLDIG JSON-LD på ${f}`); }
