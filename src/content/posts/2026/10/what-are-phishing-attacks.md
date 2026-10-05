@@ -2,7 +2,7 @@
 title: "What Are Phishing Attacks and How Do They Work"
 description: "Learn what phishing attacks are, how cybercriminals use deceptive emails to steal sensitive data, and why this persistent cyber threat matters today."
 published: 2026-10-04T13:17:43.589Z
-updated: 2026-10-05T12:00:00.000+02:00
+updated: 2026-10-05T10:25:33.081Z
 labels:
   - Infosec
   - Video
@@ -24,7 +24,7 @@ robot: true
 
 <h2>How Phishing Operates as a Social Engineering Tactic</h2>
 
-<p>A frequent point of discussion among security professionals centers on whether phishing is a <a href="https://www.crowdstrike.com/en-us/cybersecurity-101/social-engineering/phishing-attack/" rel="noopener" target="_blank">social engineering attack</a>. Security researchers confirm that phishing is a direct form of social engineering, meaning it exploits human psychology, trust, and error rather than directly hacking software code. Instead of targeting system vulnerabilities, unpatched software flaws, or firewall misconfigurations, attackers target human behavior. They recognize that users are often the weakest link in any security chain, prone to distraction, fatigue, and cognitive biases that make them susceptible to manipulation.</p>
+<p>A frequent point of discussion among security professionals centers on whether phishing is a <a href="https://www.crowdstrike.com/en-us/cybersecurity-101/social-engineering/phishing-attack/" rel="noopener" target="_blank">social engineering attack</a>. Phishing is a direct form of social engineering, meaning it exploits human psychology, trust, and error rather than directly hacking software code. Instead of targeting system vulnerabilities, unpatched software flaws, or firewall misconfigurations, attackers target human behavior. They recognize that users are often the weakest link in any security chain, prone to distraction, fatigue, and cognitive biases that make them susceptible to manipulation.</p>
 
 <p>By manipulating emotions such as fear, urgency, or curiosity, attackers convince targets to bypass security protocols voluntarily. For instance, a message warning that an employee's bank account will be closed within hours induces panic, short-circuiting rational thought and driving the victim to click a malicious link immediately. This psychological manipulation makes traditional software patches ineffective on their own, because no firewall can prevent a user from willingly handing over their password to a fraudulent portal. Security awareness training must address human behavior directly to counteract these manipulative techniques effectively, teaching personnel to pause, verify, and question unexpected requests regardless of how authoritative the sender appears.</p>
 
@@ -32,7 +32,7 @@ robot: true
 
 <p>To understand the danger of these campaigns, analysts must examine what phishing attacks are designed to do. Phishing attacks are designed to manipulate victims into taking harmful actions, such as sharing login credentials, disclosing credit card numbers, wiring money, or downloading malware like ransomware. Once attackers gain initial access through these stolen credentials, they often deploy malicious payloads to lock down enterprise networks, exfiltrate proprietary intellectual property, or demand extortion payments from executive leadership.</p>
 
-<p>Data breaches caused by phishing cost organizations an average of USD $4.88 million per incident, according to enterprise cost reports. This staggering financial figure includes regulatory fines, forensic investigation costs, legal fees, customer notification expenses, and long-term brand reputation damage. Furthermore, FBI Internet Crime Complaint Center (IC3) data indicates that phishing and spoofing generated roughly $215.8 million in <a href="https://heimdalsecurity.com/blog/phishing-statistics-analysis/" rel="noopener" target="_blank">reported direct losses in 2025</a> alone. These financial figures highlight the severe economic damage inflicted by successful credential harvesting, proving that phishing is not merely an IT nuisance but a severe enterprise risk with direct bottom-line consequences.</p>
+<p>Data breaches caused by phishing cost organizations an average of USD $4.88 million per incident. This staggering financial figure includes regulatory fines, forensic investigation costs, legal fees, customer notification expenses, and long-term brand reputation damage. Furthermore, FBI Internet Crime Complaint Center (IC3) data indicates that phishing and spoofing generated roughly $215.8 million in <a href="https://heimdalsecurity.com/blog/phishing-statistics-analysis/" rel="noopener" target="_blank">reported direct losses in 2025</a> alone. These financial figures highlight the severe economic damage inflicted by successful credential harvesting, proving that phishing is not merely an IT nuisance but a severe enterprise risk with direct bottom-line consequences.</p>
 
 <div style="text-align:center;"><iframe allowfullscreen="true" height="360" src="https://www.youtube.com/embed/gWGhUdHItto?rel=0" width="640"></iframe></div><h2>The Statistical Weight of Phishing in Cyber Breaches</h2>
 
