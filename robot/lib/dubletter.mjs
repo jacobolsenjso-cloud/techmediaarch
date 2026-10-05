@@ -18,6 +18,13 @@ import { kerne, normaliser, daekning } from './tekst.mjs';
 // Kun den ene = den ene dækker den anden → TVIVL, Gemini afgør (lag 3).
 export const GRAENSE = { afvist: 0.75, tvivl: 0.75 };
 
+// Delvist overlap (Jacob 5/10-2026, forslag 4): "what are phishing attacks" blev
+// skrevet, selv om "What Are Phishing Emails…" fandtes, fordi kun 1 kerneord var
+// fælles ("phishing"), og lag 2 kræver 2. Står mindst halvdelen af det nye søgeords
+// kerne i en eksisterende artikel, skal Gemini (lag 3) også afgøre "fri"-søgeord.
+export const DELVIS = 0.5;
+export const delvistOverlap = (q, indeks) => (mestEns(q, indeks, 1)[0]?.andel || 0) >= DELVIS;
+
 export function lavIndeks(artikler, brugte = []) {
   const ind = [];
   for (const a of artikler) {
@@ -82,7 +89,8 @@ export async function geminiSammeHensigt(q, kandidater, { model = 'gemini-3.5-fl
   const noegle = process.env.GEMINI_API_KEY;
   if (!noegle || !kandidater.length) return null;
   const liste = kandidater.map((c, i) => `${i + 1}. ${c.tekst}`).join('\n');
-  const prompt = `New article keyword: "${q}"\nExisting articles:\n${liste}\n\nWould a reader searching the new keyword be fully served by one of the existing articles (same search intent)? Answer only JSON: {"same": true|false, "number": <number or 0>}`;
+  // 5/10-2026: "fully served" var for strengt til delvist overlap — nu "samme kerneemne".
+  const prompt = `New article keyword: "${q}"\nExisting articles:\n${liste}\n\nWould a reader searching the new keyword get their question answered by one of the existing articles, because it covers the same core topic and search intent, even if worded differently (e.g. "what are phishing attacks" vs. "What Are Phishing Emails and How Do Cyberattacks Work?")? A narrower sub-topic with its own clear intent (e.g. "ransomware canary files" vs. "what is ransomware") is NOT the same. Answer only JSON: {"same": true|false, "number": <number or 0>}`;
   try {
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: 'POST',

@@ -18,7 +18,7 @@ import path from 'node:path';
 import { hentForslag, omFroe } from './lib/autoforslag.mjs';
 import { harAdgang, hentSoegninger } from './lib/searchconsole.mjs';
 import { artikler, antalPrEmne, brugte, proevedeForNylig, emner, sti } from './lib/arkiv.mjs';
-import { lavIndeks, tjek, sammenlign, mestEns, geminiSammeHensigt } from './lib/dubletter.mjs';
+import { lavIndeks, tjek, sammenlign, mestEns, geminiSammeHensigt, delvistOverlap } from './lib/dubletter.mjs';
 import { kerne, normaliser } from './lib/tekst.mjs';
 
 const arg = (navn, std) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? process.argv[i + 1] : std; };
@@ -74,7 +74,7 @@ function naboer(x, vurderet) {
 const valgteIndeks = []; // hovedsøgeord valgt i DENNE kørsel — så to pakker ikke bliver ens
 const brugteBes = new Set(); // beslægtede søgeord brugt i denne kørsel
 const resultat = {};
-let geminiKoert = 0;
+let geminiKoert = 0; let geminiDelvis = 0;
 for (const emne of emneListe) {
   // omFroe køres også her, så gemte forslag (--fra) får samme filter som nye.
   const liste = (raa[emne] || []).filter((x, i, a) => a.findIndex((y) => y.q === x.q) === i && (froe[emne] || []).includes(x.froe) && omFroe(x.q, x.froe));
@@ -103,11 +103,18 @@ for (const emne of emneListe) {
     if (valgteIndeks.some((v) => sammenlign(hk, v.kerne))) continue;
     if (brugteBes.has(normaliser(h.q))) continue;
     // Tvivl: lag 3 (Gemini) afgør, hvis nøglen findes. Ellers markeres den.
+    // 5/10-2026: også "fri" med delvist overlap (robot/lib/dubletter.mjs, DELVIS).
     let lag3 = null;
-    if (h.dom === 'tvivl') {
+    const delvis = h.dom === 'fri' && delvistOverlap(h.q, indeks);
+    if (h.dom === 'tvivl' || delvis) {
       lag3 = await geminiSammeHensigt(h.q, mestEns(h.q, indeks, 10));
-      if (lag3) geminiKoert++;
-      if (lag3?.samme) { h.dom = 'afvist'; h.grund = 'Gemini: samme hensigt'; h.mod = lag3.mod?.tekst || h.mod; continue; }
+      if (lag3) { geminiKoert++; if (delvis) geminiDelvis++; }
+      if (lag3?.samme) {
+        h.dom = 'afvist'; h.grund = delvis ? 'Gemini: samme hensigt (delvist overlap)' : 'Gemini: samme hensigt'; h.mod = lag3.mod?.tekst || h.mod;
+        // Også i læselistens "Afvist", så man kan se, hvad Gemini stoppede
+        Object.assign(vurderet.find((x) => x.q === h.q) || {}, { dom: 'afvist', grund: h.grund, mod: h.mod });
+        continue;
+      }
     }
     // Beslægtede: fra samme startord og ikke selv en eksisterende artikel.
     // Tættest på hovedet først: flest fælles kerneord UDOVER startordet (ellers
@@ -189,7 +196,7 @@ L.push(`# Søgeordsliste — techmediaarch.com`, '', `Lavet ${dato} UTC. Kun til
 const sumP = Object.values(resultat).reduce((s, r) => s + r.pakker.length, 0);
 const sumF = Object.values(resultat).reduce((s, r) => s + r.forslag, 0);
 const sumA = Object.values(resultat).reduce((s, r) => s + r.afvist.length, 0);
-L.push(`**${sumF}** spørgsmål fra Google · **${sumA}** afvist som dubletter · **${sumP}** pakker foreslået · Gemini-tjek (lag 3): ${geminiKoert ? `${geminiKoert} kørt` : process.env.GEMINI_API_KEY ? 'ikke brugt (ingen tvivlstilfælde blandt de valgte)' : 'ikke kørt (ingen nøgle)'}`, '');
+L.push(`**${sumF}** spørgsmål fra Google · **${sumA}** afvist som dubletter · **${sumP}** pakker foreslået · Gemini-tjek (lag 3): ${geminiKoert ? `${geminiKoert} kørt (heraf ${geminiDelvis} for delvist overlap)` : process.env.GEMINI_API_KEY ? 'ikke brugt (ingen tvivlstilfælde blandt de valgte)' : 'ikke kørt (ingen nøgle)'}`, '');
 for (const emne of emneListe) {
   const r = resultat[emne];
   L.push(`## ${emne} — ${r.antal} artikler i dag`, '', `${r.forslag} forslag: ${r.fri} fri, ${r.tvivl} tvivl, ${r.afvist.length} afvist.`, '');
