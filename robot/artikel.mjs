@@ -25,6 +25,7 @@ import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
+import { delAfsnit } from './lib/afsnit.mjs';
 import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord } from './lib/sprog.mjs';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
@@ -118,6 +119,8 @@ Rules:
 - Write like a technology journalist at a news publication, not like an analyst or a marketer (Jacob 28/9-2026):
   lead with the most important facts, attribute facts to their source in the sentence ("according to IBM", "NIST defines ..."),
   short paragraphs, concrete examples, neutral tone, no hype words, no "our analysis", "the verdict" or "key takeaways" framing.
+- Paragraphs like a news site (Jacob 5/10-2026): 1-3 sentences and at most 40 words each. A one-sentence paragraph is fine.
+- Include at least 2 lists (<ul> or <ol>, 3-6 items each) where they genuinely help the reader: steps, options, key differences, benefits or risks. Introduce each list with one sentence.
 - The first paragraph is a short, direct answer to the main keyword: 2 sentences, at most 50 words, plain language. Context and numbers come after it.
 - Search phrases are often ungrammatical ("what is phishing attack", "how does seo work"). Never paste a keyword verbatim into a sentence where it reads wrongly; write correct English ("how phishing attacks work"). Never put keywords in bold, quotes or <strong>.
 - Every factual claim names its source from the facts (an organization, agency, company or publication). Never use vague attributions such as "experts say", "industry experts note", "researchers confirm", "analysts point out", "studies show" or "according to market research".
@@ -136,7 +139,7 @@ const ordI = (h) => h.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).leng
 if (ordI(html) < 1500) {
   log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1500.`);
   const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1600 words by deepening the existing sections with concrete explanations, examples and practical guidance. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
-Keep the first paragraph exactly as it is (it is a short direct answer). Name the source of every fact; no vague attributions ("experts say", "studies show"). Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
+Keep the first paragraph exactly as it is (it is a short direct answer). Paragraphs of 1-3 sentences and at most 40 words; keep the existing lists. Name the source of every fact; no vague attributions ("experts say", "studies show"). Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
 Output ONLY the full expanded article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>).
 
 ${html}`);
@@ -224,6 +227,32 @@ ${foerRet.map((x, i) => `${i + 1}. [${[x.uklar && 'VAGUE', x.klistret && 'PHRASE
     log(`- Sætninger med uklare kilder/klistrede søgeord: ${foerRet.length} fundet, ${rettet} rettet, ${daarlige().length} tilbage`);
   } catch (e) { log(`- Sætningsretning fejlede (${e.message.slice(0, 80)}) — ${foerRet.length} sætninger uændret`); }
 } else log('- Sætninger med uklare kilder/klistrede søgeord: 0');
+
+// Lister (Jacob 5/10-2026): mindst 2. Mangler de, omskriver Gemini 1-2 afsnit, hvor en liste hjælper læseren.
+// Kun hvis afsnittet findes ordret, alle links bevares, og næsten alle ord er med (ingen fakta forsvinder).
+const antalLister = () => (html.match(/<(ul|ol)\b/gi) || []).length;
+if (antalLister() < 2) {
+  // Ikke FAQ-svarene (FAQ-boksen og FAQ-dataene bygger på dem) og ikke første afsnit (det korte svar)
+  const faqPos = html.search(/<h2[^>]*>\s*(?:FAQ|Frequently Asked Questions)/i);
+  const kandAfsnit = [...html.matchAll(/<p\b[^>]*>[\s\S]*?<\/p>/gi)].filter((m) => faqPos < 0 || m.index < faqPos).map((m) => m[0])
+    .filter((p) => antalOrd(p) >= 35 && antalOrd(p) <= 140 && p !== foersteAfsnit(html));
+  try {
+    const r = await json(`From an article about "${valgt.hoved}", choose ${2 - antalLister()} of the numbered paragraphs where a bulleted or numbered list would genuinely help the reader (steps, options, differences, benefits or risks), and rewrite each as one short intro sentence in <p> followed by a <ul> or <ol> with 3-6 <li> items.
+Keep every fact, number and name; add nothing. Keep every <a ...>...</a> tag exactly. No markdown, no bold keywords.
+Return JSON {"lists":[{"n": number, "html": "<p>...</p><ul><li>...</li></ul>"}]}
+${kandAfsnit.slice(0, 30).map((p, i) => `${i + 1}. ${p}`).join('\n')}`);
+    let lavet = 0;
+    for (const x of (Array.isArray(r.lists) ? r.lists : []).slice(0, 2)) {
+      const fra = kandAfsnit[parseInt(x.n, 10) - 1]; const til = rensMarkdown(String(x.html || '').trim());
+      if (!fra || !html.includes(fra) || !/<(ul|ol)\b/i.test(til) || hrefs(til) !== hrefs(fra) || antalOrd(til) < antalOrd(fra) * 0.8 || uklarKilde(til)) continue;
+      html = html.replace(fra, () => til); lavet++;
+    }
+    log(`- Lister: ${antalLister() - lavet} skrevet af Gemini, ${lavet} lavet bagefter → ${antalLister()} i alt`);
+  } catch (e) { log(`- Lister: ${antalLister()} (omskrivning fejlede: ${e.message.slice(0, 80)})`); }
+} else log(`- Lister: ${antalLister()}`);
+
+// Korte afsnit (Jacob 5/10-2026): for lange afsnit deles mellem sætningerne (ingen ord ændres), robot/lib/afsnit.mjs
+{ const d = delAfsnit(html); html = d.html; log(`- Afsnit delt: ${d.delt}`); }
 
 // Kilder: følg Googles omdirigering, kontrollér live, højst 4, ét pr. domæne.
 const { sat: kildeLinks, afvist: kildeAfvist } = await kontrollerKilder(kilder, 4);
