@@ -1,5 +1,5 @@
 {
- "hentet": "2026-10-05T10:53:53.057Z",
+ "hentet": "2026-10-05T16:08:22.483Z",
  "fra": "2026-07-08",
  "til": "2026-10-05",
  "dage": 90,
@@ -37,13 +37,13 @@
    "visninger": 6,
    "brugere": 3
   },
+  "/2026/09/how-content-marketing-helps-seo": {
+   "visninger": 6,
+   "brugere": 4
+  },
   "/2024/08/tube-magic-ai-tools-for-growing-on": {
    "visninger": 5,
    "brugere": 1
-  },
-  "/2026/09/how-content-marketing-helps-seo": {
-   "visninger": 5,
-   "brugere": 4
   },
   "/2026/09/product-roadmap-vs-backlog": {
    "visninger": 6,
@@ -69,6 +69,10 @@
    "visninger": 5,
    "brugere": 3
   },
+  "/2026/05/stop-losing-rankings-how-to-find-and": {
+   "visninger": 4,
+   "brugere": 3
+  },
   "/2026/05/the-best-ai-detector-free-tools-to-spot": {
    "visninger": 6,
    "brugere": 4
@@ -85,9 +89,17 @@
    "visninger": 3,
    "brugere": 2
   },
+  "/2026/09/what-is-python-used-for": {
+   "visninger": 3,
+   "brugere": 2
+  },
   "/2026/09/what-is-ransomware-cyber-security": {
    "visninger": 6,
    "brugere": 4
+  },
+  "/2026/10/what-are-ransomware-canary-files": {
+   "visninger": 3,
+   "brugere": 2
   },
   "/2024/08/experience-future-of-financial": {
    "visninger": 2,
@@ -130,8 +142,8 @@
    "brugere": 2
   },
   "/2026/05/decoding-power-of-fintech-what": {
-   "visninger": 2,
-   "brugere": 1
+   "visninger": 3,
+   "brugere": 2
   },
   "/2026/05/google-workspace-studio-analysts-take": {
    "visninger": 2,
@@ -153,15 +165,11 @@
    "visninger": 4,
    "brugere": 3
   },
-  "/2026/05/stop-losing-rankings-how-to-find-and": {
-   "visninger": 2,
-   "brugere": 2
-  },
   "/2026/09/product-management-vs-marketing": {
-   "visninger": 3,
+   "visninger": 4,
    "brugere": 2
   },
-  "/2026/09/what-is-python-used-for": {
+  "/2026/10/how-long-learn-python": {
    "visninger": 2,
    "brugere": 2
   },
@@ -281,6 +289,10 @@
    "visninger": 1,
    "brugere": 1
   },
+  "/2024/12/metaplanet-secures-61-million-to-expand": {
+   "visninger": 1,
+   "brugere": 1
+  },
   "/2024/12/web3s missing piece the grid aims to map blockchain": {
    "visninger": 1,
    "brugere": 1
@@ -376,10 +388,6 @@
   "/2026/06/blueprint-for-building-your-first": {
    "visninger": 2,
    "brugere": 2
-  },
-  "/2026/10/what-are-ransomware-canary-files": {
-   "visninger": 1,
-   "brugere": 1
   },
   "/2026/10/why-seo-is-important": {
    "visninger": 1,
