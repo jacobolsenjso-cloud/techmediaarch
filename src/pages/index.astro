@@ -51,6 +51,8 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
     .lead-mini .card-thumb { border-radius: 10px; margin: 0; }
     .lead-mini-title { margin: 0 0 5px 0; font-size: 1rem; line-height: 1.35; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .lead-mini:hover .lead-mini-title { color: var(--teal-text); }
+    .lead-mini-eyebrow { display: flex; width: fit-content; font-size: 0.66rem; margin-bottom: 5px; }
+    .lead-mini-eyebrow::before { width: 6px; height: 6px; }
     @media (max-width: 900px) { .lead-section { grid-template-columns: 1fr; gap: 30px; } .lead-title { font-size: 1.45rem; } }
     @media (max-width: 520px) { .lead-mini { grid-template-columns: 110px 1fr; gap: 12px; } .lead-title { font-size: 1.3rem; } .lead-excerpt { -webkit-line-clamp: 2; font-size: 0.95rem; } }
 
@@ -93,9 +95,11 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
         </a>
         <div class="lead-secondary">
           {sideHistorier.map((p) => (
-            <a href={p.href} class="lead-mini">
+            <a href={p.href} class="lead-mini" style={p.emner[0] ? `--tag-accent: ${p.emner[0].farve}` : undefined}>
               {p.image ? <div class="card-thumb"><img src={p.image} alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
               <div>
+                {/* Emnemærke over titlen (Jacob 5/10-2026), som på hovedhistorien: læseren ser emnet før titlen */}
+                {p.emner[0] && <span class="lead-eyebrow lead-mini-eyebrow">{p.emner[0].navn}</span>}
                 <h3 class="lead-mini-title">{p.title}</h3>
                 <p class="card-meta"><span>{datoTekst(p.published)}</span></p>
               </div>
