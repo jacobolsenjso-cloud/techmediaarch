@@ -214,7 +214,7 @@ capital first letter, correct capitalisation of names and acronyms exactly as th
 Only use names that appear in the article. Never refer to "the text", "the article", "the guide", "the post" or "the video" — not in questions and not in answers.
 If a question asks for a number, percentage, price, date or a name, the answer MUST state it exactly as the article does; if the article
 does not give it, do not ask that question. Never write an answer saying that something is not mentioned. If fewer searches are answered by the article, write other questions a reader would type into Google that THIS ARTICLE answers.
-Answers: 2-4 sentences, 25-90 words, journalistic and neutral, based ONLY on the article text below — no outside facts, no numbers that are not in the article, no first person, no links.
+Answers: 2-4 sentences, 25-90 words, journalistic and neutral, based ONLY on the article text below — no outside facts, no numbers that are not in the article, no first person, no links, no markdown, and no vague attributions such as "experts say", "research indicates" or "analysts emphasize" (name the source only if the article names it).
 For each item include "citat": one sentence copied EXACTLY, word for word, from the article that the answer is based on.
 Return JSON {"faq":[{"q":"...","a":"...","citat":"..."}]}
 
