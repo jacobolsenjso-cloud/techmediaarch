@@ -25,7 +25,7 @@ import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
-import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger } from './lib/afsnit.mjs';
+import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
 import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord } from './lib/sprog.mjs';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
@@ -106,14 +106,14 @@ log(`- Interne link-kandidater: ${kandListe.length}, relevante ifølge Gemini: $
 // ikke, prøves en større som reserve.
 const researchOpgave = `Use Google Search to research these questions for a factual explainer article:
 - ${[valgt.hoved, ...valgt.beslaegtede].join('\n- ')}
-Return 15-25 short bullet points of concrete, verified facts (definitions, how it works, examples, numbers with dates, best practices). Only include facts you found in search results.
+Return 25-40 short bullet points of concrete, verified facts (definitions, how it works, examples, numbers with dates, steps, comparisons, best practices). Cover every question above with at least 3 different facts, and never repeat the same fact in other words. Only include facts you found in search results.
 Start every bullet with the name of the organization, agency, company or publication the fact comes from (e.g. "IBM: ...", "NIST: ...").`;
 // ↑ Kildenavnet i hvert punkt (5/10-2026): uden det skrev Gemini "industry experts note" (18 sætninger i 8 af 15 artikler).
 let fakta = ''; let kilder = [];
 for (const model of [undefined, undefined, 'gemini-3.5-flash', 'gemini-2.5-flash']) {
   try {
     const r = await skriv(researchOpgave, { soeg: true, temperatur: 0.2, ...(model ? { model } : {}) });
-    if (r.kilder.length >= 2) { fakta = r.tekst; kilder = r.kilder; log(`- Research: ${r.kilder.length} kilder (${model || 'standardmodel'}).`); break; }
+    if (r.kilder.length >= 2) { fakta = r.tekst; kilder = r.kilder; log(`- Research: ${r.kilder.length} kilder, ${(r.tekst.match(/^\s*(?:[-*•]|\d+\.)\s+/gm) || []).length} faktapunkter (${model || 'standardmodel'}).`); break; }
     log(`- Research (${model || 'standardmodel'}): ${r.kilder.length} kilder — prøver igen.`);
   } catch (e) { log(`- Research (${model}): ${e.message.slice(0, 120)}`); }
 }
@@ -128,7 +128,7 @@ Base all factual claims on these researched facts (do not add other numbers, dat
 ${fakta}
 
 Rules:
-- At least 1600 words, 8-10 sections with <h2> (and <h3> where useful), each section 150-250 words.
+- At least 1200 words, 7-10 sections with <h2> (and <h3> where useful), each section 120-250 words. Write longer only when the researched facts give enough material; never pad to reach a length (Jacob 6/10-2026).
 - Write like a technology journalist at a news publication, not like an analyst or a marketer (Jacob 28/9-2026):
   lead with the most important facts, attribute facts to their source in the sentence ("according to IBM", "NIST defines ..."),
   short paragraphs, concrete examples, neutral tone, no hype words, no "our analysis", "the verdict" or "key takeaways" framing.
@@ -150,11 +150,13 @@ Output ONLY the article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>
 const { tekst } = await skriv(opgave);
 let html = rensMarkdown(tekst.replace(/^```html?\s*|```\s*$/g, '').trim());
 // Gemini skriver kortere end bedt om (målt 26/9: 857 ord mod 1400-1900 bedt om).
-// Er udkastet under 1500 ord, får den det tilbage og skal uddybe — kun med de researchede fakta.
+// Er udkastet under 1200 ord, får den det tilbage og skal uddybe — kun med de researchede fakta.
+// Kravet var 1600/1500 ord til 6/10: prøve #29 nåede det kun med fyld (Gemini udpegede selv 37
+// fyldsætninger). Jacob 6/10: mindst 1200 ord, længere kun når fakta rækker, og mere research.
 const ordI = (h) => h.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
-if (ordI(html) < 1500) {
-  log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1500.`);
-  const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1600 words by deepening the existing sections with concrete explanations, examples and practical guidance. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
+if (ordI(html) < 1200) {
+  log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1200.`);
+  const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1300 words by deepening the existing sections with concrete explanations, examples and practical guidance taken from the facts below. If the facts do not support more text, add less: never pad with generic sentences. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
 Keep the first paragraph exactly as it is (it is a short direct answer). Most paragraphs 2 connected sentences (at most 55 words together) or 3 short ones (at most 40 words), never several one-sentence paragraphs in a row; keep the existing lists. Name the source of numbers and statistics once, varying how; no vague attributions ("experts say", "studies show"). Never repeat a fact or sentence that is already in the article. Every new sentence must add something concrete (a fact, definition, example, step or comparison); no generic filler. Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
 Output ONLY the full expanded article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>).
 
@@ -162,7 +164,7 @@ ${html}`);
   const ny = rensMarkdown(udv.tekst.replace(/^```html?\s*|```\s*$/g, '').trim());
   if (ordI(ny) > ordI(html)) html = ny;
   log(`- Efter uddybning: ${ordI(html)} ord.`);
-}
+} else log(`- Udkast 1: ${ordI(html)} ord — ingen uddybning nødvendig.`);
 
 // Fjern alle links, der ikke er et af de tilladte interne (Gemini må ikke selv finde på links).
 const tilladt = new Set(interne.map((l) => l.href));
@@ -289,6 +291,8 @@ ${kand.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
     } catch (e) { log(`- Fyldsætninger: tjek fejlede (${e.message.slice(0, 80)}) — intet fjernet`); }
   } else log('- Fyldsætninger: ingen kandidater');
 }
+// Saml enkeltsætninger, der står lige efter hinanden (Jacob 6/10-2026), robot/lib/afsnit.mjs. Ingen ord ændres.
+{ const s = samlEnkelte(html); html = s.html; const g = fjernGentagelser(html); html = g.html; log(`- Enkeltsætninger samlet: ${s.samlet} · afsnit med kun én sætning nu: ${g.enSaetning} af ${g.afsnit}`); }
 
 // Kilder: følg Googles omdirigering, kontrollér live, højst 4, ét pr. domæne.
 const { sat: kildeLinks, afvist: kildeAfvist } = await kontrollerKilder(kilder, 4);

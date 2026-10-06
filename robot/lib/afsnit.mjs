@@ -143,3 +143,32 @@ export function fjernSaetninger(html, liste, maks) {
   }
   return { html: ud, fjernet };
 }
+
+// --- Saml enkeltsætninger (Jacob 6/10-2026) -----------------------------------
+// Prøve #29: 25 af 50 afsnit var én sætning — Gemini skriver dem selv, og fyldtjekket efterlader en
+// enkelt sætning, når det fjerner den anden. To afsnit på én sætning, der står LIGE efter hinanden
+// (samme afsnit i artiklen, ingen overskrift/liste imellem), samles til ét, når de tilsammen holder
+// regel C (højst MAKS_ORD_TO ord). Ingen ord ændres. Første afsnit (det korte svar) og FAQ røres ikke.
+const enSaetning = (indre) => { const s = saetninger(indre); return !!s && s.length === 1 && /[.!?]["”’)]?\s*$/.test(indre.replace(/<[^>]+>/g, '')); };
+export function samlEnkelte(html) {
+  const s = String(html);
+  const faqPos = s.search(/<h[23][^>]*>\s*(?:<[^>]+>\s*)*(?:FAQ|Frequently Asked Questions)/i);
+  const dele = s.split(/(<p\b[^>]*>(?:(?!<\/?p[\s>])[\s\S])*?<\/p>)/i); // ulige pladser = <p>-blokke
+  const ud = []; let pos = 0, foerste = true, samlet = 0;
+  for (let i = 0; i < dele.length; i++) {
+    const d = dele[i];
+    if (i % 2 === 1 && !foerste && (faqPos < 0 || pos < faqPos) && i + 2 < dele.length && /^\s*$/.test(dele[i + 1])) {
+      const naeste = dele[i + 2];
+      const a = d.match(/^<p(\s[^>]*)?>([\s\S]*)<\/p>$/i), b = naeste.match(/^<p(\s[^>]*)?>([\s\S]*)<\/p>$/i);
+      const ialt = pos + d.length + dele[i + 1].length + naeste.length;
+      if (a && b && (a[1] || '') === (b[1] || '') && (faqPos < 0 || ialt <= faqPos) && enSaetning(a[2]) && enSaetning(b[2])
+        && !/:\s*$/.test(a[2].replace(/<[^>]+>/g, '')) && ord(a[2]) + ord(b[2]) <= MAKS_ORD_TO) {
+        ud.push(`<p${a[1] || ''}>${a[2].trim()} ${b[2].trim()}</p>`); samlet++;
+        pos = ialt; i += 2; continue;
+      }
+    }
+    if (i % 2 === 1) foerste = false;
+    ud.push(d); pos += d.length;
+  }
+  return { html: ud.join(''), samlet };
+}
