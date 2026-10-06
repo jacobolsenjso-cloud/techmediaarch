@@ -37,7 +37,9 @@ export function foersteAfsnit(h) { const m = String(h).match(/<p\b[^>]*>[\s\S]*?
 export function saetninger(h) {
   const ud = [];
   for (const m of String(h).matchAll(/<(p|li)\b[^>]*>([\s\S]*?)<\/\1>/gi)) {
-    for (const s of m[2].split(/(?<=[.!?])\s+(?=[A-Z"“<])/)) if (s.trim()) ud.push(s.trim());
+    // Knæk ikke efter forkortelser ("the U.S. Bureau", "Dr. Smith", "e.g. ChatGPT"); målt 6/10: prøve #28
+    // fik "according to data from the U.S." markeret som uklar kilde, fordi sætningen blev knækket efter "U.S."
+    for (const s of m[2].split(/(?<!(?:^|[\s(])(?:Mr|Mrs|Ms|Dr|Prof|Sr|Jr|St|Inc|Ltd|Co|Corp|vs|etc|e\.g|i\.e|No|U\.S|U\.K|E\.U|U\.N|[A-Z])\.)(?<=[.!?])\s+(?=[A-Z"“<])/)) if (s.trim()) ud.push(s.trim());
   }
   return ud;
 }
@@ -53,7 +55,11 @@ const VAG_SUBJ = new RegExp(`\\b(?:${KVAL}\\s+)*${SUBJ}\\s+(?:(?:widely|consiste
 const VAG_IFLG = new RegExp(`\\baccording to (?:the\\s+)?(?:${KVAL}\\s+)*(?:${SUBJ}|data|metrics|cost reports|estimates|figures)\\b`, 'gi');
 export function uklarKilde(s) {
   const t = synlig(s).replace(/\s+/g, ' ').trim();
-  for (const m of t.matchAll(VAG_IFLG)) return m[0];
+  for (const m of t.matchAll(VAG_IFLG)) {
+    // Navngivet lige efter: "according to data from the U.S. Bureau of Labor Statistics" (prøve #28, 6/10)
+    if (/^\s+(?:from|by|of|published by|compiled by|released by)\s+(?:the\s+)?[A-Z]/.test(t.slice(m.index + m[0].length))) continue;
+    return m[0];
+  }
   for (const m of t.matchAll(VAG_SUBJ)) {
     const ord2 = t.slice(0, m.index).trim().split(' ').slice(-2);
     const foer = ord2[ord2.length - 1] || '';
