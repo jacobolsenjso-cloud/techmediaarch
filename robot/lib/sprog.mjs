@@ -57,7 +57,7 @@ export function uklarKilde(s) {
   const t = synlig(s).replace(/\s+/g, ' ').trim();
   for (const m of t.matchAll(VAG_IFLG)) {
     // Navngivet lige efter: "according to data from the U.S. Bureau of Labor Statistics" (prøve #28, 6/10)
-    if (/^\s+(?:from|by|of|published by|compiled by|released by)\s+(?:the\s+)?[A-Z]/.test(t.slice(m.index + m[0].length))) continue;
+    if (/^\s+(?:from|by|of|(?:published|compiled|released|cited|reported|collected|provided|gathered|quoted) by)\s+(?:the\s+)?[A-Z]/.test(t.slice(m.index + m[0].length))) continue;
     return m[0];
   }
   for (const m of t.matchAll(VAG_SUBJ)) {
