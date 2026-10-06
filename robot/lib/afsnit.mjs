@@ -5,6 +5,9 @@
 export const MAKS_SAETNINGER = 3;
 // 40 ord ≈ 6 linjer på mobil (43 tegn/linje, målt 5/10). Første forsøg med 55 gav stadig 9 linjer.
 export const MAKS_ORD = 40;
+// To sætninger må stå sammen op til 55 ord (6/10, forslag C): med 40 kunne to sætninger på 20+ ord aldrig
+// stå sammen, så 75 % af de delte robotafsnit blev én sætning (målt 6/10, _afsnit-varianter.mjs).
+export const MAKS_ORD_TO = 55;
 
 // Tags, et knæk må gå igennem: de lukkes før knækket og åbnes igen efter (samme attributter).
 const INLINE = new Set(['span', 'strong', 'b', 'em', 'i', 'u', 'font', 'small', 'mark', 'sup', 'sub']);
@@ -53,7 +56,8 @@ function grupper(dele) {
   const grp = []; let cur = [];
   for (const d of dele) {
     const n = cur.length ? ord(cur.map((x) => x.html).join(' ')) : 0;
-    if (cur.length && (cur.length >= MAKS_SAETNINGER || n + ord(d.html) > MAKS_ORD)) { grp.push(cur); cur = []; }
+    const loft = cur.length === 1 ? MAKS_ORD_TO : MAKS_ORD; // 2. sætning: op til 55 ord; 3. sætning: op til 40
+    if (cur.length && (cur.length >= MAKS_SAETNINGER || n + ord(d.html) > loft)) { grp.push(cur); cur = []; }
     cur.push(d);
   }
   if (cur.length) grp.push(cur);
@@ -61,7 +65,9 @@ function grupper(dele) {
 }
 
 // Skal afsnittet deles? (bruges også af målinger)
-export function forLangt(indre) { const s = saetninger(indre); const n = s ? s.length : 1; return n > MAKS_SAETNINGER || ord(indre) > MAKS_ORD; }
+// For langt = over 3 sætninger, eller 3 sætninger over 40 ord, eller 2 sætninger over 55 ord. Én sætning kan ikke deles.
+const forLangtTal = (n, w) => n > MAKS_SAETNINGER || (n === MAKS_SAETNINGER && w > MAKS_ORD) || (n === 2 && w > MAKS_ORD_TO);
+export function forLangt(indre) { const s = saetninger(indre); const n = s ? s.length : 1; return forLangtTal(n, ord(indre)); }
 
 // Deler alle for lange <p> i html. FAQ-afsnit (fra en overskrift med "FAQ"/"Frequently Asked" til næste <h2>)
 // røres ikke, fordi FAQ-boksen og FAQ-dataene bygger på svaret som ét afsnit.
@@ -72,7 +78,7 @@ export function delAfsnit(html) {
   const ud = String(html).replace(/<p(\s[^>]*)?>((?:(?!<\/?p[\s>])[\s\S])*?)<\/p>/gi, (hel, attr = '', indre, pos) => {
     if (faqStart >= 0 && pos > faqStart && pos < faqSlut) return hel;
     const dele = saetninger(indre);
-    if (!dele || dele.length < 2 || !(dele.length > MAKS_SAETNINGER || ord(indre) > MAKS_ORD)) return hel;
+    if (!dele || dele.length < 2 || !forLangtTal(dele.length, ord(indre))) return hel;
     const grp = grupper(dele); if (grp.length < 2) return hel;
     // Inline-tags åbne ved et knæk: lukkes sidst i bidden og åbnes igen først i næste
     let ny = ''; let aabne = [];

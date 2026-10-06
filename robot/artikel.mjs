@@ -132,7 +132,7 @@ Rules:
 - Write like a technology journalist at a news publication, not like an analyst or a marketer (Jacob 28/9-2026):
   lead with the most important facts, attribute facts to their source in the sentence ("according to IBM", "NIST defines ..."),
   short paragraphs, concrete examples, neutral tone, no hype words, no "our analysis", "the verdict" or "key takeaways" framing.
-- Paragraphs like a news site (Jacob 5/10-2026): most paragraphs are 2-3 connected sentences, at most 40 words. Use a one-sentence paragraph only now and then for emphasis, never several in a row.
+- Paragraphs like a news site (Jacob 5/10-2026, rule C 6/10): most paragraphs are 2 connected sentences of at most 55 words together, or 3 short sentences of at most 40 words. Use a one-sentence paragraph only now and then for emphasis, never several in a row.
 - Attribute a fact once, where it first appears. Vary how sources are named and where ("CompTIA defines ...", "..., according to Coursera"); sentences that explain, compare or give context need no source. Never start most sentences with "X notes/reports/states that".
 - Never repeat a fact, number or sentence that already appears in another section (the FAQ may summarise).
 - Every sentence must tell the reader something concrete: a fact, a definition, an example, a step or a clear comparison. No generic filler that could sit in any article on the topic ("Both roles are critical for modern organizations.", "Companies must invest in skilled personnel.").
@@ -155,7 +155,7 @@ const ordI = (h) => h.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).leng
 if (ordI(html) < 1500) {
   log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1500.`);
   const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1600 words by deepening the existing sections with concrete explanations, examples and practical guidance. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
-Keep the first paragraph exactly as it is (it is a short direct answer). Most paragraphs 2-3 connected sentences, at most 40 words, never several one-sentence paragraphs in a row; keep the existing lists. Name the source of numbers and statistics once, varying how; no vague attributions ("experts say", "studies show"). Never repeat a fact or sentence that is already in the article. Every new sentence must add something concrete (a fact, definition, example, step or comparison); no generic filler. Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
+Keep the first paragraph exactly as it is (it is a short direct answer). Most paragraphs 2 connected sentences (at most 55 words together) or 3 short ones (at most 40 words), never several one-sentence paragraphs in a row; keep the existing lists. Name the source of numbers and statistics once, varying how; no vague attributions ("experts say", "studies show"). Never repeat a fact or sentence that is already in the article. Every new sentence must add something concrete (a fact, definition, example, step or comparison); no generic filler. Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
 Output ONLY the full expanded article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>).
 
 ${html}`);
