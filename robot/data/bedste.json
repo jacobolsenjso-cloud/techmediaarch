@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-05T16:08:22.483Z",
- "fra": "2026-07-08",
- "til": "2026-10-05",
+ "hentet": "2026-10-07T14:37:48.042Z",
+ "fra": "2026-07-10",
+ "til": "2026-10-07",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -41,19 +41,23 @@
    "visninger": 6,
    "brugere": 4
   },
+  "/2026/09/product-roadmap-vs-backlog": {
+   "visninger": 7,
+   "brugere": 3
+  },
+  "/2026/09/what-is-mvp-software-development": {
+   "visninger": 6,
+   "brugere": 3
+  },
   "/2024/08/tube-magic-ai-tools-for-growing-on": {
    "visninger": 5,
    "brugere": 1
-  },
-  "/2026/09/product-roadmap-vs-backlog": {
-   "visninger": 6,
-   "brugere": 3
   },
   "/2026/09/what-are-zero-trust-security-models": {
    "visninger": 5,
    "brugere": 1
   },
-  "/2026/09/what-is-mvp-software-development": {
+  "/2026/10/why-web-development-career": {
    "visninger": 5,
    "brugere": 2
   },
@@ -69,25 +73,25 @@
    "visninger": 5,
    "brugere": 3
   },
-  "/2026/05/stop-losing-rankings-how-to-find-and": {
-   "visninger": 4,
-   "brugere": 3
-  },
   "/2026/05/the-best-ai-detector-free-tools-to-spot": {
    "visninger": 6,
    "brugere": 4
-  },
-  "/2026/10/why-web-development-career": {
-   "visninger": 4,
-   "brugere": 2
   },
   "/2024/09/AI Giant OpenAI Poised for Radical Transformation into For-Profit Empire": {
    "visninger": 3,
    "brugere": 3
   },
+  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
+   "visninger": 4,
+   "brugere": 4
+  },
   "/2026/05/inside-tmobiles-airan-partnership-how": {
    "visninger": 3,
    "brugere": 2
+  },
+  "/2026/05/stop-losing-rankings-how-to-find-and": {
+   "visninger": 3,
+   "brugere": 3
   },
   "/2026/09/what-is-python-used-for": {
    "visninger": 3,
@@ -100,6 +104,10 @@
   "/2026/10/what-are-ransomware-canary-files": {
    "visninger": 3,
    "brugere": 2
+  },
+  "/2026/10/what-are-saas-product-companies": {
+   "visninger": 3,
+   "brugere": 1
   },
   "/2024/08/experience-future-of-financial": {
    "visninger": 2,
@@ -116,10 +124,6 @@
   "/2024/10/ai-shocks-again-claude-alexa-smarter": {
    "visninger": 2,
    "brugere": 2
-  },
-  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
-   "visninger": 3,
-   "brugere": 3
   },
   "/2026/03/guide-to-databricks-success": {
    "visninger": 2,
@@ -138,7 +142,7 @@
    "brugere": 2
   },
   "/2026/05/apple-faces-dual-legal-battles-siri": {
-   "visninger": 3,
+   "visninger": 4,
    "brugere": 2
   },
   "/2026/05/decoding-power-of-fintech-what": {
@@ -173,7 +177,11 @@
    "visninger": 2,
    "brugere": 2
   },
-  "/2026/10/what-are-saas-product-companies": {
+  "/2026/10/seo-best-practices-guide": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/10/why-seo-is-important": {
    "visninger": 2,
    "brugere": 1
   },
@@ -252,6 +260,10 @@
   "/2024/10/closure-completed-on-dragon": {
    "visninger": 2,
    "brugere": 2
+  },
+  "/2024/10/how technology can help you get a good nights sleep": {
+   "visninger": 1,
+   "brugere": 1
   },
   "/2024/10/meta-unveils-revolutionary-ai-video": {
    "visninger": 1,
@@ -353,10 +365,6 @@
    "visninger": 2,
    "brugere": 2
   },
-  "/2026/05/create-15-minute-videos-with-free-ai": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/05/ditch-linktree-build-better-link-in-bio": {
    "visninger": 2,
    "brugere": 2
@@ -388,10 +396,6 @@
   "/2026/06/blueprint-for-building-your-first": {
    "visninger": 2,
    "brugere": 2
-  },
-  "/2026/10/why-seo-is-important": {
-   "visninger": 1,
-   "brugere": 1
   }
  }
 }

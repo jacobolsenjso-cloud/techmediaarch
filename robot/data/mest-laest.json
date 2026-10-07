@@ -1,54 +1,38 @@
 {
- "hentet": "2026-10-05T16:08:23.092Z",
- "fra": "2026-09-29",
- "til": "2026-10-05",
+ "hentet": "2026-10-07T14:37:48.615Z",
+ "fra": "2026-10-01",
+ "til": "2026-10-07",
  "dage": 7,
  "sider": {
-  "/2026/09/what-are-phishing-emails": {
-   "visninger": 9,
-   "brugere": 4
-  },
-  "/2026/05/the-real-arch-linux-myths-trade-offs": {
-   "visninger": 6,
-   "brugere": 3
-  },
   "/2026/09/how-content-marketing-helps-seo": {
    "visninger": 6,
    "brugere": 4
   },
-  "/2026/06/agentic-ai-vs-ai-agents-technical": {
-   "visninger": 5,
-   "brugere": 1
-  },
-  "/2026/09/product-roadmap-vs-backlog": {
-   "visninger": 5,
-   "brugere": 2
-  },
-  "/2026/09/what-are-zero-trust-security-models": {
-   "visninger": 5,
-   "brugere": 1
-  },
   "/2026/09/what-is-mvp-software-development": {
+   "visninger": 6,
+   "brugere": 3
+  },
+  "/2026/09/what-are-phishing-emails": {
+   "visninger": 5,
+   "brugere": 4
+  },
+  "/2026/10/why-web-development-career": {
    "visninger": 5,
    "brugere": 2
   },
-  "/2026/05/kling-ai-tutorial-create-stunning-ai": {
-   "visninger": 5,
+  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
+   "visninger": 3,
    "brugere": 3
   },
   "/2026/05/stop-losing-rankings-how-to-find-and": {
-   "visninger": 4,
+   "visninger": 3,
    "brugere": 3
   },
-  "/2026/10/why-web-development-career": {
-   "visninger": 4,
-   "brugere": 2
-  },
-  "/2026/09/what-is-python-used-for": {
+  "/2026/06/agentic-ai-vs-ai-agents-technical": {
    "visninger": 3,
-   "brugere": 2
+   "brugere": 1
   },
-  "/2026/09/what-is-ransomware-cyber-security": {
+  "/2026/09/product-roadmap-vs-backlog": {
    "visninger": 3,
    "brugere": 2
   },
@@ -56,23 +40,11 @@
    "visninger": 3,
    "brugere": 2
   },
-  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
-   "visninger": 2,
-   "brugere": 2
-  },
-  "/2026/05/a-deep-dive-into-chinese-tech-brands": {
-   "visninger": 2,
+  "/2026/10/what-are-saas-product-companies": {
+   "visninger": 3,
    "brugere": 1
   },
-  "/2026/05/quantum-threats-to-encryption-7-actions": {
-   "visninger": 2,
-   "brugere": 1
-  },
-  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
-   "visninger": 2,
-   "brugere": 1
-  },
-  "/2026/09/product-management-vs-marketing": {
+  "/2026/09/what-are-zero-trust-security-models": {
    "visninger": 2,
    "brugere": 1
   },
@@ -80,31 +52,23 @@
    "visninger": 2,
    "brugere": 2
   },
-  "/2026/10/what-are-saas-product-companies": {
+  "/2026/10/seo-best-practices-guide": {
    "visninger": 2,
-   "brugere": 1
+   "brugere": 2
   },
-  "/2024/09/Eclipse Initiative Takes On Cybersecurity AI Regulations Industry to Take Note": {
-   "visninger": 1,
+  "/2026/10/why-seo-is-important": {
+   "visninger": 2,
    "brugere": 1
   },
   "/2024/09/faq": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2024/10/Get ready to deploy a fleet of ai agents startups": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/10/closure-completed-on-dragon": {
+  "/2024/10/how technology can help you get a good nights sleep": {
    "visninger": 1,
    "brugere": 1
   },
   "/2024/10/meta-unveils-revolutionary-ai-video": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/10/the-coming-wave-how-ai-will-change": {
    "visninger": 1,
    "brugere": 1
   },
@@ -116,15 +80,7 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/05/apple-faces-dual-legal-battles-siri": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/05/build-your-own-webp-converter-website": {
    "visninger": 1,
    "brugere": 1
   },
@@ -132,15 +88,7 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/chinas-new-free-ai-tools-are-beating": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/05/decoding-power-of-fintech-what": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/05/ditch-linktree-build-better-link-in-bio": {
    "visninger": 1,
    "brugere": 1
   },
@@ -148,19 +96,15 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/rephrasy-ai-review-2026-real-world": {
+  "/2026/05/the-real-arch-linux-myths-trade-offs": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/unpacking-grubby-ai-is-this-humanizer": {
+  "/2026/09/product-management-vs-marketing": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/06/blueprint-for-building-your-first": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/10/why-seo-is-important": {
+  "/2026/09/what-is-python-used-for": {
    "visninger": 1,
    "brugere": 1
   }
