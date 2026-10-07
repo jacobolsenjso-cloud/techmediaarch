@@ -1,5 +1,5 @@
 {
- "hentet": "2026-10-07T14:37:48.042Z",
+ "hentet": "2026-10-07T20:43:45.174Z",
  "fra": "2026-07-10",
  "til": "2026-10-07",
  "dage": 90,
@@ -29,6 +29,10 @@
    "visninger": 9,
    "brugere": 6
   },
+  "/2026/09/what-is-mvp-software-development": {
+   "visninger": 7,
+   "brugere": 4
+  },
   "/2024/09/faq": {
    "visninger": 7,
    "brugere": 3
@@ -43,10 +47,6 @@
   },
   "/2026/09/product-roadmap-vs-backlog": {
    "visninger": 7,
-   "brugere": 3
-  },
-  "/2026/09/what-is-mvp-software-development": {
-   "visninger": 6,
    "brugere": 3
   },
   "/2024/08/tube-magic-ai-tools-for-growing-on": {
@@ -77,6 +77,14 @@
    "visninger": 6,
    "brugere": 4
   },
+  "/2026/10/what-are-ransomware-canary-files": {
+   "visninger": 4,
+   "brugere": 3
+  },
+  "/2026/10/what-are-saas-product-companies": {
+   "visninger": 4,
+   "brugere": 2
+  },
   "/2024/09/AI Giant OpenAI Poised for Radical Transformation into For-Profit Empire": {
    "visninger": 3,
    "brugere": 3
@@ -100,14 +108,6 @@
   "/2026/09/what-is-ransomware-cyber-security": {
    "visninger": 6,
    "brugere": 4
-  },
-  "/2026/10/what-are-ransomware-canary-files": {
-   "visninger": 3,
-   "brugere": 2
-  },
-  "/2026/10/what-are-saas-product-companies": {
-   "visninger": 3,
-   "brugere": 1
   },
   "/2024/08/experience-future-of-financial": {
    "visninger": 2,
@@ -343,7 +343,7 @@
   },
   "/2026/04/gemma-4-explained-pricing-limits-and": {
    "visninger": 1,
-   "brugere": 1
+   "brugere": 2
   },
   "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
    "visninger": 2,
@@ -396,6 +396,10 @@
   "/2026/06/blueprint-for-building-your-first": {
    "visninger": 2,
    "brugere": 2
+  },
+  "/2026/10/why-product-management-is-good-career": {
+   "visninger": 1,
+   "brugere": 1
   }
  }
 }

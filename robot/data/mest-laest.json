@@ -1,16 +1,16 @@
 {
- "hentet": "2026-10-07T14:37:48.615Z",
+ "hentet": "2026-10-07T20:43:46.547Z",
  "fra": "2026-10-01",
  "til": "2026-10-07",
  "dage": 7,
  "sider": {
+  "/2026/09/what-is-mvp-software-development": {
+   "visninger": 7,
+   "brugere": 4
+  },
   "/2026/09/how-content-marketing-helps-seo": {
    "visninger": 6,
    "brugere": 4
-  },
-  "/2026/09/what-is-mvp-software-development": {
-   "visninger": 6,
-   "brugere": 3
   },
   "/2026/09/what-are-phishing-emails": {
    "visninger": 5,
@@ -18,6 +18,14 @@
   },
   "/2026/10/why-web-development-career": {
    "visninger": 5,
+   "brugere": 2
+  },
+  "/2026/10/what-are-ransomware-canary-files": {
+   "visninger": 4,
+   "brugere": 3
+  },
+  "/2026/10/what-are-saas-product-companies": {
+   "visninger": 4,
    "brugere": 2
   },
   "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
@@ -35,14 +43,6 @@
   "/2026/09/product-roadmap-vs-backlog": {
    "visninger": 3,
    "brugere": 2
-  },
-  "/2026/10/what-are-ransomware-canary-files": {
-   "visninger": 3,
-   "brugere": 2
-  },
-  "/2026/10/what-are-saas-product-companies": {
-   "visninger": 3,
-   "brugere": 1
   },
   "/2026/09/what-are-zero-trust-security-models": {
    "visninger": 2,
@@ -106,6 +106,14 @@
   },
   "/2026/09/what-is-python-used-for": {
    "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/why-product-management-is-good-career": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/04/gemma-4-explained-pricing-limits-and": {
+   "visninger": 0,
    "brugere": 1
   }
  }
