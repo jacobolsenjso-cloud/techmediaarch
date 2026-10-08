@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-07T20:43:45.174Z",
- "fra": "2026-07-10",
- "til": "2026-10-07",
+ "hentet": "2026-10-08T14:41:31.424Z",
+ "fra": "2026-07-11",
+ "til": "2026-10-08",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -175,7 +175,7 @@
   },
   "/2026/10/how-long-learn-python": {
    "visninger": 2,
-   "brugere": 2
+   "brugere": 3
   },
   "/2026/10/seo-best-practices-guide": {
    "visninger": 2,
@@ -342,7 +342,7 @@
    "brugere": 1
   },
   "/2026/04/gemma-4-explained-pricing-limits-and": {
-   "visninger": 1,
+   "visninger": 2,
    "brugere": 2
   },
   "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
