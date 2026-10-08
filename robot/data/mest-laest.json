@@ -1,5 +1,5 @@
 {
- "hentet": "2026-10-08T14:41:32.388Z",
+ "hentet": "2026-10-08T20:47:18.658Z",
  "fra": "2026-10-02",
  "til": "2026-10-08",
  "dage": 7,
@@ -24,6 +24,10 @@
    "visninger": 3,
    "brugere": 2
   },
+  "/2026/10/how-long-learn-python": {
+   "visninger": 3,
+   "brugere": 3
+  },
   "/2026/10/what-are-ransomware-canary-files": {
    "visninger": 3,
    "brugere": 2
@@ -43,10 +47,6 @@
   "/2026/09/what-is-mvp-software-development": {
    "visninger": 2,
    "brugere": 2
-  },
-  "/2026/10/how-long-learn-python": {
-   "visninger": 2,
-   "brugere": 3
   },
   "/2026/10/seo-best-practices-guide": {
    "visninger": 2,
@@ -97,6 +97,10 @@
    "brugere": 1
   },
   "/2026/09/what-is-python-used-for": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/what-does-api-mean-in-software": {
    "visninger": 1,
    "brugere": 1
   },

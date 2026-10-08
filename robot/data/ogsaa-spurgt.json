@@ -2241,5 +2241,18 @@
     "sti": "/2026/10/seo-best-practices-guide"
    }
   ]
+ },
+ "/2026/10/what-is-product-roadmap": {
+  "dato": "2026-10-08T20:47:17.135Z",
+  "valg": [
+   {
+    "q": "Difference between product roadmap and backlog?",
+    "sti": "/2026/09/product-roadmap-vs-backlog"
+   },
+   {
+    "q": "What is MVP product development process?",
+    "sti": "/2026/09/what-is-mvp-software-development"
+   }
+  ]
  }
 }
