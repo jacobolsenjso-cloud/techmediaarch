@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-08T20:47:18.055Z",
- "fra": "2026-07-11",
- "til": "2026-10-08",
+ "hentet": "2026-10-10T13:50:17.360Z",
+ "fra": "2026-07-13",
+ "til": "2026-10-10",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -77,6 +77,10 @@
    "visninger": 6,
    "brugere": 4
   },
+  "/2026/10/how-long-learn-python": {
+   "visninger": 4,
+   "brugere": 3
+  },
   "/2026/10/what-are-ransomware-canary-files": {
    "visninger": 4,
    "brugere": 3
@@ -109,10 +113,6 @@
    "visninger": 6,
    "brugere": 4
   },
-  "/2026/10/how-long-learn-python": {
-   "visninger": 3,
-   "brugere": 3
-  },
   "/2024/08/experience-future-of-financial": {
    "visninger": 2,
    "brugere": 2
@@ -132,6 +132,10 @@
   "/2026/03/guide-to-databricks-success": {
    "visninger": 2,
    "brugere": 1
+  },
+  "/2026/04/gemma-4-explained-pricing-limits-and": {
+   "visninger": 3,
+   "brugere": 2
   },
   "/2026/04/nvidia-egpus-and-mac": {
    "visninger": 2,
@@ -340,10 +344,6 @@
   "/2026/04/ex-amazon-ai-leader-one-year-until-ai": {
    "visninger": 1,
    "brugere": 1
-  },
-  "/2026/04/gemma-4-explained-pricing-limits-and": {
-   "visninger": 2,
-   "brugere": 2
   },
   "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
    "visninger": 2,

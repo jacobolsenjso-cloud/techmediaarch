@@ -1,12 +1,12 @@
 {
- "hentet": "2026-10-08T20:47:18.658Z",
- "fra": "2026-10-02",
- "til": "2026-10-08",
+ "hentet": "2026-10-10T13:50:17.908Z",
+ "fra": "2026-10-04",
+ "til": "2026-10-10",
  "dage": 7,
  "sider": {
-  "/2026/10/why-web-development-career": {
-   "visninger": 5,
-   "brugere": 2
+  "/2026/10/how-long-learn-python": {
+   "visninger": 4,
+   "brugere": 3
   },
   "/2026/10/what-are-saas-product-companies": {
    "visninger": 4,
@@ -16,33 +16,13 @@
    "visninger": 3,
    "brugere": 1
   },
-  "/2026/09/how-content-marketing-helps-seo": {
-   "visninger": 3,
-   "brugere": 2
-  },
-  "/2026/09/product-roadmap-vs-backlog": {
-   "visninger": 3,
-   "brugere": 2
-  },
-  "/2026/10/how-long-learn-python": {
-   "visninger": 3,
-   "brugere": 3
-  },
   "/2026/10/what-are-ransomware-canary-files": {
    "visninger": 3,
    "brugere": 2
   },
-  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
+  "/2026/04/gemma-4-explained-pricing-limits-and": {
    "visninger": 2,
-   "brugere": 2
-  },
-  "/2026/05/stop-losing-rankings-how-to-find-and": {
-   "visninger": 2,
-   "brugere": 2
-  },
-  "/2026/09/what-are-phishing-emails": {
-   "visninger": 2,
-   "brugere": 2
+   "brugere": 1
   },
   "/2026/09/what-is-mvp-software-development": {
    "visninger": 2,
@@ -52,15 +32,11 @@
    "visninger": 2,
    "brugere": 2
   },
-  "/2026/10/why-seo-is-important": {
-   "visninger": 2,
-   "brugere": 1
-  },
   "/2024/10/how technology can help you get a good nights sleep": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2024/10/meta-unveils-revolutionary-ai-video": {
+  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
    "visninger": 1,
    "brugere": 1
   },
@@ -68,19 +44,7 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/04/gemma-4-explained-pricing-limits-and": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/04/mastering-chatgpt": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/05/apple-faces-dual-legal-battles-siri": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/05/capabilities-of-claude-ai-deep-dive": {
    "visninger": 1,
    "brugere": 1
   },
@@ -88,11 +52,19 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/exploring-claude-just-changed-making": {
+  "/2026/05/stop-losing-rankings-how-to-find-and": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/09/how-content-marketing-helps-seo": {
    "visninger": 1,
    "brugere": 1
   },
   "/2026/09/product-management-vs-marketing": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/09/product-roadmap-vs-backlog": {
    "visninger": 1,
    "brugere": 1
   },
@@ -105,6 +77,14 @@
    "brugere": 1
   },
   "/2026/10/why-product-management-is-good-career": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/why-seo-is-important": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/why-web-development-career": {
    "visninger": 1,
    "brugere": 1
   }
