@@ -1,20 +1,12 @@
 {
- "hentet": "2026-10-10T19:22:38.067Z",
- "fra": "2026-10-04",
- "til": "2026-10-10",
+ "hentet": "2026-10-11T14:09:46.780Z",
+ "fra": "2026-10-05",
+ "til": "2026-10-11",
  "dage": 7,
  "sider": {
   "/2026/10/how-long-learn-python": {
    "visninger": 4,
    "brugere": 3
-  },
-  "/2026/10/what-are-saas-product-companies": {
-   "visninger": 4,
-   "brugere": 2
-  },
-  "/2026/06/agentic-ai-vs-ai-agents-technical": {
-   "visninger": 3,
-   "brugere": 1
   },
   "/2026/10/what-are-ransomware-canary-files": {
    "visninger": 3,
@@ -29,6 +21,10 @@
    "brugere": 2
   },
   "/2026/10/seo-best-practices-guide": {
+   "visninger": 2,
+   "brugere": 2
+  },
+  "/2026/10/what-are-saas-product-companies": {
    "visninger": 2,
    "brugere": 2
   },
@@ -86,6 +82,10 @@
   },
   "/2026/10/why-web-development-career": {
    "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/06/agentic-ai-vs-ai-agents-technical": {
+   "visninger": 0,
    "brugere": 1
   }
  }
