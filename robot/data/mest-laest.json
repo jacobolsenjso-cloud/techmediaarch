@@ -1,70 +1,30 @@
 {
- "hentet": "2026-10-11T19:39:30.185Z",
- "fra": "2026-10-05",
- "til": "2026-10-11",
+ "hentet": "2026-10-12T16:50:20.354Z",
+ "fra": "2026-10-06",
+ "til": "2026-10-12",
  "dage": 7,
  "sider": {
-  "/2026/10/how-long-learn-python": {
-   "visninger": 4,
-   "brugere": 3
-  },
-  "/2026/10/what-are-ransomware-canary-files": {
-   "visninger": 3,
-   "brugere": 2
-  },
   "/2026/04/gemma-4-explained-pricing-limits-and": {
    "visninger": 2,
    "brugere": 1
   },
-  "/2026/09/what-is-mvp-software-development": {
+  "/2026/10/how-long-learn-python": {
    "visninger": 2,
-   "brugere": 2
+   "brugere": 1
   },
-  "/2026/10/seo-best-practices-guide": {
-   "visninger": 2,
-   "brugere": 2
+  "/2026/09/what-is-mvp-software-development": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/how-to-use-ai-marketing-tools": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/what-are-ransomware-canary-files": {
+   "visninger": 1,
+   "brugere": 1
   },
   "/2026/10/what-are-saas-product-companies": {
-   "visninger": 2,
-   "brugere": 2
-  },
-  "/2024/10/how technology can help you get a good nights sleep": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/12/metaplanet-secures-61-million-to-expand": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/05/apple-faces-dual-legal-battles-siri": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/05/decoding-power-of-fintech-what": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/05/stop-losing-rankings-how-to-find-and": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/09/how-content-marketing-helps-seo": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/09/product-management-vs-marketing": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/09/product-roadmap-vs-backlog": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/09/what-is-python-used-for": {
    "visninger": 1,
    "brugere": 1
   },
@@ -74,18 +34,6 @@
   },
   "/2026/10/why-product-management-is-good-career": {
    "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/10/why-seo-is-important": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/10/why-web-development-career": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/06/agentic-ai-vs-ai-agents-technical": {
-   "visninger": 0,
    "brugere": 1
   }
  }

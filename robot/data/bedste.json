@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-11T19:39:29.404Z",
- "fra": "2026-07-14",
- "til": "2026-10-11",
+ "hentet": "2026-10-12T16:50:19.149Z",
+ "fra": "2026-07-15",
+ "til": "2026-10-12",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -396,6 +396,10 @@
   "/2026/06/blueprint-for-building-your-first": {
    "visninger": 2,
    "brugere": 2
+  },
+  "/2026/10/how-to-use-ai-marketing-tools": {
+   "visninger": 1,
+   "brugere": 1
   },
   "/2026/10/what-does-api-mean-in-software": {
    "visninger": 1,
