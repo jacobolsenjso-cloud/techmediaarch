@@ -1,18 +1,10 @@
 {
- "hentet": "2026-10-12T16:50:20.354Z",
- "fra": "2026-10-06",
- "til": "2026-10-12",
+ "hentet": "2026-10-14T12:58:49.258Z",
+ "fra": "2026-10-08",
+ "til": "2026-10-14",
  "dage": 7,
  "sider": {
-  "/2026/04/gemma-4-explained-pricing-limits-and": {
-   "visninger": 2,
-   "brugere": 1
-  },
   "/2026/10/how-long-learn-python": {
-   "visninger": 2,
-   "brugere": 1
-  },
-  "/2026/09/what-is-mvp-software-development": {
    "visninger": 1,
    "brugere": 1
   },
@@ -20,19 +12,7 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/10/what-are-ransomware-canary-files": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/10/what-are-saas-product-companies": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/10/what-does-api-mean-in-software": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/10/why-product-management-is-good-career": {
    "visninger": 1,
    "brugere": 1
   }

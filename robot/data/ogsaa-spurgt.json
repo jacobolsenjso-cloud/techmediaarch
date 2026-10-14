@@ -2319,5 +2319,22 @@
     "sti": "/2024/09/bitmex-ceo-us-crypto-by-sector-to-take"
    }
   ]
+ },
+ "/2026/10/how-to-access-ransomware-protection": {
+  "dato": "2026-10-14T12:58:47.492Z",
+  "valg": [
+   {
+    "q": "What are ransomware canary files?",
+    "sti": "/2026/10/what-are-ransomware-canary-files"
+   },
+   {
+    "q": "How does ransomware typically get installed on a computer?",
+    "sti": "/2026/10/how-ransomware-gets-installed"
+   },
+   {
+    "q": "What is ransomware in cyber security?",
+    "sti": "/2026/09/what-is-ransomware-cyber-security"
+   }
+  ]
  }
 }

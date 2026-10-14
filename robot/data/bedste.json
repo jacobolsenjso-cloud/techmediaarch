@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-12T16:50:19.149Z",
- "fra": "2026-07-15",
- "til": "2026-10-12",
+ "hentet": "2026-10-14T12:58:48.728Z",
+ "fra": "2026-07-17",
+ "til": "2026-10-14",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -113,10 +113,6 @@
    "visninger": 6,
    "brugere": 4
   },
-  "/2024/08/experience-future-of-financial": {
-   "visninger": 2,
-   "brugere": 2
-  },
   "/2024/08/google-recruits-characterai-founders-in": {
    "visninger": 2,
    "brugere": 2
@@ -189,14 +185,6 @@
    "visninger": 2,
    "brugere": 1
   },
-  "/2024/07/articles-apple-releases-first-preview": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/07/ciscos-report-reveals-ai-and": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2024/07/google-ai-chatbot-avoids-trump": {
    "visninger": 1,
    "brugere": 1
@@ -209,15 +197,15 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2024/08/a-comprehensive-review-of-cyber": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2024/08/ai-oversight-unveiled-eu-introduces": {
    "visninger": 1,
    "brugere": 1
   },
   "/2024/08/comprehensive-review-of-brave-browser": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2024/08/experience-future-of-financial": {
    "visninger": 1,
    "brugere": 1
   },
