@@ -2336,5 +2336,22 @@
     "sti": "/2026/09/what-is-ransomware-cyber-security"
    }
   ]
+ },
+ "/2026/10/web-vs-full-stack-development": {
+  "dato": "2026-10-14T19:31:10.927Z",
+  "valg": [
+   {
+    "q": "Why web development is a good career?",
+    "sti": "/2026/10/why-web-development-career"
+   },
+   {
+    "q": "What is mvp software development?",
+    "sti": "/2026/09/what-is-mvp-software-development"
+   },
+   {
+    "q": "What does API mean in software development?",
+    "sti": "/2026/10/what-does-api-mean-in-software"
+   }
+  ]
  }
 }
