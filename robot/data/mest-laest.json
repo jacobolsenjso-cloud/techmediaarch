@@ -1,18 +1,10 @@
 {
- "hentet": "2026-10-14T19:31:12.603Z",
- "fra": "2026-10-08",
- "til": "2026-10-14",
+ "hentet": "2026-10-15T12:45:46.999Z",
+ "fra": "2026-10-09",
+ "til": "2026-10-15",
  "dage": 7,
  "sider": {
-  "/2026/10/how-long-learn-python": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/10/how-to-use-ai-marketing-tools": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/10/what-does-api-mean-in-software": {
    "visninger": 1,
    "brugere": 1
   }

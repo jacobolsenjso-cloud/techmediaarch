@@ -25,7 +25,7 @@ robot: true
 
 <h2>Front-End and Back-End Responsibilities</h2>
 
-<p>Frontend production involves crafting user interfaces and client-side interactions. YouTube highlights that key back-end responsibilities in full-stack development include writing server-side logic in languages like Node.js or Python, managing SQL or NoSQL databases, and building RESTful or GraphQL APIs.</p><p>You can learn more about these interfaces by reading <a href="/2026/10/what-does-api-mean-in-software">What Does API Mean in Software Development</a>.</p>
+<p>Frontend production involves crafting <a href="/2026/10/difference-between-ux-and-ui-design">user interfaces</a> and client-side interactions. YouTube highlights that key back-end responsibilities in full-stack development include writing server-side logic in languages like Node.js or Python, managing SQL or NoSQL databases, and building RESTful or GraphQL APIs.</p><p>You can learn more about these interfaces by reading <a href="/2026/10/what-does-api-mean-in-software">What Does API Mean in Software Development</a>.</p>
 
 <p>Engineers handling back-end architecture must ensure data flows securely between servers and clients. They write application logic that processes incoming user requests and queries underlying databases.</p><p>Traditional web developers often specialize exclusively in one of these halves, while cross-functional professionals bridge both domains seamlessly.</p>
 

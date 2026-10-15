@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-14T19:31:12.035Z",
- "fra": "2026-07-17",
- "til": "2026-10-14",
+ "hentet": "2026-10-15T12:45:46.322Z",
+ "fra": "2026-07-18",
+ "til": "2026-10-15",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -113,10 +113,6 @@
    "visninger": 6,
    "brugere": 4
   },
-  "/2024/08/google-recruits-characterai-founders-in": {
-   "visninger": 2,
-   "brugere": 2
-  },
   "/2024/09/blog-post": {
    "visninger": 2,
    "brugere": 2
@@ -185,31 +181,11 @@
    "visninger": 2,
    "brugere": 1
   },
-  "/2024/07/google-ai-chatbot-avoids-trump": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/08/Cracking the Code A Beginners Guide to Cryptocurrency Basics": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/08/The internet is buzzing with a new trend": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/08/ai-oversight-unveiled-eu-introduces": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/08/comprehensive-review-of-brave-browser": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2024/08/experience-future-of-financial": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2024/08/explore-wirexs-vision-for-web3-payment": {
+  "/2024/08/google-recruits-characterai-founders-in": {
    "visninger": 1,
    "brugere": 1
   },
