@@ -1,17 +1,17 @@
 {
- "hentet": "2026-10-15T19:15:47.248Z",
- "fra": "2026-07-18",
- "til": "2026-10-15",
+ "hentet": "2026-10-17T11:43:18.579Z",
+ "fra": "2026-07-20",
+ "til": "2026-10-17",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
-  "/2026/05/free-open-source-whatsapp-crm-technical": {
-   "visninger": 28,
-   "brugere": 26
-  },
   "/2026/06/agentic-ai-vs-ai-agents-technical": {
    "visninger": 29,
    "brugere": 6
+  },
+  "/2026/05/free-open-source-whatsapp-crm-technical": {
+   "visninger": 17,
+   "brugere": 15
   },
   "/2026/09/what-are-phishing-emails": {
    "visninger": 9,
