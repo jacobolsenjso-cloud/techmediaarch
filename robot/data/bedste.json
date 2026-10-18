@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-17T17:57:29.315Z",
- "fra": "2026-07-20",
- "til": "2026-10-17",
+ "hentet": "2026-10-18T12:09:05.553Z",
+ "fra": "2026-07-21",
+ "til": "2026-10-18",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -10,8 +10,8 @@
    "brugere": 6
   },
   "/2026/05/free-open-source-whatsapp-crm-technical": {
-   "visninger": 17,
-   "brugere": 15
+   "visninger": 12,
+   "brugere": 10
   },
   "/2026/09/what-are-phishing-emails": {
    "visninger": 9,
@@ -312,10 +312,6 @@
   "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
    "visninger": 2,
    "brugere": 2
-  },
-  "/2026/05/automate-backlinks-with-claude-in-10": {
-   "visninger": 1,
-   "brugere": 1
   },
   "/2026/05/build-your-own-webp-converter-website": {
    "visninger": 1,
