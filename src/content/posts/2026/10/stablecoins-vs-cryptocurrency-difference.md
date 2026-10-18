@@ -35,7 +35,7 @@ robot: true
 
 <p>Key technical characteristics include:</p>
 <ul>
-  <li>Issuance by centralized private companies rather than decentralized algorithmic mining rewards.</li>
+  <li>Issuance by centralized private companies rather than decentralized <a href="/2026/10/what-does-bitcoin-mining-mean">algorithmic mining rewards</a>.</li>
   <li>Deployment across multiple distinct blockchain networks simultaneously.</li>
   <li>Reliance on distributed ledger transfers to facilitate broader digital asset trading.</li>
   <li>Integration with smart contracts for automated token management.</li>
