@@ -1,17 +1,13 @@
 {
- "hentet": "2026-10-18T18:13:00.160Z",
- "fra": "2026-07-21",
- "til": "2026-10-18",
+ "hentet": "2026-10-19T14:47:09.189Z",
+ "fra": "2026-07-22",
+ "til": "2026-10-19",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
   "/2026/06/agentic-ai-vs-ai-agents-technical": {
-   "visninger": 29,
-   "brugere": 6
-  },
-  "/2026/05/free-open-source-whatsapp-crm-technical": {
-   "visninger": 12,
-   "brugere": 10
+   "visninger": 26,
+   "brugere": 5
   },
   "/2026/09/what-are-phishing-emails": {
    "visninger": 9,
@@ -52,6 +48,10 @@
   "/2024/08/tube-magic-ai-tools-for-growing-on": {
    "visninger": 5,
    "brugere": 1
+  },
+  "/2026/05/free-open-source-whatsapp-crm-technical": {
+   "visninger": 5,
+   "brugere": 5
   },
   "/2026/09/what-are-zero-trust-security-models": {
    "visninger": 5,
@@ -130,10 +130,6 @@
    "brugere": 2
   },
   "/2026/04/nvidia-egpus-and-mac": {
-   "visninger": 2,
-   "brugere": 2
-  },
-  "/2026/04/your-windows-pc-has-secret-cleaning": {
    "visninger": 2,
    "brugere": 2
   },
@@ -312,6 +308,10 @@
   "/2026/04/mdm-activate-your-mac-with-this-essential-guide": {
    "visninger": 2,
    "brugere": 2
+  },
+  "/2026/04/your-windows-pc-has-secret-cleaning": {
+   "visninger": 1,
+   "brugere": 1
   },
   "/2026/05/build-your-own-webp-converter-website": {
    "visninger": 1,
