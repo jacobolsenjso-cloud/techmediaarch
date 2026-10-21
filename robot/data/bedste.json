@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-19T20:41:20.002Z",
- "fra": "2026-07-22",
- "til": "2026-10-19",
+ "hentet": "2026-10-21T13:02:43.044Z",
+ "fra": "2026-07-24",
+ "til": "2026-10-21",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -12,14 +12,6 @@
   "/2026/09/what-are-phishing-emails": {
    "visninger": 9,
    "brugere": 4
-  },
-  "/2024/10/the future of examples of passive income.": {
-   "visninger": 8,
-   "brugere": 7
-  },
-  "/2026/05/the-impact-of-googles-new-video-model": {
-   "visninger": 8,
-   "brugere": 6
   },
   "/2026/05/unpacking-grubby-ai-is-this-humanizer": {
    "visninger": 9,
@@ -32,6 +24,10 @@
   "/2024/09/faq": {
    "visninger": 7,
    "brugere": 3
+  },
+  "/2024/10/the future of examples of passive income.": {
+   "visninger": 6,
+   "brugere": 6
   },
   "/2026/05/the-real-arch-linux-myths-trade-offs": {
    "visninger": 6,
@@ -49,7 +45,7 @@
    "visninger": 5,
    "brugere": 1
   },
-  "/2026/05/free-open-source-whatsapp-crm-technical": {
+  "/2026/05/the-impact-of-googles-new-video-model": {
    "visninger": 5,
    "brugere": 5
   },
@@ -73,10 +69,6 @@
    "visninger": 5,
    "brugere": 3
   },
-  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
-   "visninger": 6,
-   "brugere": 4
-  },
   "/2026/10/how-long-learn-python": {
    "visninger": 4,
    "brugere": 3
@@ -97,12 +89,20 @@
    "visninger": 4,
    "brugere": 4
   },
+  "/2026/05/free-open-source-whatsapp-crm-technical": {
+   "visninger": 3,
+   "brugere": 3
+  },
   "/2026/05/inside-tmobiles-airan-partnership-how": {
    "visninger": 3,
    "brugere": 2
   },
   "/2026/05/stop-losing-rankings-how-to-find-and": {
    "visninger": 3,
+   "brugere": 3
+  },
+  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
+   "visninger": 5,
    "brugere": 3
   },
   "/2026/09/what-is-python-used-for": {
