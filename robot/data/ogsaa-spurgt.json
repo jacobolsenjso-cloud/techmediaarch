@@ -2456,5 +2456,22 @@
  "/2026/10/email-marketing-best-practices": {
   "dato": "2026-10-21T19:23:46.781Z",
   "valg": []
+ },
+ "/2026/10/product-management-business-development": {
+  "dato": "2026-10-22T19:19:14.491Z",
+  "valg": [
+   {
+    "q": "Difference between product management and product marketing?",
+    "sti": "/2026/09/product-management-vs-marketing"
+   },
+   {
+    "q": "What does product management involve?",
+    "sti": "/2026/10/what-does-product-management-involve"
+   },
+   {
+    "q": "What is the best way to learn product management?",
+    "sti": "/2026/10/best-way-learn-product-management"
+   }
+  ]
  }
 }
