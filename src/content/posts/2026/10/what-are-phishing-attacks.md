@@ -60,7 +60,7 @@ robot: true
 
 <h2>Technical Controls and Defensive Frameworks</h2>
 
-<p>Mitigating modern credential harvesting requires a combination of user vigilance and robust backend architecture. Organizations prevent phishing by implementing enterprise email security filters, multi-factor authentication (MFA), and adopting Zero Trust security frameworks to limit lateral movement and contain potential breaches before they escalate.</p>
+<p>Mitigating modern credential harvesting requires a combination of user vigilance and robust backend architecture. Organizations prevent phishing by implementing enterprise email security filters, <a href="/2026/10/how-phishing-resistant-mfa-works">multi-factor authentication</a> (MFA), and adopting Zero Trust security frameworks to limit lateral movement and contain potential breaches before they escalate.</p>
 
 <p>Implementing a Zero Trust architecture ensures that even if an employee falls victim to credential theft, the attacker cannot automatically access sensitive internal databases or critical infrastructure.</p><p>For a deeper understanding of how strict access policies mitigate breach impacts, review <a href="/2026/09/what-are-zero-trust-security-models">What Are Zero Trust Security Models: A Complete Guide</a> to see how continuous identity verification protects network segments.</p><p>By verifying every access request regardless of where it originates, organizations can drastically reduce the dwell time of attackers who manage to slip past initial perimeter defenses.</p>
 

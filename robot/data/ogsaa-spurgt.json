@@ -2495,5 +2495,22 @@
     "sti": "/2024/08/Cracking the Code A Beginners Guide to Cryptocurrency Basics"
    }
   ]
+ },
+ "/2026/10/how-phishing-resistant-mfa-works": {
+  "dato": "2026-10-25T12:40:33.337Z",
+  "valg": [
+   {
+    "q": "Is phishing a social engineering attack?",
+    "sti": "/2026/10/what-are-phishing-attacks"
+   },
+   {
+    "q": "What are phishing emails?",
+    "sti": "/2026/09/what-are-phishing-emails"
+   },
+   {
+    "q": "What are some signs of phishing emails?",
+    "sti": "/2024/10/the fake gmail com inbox that fooled the world"
+   }
+  ]
  }
 }
