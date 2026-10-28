@@ -9,10 +9,10 @@ import '@fontsource-variable/source-serif-4/wght.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import archivoLatinWoff2 from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
-import { KATEGORIER, emneUrl } from '../lib/emner';
+import { ANDRE_EMNER, emneUrl } from '../lib/emner';
 import { HAR_BEDSTE } from '../lib/bedste';
 import { udenHtml } from '../lib/adresse.mjs';
-import { HYLDER } from '../lib/hylder';
+import { HYLDER, hyldeUrl, iHylde } from '../lib/hylder';
 import { INDLAEG } from '../lib/indhold';
 
 interface Props {
@@ -207,11 +207,12 @@ const nyeste = INDLAEG[0];
       body.dark-mode .mega-inner { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); }
       .mega-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
       .mega-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 8px 12px 4px; }
-      .mega-item { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px; border-radius: 15px; color: var(--text-color); text-decoration: none; transition: background 0.15s ease; }
+      .mega-item { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px; border-radius: 15px; color: var(--text-color); text-decoration: none; transition: background 0.15s ease; }
       .mega-item:hover, .mega-item:focus-visible { background: color-mix(in srgb, var(--teal) 7%, var(--card-bg)); }
       .mega-ikon { width: 44px; height: 44px; border-radius: 10px; background: color-mix(in srgb, var(--h-farve) 15%, var(--card-bg)); color: var(--h-farve); display: flex; align-items: center; justify-content: center; }
       .mega-ikon svg, .nav-hylde-ikon svg, .mega-start-ikon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
       .mega-tekst { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+      .mega-antal { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
       .mega-navn { font-size: 16px; font-weight: 700; }
       .mega-besk { font-size: 13.5px; color: var(--muted); line-height: 1.4; }
       .mega-az { margin: 6px 12px 4px; padding-top: 12px; border-top: 1px solid var(--rule-light); font-size: 14px; font-weight: 600; color: var(--teal-text); text-decoration: none; }
@@ -432,6 +433,9 @@ const nyeste = INDLAEG[0];
       .chip-accent.active { background: var(--teal); color: var(--bg-color); border-color: var(--teal); }
       .chip-accent:not(.active):hover { background: var(--hover-bg); }
       .chip-count { font-weight: 500; opacity: 0.6; margin-left: 6px; font-size: 0.8rem; }
+      /* Hylde-knapperne (trin 4): rolig farveprik foran navnet */
+      .chip-prik { width: 8px; height: 8px; border-radius: 50%; background: var(--h-farve); margin-right: 8px; flex-shrink: 0; }
+      .chip.active .chip-prik { background: var(--bg-color); }
 
       .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 20px 0 40px 0; flex-wrap: wrap; }
       .pagination-btn, .pagination-num { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding: 0 16px; border-radius: var(--radius); border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: background 0.2s; box-sizing: border-box; }
@@ -508,13 +512,13 @@ const nyeste = INDLAEG[0];
         </a>
       </div>
       {/* 28/10 aften (Jacob): fuld bredde, kun navnet, Shelves (megamenu), Start here og A–Z index.
-          "How we verify" og "About" står i menuen og i footeren. "A–Z index" er indtil trin 4 siden med alle artikler. */}
+          "How we verify" og "About" står i menuen og i footeren. "A–Z index" er /a-z (trin 4). */}
       <nav class="top-links" aria-label="Main">
         <button type="button" id="megaBtn" class="top-link-btn" aria-expanded="false" aria-controls="megaMenu">Shelves
           <svg class="top-link-pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
         </button>
         <a href="/p/start-here" class={aktiv('/p/start-here') ? 'active' : ''} aria-current={aktiv('/p/start-here') ? 'page' : undefined}>Start here</a>
-        <a href="/p/sitemap" class={aktiv('/p/sitemap') ? 'active' : ''} aria-current={aktiv('/p/sitemap') ? 'page' : undefined}>A–Z index</a>
+        <a href="/a-z" class={aktiv('/a-z') ? 'active' : ''} aria-current={aktiv('/a-z') ? 'page' : undefined}>A–Z index</a>
       </nav>
       <div class="nav-right">
         <button id="searchBtn" class="icon-btn" aria-label="Open search" aria-expanded="false" aria-controls="searchOverlay">
@@ -539,18 +543,19 @@ const nyeste = INDLAEG[0];
       </div>
 
       {/* Megamenuen under "Shelves" (godkendt i designlærredet, udkast 3). Åbner ved mus over knappen eller ved klik/tastatur.
-          Indtil hyldesiderne findes (trin 4) fører hver hylde til sit vigtigste emne; derfor ingen tal her endnu. */}
+          Fra trin 4 fører hver hylde til sin hyldeside (/shelf/<slug>); tallet er antal artikler på hylden. */}
       <div class="mega" id="megaMenu" role="region" aria-label="Shelves" hidden>
         <div class="mega-inner">
           <div class="mega-col">
             <span class="mega-label">The five shelves</span>
             {HYLDER.map((h) => (
-              <a href={h.link} class="mega-item" style={`--h-farve: ${h.farve}`}>
+              <a href={hyldeUrl(h)} class="mega-item" style={`--h-farve: ${h.farve}`}>
                 <span class="mega-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d={h.ikon} /></svg></span>
                 <span class="mega-tekst"><span class="mega-navn">{h.navn}</span><span class="mega-besk">{h.besk}</span></span>
+                <span class="mega-antal">{iHylde(h).length}</span>
               </a>
             ))}
-            <a href="/p/sitemap" class="mega-az">A–Z index of every answer →</a>
+            <a href="/a-z" class="mega-az">A–Z index of every answer →</a>
           </div>
           <div class="mega-col">
             {nyeste && (
@@ -574,7 +579,7 @@ const nyeste = INDLAEG[0];
         {/* De 5 hylder øverst i menuen (mobilens udgave af megamenuen, designlærredet udkast 3) */}
         <span class="nav-heading">Shelves</span>
         {HYLDER.map((h) => (
-          <a href={h.link} class="nav-item nav-hylde" style={`--h-farve: ${h.farve}`}>
+          <a href={hyldeUrl(h)} class={`nav-item nav-hylde ${aktiv(hyldeUrl(h)) ? 'active' : ''}`} style={`--h-farve: ${h.farve}`}>
             <span class="nav-hylde-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d={h.ikon} /></svg></span>
             {h.navn}
           </a>
@@ -616,13 +621,13 @@ const nyeste = INDLAEG[0];
         <hr class="nav-sep" />
         {/* Topics foldet sammen (30/9, Jacobs valg C): emne-knapperne står øverst på forsiden, emnesiderne og Trending,
             men i artikler og på mobil er menuen eneste vej til emnerne — derfor foldet, ikke slettet. Åben på en emneside. */}
-        <details class="nav-topics" open={KATEGORIER.some((e) => aktiv(emneUrl(e)))}>
+        <details class="nav-topics" open={ANDRE_EMNER.some((e) => aktiv(emneUrl(e)))}>
           <summary class="nav-item nav-topics-knap">
             <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
-            Topics
+            Other topics
             <svg class="nav-topics-pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
           </summary>
-          {KATEGORIER.map((e) => (
+          {ANDRE_EMNER.map((e) => (
             <a href={emneUrl(e)} class={`nav-item ${aktiv(emneUrl(e)) ? 'active' : ''}`} style={`--tag-accent: ${e.farve}`}>
               <span class="nav-dot" aria-hidden="true"></span>
               {e.navn}

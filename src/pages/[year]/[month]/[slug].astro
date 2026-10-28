@@ -7,6 +7,7 @@ import MainLayout from '../../../layouts/MainLayout.astro';
 import ArticleCard from '../../../components/ArticleCard.astro';
 import { INDLAEG, datoTekst } from '../../../lib/indhold';
 import { emneUrl } from '../../../lib/emner';
+import { hyldeFor, hyldeUrl } from '../../../lib/hylder';
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
@@ -104,7 +105,10 @@ const schema = {
 const egneFaq = faqSchema(p.faqHtml);
 const ekstraQ = p.faqEkstra.map((x) => ({ '@type': 'Question', name: x.q, acceptedAnswer: { '@type': 'Answer', text: x.a } }));
 const faq = egneFaq || ekstraQ.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [...(egneFaq?.mainEntity || []), ...ekstraQ] } : null;
-const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
+// Brødkrummen viser hylden (trin 4); artikler uden hylde viser deres emne som før
+const hylde = hyldeFor(p);
+const krumme = hylde ? { navn: hylde.navn, href: hyldeUrl(hylde) } : emne ? { navn: emne.navn, href: emneUrl(emne) } : null;
+const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
 ---
 <MainLayout title={p.title} seoTitle={p.seoTitle} description={p.description} image={p.image} schema={faq ? [schema, faq] : schema} ogType="article" breadcrumb={crumbs}>
   <style is:global>
@@ -251,7 +255,7 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     <div class="article-primary">
       <nav class="breadcrumbs-bar" aria-label="Breadcrumb">
         <a href="/">Archive</a>
-        {emne && <><span>/</span><a href={emneUrl(emne)}>{emne.navn}</a></>}
+        {krumme && <><span>/</span><a href={krumme.href}>{krumme.navn}</a></>}
       </nav>
 
       <h1 class="article-title">{p.title}</h1>

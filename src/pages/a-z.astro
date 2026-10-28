@@ -1,0 +1,74 @@
+---
+// A–Z-indeks (trin 4, 28/10-2026): /a-z — alle artikler alfabetisk efter titel, grupperet efter forbogstav,
+// med hylden (eller emnet for artikler uden hylde) ved hver. Topbjælkens og megamenuens "A–Z index".
+import MainLayout from '../layouts/MainLayout.astro';
+import EmneChips from '../components/EmneChips.astro';
+import { INDLAEG, datoTekst } from '../lib/indhold';
+import { emneUrl } from '../lib/emner';
+import { hyldeFor, hyldeUrl } from '../lib/hylder';
+
+const BOGSTAVER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const bogstav = (t: string) => { const c = t.trim().charAt(0).toUpperCase(); return BOGSTAVER.includes(c) ? c : '#'; };
+const sorteret = [...INDLAEG].sort((a, b) => a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }));
+const grupper = new Map<string, typeof INDLAEG>();
+for (const p of sorteret) { const b = bogstav(p.title); if (!grupper.has(b)) grupper.set(b, []); grupper.get(b)!.push(p); }
+const raekkefoelge = [...BOGSTAVER, '#'].filter((b) => grupper.has(b));
+// Hylde eller emne ved hver artikel
+const sted = (p: (typeof INDLAEG)[number]) => {
+  const h = hyldeFor(p);
+  if (h) return { navn: h.navn, href: hyldeUrl(h), farve: h.farve };
+  const e = p.emner[0];
+  return e ? { navn: e.navn, href: emneUrl(e), farve: e.farve } : null;
+};
+---
+<MainLayout title="A–Z index of every article" description={`All ${INDLAEG.length} articles on Tech Media Arch from A to Z, with the shelf each one belongs to.`}
+  breadcrumb={[{ navn: 'A–Z index', href: '/a-z' }]}>
+  <style is:global>
+    .az-top { margin: 8px 0 18px; }
+    .az-titel { margin: 0; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; font-weight: 700; font-stretch: 92%; letter-spacing: -0.02em; }
+    .az-besk { margin: 6px 0 0; font-family: var(--font-serif); font-size: 1.15rem; color: var(--ink-2); }
+    .az-hop { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 28px; position: sticky; top: 60px; z-index: 5; background: var(--bg-color); padding: 10px 0; border-bottom: 1px solid var(--rule-light); }
+    .az-hop a, .az-hop span { min-width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: 650; font-size: 14px; text-decoration: none; }
+    .az-hop a { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); }
+    .az-hop a:hover { border-color: var(--teal); color: var(--teal-text); }
+    .az-hop span { color: var(--muted); opacity: 0.45; }
+    .az-gruppe { margin-bottom: 30px; scroll-margin-top: 130px; }
+    .az-gruppe h2 { margin: 0 0 6px; font-size: 1.8rem; color: var(--teal-text); }
+    .az-raekke { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 18px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--rule-light); }
+    .az-raekke > a { color: var(--text-color); text-decoration: none; font-weight: 600; font-size: 1.02rem; line-height: 1.4; }
+    .az-raekke > a:hover { color: var(--teal-text); }
+    .az-meta { display: flex; gap: 12px; align-items: center; font-family: var(--font-mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .az-sted { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); text-decoration: none; font-family: var(--font-display); font-size: 13px; font-weight: 600; }
+    .az-sted::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--h-farve); }
+    .az-sted:hover { color: var(--teal-text); }
+    @media (max-width: 700px) { .az-raekke { grid-template-columns: minmax(0, 1fr); } .az-meta { white-space: normal; } }
+  </style>
+
+  <div class="page-wrapper" style="padding-top: 24px;">
+    <EmneChips aktiv="a-z" />
+    <header class="az-top">
+      <h1 class="az-titel">A–Z index</h1>
+      <p class="az-besk">All {INDLAEG.length} articles from A to Z, with the shelf each one belongs to.</p>
+    </header>
+    <nav class="az-hop" aria-label="Jump to letter">
+      {[...BOGSTAVER, '#'].map((b) => grupper.has(b) ? <a href={`#bogstav-${b === '#' ? 'andre' : b.toLowerCase()}`}>{b}</a> : <span aria-hidden="true">{b}</span>)}
+    </nav>
+    {raekkefoelge.map((b) => (
+      <section class="az-gruppe" id={`bogstav-${b === '#' ? 'andre' : b.toLowerCase()}`} aria-labelledby={`az-${b === '#' ? 'andre' : b.toLowerCase()}`}>
+        <h2 id={`az-${b === '#' ? 'andre' : b.toLowerCase()}`}>{b}</h2>
+        {grupper.get(b)!.map((p) => {
+          const s = sted(p);
+          return (
+            <div class="az-raekke">
+              <a href={p.href}>{p.title}</a>
+              <span class="az-meta">
+                {s && <a href={s.href} class="az-sted" style={`--h-farve: ${s.farve}`}>{s.navn}</a>}
+                <time datetime={p.published}>{datoTekst(p.published)}</time>
+              </span>
+            </div>
+          );
+        })}
+      </section>
+    ))}
+  </div>
+</MainLayout>

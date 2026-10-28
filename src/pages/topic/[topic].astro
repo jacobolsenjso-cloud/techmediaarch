@@ -4,11 +4,13 @@
 import MainLayout from '../../layouts/MainLayout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
 import EmneChips from '../../components/EmneChips.astro';
-import { EMNER, TYND_GRAENSE, emneUrl } from '../../lib/emner';
+import { EMNER, TYND_GRAENSE, emneUrl, harHylde } from '../../lib/emner';
 import { iEmne } from '../../lib/indhold';
 
+// Fra trin 4 (28/10-2026): kun emner UDEN hylde har en emneside (fintech, crypto, web3, vlog, resources).
+// Emner med hylde sendes af workeren med 301 til hylden (/shelf/<slug>).
 export function getStaticPaths() {
-  return EMNER.filter((e) => iEmne(e).length > 0).map((e) => ({ params: { topic: e.slug }, props: { e } }));
+  return EMNER.filter((e) => iEmne(e).length > 0 && !harHylde(e)).map((e) => ({ params: { topic: e.slug }, props: { e } }));
 }
 const { e } = Astro.props;
 const liste = iEmne(e);
