@@ -1,19 +1,29 @@
 ---
-// Forsiden: samme opbygning som techfeedwatchs forside — introkort, emne-chips,
-// redaktionel top (én hovedhistorie + fire mindre) og derefter et grid.
+// Forsiden: introkort, hylde-chips, redaktionel top (én hovedhistorie + fire mindre),
+// "Questions people are asking" og fra 28/10 ét afsnit pr. hylde (tidligere et grid med kort).
 import MainLayout from '../layouts/MainLayout.astro';
-import ArticleCard from '../components/ArticleCard.astro';
+import ArtikelRaekke from '../components/ArtikelRaekke.astro';
 import EmneChips from '../components/EmneChips.astro';
 import Pagination from '../components/Pagination.astro';
 import { INDLAEG, datoTekst, udsnit } from '../lib/indhold';
 import { somSporgsmaal, tegnFarve } from '../lib/sporgsmaal.mjs';
+import { HYLDER, hyldeFor, hyldeUrl, iHylde } from '../lib/hylder';
+import { FORSIDE_NYESTE, listeSider } from '../lib/liste';
 
-export const PR_SIDE = 24;
-const side1 = INDLAEG.slice(0, PR_SIDE);
-const antalSider = Math.max(1, Math.ceil(INDLAEG.length / PR_SIDE));
+// Forsiden (Jacob 28/10, forslag 2): de 5 nyeste øverst, derefter ét afsnit pr. hylde (1 stor + 3 rækker + "See all").
+// Gitteret med 19 kort er væk; "All articles" fortsætter på /page/2 lige efter de 5 nyeste (lib/liste.ts).
+const side1 = INDLAEG.slice(0, FORSIDE_NYESTE);
+const antalSider = listeSider(INDLAEG.length);
 const hoved = side1[0];
-const sideHistorier = side1.slice(1, 5);
-const resten = side1.slice(5);
+const sideHistorier = side1.slice(1, FORSIDE_NYESTE);
+// Mærket over titlerne viser hylden (ikke det gamle emnenavn); uden hylde: emnet
+const maerke = (p: (typeof INDLAEG)[number]) => { const h = hyldeFor(p); return h ? { navn: h.navn, farve: h.farve } : p.emner[0] ? { navn: p.emner[0].navn, farve: p.emner[0].farve } : null; };
+// Hyldeafsnittene: den nyeste med billede som stor, de 3 næste som rækker
+const hyldeAfsnit = HYLDER.map((h) => {
+  const liste = iHylde(h);
+  const stor = liste.find((p) => p.image) ?? liste[0];
+  return { h, antal: liste.length, stor, smaa: liste.filter((p) => p !== stor).slice(0, 3) };
+}).filter((x) => x.stor);
 
 // "Questions people are asking" (29/9, Jacobs ønske): de nyeste robotartiklers Google-søgespørgsmål som genveje.
 // Undertitlen lover "this week" — den står kun, når ALLE viste spørgsmål er højst 7 dage gamle (ellers "recently").
@@ -80,6 +90,30 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
     .home-question:hover .home-question-arrow { transform: translateX(3px); color: var(--teal-text); }
     @media (max-width: 768px) { .home-questions-list { grid-template-columns: 1fr; } }
     @media (prefers-reduced-motion: reduce) { .home-question:hover, .home-question:hover .home-question-arrow { transform: none; } }
+
+    /* Forslag 2 (Jacob 28/10): hyldeafsnit — 1 stor artikel til venstre, 3 rækker til højre */
+    .hylde-afsnit { display: flex; flex-direction: column; gap: 16px; margin: 0 0 44px; }
+    .hylde-afsnit-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+    .hylde-afsnit-top h2 { margin: 0; font-size: 1.6rem; display: flex; align-items: center; gap: 10px; }
+    .hylde-afsnit-top h2::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--h); }
+    .hylde-afsnit-top h2 a { color: inherit; text-decoration: none; }
+    .hylde-afsnit-top h2 a:hover { color: var(--teal-text); }
+    .hylde-afsnit-alle { font-weight: 600; font-size: 0.95rem; color: var(--teal-text); text-decoration: none; white-space: nowrap; }
+    .hylde-afsnit-alle:hover { text-decoration: underline; }
+    .hylde-afsnit-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 28px; align-items: start; }
+    .hylde-stor { display: flex; flex-direction: column; gap: 10px; color: var(--text-color); text-decoration: none; }
+    .hylde-stor img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-lg); display: block; background: var(--placeholder); }
+    .hylde-stor-titel { font-size: 1.6rem; font-weight: 700; line-height: 1.2; font-stretch: 92%; letter-spacing: -0.015em; transition: color 0.15s; }
+    .hylde-stor:hover .hylde-stor-titel { color: var(--teal-text); }
+    .hylde-stor-besk { font-family: var(--font-serif); font-size: 1rem; line-height: 1.55; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .hylde-stor-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-transform: uppercase; }
+    .hylde-smaa { display: flex; flex-direction: column; }
+    .alle-svar { margin-top: 8px; }
+    @media (max-width: 860px) {
+      .hylde-afsnit-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+      .hylde-afsnit-top h2 { font-size: 1.3rem; }
+      .hylde-stor-titel { font-size: 1.3rem; }
+    }
   </style>
 
   <section class="home-hero">
@@ -116,20 +150,20 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
 
     {hoved && (
       <section class="lead-section" aria-label="Latest">
-        <a href={hoved.href} class="lead-card" style={hoved.emner[0] ? `--tag-accent: ${hoved.emner[0].farve}` : undefined}>
+        <a href={hoved.href} class="lead-card" style={maerke(hoved) ? `--tag-accent: ${maerke(hoved)!.farve}` : undefined}>
           {hoved.image ? <div class="card-thumb"><img src={hoved.image} alt="" loading="eager" fetchpriority="high" /></div> : null}
-          {hoved.emner[0] && <span class="lead-eyebrow">{hoved.emner[0].navn}</span>}
+          {maerke(hoved) && <span class="lead-eyebrow">{maerke(hoved)!.navn}</span>}
           <h2 class="lead-title">{hoved.title}</h2>
           <p class="lead-excerpt">{udsnit(hoved.description, 230)}</p>
           <p class="card-meta"><span>{datoTekst(hoved.published)}</span><span aria-hidden="true">·</span><span>{hoved.minutter} min read</span></p>
         </a>
         <div class="lead-secondary">
           {sideHistorier.map((p) => (
-            <a href={p.href} class="lead-mini" style={p.emner[0] ? `--tag-accent: ${p.emner[0].farve}` : undefined}>
+            <a href={p.href} class="lead-mini" style={maerke(p) ? `--tag-accent: ${maerke(p)!.farve}` : undefined}>
               {p.image ? <div class="card-thumb"><img src={p.image} alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
               <div>
-                {/* Emnemærke over titlen (Jacob 5/10-2026), som på hovedhistorien: læseren ser emnet før titlen */}
-                {p.emner[0] && <span class="lead-eyebrow lead-mini-eyebrow">{p.emner[0].navn}</span>}
+                {/* Mærke over titlen (Jacob 5/10-2026), som på hovedhistorien — fra 28/10 hylden i stedet for emnet */}
+                {maerke(p) && <span class="lead-eyebrow lead-mini-eyebrow">{maerke(p)!.navn}</span>}
                 <h3 class="lead-mini-title">{p.title}</h3>
                 <p class="card-meta"><span>{datoTekst(p.published)}</span></p>
               </div>
@@ -159,13 +193,26 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
       </section>
     )}
 
-    {resten.length > 0 && (
-      <>
-        <div class="section-heading"><h2>Latest articles</h2></div>
-        <div class="card-grid">{resten.map((p) => <ArticleCard p={p} />)}</div>
-      </>
-    )}
+    {/* Forslag 2 (Jacob 28/10): ét afsnit pr. hylde */}
+    {hyldeAfsnit.map(({ h, antal, stor, smaa }) => (
+      <section class="hylde-afsnit" style={`--h: ${h.farve}`} aria-labelledby={`afsnit-${h.slug}`}>
+        <div class="hylde-afsnit-top">
+          <h2 id={`afsnit-${h.slug}`}><a href={hyldeUrl(h)}>{h.navn}</a></h2>
+          <a href={hyldeUrl(h)} class="hylde-afsnit-alle">See all {antal} →</a>
+        </div>
+        <div class="hylde-afsnit-grid">
+          <a href={stor.href} class="hylde-stor">
+            {stor.image && <img src={stor.image} alt="" loading="lazy" decoding="async" />}
+            <span class="hylde-stor-titel">{stor.title}</span>
+            {stor.description && <span class="hylde-stor-besk">{stor.description}</span>}
+            <span class="hylde-stor-meta">{datoTekst(stor.published)} · {stor.minutter} min read</span>
+          </a>
+          <div class="hylde-smaa">{smaa.map((p) => <ArtikelRaekke p={p} besk={false} hylde={false} lille />)}</div>
+        </div>
+      </section>
+    ))}
 
+    <div class="section-heading alle-svar"><h2>All answers</h2><span class="section-note">{INDLAEG.length} answers, newest first</span></div>
     <Pagination side={1} antal={antalSider} />
   </div>
 </MainLayout>

@@ -1,23 +1,27 @@
 ---
-// Side 2, 3 … af artikellisten: /page/2 osv.
+// Side 2, 3 … af artikellisten: /page/2 osv. Fra 28/10 (Jacob, forslag 1) som rækker i stedet for kort i 3 kolonner.
+// Forsiden viser de 5 nyeste; side 2 fortsætter lige efter dem (se lib/liste.ts).
 import MainLayout from '../../layouts/MainLayout.astro';
-import ArticleCard from '../../components/ArticleCard.astro';
+import ArtikelRaekke from '../../components/ArtikelRaekke.astro';
 import Pagination from '../../components/Pagination.astro';
 import { INDLAEG } from '../../lib/indhold';
+import { listeSider, listeUdsnit } from '../../lib/liste';
 
-const PR_SIDE = 24;
 export function getStaticPaths() {
-  const antal = Math.ceil(INDLAEG.length / 24);
-  return Array.from({ length: Math.max(0, antal - 1) }, (_, i) => ({ params: { page: String(i + 2) } }));
+  // (skal stå inde i funktionen: Astro kører getStaticPaths isoleret)
+  return Array.from({ length: Math.max(0, listeSider(INDLAEG.length) - 1) }, (_, i) => ({ params: { page: String(i + 2) } }));
 }
 const side = Number(Astro.params.page);
-const antal = Math.ceil(INDLAEG.length / PR_SIDE);
-const liste = INDLAEG.slice((side - 1) * PR_SIDE, side * PR_SIDE);
+const antal = listeSider(INDLAEG.length);
+const liste = listeUdsnit(INDLAEG, side);
 ---
 <MainLayout title={`All articles – page ${side}`} description={`Tech Media Arch articles, page ${side} of ${antal}.`} noindex breadcrumb={[{ navn: `Page ${side}`, href: `/page/${side}` }]}>
   <div class="page-wrapper" style="padding-top: 24px;">
-    <div class="section-heading"><h1>All articles</h1><span class="section-note">Page {side} of {antal}</span></div>
-    <div class="card-grid">{liste.map((p) => <ArticleCard p={p} niveau={2} />)}</div>
+    <div class="section-heading"><h1>All articles</h1><span class="section-note">Page {side} of {antal} · newest first</span></div>
+    <div class="raekke-liste">{liste.map((p, n) => <ArtikelRaekke p={p} ivrig={n < 3} />)}</div>
     <Pagination side={side} antal={antal} />
   </div>
 </MainLayout>
+<style>
+  .raekke-liste { display: flex; flex-direction: column; max-width: 980px; margin-bottom: 36px; }
+</style>

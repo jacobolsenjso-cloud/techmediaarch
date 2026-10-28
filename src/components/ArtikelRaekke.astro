@@ -1,0 +1,44 @@
+---
+// Én artikel som række (Jacob 28/10, forslag 1): lille billede til venstre, hylde, titel, evt. én linje tekst,
+// dato og læsetid. Bruges på "All articles"-siderne (/page/N) og som de små rækker i forsidens hyldeafsnit.
+// besk = vis beskrivelsen; hylde = vis hyldemærket (slås fra inde i et hyldeafsnit, hvor det står i overskriften).
+import type { Indlaeg } from '../lib/indhold';
+import { datoTekst } from '../lib/indhold';
+import { hyldeFor } from '../lib/hylder';
+interface Props { p: Indlaeg; besk?: boolean; hylde?: boolean; lille?: boolean; ivrig?: boolean }
+const { p, besk = true, hylde = true, lille = false, ivrig = false } = Astro.props;
+const h = hyldeFor(p);
+const maerke = h ? { navn: h.navn, farve: h.farve } : p.emner[0] ? { navn: p.emner[0].navn, farve: p.emner[0].farve } : null;
+---
+<a href={p.href} class:list={['raekke', { lille }]}>
+  {p.image
+    ? <img src={p.image} alt="" loading={ivrig ? 'eager' : 'lazy'} decoding="async" />
+    : <span class="raekke-tom" style={maerke ? `--h: ${maerke.farve}` : undefined}></span>}
+  <span class="raekke-tekst">
+    {hylde && maerke && <span class="raekke-maerke" style={`--h: ${maerke.farve}`}>{maerke.navn}</span>}
+    <span class="raekke-titel">{p.title}</span>
+    {besk && p.description && <span class="raekke-besk">{p.description}</span>}
+    <span class="raekke-meta">{datoTekst(p.published)} · {p.minutter} min read</span>
+  </span>
+</a>
+
+<style>
+  .raekke { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 20px; align-items: center; padding: 16px 0; border-top: 1px solid var(--rule-light); color: var(--text-color); text-decoration: none; }
+  .raekke:first-child { border-top: 0; }
+  .raekke img, .raekke-tom { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: var(--radius); display: block; background: var(--placeholder); }
+  .raekke-tom { background: linear-gradient(135deg, color-mix(in srgb, var(--h, var(--teal)) 22%, var(--card-bg)), var(--hover-bg)); }
+  .raekke-tekst { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .raekke-maerke { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+  .raekke-maerke::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--h); }
+  .raekke-titel { font-size: 1.2rem; font-weight: 700; line-height: 1.3; font-stretch: 92%; letter-spacing: -0.01em; transition: color 0.15s; }
+  .raekke:hover .raekke-titel { color: var(--teal-text); }
+  .raekke-besk { font-family: var(--font-serif); color: var(--ink-2); font-size: 0.98rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .raekke-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-transform: uppercase; }
+  .raekke.lille { grid-template-columns: 120px minmax(0, 1fr); gap: 14px; padding: 12px 0; }
+  .raekke.lille .raekke-titel { font-size: 1rem; }
+  @media (max-width: 760px) {
+    .raekke { grid-template-columns: 110px minmax(0, 1fr); gap: 14px; }
+    .raekke .raekke-besk { display: none; }
+    .raekke-titel, .raekke.lille .raekke-titel { font-size: 1.02rem; }
+  }
+</style>
