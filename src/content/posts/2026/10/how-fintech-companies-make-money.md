@@ -42,7 +42,7 @@ Boston Consulting Group and FT Partners share that trading and investments emerg
 <ul>
   <li>Direct consumer subscriptions for premium account tiers and enhanced features</li>
   <li>Advertising revenue from targeted financial product placements</li>
-  <li>Transaction fees charged on merchant payment processing and transfers</li>
+  <li>Transaction fees charged on <a href="/2026/10/how-payment-processors-work">merchant payment processing</a> and transfers</li>
   <li>Referral fees earned when users sign up for third-party credit cards or loans</li>
 </ul>
 
