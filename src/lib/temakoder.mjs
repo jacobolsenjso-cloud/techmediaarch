@@ -60,6 +60,24 @@ export function youtubeLazy(html) {
   });
 }
 
+// Trin 5 i svar-arkivet (Jacob 28/10): YouTube-videoerne tages ud af artiklerne. Det sker her ved
+// byggeriet — artikelfilerne i src/content røres ikke, så det kan rulles tilbage ved at bruge youtubeLazy igen.
+// Målt 28/10: 151 rammer i 151 artikler (123 i <div data-youtube-video="">), og 45 artikler har
+// VideoObject-data om netop den video. Dataene fjernes også: data om en video, der ikke står på siden,
+// er vildledende for Google. Et omslag, der kun indeholdt rammen (div/p med evt. &nbsp;), fjernes med,
+// så der ikke står et tomt hul i teksten.
+const YT_RAMME = /<iframe\b[^>]*\ssrc=(["'])[^"']*(?:youtube(?:-nocookie)?\.com|youtu\.be)[^"']*\1[^>]*>\s*<\/iframe>/gi;
+const VIDEO_DATA = /<script\b[^>]*application\/ld\+json[^>]*>(?:(?!<\/script>)[\s\S])*?"@type"\s*:\s*"VideoObject"(?:(?!<\/script>)[\s\S])*?<\/script>/gi;
+const MAERKE = '\u0000yt\u0000';
+export function udenYoutube(html) {
+  return html.replace(YT_RAMME, MAERKE).replace(VIDEO_DATA, '')
+    .replace(/<(div|p|center|figure)\b[^>]*>(?:\s|&nbsp;)*\u0000yt\u0000(?:\s|&nbsp;|<br\s*\/?>)*<\/\1>/gi, '')
+    .split(MAERKE).join('');
+}
+// Links til den nedlagte Watch-side (/p/watch er 301 til forsiden, se worker): et listepunkt, der kun er
+// det link, tages ud (målt 28/10: kun "Other places to go" på Start here).
+export const udenWatchLink = (html) => html.replace(/<li>\s*<a href="\/p\/watch(?:\.html)?">[^<]*<\/a>\s*<\/li>\s*/gi, '');
+
 // Videoer uploadet direkte til Blogger (ikke YouTube). Blogger viste dem i en ramme fra
 // blogger.com/video.g?token=…, som kun virker, så længe Blogger-bloggen findes. Her
 // skiftes rammen ud med en almindelig videoafspiller og en kopi af videoen på vores eget

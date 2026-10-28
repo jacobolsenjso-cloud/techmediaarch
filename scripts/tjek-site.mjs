@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { temaKoder, vandmaerke, RAA_KODE } from '../src/lib/temakoder.mjs';
 import { SLETTEDE } from '../worker/slettede.js';
+import { NEDLAGTE } from '../worker/nedlagte.js';
 
 const EKS = process.argv[2];
 const DIST = path.resolve('dist');
@@ -77,9 +78,23 @@ const posts = laes('posts.json').filter((p) => !SLETTEDE[decodeURI(alt(p).replac
 // Slettede artikler (worker/slettede.js) må IKKE længere ligge som fil — ellers svarer de 200, ikke 301
 for (const s of Object.keys(SLETTEDE)) if (filer.has(s)) fejl.push(`SLETTET artikel findes stadig: ${s}`);
 for (const [s, til] of Object.entries(SLETTEDE)) if (!filer.has(til + '.html')) fejl.push(`SLETTET artikels mål findes ikke: ${s} -> ${til}`);
+// Nedlagte faste sider (worker/nedlagte.js, fx Watch): må ikke ligge som fil, og målet skal findes
+for (const [s, til] of Object.entries(NEDLAGTE)) {
+  if (filer.has(s + '.html')) fejl.push(`NEDLAGT side findes stadig som fil: ${s}`);
+  if (!filer.has(til === '/' ? '/index.html' : til + '.html')) fejl.push(`NEDLAGT sides mål findes ikke: ${s} -> ${til}`);
+}
+// Trin 5 (28/10): artiklerne må ikke have YouTube-videoer eller VideoObject-data (temakoder.mjs: udenYoutube)
+for (const f of html) if (/^\/\d{4}\/\d{2}\//.test(f)) {
+  const s = fs.readFileSync(path.join(DIST, f), 'utf8');
+  // Kun brødteksten: skabelonens klik-kode til videoer nævner selv youtube.com/embed
+  const krop = (s.match(/<article class="post-body"[^>]*>([\s\S]*?)<\/article>/) || ['', ''])[1];
+  if (/<iframe\b[^>]*(youtube(-nocookie)?\.com|youtu\.be)|class="yt-lazy"/i.test(krop)) fejl.push(`YOUTUBE-video i artikel: ${f}`);
+  if (/"@type"\s*:\s*"VideoObject"/.test(s)) fejl.push(`VIDEOOBJECT-data i artikel: ${f}`);
+}
 let tekstOk = 0;
 for (const p of [...posts, ...pages]) {
   const sti = decodeURI(alt(p).replace('https://www.techmediaarch.com', ''));
+  if (NEDLAGTE[sti.replace(/\.html$/, '')]) continue;
   if (!filer.has(sti)) { fejl.push(`MANGLER adresse: ${sti}`); continue; }
   if (!posts.includes(p)) continue;
   const side = fs.readFileSync(path.join(DIST, sti), 'utf8');

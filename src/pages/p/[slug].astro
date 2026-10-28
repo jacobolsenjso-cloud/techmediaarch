@@ -8,7 +8,8 @@ import { faqSchema } from '../../lib/faqschema.mjs';
 
 export function getStaticPaths() {
   // (skal stå inde i funktionen: Astro kører getStaticPaths isoleret)
-  // Watch-siden har sin egen skabelon (p/watch.astro).
+  // Watch-siden bygges ikke (trin 5): skabelonen hedder nu p/_watch.astro (Astro springer filer med _ over),
+  // og workeren sender /p/watch til forsiden med 301.
   const UDELAD = new Set(['watch']);
   return SIDER.filter((s) => !UDELAD.has(s.navn)).map((s) => ({ params: { slug: s.navn }, props: { s } }));
 }

@@ -1,5 +1,5 @@
 // /sitemap-pages.xml: forside, faste sider og emnesider (Bloggers havde forside + faste sider).
-import { SIDER, iEmne } from '../lib/indhold';
+import { SIDER_UDEN_WATCH as SIDER, iEmne } from '../lib/indhold';
 import { EMNER, TYND_GRAENSE, emneUrl, harHylde } from '../lib/emner';
 import { HAR_BEDSTE } from '../lib/bedste';
 import { HYLDER, hyldeUrl } from '../lib/hylder';

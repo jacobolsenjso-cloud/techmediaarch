@@ -13,6 +13,7 @@
 // stykker til Safari — se video() nedenfor.
 const PROD = 'www.techmediaarch.com';
 import { SLETTEDE } from './slettede.js';
+import { NEDLAGTE } from './nedlagte.js';
 
 // "/2026/05/navn.html" -> "/2026/05/navn"; "/index.html" -> "/" (samme regel som src/lib/adresse.mjs)
 const udenHtml = (sti) => sti.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
@@ -106,6 +107,10 @@ async function haandter(request, env) {
   // Emnesider for emner med hylde (trin 4): /topic/ai og /topic/ai.html -> /shelf/ai (301, ét hop)
   const emneSide = sti.match(/^\/topic\/([A-Za-z0-9-]+?)(?:\.html)?\/?$/);
   if (emneSide && HYLDE_FOR_EMNE[emneSide[1].toLowerCase()]) return flyt(url, nyEmneAdresse(emneSide[1].toLowerCase()));
+
+  // Nedlagte faste sider (worker/nedlagte.js, fx Watch i trin 5): med og uden .html -> målet (301, ét hop)
+  const nedlagt = NEDLAGTE[sti.replace(/\/$/, '').replace(/\.html$/, '')];
+  if (nedlagt) return flyt(url, nedlagt);
 
   // Slettede artikler (worker/slettede.js): 301 til nærmeste levende artikel — både den
   // gamle .html-adresse og den nye uden

@@ -5,7 +5,7 @@
 // forrige/næste, relaterede) — uden videoafspilleren og alt det, der hørte til den.
 import MainLayout from '../../../layouts/MainLayout.astro';
 import ArticleCard from '../../../components/ArticleCard.astro';
-import { INDLAEG, datoTekst } from '../../../lib/indhold';
+import { INDLAEG, datoTekst, synligeEtiketter } from '../../../lib/indhold';
 import { emneUrl } from '../../../lib/emner';
 import { hyldeFor, hyldeUrl } from '../../../lib/hylder';
 import Maerke from '../../../components/Maerke.astro';
@@ -98,7 +98,7 @@ const schema = {
   // at der står et menneske bag. Navn og titel som på om-siden ("Jacob S. Olsen Founder & CEO").
   author: { '@type': 'Person', name: 'Jacob S. Olsen', jobTitle: 'Founder & CEO', url: SITE + '/p/about-us', worksFor: { '@id': `${SITE}/#organization` } },
   publisher: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/icon-512.png' } },
-  ...(p.labels.length ? { keywords: p.labels.join(', ') } : {}),
+  ...(synligeEtiketter(p).length ? { keywords: synligeEtiketter(p).join(', ') } : {}),
 };
 // FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs) + de ekstra spørgsmål fra frontmatter,
 // så Google får præcis de spørgsmål, læseren ser i FAQ-boksen

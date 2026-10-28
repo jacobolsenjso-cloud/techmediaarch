@@ -598,10 +598,7 @@ const nyeste = INDLAEG[0];
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>
           Start here
         </a>
-        <a href="/p/watch" class={`nav-item ${aktiv('/p/watch') ? 'active' : ''}`}>
-          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>
-          Watch
-        </a>
+        {/* Watch er taget ud (trin 5): /p/watch er 301 til forsiden */}
         {/* Trending og Resources var egne menupunkter på Blogger */}
         <a href="/trending" class={`nav-item ${aktiv('/trending') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
