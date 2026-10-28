@@ -1,7 +1,24 @@
 {
- "hentet": "2026-10-26T20:35:46.319Z",
- "fra": "2026-10-20",
- "til": "2026-10-26",
+ "hentet": "2026-10-28T14:08:22.635Z",
+ "fra": "2026-10-22",
+ "til": "2026-10-28",
  "dage": 7,
- "sider": {}
+ "sider": {
+  "/2026/09/what-are-phishing-emails": {
+   "visninger": 4,
+   "brugere": 1
+  },
+  "/2026/05/exploring-possibilities-of-openfutureai": {
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/09/what-is-mvp-software-development": {
+   "visninger": 2,
+   "brugere": 1
+  }
+ }
 }
