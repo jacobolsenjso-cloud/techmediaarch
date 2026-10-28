@@ -7,7 +7,7 @@ import MainLayout from '../../../layouts/MainLayout.astro';
 import ArticleCard from '../../../components/ArticleCard.astro';
 import { INDLAEG, datoTekst, synligeEtiketter } from '../../../lib/indhold';
 import { emneUrl } from '../../../lib/emner';
-import { hyldeFor, hyldeUrl } from '../../../lib/hylder';
+import { HYLDER, hyldeFor, hyldeUrl, iHylde, startListe } from '../../../lib/hylder';
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
@@ -42,7 +42,16 @@ const paa = geminiValg
 const paaHtml = paa.length ? `<aside class="paa" data-ekstra="1" aria-labelledby="paa-heading"><span class="paa-title" id="paa-heading">People also ask</span><span class="paa-sub">Related questions answered on this site.</span><nav class="paa-list" aria-label="People also ask">${
   paa.map((q) => `<a href="${esc(q.href)}" class="paa-link"><span class="paa-mark" style="--tag-accent: ${q.farve}; color: ${tegnFarve(q.farve)}" aria-hidden="true">?</span><span class="paa-text">${esc(q.q)}</span><span class="paa-arrow" aria-hidden="true">→</span></a>`).join('')
 }</nav></aside>` : '';
-const faqStart = p.html.indexOf('<section class="faq-box"');
+// Trin 6, forslag 1 (Jacob 28/10): forspalten. Robotartiklerne er skrevet "kort svar først", så deres første afsnit
+// flyttes op under titlen og står ikke igen i brødteksten. De gamle Blogger-artikler begynder ofte med et billede
+// eller en indledning, der ikke er et svar — de får ingen forspalte (og deres brødtekst skal være ord for ord som på Blogger).
+// Målt 28/10: 11 af 45 robotartikler begynder med svaret; 33 begynder med en indledende <h2> ("Introduction to …",
+// "Understanding …") og har svaret i afsnittet lige under. Overskriften bliver stående; kun afsnittet flyttes op.
+const FOERSTE_AFSNIT = /^(\s*<h2\b[^>]*>(?:(?!<\/h2>)[\s\S])*<\/h2>\s*)?<p>((?:(?!<\/?p[\s>])[\s\S])+?)<\/p>/;
+const fa = p.robot ? p.html.match(FOERSTE_AFSNIT) : null;
+const forspalte = fa && fa[2].replace(/<[^>]+>/g, '').trim().length >= 60 ? fa[2] : null;
+const krop = forspalte ? (fa![1] ?? '') + p.html.slice(fa![0].length) : p.html;
+const faqStart = krop.indexOf('<section class="faq-box"');
 
 const i = INDLAEG.indexOf(p);
 const nyere = INDLAEG[i - 1];
@@ -58,16 +67,39 @@ const laest = (x: typeof p) => (MEST_RAA as { sider?: Record<string, { visninger
 const kandidater = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].filter((x) => x.image && !paaHref.has(x.href));
 // Samme emne vinder altid over et andet emne (målt 1/10: en Product-artikel fik ellers et Infosec-forslag, fordi det var læst mest)
 const sammeEmne = (x: typeof p) => (somEmne.includes(x) ? 1 : 0);
-const forslag = [...kandidater.slice(0, 12)].sort((a, b) => sammeEmne(b) - sammeEmne(a) || laest(b) - laest(a)).slice(0, 2);
-const forslagHtml = forslag.length === 2 ? `<aside class="ymal" data-ekstra="1" aria-label="You might also like"><span class="ymal-label">You might also like</span><span class="ymal-grid">${
-  forslag.map((x) => `<a href="${esc(x.href)}" class="ymal-card"><span class="ymal-thumb"><img src="${esc(x.image!)}" alt="" loading="lazy" decoding="async"></span><span class="ymal-title">${esc(x.title)}</span></a>`).join('')
-}</span></aside>` : '';
+const gamleForslag = [...kandidater.slice(0, 12)].sort((a, b) => sammeEmne(b) - sammeEmne(a) || laest(b) - laest(a));
+
+// Trin 6, forslag 3 (Jacob 28/10): står artiklen på en hyldes "Start here"-liste, vises forløbet øverst
+const serieHylde = HYLDER.find((h) => h.start.includes(p.sti));
+const serie = serieHylde ? startListe(serieHylde) : [];
+const serieNr = serie.indexOf(p) + 1;
+const hylde = hyldeFor(p) ?? serieHylde;
+
+// Trin 6, forslag 4 (Jacob 28/10): ÉN "Read next"-boks midt i teksten (afløser "You might also like" med 2 forslag fra 1/10).
+// Rækkefølge: næste trin i "Start here" → den mest læste på samme hylde → den gamle regel (samme emne, mest læst).
+const hyldeKandidater = hylde ? iHylde(hylde).filter((x) => x !== p && x.image && !paaHref.has(x.href)) : [];
+const naeste = (serieNr && serieNr < serie.length ? serie[serieNr] : null)
+  ?? [...hyldeKandidater.slice(0, 12)].sort((a, b) => laest(b) - laest(a))[0]
+  ?? gamleForslag[0];
+const forslag = naeste ? [naeste] : [];
+const forslagHtml = naeste ? `<aside class="las-naeste" data-ekstra="1" aria-label="Read next" style="--hylde: ${hylde?.farve ?? 'var(--teal)'}"><a href="${esc(naeste.href)}" class="las-naeste-link">${
+  naeste.image ? `<span class="las-naeste-thumb"><img src="${esc(naeste.image)}" alt="" loading="lazy" decoding="async"></span>` : ''
+}<span class="las-naeste-tekst"><span class="las-naeste-label">${hylde ? 'Read next on this shelf' : 'Read next'}</span><span class="las-naeste-titel">${esc(naeste.title)}</span><span class="las-naeste-meta">${esc(datoTekst(naeste.published))} · ${naeste.minutter} min read</span></span></a></aside>` : '';
 const relaterede = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].filter((x) => !forslag.includes(x)).slice(0, 8);
-// Sidebaren lover "More in <emne>" — så den må kun vise det emne. Har emnet
-// for få artikler, hedder den "Latest articles" og viser de nyeste i stedet.
+// Sidebaren lover "More in <hylde/emne>" — så den må kun vise den. Trin 6, forslag 5: hylden først (ikke det gamle
+// emnenavn, fx "Infosec"). Har hylden/emnet for få artikler, hedder den "Latest articles" og viser de nyeste i stedet.
+const somHylde = hylde ? iHylde(hylde).filter((x) => x !== p) : [];
+const nokIHylde = somHylde.length >= 3;
 const nokIEmne = somEmne.length >= 3;
-const sidebarTitel = nokIEmne ? `More in ${emne!.navn}` : 'Latest articles';
-const sidebarListe = (nokIEmne ? somEmne : INDLAEG.filter((x) => x !== p)).slice(0, 8);
+const sidebarTitel = nokIHylde ? `More in ${hylde!.navn}` : nokIEmne ? `More in ${emne!.navn}` : 'Latest articles';
+const sidebarListe = (nokIHylde ? somHylde : nokIEmne ? somEmne : INDLAEG.filter((x) => x !== p)).slice(0, 8);
+
+// Trin 6, forslag 6: Verification record. Kun det, der er sandt i dag (Jacob 28/10): udgivet/opdateret, de navngivne kilder
+// (artiklens egen "Sources"-liste) og — for robotartikler — at teksten er skrevet med AI ud fra kilderne.
+// "Last verified" kommer først, når robotten faktisk tjekker artiklerne igen (trin 7).
+const kildeStart = krop.search(/<h2[^>]*>\s*Sources\s*<\/h2>/i);
+const kildeListe = kildeStart >= 0 ? (krop.slice(kildeStart).match(/<ul[\s\S]*?<\/ul>/) || [''])[0] : '';
+const kildeVaerter = [...new Set([...kildeListe.matchAll(/href="https?:\/\/(?:www\.)?([^/"]+)/g)].map((m) => m[1]))];
 
 // Indholdsfortegnelse ved 3+ overskrifter. Bliver den lang (de ældre indlæg har
 // op til 40), vises kun hovedafsnittene (h2), så den ikke fylder en hel skærm.
@@ -77,10 +109,10 @@ const toc = p.overskrifter.length < 3 ? [] : p.overskrifter.length > 14 ? p.over
 const tocHtml = toc.length ? `<nav class="toc-container" data-ekstra="1" aria-label="Table of contents"><span class="toc-title">Table of Contents</span><span class="toc-list">${
   toc.map((h) => `<a class="toc-depth-${h.niveau}" href="#${esc(h.id)}">${esc(h.tekst)}</a>`).join('')
 }</span></nav>` : '';
-const slut = faqStart >= 0 ? faqStart : p.html.length;
-const broedtekst = indsaet(p.html, [
-  { pos: efterFoersteBillede(p.html, slut), html: tocHtml },
-  { pos: foranMidterOverskrift(p.html, slut), html: forslagHtml },
+const slut = faqStart >= 0 ? faqStart : krop.length;
+const broedtekst = indsaet(krop, [
+  { pos: efterFoersteBillede(krop, slut), html: tocHtml },
+  { pos: foranMidterOverskrift(krop, slut), html: forslagHtml },
   { pos: slut, html: paaHtml },
 ]);
 
@@ -106,7 +138,6 @@ const egneFaq = faqSchema(p.faqHtml);
 const ekstraQ = p.faqEkstra.map((x) => ({ '@type': 'Question', name: x.q, acceptedAnswer: { '@type': 'Answer', text: x.a } }));
 const faq = egneFaq || ekstraQ.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [...(egneFaq?.mainEntity || []), ...ekstraQ] } : null;
 // Brødkrummen viser hylden (trin 4); artikler uden hylde viser deres emne som før
-const hylde = hyldeFor(p);
 const krumme = hylde ? { navn: hylde.navn, href: hyldeUrl(hylde) } : emne ? { navn: emne.navn, href: emneUrl(emne) } : null;
 const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
 ---
@@ -177,20 +208,62 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .post-body .toc-list a { display: block; padding: 4px 0; color: var(--text-color); text-decoration: none; font-weight: 500; border-bottom: 0; line-height: 1.45; }
     .post-body .toc-list a:hover { color: var(--teal-text); border-bottom: 0; }
     .post-body .toc-list a.toc-depth-3 { padding-left: 20px; font-size: 0.95rem; opacity: 0.9; }
-    /* "You might also like" (1/10, som på techfeedwatch): 2 forslag midt i artiklen. Kun <span>/<a>, ingen afsnit. */
-    .post-body .ymal { display: block; margin: 30px 0; padding: 20px 22px 22px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); }
-    .post-body .ymal-label { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-    .post-body .ymal-label::before { content: '🔎'; letter-spacing: 0; }
-    .post-body .ymal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    .post-body a.ymal-card { display: block; color: var(--teal-text); font-weight: 700; border-bottom: 0; text-decoration: none; }
-    .post-body a.ymal-card:hover { border-bottom: 0; }
-    .post-body .ymal-thumb { display: block; aspect-ratio: 16/9; overflow: hidden; border-radius: var(--radius); margin-bottom: 10px; background: var(--placeholder); }
-    .post-body .ymal-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius); margin: 0; transition: transform 0.3s; }
-    .post-body a.ymal-card:hover .ymal-thumb img { transform: scale(1.04); }
-    .post-body .ymal-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 1rem; line-height: 1.4; }
-    .post-body a.ymal-card:hover .ymal-title { text-decoration: underline; }
-    @media (max-width: 600px) { .post-body .ymal { padding: 16px 14px; } .post-body .ymal-grid { gap: 12px; } .post-body .ymal-title { font-size: 0.92rem; } }
-    @media (prefers-reduced-motion: reduce) { .post-body a.ymal-card:hover .ymal-thumb img { transform: none; } }
+    /* ===== Trin 6 (Jacob 28/10): forslag 1–6 fra lærredet "UDKAST 4 artikel" ===== */
+    /* 2: hyldens mærke over titlen (farveprik + en let tone af hyldens farve; tonen blandes med kortfarven, så den virker i mørk tilstand) */
+    .hylde-maerke { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 14px; padding: 6px 12px; border-radius: var(--radius); background: color-mix(in srgb, var(--hylde) 14%, var(--card-bg)); color: var(--text-color); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; }
+    .hylde-maerke::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--hylde); }
+    .hylde-maerke:hover { background: color-mix(in srgb, var(--hylde) 22%, var(--card-bg)); }
+    /* 1: forspalten — det korte svar stort under titlen */
+    .forspalte { margin: 0 0 20px; max-width: 700px; font-family: var(--font-serif); font-size: 1.32rem; line-height: 1.5; color: var(--ink-2); }
+    .forspalte a { color: inherit; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--teal) 45%, transparent); text-underline-offset: 3px; }
+    .forspalte a:hover { color: var(--teal-text); }
+    /* 3: "Start here"-forløbet */
+    .serie { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px 18px; margin: 0 0 26px; box-shadow: var(--shadow); }
+    .serie-top { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap; margin-bottom: 12px; }
+    .serie-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-text); }
+    .serie-forrige { font-size: 0.85rem; font-weight: 600; color: var(--teal-text); text-decoration: none; }
+    .serie-forrige:hover { text-decoration: underline; }
+    .serie-liste { display: grid; grid-template-columns: repeat(var(--antal), minmax(0, 1fr)); gap: 10px; }
+    .serie-trin { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--radius); background: var(--bg-color); border: 1px solid var(--rule-light); color: var(--text-color); text-decoration: none; font-size: 0.85rem; font-weight: 600; line-height: 1.3; transition: border-color 0.2s, background 0.2s; }
+    a.serie-trin:hover { border-color: var(--teal-text); }
+    .serie-nr { width: 24px; height: 24px; border-radius: 50%; background: var(--hero-bg-2); color: var(--teal-text); font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+    .serie-trin.her { background: var(--teal); border-color: var(--teal); color: var(--bg-color); }
+    .serie-trin.her .serie-nr { background: var(--bg-color); color: var(--teal-text); }
+    .serie-her { font-weight: 400; opacity: 0.85; }
+    @media (max-width: 700px) {
+      .serie-liste { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .serie-trin { flex-direction: row; align-items: center; gap: 10px; background: transparent; border: 0; border-top: 1px solid var(--rule-light); border-radius: 0; padding: 9px 0; font-size: 0.9rem; }
+      .serie-trin:first-child { border-top: 0; }
+      .serie-trin.her { background: transparent; color: var(--text-color); font-weight: 700; border-color: var(--rule-light); }
+      .forspalte { font-size: 1.15rem; }
+      .serie-trin.her .serie-nr { background: var(--teal); color: var(--bg-color); }
+      .serie-nr { flex: none; }
+    }
+    /* 4: "Read next" midt i teksten (afløser "You might also like"). Kun <span>/<a>, ingen afsnit (Auto-annoncer). */
+    .post-body .las-naeste { display: block; margin: 30px 0; }
+    .post-body a.las-naeste-link { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; align-items: center; padding: 14px; background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--hylde); border-radius: var(--radius-lg); box-shadow: var(--shadow); color: var(--text-color); text-decoration: none; border-bottom-width: 1px; transition: border-color 0.2s, transform 0.2s; }
+    .post-body a.las-naeste-link:not(:has(.las-naeste-thumb)) { grid-template-columns: minmax(0, 1fr); }
+    .post-body a.las-naeste-link:hover { transform: translateY(-2px); border-color: var(--teal-text); border-left-color: var(--hylde); }
+    .post-body .las-naeste-thumb { display: block; aspect-ratio: 16/10; overflow: hidden; border-radius: var(--radius); background: var(--placeholder); }
+    .post-body .las-naeste-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; margin: 0; border-radius: 0; box-shadow: none; }
+    .post-body .las-naeste-tekst { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .post-body .las-naeste-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-text); }
+    .post-body .las-naeste-titel { font-family: var(--font-display); font-size: 1.05rem; font-weight: 650; line-height: 1.3; }
+    .post-body a.las-naeste-link:hover .las-naeste-titel { color: var(--teal-text); }
+    .post-body .las-naeste-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-transform: uppercase; }
+    @media (max-width: 600px) { .post-body a.las-naeste-link { grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 12px; } .post-body .las-naeste-titel { font-size: 0.98rem; } }
+    @media (prefers-reduced-motion: reduce) { .post-body a.las-naeste-link:hover { transform: none; } }
+    /* 6: Verification record i sidekolonnen (på mobil står sidekolonnen under teksten) */
+    .verif { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--verified); border-radius: var(--radius-lg); padding: 18px 20px; margin: 0 0 22px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); }
+    .verif-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--verified); }
+    .verif dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 7px 14px; font-size: 0.88rem; line-height: 1.45; }
+    .verif dt { color: var(--muted); }
+    .verif dd { margin: 0; overflow-wrap: anywhere; }
+    .verif-link { font-size: 0.88rem; font-weight: 600; color: var(--teal-text); text-decoration: none; }
+    .verif-link:hover { text-decoration: underline; }
+    /* 5: dato og læsetid på sidelistens artikler */
+    .side-item-tekst { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .side-item-meta { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); text-transform: uppercase; }
     .disclosure-box { font-size: 0.85rem; line-height: 1.6; color: var(--muted); background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 18px; margin: 0 0 30px 0; }
     .disclosure-box strong { color: var(--text-color); }
     .disclosure-box a { color: var(--teal-text); font-weight: 600; }
@@ -258,7 +331,13 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
         {krumme && <><span>/</span><a href={krumme.href}>{krumme.navn}</a></>}
       </nav>
 
+      {/* Trin 6, forslag 2: hylden over titlen (erstatter de små emne-mærker under Share). Uden hylde: emnet. */}
+      {hylde ? <a href={hyldeUrl(hylde)} class="hylde-maerke" style={`--hylde: ${hylde.farve}`}>{hylde.navn}</a>
+        : emne && <a href={emneUrl(emne)} class="hylde-maerke" style={`--hylde: ${emne.farve}`}>{emne.navn}</a>}
+
       <h1 class="article-title">{p.title}</h1>
+
+      {forspalte && <p class="forspalte" set:html={forspalte} />}
 
       <div class="article-byline">
         {/* 1/10 (Jacob): hans foto i stedet for logoet; navnet fører ned til forfatterboksen med hvordan artiklen er lavet.
@@ -281,10 +360,22 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
         </button>
       </div>
 
-      {p.emner.length > 0 && (
-        <div class="tag-container">
-          {p.emner.map((e) => <a href={emneUrl(e)} class="tag-badge" style={`--tag-accent: ${e.farve}`}>{e.navn}</a>)}
-        </div>
+      {/* Trin 6, forslag 3: "Start here"-forløbet — kun på artikler, der står på en hyldes "Start here"-liste */}
+      {serieNr > 0 && (
+        <nav class="serie" aria-label={`Start here: ${serieHylde!.navn}`}>
+          <div class="serie-top">
+            <span class="serie-label">Start here · {serieHylde!.navn} · part {serieNr} of {serie.length}</span>
+            <span style="display: flex; gap: 16px">
+              {serieNr > 1 && <a href={serie[serieNr - 2].href} class="serie-forrige">← Previous</a>}
+              {serieNr < serie.length && <a href={serie[serieNr].href} class="serie-forrige">Next →</a>}
+            </span>
+          </div>
+          <div class="serie-liste" style={`--antal: ${serie.length}`}>
+            {serie.map((x, n) => x === p
+              ? <span class="serie-trin her" aria-current="page"><span class="serie-nr">{n + 1}</span><span>{x.title} <span class="serie-her">· you are here</span></span></span>
+              : <a href={x.href} class="serie-trin"><span class="serie-nr">{n + 1}</span><span>{x.title}</span></a>)}
+          </div>
+        </nav>
       )}
 
       {/* Resources-artikler har affiliate-/henvisningslinks: oplysningen skal stå FØR linkene,
@@ -348,19 +439,33 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       )}
     </div>
 
-    {sidebarListe.length > 0 && (
-      <aside class="article-secondary" aria-label="More articles">
-        <h2 class="side-title">{sidebarTitel}</h2>
-        <div class="side-list">
-          {sidebarListe.map((r) => (
-            <a href={r.href} class="side-item">
-              {r.image ? <div class="card-thumb"><img src={r.image} alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
-              <h3 class="side-item-title">{r.title}</h3>
-            </a>
-          ))}
-        </div>
-      </aside>
-    )}
+    <aside class="article-secondary" aria-label="About this answer and more articles">
+      {/* Trin 6, forslag 6: Verification record — kun det, der er sandt i dag (se kildeVaerter ovenfor) */}
+      <section class="verif" aria-label="Verification record">
+        <span class="verif-label">VERIFICATION RECORD</span>
+        <dl>
+          <dt>Published</dt><dd><time datetime={p.published}>{datoTekst(p.published)}</time></dd>
+          {opdateret && <><dt>Updated</dt><dd><time datetime={p.updated}>{datoTekst(p.updated)}</time></dd></>}
+          {kildeVaerter.length > 0 && <><dt>Sources</dt><dd>{kildeVaerter.length} named ({kildeVaerter.slice(0, 3).join(', ')}{kildeVaerter.length > 3 ? ' …' : ''})</dd></>}
+          {p.robot && <><dt>Written</dt><dd>With AI from the named sources</dd></>}
+        </dl>
+        <a href="/p/editorial-guidelines" class="verif-link">How we verify →</a>
+      </section>
+      {sidebarListe.length > 0 && (
+        <>
+          <h2 class="side-title">{sidebarTitel}</h2>
+          <div class="side-list">
+            {sidebarListe.map((r) => (
+              <a href={r.href} class="side-item">
+                {r.image ? <div class="card-thumb"><img src={r.image} alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
+                {/* Trin 6, forslag 5: dato og læsetid under titlen */}
+                <span class="side-item-tekst"><h3 class="side-item-title">{r.title}</h3><span class="side-item-meta">{datoTekst(r.published)} · {r.minutter} min read</span></span>
+              </a>
+            ))}
+          </div>
+        </>
+      )}
+    </aside>
   </div>
 
   {/* Del-knapper: telefonens egen del-menu når den findes, ellers kopieres linket. */}

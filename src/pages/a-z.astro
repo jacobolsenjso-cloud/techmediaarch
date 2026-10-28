@@ -63,7 +63,8 @@ const sted = (p: (typeof INDLAEG)[number]) => {
               <a href={p.href}>{p.title}</a>
               <span class="az-meta">
                 {s && <a href={s.href} class="az-sted" style={`--h-farve: ${s.farve}`}>{s.navn}</a>}
-                <time datetime={p.published}>{datoTekst(p.published)}</time>
+                {/* Trin 6, forslag 5: dato og læsetid */}
+                <span><time datetime={p.published}>{datoTekst(p.published)}</time> · {p.minutter} min</span>
               </span>
             </div>
           );

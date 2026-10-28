@@ -117,6 +117,8 @@ for (const p of [...posts, ...pages]) {
     // 1/10: indholdsfortegnelsen (under første billede) og "You might also like" (midt i) står nu inde i brødteksten
     .replace(/<nav class="toc-container" data-ekstra="1"[\s\S]*?<\/nav>/g, ' ')
     .replace(/<aside class="ymal" data-ekstra="1"[\s\S]*?<\/aside>/g, ' ')
+    // Trin 6 (28/10): "Read next"-boksen afløste "You might also like"
+    .replace(/<aside class="las-naeste" data-ekstra="1"[\s\S]*?<\/aside>/g, ' ')
     .replace(/<details class="faq-item" data-ekstra="1">[\s\S]*?<\/details>/g, ' '));
   if (kilde === ny) tekstOk++;
   else {
