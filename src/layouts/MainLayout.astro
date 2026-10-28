@@ -12,6 +12,8 @@ import archivoLatinWoff2 from '@fontsource-variable/archivo/files/archivo-latin-
 import { KATEGORIER, emneUrl } from '../lib/emner';
 import { HAR_BEDSTE } from '../lib/bedste';
 import { udenHtml } from '../lib/adresse.mjs';
+import { HYLDER } from '../lib/hylder';
+import { INDLAEG } from '../lib/indhold';
 
 interface Props {
   title?: string;
@@ -55,6 +57,8 @@ const siteSchema = [
 ];
 const schemaListe = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
 const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
+// Megamenuen viser den nyeste artikel (INDLAEG er sorteret nyeste først)
+const nyeste = INDLAEG[0];
 ---
 
 <html lang="en">
@@ -155,7 +159,12 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .top-navbar { height: 60px; display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 0 max(20px, calc((100% - 1200px) / 2 + 20px)); background: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); z-index: 1000; position: sticky; top: 0; box-sizing: border-box; }
       .nav-left { display: flex; align-items: center; gap: 15px; min-width: 0; }
       .nav-right { display: flex; align-items: center; gap: 8px; }
-      .top-links { display: flex; gap: 22px; margin-left: auto; font-size: 15px; font-weight: 500; }
+      .top-links { display: flex; align-items: center; gap: 22px; margin: 0 auto; font-size: 15px; font-weight: 500; }
+      /* "Shelves"-knappen åbner megamenuen; åben = lys blå flade */
+      .top-link-btn { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px; margin: 0 -4px 0 -12px; border: 0; border-radius: 10px; background: transparent; font: inherit; color: var(--text-color); cursor: pointer; transition: background 0.2s ease, color 0.2s ease; }
+      .top-link-btn:hover, .top-link-btn[aria-expanded="true"] { background: color-mix(in srgb, var(--teal) 10%, var(--card-bg)); color: var(--teal-text); }
+      .top-link-pil { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.2s ease; }
+      .top-link-btn[aria-expanded="true"] .top-link-pil { transform: rotate(180deg); }
       .top-links a { color: var(--text-color); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
       .top-links a:hover, .top-links a.active { color: var(--teal-text); }
       /* Firkantede ikonknapper med tynd kant, som i designet (ikke runde emoji-knapper) */
@@ -189,8 +198,42 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .logo-name { font-size: 22px; line-height: 1.05; font-weight: 800; font-stretch: 92%; letter-spacing: -0.01em; white-space: nowrap; }
       .logo-sub { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
       .logo-sub-kort { display: none; }
-      .menu-label { font-size: 14px; font-weight: 600; margin-left: 6px; }
-      .menu-btn { width: auto; padding: 0 12px; }
+      /* Menu-knappen er kun et ikon (udkast 3); ordet "Menu" står til skærmlæsere i aria-label */
+      .menu-label { display: none; }
+
+      /* --- Megamenu under "Shelves" (28/10 aften, designlærredet udkast 3: hjørner 15 px på flader, 10 px på ikoner) --- */
+      .mega { position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%); width: min(1160px, calc(100% - 40px)); z-index: 1001; }
+      .mega-inner { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 18px; padding: 18px; background: var(--card-bg); border: 1px solid var(--rule-light); border-radius: 15px; box-shadow: 0 4px 10px rgba(31, 35, 40, 0.06), 0 24px 60px rgba(31, 35, 40, 0.18); }
+      body.dark-mode .mega-inner { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); }
+      .mega-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+      .mega-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 8px 12px 4px; }
+      .mega-item { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px; border-radius: 15px; color: var(--text-color); text-decoration: none; transition: background 0.15s ease; }
+      .mega-item:hover, .mega-item:focus-visible { background: color-mix(in srgb, var(--teal) 7%, var(--card-bg)); }
+      .mega-ikon { width: 44px; height: 44px; border-radius: 10px; background: color-mix(in srgb, var(--h-farve) 15%, var(--card-bg)); color: var(--h-farve); display: flex; align-items: center; justify-content: center; }
+      .mega-ikon svg, .nav-hylde-ikon svg, .mega-start-ikon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      .mega-tekst { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+      .mega-navn { font-size: 16px; font-weight: 700; }
+      .mega-besk { font-size: 13.5px; color: var(--muted); line-height: 1.4; }
+      .mega-az { margin: 6px 12px 4px; padding-top: 12px; border-top: 1px solid var(--rule-light); font-size: 14px; font-weight: 600; color: var(--teal-text); text-decoration: none; }
+      .mega-az:hover { text-decoration: underline; }
+      .mega-nyeste { display: flex; flex-direction: column; border-radius: 15px; overflow: hidden; background: var(--bg-color); border: 1px solid var(--rule-light); color: var(--text-color); text-decoration: none; }
+      .mega-nyeste img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+      .mega-nyeste-tekst { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; }
+      .mega-badge { align-self: flex-start; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--bg-color); background: var(--teal); border-radius: 10px; padding: 4px 10px; }
+      .mega-nyeste-titel { font-size: 17px; font-weight: 700; line-height: 1.3; }
+      .mega-nyeste:hover .mega-nyeste-titel { color: var(--teal-text); }
+      .mega-start { display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: 15px; background: linear-gradient(135deg, var(--hero-bg), var(--hero-bg-2)); color: var(--text-color); text-decoration: none; }
+      .mega-start:hover .mega-navn { color: var(--teal-text); }
+      .mega-start-ikon { flex: none; width: 40px; height: 40px; border-radius: 10px; background: var(--teal); color: var(--bg-color); display: flex; align-items: center; justify-content: center; }
+      .mega-start-ikon svg { width: 20px; height: 20px; }
+      /* Siden bag megamenuen dæmpes; klik på den lukker menuen */
+      .mega-dim { position: fixed; inset: 60px 0 0 0; background: rgba(31, 35, 40, 0.25); z-index: 999; }
+      @keyframes megaInd { from { opacity: 0; transform: translate(-50%, -6px); } to { opacity: 1; transform: translate(-50%, 0); } }
+      .mega:not([hidden]) { animation: megaInd 0.18s ease; }
+      @media (prefers-reduced-motion: reduce) { .mega:not([hidden]) { animation: none; } .top-link-pil { transition: none; } }
+      /* Hylderne øverst i menuen (mobil) */
+      .nav-hylde-ikon { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0; background: color-mix(in srgb, var(--h-farve) 15%, var(--sidebar-bg)); color: var(--h-farve); display: flex; align-items: center; justify-content: center; }
+      .nav-hylde-ikon svg { width: 17px; height: 17px; }
 
       /* --- Layout: sidemenu + indhold ---
          29/9-2026: siden ruller i VINDUET (før i en indre boks). Googles svævende "Privacy and cookie
@@ -251,8 +294,10 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .scroll-top-btn.visible { display: flex; }
       .scroll-top-btn:hover { border-color: var(--teal-text); color: var(--teal-text); }
 
-      /* Under 960 px er der ikke plads til de fire links i topbjælken: de står i menuen i stedet */
-      @media (max-width: 960px) { .top-links { display: none; } }
+      /* Under 780 px er der ikke plads til de tre links i topbjælken (målt 28/10): hylderne m.m. står i menuen i stedet */
+      @media (max-width: 780px) { .top-links { display: none; } .mega, .mega-dim { display: none !important; } }
+      /* De smalleste telefoner (ca. 320 px): navnet en anelse mindre, så det ikke skæres af ved knapperne */
+      @media (max-width: 380px) { .logo-name { font-size: 17px !important; } }
       @media (max-width: 768px) {
         .top-navbar { padding: 0 12px; gap: 10px; }
         .logo-name { font-size: 19px; }
@@ -460,15 +505,16 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       <div class="nav-left">
         <a href="/" class="logo" aria-label="Tech Media Arch home">
           <span class="logo-name">Tech Media Arch</span>
-          <span class="logo-sub" aria-hidden="true"><span class="logo-sub-lang">The checked tech answer archive</span><span class="logo-sub-kort">The tech answer archive</span></span>
         </a>
       </div>
-      {/* Fire faste genveje (desktop). "How we verify" peger indtil videre på Editorial Guidelines (trin 6 laver den rigtige side) */}
+      {/* 28/10 aften (Jacob): fuld bredde, kun navnet, Shelves (megamenu), Start here og A–Z index.
+          "How we verify" og "About" står i menuen og i footeren. "A–Z index" er indtil trin 4 siden med alle artikler. */}
       <nav class="top-links" aria-label="Main">
+        <button type="button" id="megaBtn" class="top-link-btn" aria-expanded="false" aria-controls="megaMenu">Shelves
+          <svg class="top-link-pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
         <a href="/p/start-here" class={aktiv('/p/start-here') ? 'active' : ''} aria-current={aktiv('/p/start-here') ? 'page' : undefined}>Start here</a>
-        <a href="/p/sitemap" class={aktiv('/p/sitemap') ? 'active' : ''} aria-current={aktiv('/p/sitemap') ? 'page' : undefined}>All answers</a>
-        <a href="/p/editorial-guidelines" class={aktiv('/p/editorial-guidelines') ? 'active' : ''} aria-current={aktiv('/p/editorial-guidelines') ? 'page' : undefined}>How we verify</a>
-        <a href="/p/about-us" class={aktiv('/p/about-us') ? 'active' : ''} aria-current={aktiv('/p/about-us') ? 'page' : undefined}>About</a>
+        <a href="/p/sitemap" class={aktiv('/p/sitemap') ? 'active' : ''} aria-current={aktiv('/p/sitemap') ? 'page' : undefined}>A–Z index</a>
       </nav>
       <div class="nav-right">
         <button id="searchBtn" class="icon-btn" aria-label="Open search" aria-expanded="false" aria-controls="searchOverlay">
@@ -491,10 +537,49 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
         </button>
       </div>
+
+      {/* Megamenuen under "Shelves" (godkendt i designlærredet, udkast 3). Åbner ved mus over knappen eller ved klik/tastatur.
+          Indtil hyldesiderne findes (trin 4) fører hver hylde til sit vigtigste emne; derfor ingen tal her endnu. */}
+      <div class="mega" id="megaMenu" role="region" aria-label="Shelves" hidden>
+        <div class="mega-inner">
+          <div class="mega-col">
+            <span class="mega-label">The five shelves</span>
+            {HYLDER.map((h) => (
+              <a href={h.link} class="mega-item" style={`--h-farve: ${h.farve}`}>
+                <span class="mega-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d={h.ikon} /></svg></span>
+                <span class="mega-tekst"><span class="mega-navn">{h.navn}</span><span class="mega-besk">{h.besk}</span></span>
+              </a>
+            ))}
+            <a href="/p/sitemap" class="mega-az">A–Z index of every answer →</a>
+          </div>
+          <div class="mega-col">
+            {nyeste && (
+              <a href={nyeste.href} class="mega-nyeste">
+                {nyeste.image && <img src={nyeste.image} alt="" loading="lazy" decoding="async" />}
+                <span class="mega-nyeste-tekst"><span class="mega-badge">Newest answer</span><span class="mega-nyeste-titel">{nyeste.title}</span></span>
+              </a>
+            )}
+            <a href="/p/start-here" class="mega-start">
+              <span class="mega-start-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></span>
+              <span class="mega-tekst"><span class="mega-navn">New here? Start here</span><span class="mega-besk">Where to begin if you are new to the archive.</span></span>
+            </a>
+          </div>
+        </div>
+      </div>
     </header>
+    <div class="mega-dim" id="megaDim" hidden></div>
 
     <div class="main-layout">
       <aside class="sidebar" id="sidebar">
+        {/* De 5 hylder øverst i menuen (mobilens udgave af megamenuen, designlærredet udkast 3) */}
+        <span class="nav-heading">Shelves</span>
+        {HYLDER.map((h) => (
+          <a href={h.link} class="nav-item nav-hylde" style={`--h-farve: ${h.farve}`}>
+            <span class="nav-hylde-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d={h.ikon} /></svg></span>
+            {h.navn}
+          </a>
+        ))}
+        <hr class="nav-sep" />
         <a href="/" class={`nav-item ${currentPath === '/' ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/><path d="M9.5 21v-6h5v6"/></svg>
           Home
@@ -707,6 +792,26 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
           menuBtn.addEventListener('click', function () { var open = sidebar.classList.toggle('open'); menuBtn.setAttribute('aria-expanded', open); menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); });
           document.addEventListener('click', function (e) { if (!sidebar.contains(e.target) && !menuBtn.contains(e.target)) luk(); });
           document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && sidebar.classList.contains('open')) { luk(); menuBtn.focus(); } });
+        }
+
+        // Megamenuen under "Shelves": åbner ved mus over knappen (computer) eller ved klik/tastatur.
+        // Lukker, når musen forlader både knap og menu (lille pause, så man kan nå fra knap til menu),
+        // ved klik på den dæmpede side, ved Escape og når tastaturet forlader menuen.
+        var megaBtn = document.getElementById('megaBtn');
+        var mega = document.getElementById('megaMenu');
+        var megaDim = document.getElementById('megaDim');
+        if (megaBtn && mega && megaDim) {
+          var megaT;
+          var megaAaben = function () { clearTimeout(megaT); mega.hidden = false; megaDim.hidden = false; megaBtn.setAttribute('aria-expanded', 'true'); };
+          var megaLuk = function () { clearTimeout(megaT); mega.hidden = true; megaDim.hidden = true; megaBtn.setAttribute('aria-expanded', 'false'); };
+          var megaLukSnart = function () { clearTimeout(megaT); megaT = setTimeout(megaLuk, 200); };
+          megaBtn.addEventListener('click', function () { if (mega.hidden) megaAaben(); else megaLuk(); });
+          if (window.matchMedia('(hover: hover)').matches) {
+            [megaBtn, mega].forEach(function (el) { el.addEventListener('mouseenter', megaAaben); el.addEventListener('mouseleave', megaLukSnart); });
+          }
+          megaDim.addEventListener('click', megaLuk);
+          document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !mega.hidden) { megaLuk(); megaBtn.focus(); } });
+          mega.addEventListener('focusout', function (e) { if (e.relatedTarget && !mega.contains(e.relatedTarget) && e.relatedTarget !== megaBtn) megaLuk(); });
         }
 
         // Siden ruller i vinduet (29/9-2026, se CSS'en ved .main-layout) — mål og ryk der.
