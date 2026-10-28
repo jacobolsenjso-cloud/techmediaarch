@@ -127,15 +127,15 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
          så alle sider og komponenter følger med uden at blive rettet én for én.
          --teal hedder stadig sådan, men er nu arkivets grønne "kontrolleret"-farve (#0E6B57: 5,8:1 på baggrunden).
          --ink-2 er den dæmpede brødtekst; --rule-light de tynde streger mellem rækker. */
-      :root { --bg-color: #f2f4f1; --text-color: #16202b; --card-bg: #fff; --border-color: #d3d8d2; --sidebar-bg: #fff; --hover-bg: #e8ece6; --teal: #0e6b57; --teal-text: #0e6b57; --muted: #56616c; --ink-2: #3b4652; --rule-light: #e3e7e1; --placeholder: #dde3dc;
+      :root { --bg-color: #f2f4f1; --text-color: #16202b; --card-bg: #fff; --border-color: #d3d8d2; --sidebar-bg: #fff; --hover-bg: #e8ece6; --teal: #0e6b57; --teal-text: #0e6b57; --muted: #56616c; --ink-2: #3b4652; --rule-light: #e3e7e1; --placeholder: #dde3dc; --radius: 10px; --shadow: 0 1px 2px rgba(22, 32, 43, 0.05), 0 6px 18px rgba(22, 32, 43, 0.07);
         --font-display: "Archivo Variable", "Helvetica Neue", Arial, sans-serif; --font-serif: "Source Serif 4 Variable", Georgia, "Times New Roman", serif; --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace; }
       /* Mørk tilstand: samme opbygning, blågrå bund i stedet for sort; grøn gjort lysere, så den kan læses (8,5:1) */
-      body.dark-mode { --bg-color: #11161b; --text-color: #e8ece8; --card-bg: #1a2128; --border-color: #2c353e; --sidebar-bg: #151b21; --hover-bg: #222a32; --teal: #5cc4a6; --teal-text: #5cc4a6; --muted: #9aa5af; --ink-2: #c3cbd2; --rule-light: #232b33; --placeholder: #222a32; }
+      body.dark-mode { --bg-color: #11161b; --text-color: #e8ece8; --card-bg: #1a2128; --border-color: #2c353e; --sidebar-bg: #151b21; --hover-bg: #222a32; --teal: #5cc4a6; --teal-text: #5cc4a6; --muted: #9aa5af; --ink-2: #c3cbd2; --rule-light: #232b33; --placeholder: #222a32; --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 22px rgba(0, 0, 0, 0.35); }
       body.dark-mode [style*="#1e3a8a"] { --tag-accent: #6d9eff; }
       body { background: var(--bg-color); color: var(--text-color); margin: 0; font-family: var(--font-display); transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
       * { -webkit-tap-highlight-color: transparent; }
       /* Ikke inde i Watch-siden: den skal se ud som på Blogger (se p/watch.astro) */
-      :where(h1, h2, h3, h4):not(:where(.tma-blogger-scope *)) { letter-spacing: -0.015em; font-stretch: 85%; font-weight: 750; }
+      :where(h1, h2, h3, h4):not(:where(.tma-blogger-scope *)) { letter-spacing: -0.015em; font-stretch: 92%; font-weight: 750; }
       :where(a):not(:where(.tma-blogger-scope *)) { transition: color 0.15s ease, opacity 0.15s ease; }
       ::selection { background: color-mix(in srgb, var(--teal) 24%, transparent); }
       :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
@@ -146,6 +146,9 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       @keyframes tmaReveal { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
       @media (prefers-reduced-motion: reduce) { .tma-reveal { opacity: 1 !important; } .tma-reveal.is-visible { animation: none !important; } }
 
+      /* Trin 3b (Jacob 28/10): bløde skygger på kort, billeder og bokse */
+      :is(.card-thumb, .home-hero-aside, .home-search, .toc-container, .ymal, .disclosure-box, .share-cta, .author-box, .nav-card, .related-box, .paa, .lead-card .card-thumb) { box-shadow: var(--shadow); }
+
       /* --- Topbar --- */
       /* Højden er stadig 60 px: sidemenu, hop-til-overskrift og artiklens side-kolonne regner med den */
       .top-navbar { height: 60px; display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 0 max(20px, calc((100% - 1200px) / 2 + 20px)); background: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); z-index: 1000; position: sticky; top: 0; box-sizing: border-box; }
@@ -155,7 +158,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .top-links a { color: var(--text-color); text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
       .top-links a:hover, .top-links a.active { color: var(--teal-text); }
       /* Firkantede ikonknapper med tynd kant, som i designet (ikke runde emoji-knapper) */
-      .icon-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 0; padding: 0; transition: background 0.2s, border-color 0.2s; }
+      .icon-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); cursor: pointer; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius); padding: 0; transition: background 0.2s, border-color 0.2s; }
       .icon-btn:hover { background: var(--hover-bg); border-color: var(--text-color); }
       .icon-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
       /* Solen vises i mørk tilstand, månen i lys */
@@ -166,8 +169,8 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .search-overlay.active { display: flex; }
       .search-input-wrapper { flex: 0 1 520px; margin-right: 10px; position: relative; }
       .search-overlay .icon-btn { margin-left: auto; }
-      .search-input-wrapper input { width: 100%; height: 44px; padding: 0 14px; border-radius: 0; border: 2px solid var(--text-color); background: var(--card-bg); color: var(--text-color); outline: none; font-size: 1rem; box-sizing: border-box; font-family: inherit; }
-      .search-suggest { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 0; box-shadow: 0 14px 36px rgba(0,0,0,0.18); overflow-y: auto; max-height: 72vh; display: none; z-index: 60; }
+      .search-input-wrapper input { width: 100%; height: 44px; padding: 0 14px; border-radius: var(--radius); border: 2px solid var(--text-color); background: var(--card-bg); color: var(--text-color); outline: none; font-size: 1rem; box-sizing: border-box; font-family: inherit; }
+      .search-suggest { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: 0 14px 36px rgba(0,0,0,0.18); overflow-y: auto; max-height: 72vh; display: none; z-index: 60; }
       .search-suggest.active { display: block; }
       .search-suggest-item { display: flex; gap: 12px; align-items: center; padding: 9px 12px; text-decoration: none; color: var(--text-color); }
       .search-suggest-item:hover, .search-suggest-item.is-active { background: var(--hover-bg); }
@@ -182,7 +185,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       }
       /* Ordmærke: navnet + en lille mono-linje under, som i designet */
       .logo { text-decoration: none; color: inherit; display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 44px; min-width: 0; }
-      .logo-name { font-size: 22px; line-height: 1.05; font-weight: 800; font-stretch: 85%; letter-spacing: -0.01em; white-space: nowrap; }
+      .logo-name { font-size: 22px; line-height: 1.05; font-weight: 800; font-stretch: 92%; letter-spacing: -0.01em; white-space: nowrap; }
       .logo-sub { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
       .logo-sub-kort { display: none; }
       .menu-label { font-size: 14px; font-weight: 600; margin-left: 6px; }
@@ -211,7 +214,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
          får hele bredden som i designet. Lukket er den visibility:hidden, så tastaturet ikke kan tabbe ind i den usynlige menu. */
       .sidebar { width: 280px; max-width: 86vw; background: var(--sidebar-bg); border-left: 1px solid var(--border-color); padding: 15px 10px 160px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; box-sizing: border-box; position: fixed; top: 60px; right: 0; height: calc(100vh - 60px); transform: translateX(100%); visibility: hidden; box-shadow: -2px 0 15px rgba(0,0,0,0.18); z-index: 2000; transition: transform 0.25s ease, visibility 0s linear 0.25s; }
       .sidebar.open { transform: translateX(0); visibility: visible; transition: transform 0.25s ease, visibility 0s; }
-      .nav-item { padding: 10px 15px; min-height: 44px; box-sizing: border-box; text-decoration: none; color: var(--text-color); border-radius: 0; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease; }
+      .nav-item { padding: 10px 15px; min-height: 44px; box-sizing: border-box; text-decoration: none; color: var(--text-color); border-radius: var(--radius); font-weight: 500; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease; }
       .nav-item:hover, .nav-item.active { background: var(--hover-bg); color: var(--teal-text); }
       .nav-item:hover { transform: translateX(3px); }
       .nav-icon { width: 19px; height: 19px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; }
@@ -243,7 +246,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .footer-link:hover { color: var(--teal-text); }
       /* Skillestregerne bliver stående i HTML'en (cookie-scriptet bruger #cookieSettingsSep), men vises ikke */
       .footer-sep { display: none !important; }
-      .scroll-top-btn { display: none; position: fixed; bottom: 20px; right: 20px; width: 44px; height: 44px; border-radius: 0; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); align-items: center; justify-content: center; cursor: pointer; z-index: 500; font-size: 1.3rem; line-height: 1; padding: 0; }
+      .scroll-top-btn { display: none; position: fixed; bottom: 20px; right: 20px; width: 44px; height: 44px; border-radius: var(--radius); background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); align-items: center; justify-content: center; cursor: pointer; z-index: 500; font-size: 1.3rem; line-height: 1; padding: 0; }
       .scroll-top-btn.visible { display: flex; }
       .scroll-top-btn:hover { border-color: var(--teal-text); color: var(--teal-text); }
 
@@ -294,15 +297,15 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .post-body a { color: var(--teal-text); text-decoration: none; font-weight: 600; border-bottom: 1px solid color-mix(in srgb, var(--teal-text) 45%, transparent); transition: border-color 0.2s; }
       .post-body a:hover { border-bottom-color: var(--teal-text); }
       .post-body a:has(> img) { border-bottom: 0; }
-      .post-body img { max-width: 100%; height: auto; border-radius: 0; }
+      .post-body img { max-width: 100%; height: auto; border-radius: var(--radius); }
       /* Vandmærket på billederne — samme udseende som Blogger-temaets script (se temakoder.mjs).
          !important som på Blogger, så billedernes egne gamle Blogger-stile (margin, ramme) ikke vinder. */
-      .post-body .tma-wm { position: relative !important; display: block !important; width: fit-content !important; max-width: 100% !important; margin: 2.5rem auto !important; border-radius: 0 !important; overflow: hidden !important; line-height: 0 !important; font-size: 0 !important; }
-      .post-body .tma-wm > img { display: block !important; max-width: 100% !important; width: auto; height: auto !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; box-sizing: border-box !important; border-radius: 0 !important; }
+      .post-body .tma-wm { position: relative !important; display: block !important; width: fit-content !important; max-width: 100% !important; margin: 2.5rem auto !important; border-radius: var(--radius) !important; overflow: hidden !important; line-height: 0 !important; font-size: 0 !important; }
+      .post-body .tma-wm > img { display: block !important; max-width: 100% !important; width: auto; height: auto !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; box-sizing: border-box !important; border-radius: var(--radius) !important; }
       .post-body .tma-wm-tekst { position: absolute !important; bottom: 15px !important; right: 15px !important; color: rgba(255, 255, 255, 0.9) !important; font-size: 14px !important; font-weight: bold !important; font-family: sans-serif, Arial !important; text-shadow: 1px 1px 3px #000, -1px -1px 3px #000 !important; z-index: 2 !important; pointer-events: none !important; line-height: 1 !important; user-select: none; }
       .post-body a[data-tma-uden-link] { pointer-events: none !important; border-bottom: 0 !important; }
       /* Knapper fra Blogger-temaets {getButton}-kode (se src/lib/temakoder.mjs) */
-      .post-body a.tma-knap { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.5rem; padding: 0.45rem 1.5rem; margin: 0.25rem 0; background: var(--teal); color: var(--bg-color); border: 0; border-radius: 0; font-size: 1rem; font-weight: 600; line-height: 1.3; text-decoration: none; white-space: normal; }
+      .post-body a.tma-knap { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.5rem; padding: 0.45rem 1.5rem; margin: 0.25rem 0; background: var(--teal); color: var(--bg-color); border: 0; border-radius: var(--radius); font-size: 1rem; font-weight: 600; line-height: 1.3; text-decoration: none; white-space: normal; }
       .post-body a.tma-knap:hover { border: 0; filter: brightness(1.12); }
       .post-body a.tma-knap span { white-space: normal !important; }
       .post-body .separator { text-align: center; margin: 1.2em 0; clear: both; }
@@ -316,7 +319,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       @media (max-width: 768px) { .post-body table.tr-caption-container { float: none !important; width: 100% !important; table-layout: fixed; margin-left: 0 !important; margin-right: 0 !important; } }
       .post-body .tr-caption { font-size: 0.85rem; color: var(--muted); padding-top: 8px !important; text-align: center; }
       .post-body hr { border: 0; border-top: 1px solid var(--border-color); margin: 2em 0; }
-      .post-body blockquote { margin: 1.5em 0; padding: 14px 20px; border-left: 4px solid var(--teal); background: var(--card-bg); border-radius: 0; font-size: 1.05rem; }
+      .post-body blockquote { margin: 1.5em 0; padding: 14px 20px; border-left: 4px solid var(--teal); background: var(--card-bg); border-radius: var(--radius); font-size: 1.05rem; }
       .post-body blockquote p:last-child { margin-bottom: 0; }
       .post-body table:not(.tr-caption-container) { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: 0.93rem; line-height: 1.55; }
       /* Mobil: brede tabeller ruller sidelæns i stedet for at sprænge siden */
@@ -348,12 +351,12 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       /* Trin 3: samme 1200 px bredde som topbjælken og artiklerne (før 1600 px ved siden af en fast menu) */
       .page-wrapper { padding: 0 20px 20px 20px; max-width: 1200px; margin: 0 auto; flex: 1; width: 100%; box-sizing: border-box; }
       .section-heading { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 18px 0; padding-bottom: 8px; border-bottom: 2px solid var(--text-color); }
-      .section-heading h2, .section-heading h1 { margin: 0; font-size: 1.6rem; font-weight: 750; font-stretch: 85%; letter-spacing: -0.01em; }
+      .section-heading h2, .section-heading h1 { margin: 0; font-size: 1.6rem; font-weight: 750; font-stretch: 92%; letter-spacing: -0.01em; }
       .section-heading .section-note { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
       .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px; }
       .article-card { text-decoration: none; color: inherit; display: block; transition: transform 0.2s; }
       .article-card:hover { transform: translateY(-3px); }
-      .card-thumb { aspect-ratio: 16/9; border-radius: 0; position: relative; margin-bottom: 10px; overflow: hidden; background-color: var(--placeholder); background-image: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 80%); background-size: 200% 100%; background-repeat: no-repeat; animation: tmaShimmer 1.5s ease-in-out infinite; }
+      .card-thumb { aspect-ratio: 16/9; border-radius: var(--radius); position: relative; margin-bottom: 10px; overflow: hidden; background-color: var(--placeholder); background-image: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 80%); background-size: 200% 100%; background-repeat: no-repeat; animation: tmaShimmer 1.5s ease-in-out infinite; }
       body.dark-mode .card-thumb { background-color: var(--placeholder); background-image: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0) 80%); }
       .card-thumb.is-loaded { animation: none; background-image: none; }
       .card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -371,12 +374,12 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .card-topic { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
       .card-topic::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
       /* Mærke på kortets billede (ArticleCard badge: "42 clicks", "#1"). Blæk-farve med hvid tekst: over 15:1 */
-      .card-badge { position: absolute; top: 8px; left: 8px; background: #16202b; color: #fff; padding: 3px 9px; border-radius: 0; font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 1; }
+      .card-badge { position: absolute; top: 8px; left: 8px; background: #16202b; color: #fff; padding: 3px 9px; border-radius: var(--radius); font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 1; }
       @media (prefers-reduced-motion: reduce) { .card-thumb { animation: none; } .card-thumb img { transition: none; } .article-card:hover .card-thumb img { transform: none; } }
 
       /* Emne-chips: pille-design med farveprik, som techfeedwatchs emnefilter */
       .chip-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 0; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); }
-      .chip { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 7px 16px; border-radius: 0; font-size: 0.85rem; font-weight: 600; text-decoration: none; line-height: 1.5; display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; }
+      .chip { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 7px 16px; border-radius: var(--radius); font-size: 0.85rem; font-weight: 600; text-decoration: none; line-height: 1.5; display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; }
       .chip.active { background: var(--text-color); color: var(--bg-color); border-color: var(--text-color); }
       .chip-accent { border-color: var(--tag-accent); }
       .chip-accent::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); margin-right: 7px; }
@@ -386,7 +389,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .chip-count { font-weight: 500; opacity: 0.6; margin-left: 6px; font-size: 0.8rem; }
 
       .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 20px 0 40px 0; flex-wrap: wrap; }
-      .pagination-btn, .pagination-num { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding: 0 16px; border-radius: 0; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: background 0.2s; box-sizing: border-box; }
+      .pagination-btn, .pagination-num { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding: 0 16px; border-radius: var(--radius); border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: background 0.2s; box-sizing: border-box; }
       .pagination-num { padding: 0; }
       .pagination-btn:hover, .pagination-num:hover { background: var(--hover-bg); }
       .pagination-num.active { background: var(--text-color); color: var(--bg-color); border-color: var(--text-color); }
@@ -394,7 +397,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       @media (max-width: 768px) {
         .page-wrapper { padding: 15px; }
         .card-grid { grid-template-columns: 1fr; }
-        .card-thumb { border-radius: 0; }
+        .card-thumb { border-radius: var(--radius); }
         /* Mobil: én vandret række, der kan rulles, i stedet for 4-5 rækker chips */
         .chip-bar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-left: -15px; margin-right: -15px; padding: 10px 15px; }
         .chip-bar::-webkit-scrollbar { display: none; }
