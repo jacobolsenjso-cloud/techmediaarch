@@ -403,6 +403,37 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
         .chip-bar::-webkit-scrollbar { display: none; }
         .chip { flex: none; }
       }
+
+      /* ===== Bevægelse ved mus og tastatur (Jacob 28/10 aften: A + C i topbjælken, samme stil overalt) =====
+         Kun på enheder med mus (hover: hover), så effekterne ikke "hænger fast" efter et tryk på mobil.
+         Korte (ca. 0,2 s) og slået fra ved "mindre bevægelse" (sidst i blokken). */
+      :root { --shadow-hover: 0 2px 4px rgba(31, 35, 40, 0.06), 0 12px 28px rgba(31, 35, 40, 0.12); }
+      body.dark-mode { --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 14px 30px rgba(0, 0, 0, 0.45); }
+      /* A + C: blå streg under ordene i topbjælken. Den glider ind fra venstre og ud til højre;
+         under den side, man står på, bliver den stående */
+      .top-links a { position: relative; }
+      .top-links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 8px; height: 2px; border-radius: 2px; background: var(--teal); transform: scaleX(0); transform-origin: right center; transition: transform 0.22s ease; }
+      .top-links a.active::after, .top-links a:focus-visible::after { transform: scaleX(1); transform-origin: left center; }
+      /* Links i brødteksten: en tydelig streg glider ind under ordet (billeder, knapper og bokse er undtaget) */
+      .post-body :is(p, li) a:not(.paa-link):not(.tma-knap):not(:has(> img)) { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 2px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 0.25s ease, border-color 0.2s ease; }
+      /* Ikonknapper, kort, billeder og knapper: bløde overgange */
+      .icon-btn { transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
+      :is(.article-card, .lead-card, .lead-mini, .side-item) .card-thumb { transition: box-shadow 0.22s ease; }
+      :is(.lead-card, .lead-mini, .side-item, .home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"]) { transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease, background 0.2s ease; }
+      @media (hover: hover) {
+        .top-links a:hover::after { transform: scaleX(1); transform-origin: left center; }
+        .post-body :is(p, li) a:not(.paa-link):not(.tma-knap):not(:has(> img)):hover { background-size: 100% 2px; border-bottom-color: transparent; }
+        .icon-btn:hover { color: var(--teal-text); border-color: var(--teal); background: var(--card-bg); }
+        :is(.lead-card, .lead-mini, .side-item):hover { transform: translateY(-2px); }
+        :is(.article-card, .lead-card, .lead-mini, .side-item):hover .card-thumb { box-shadow: var(--shadow-hover); }
+        :is(.lead-mini, .side-item):hover :is(.lead-mini-title, .side-item-title) { color: var(--teal-text); }
+        :is(.home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"]):hover { transform: translateY(-1px); filter: brightness(0.92); box-shadow: var(--shadow); }
+        .nav-card:hover { box-shadow: var(--shadow-hover); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .top-links a::after, .post-body :is(p, li) a, .icon-btn, .card-thumb, :is(.lead-card, .lead-mini, .side-item, .home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"]) { transition: none !important; }
+        :is(.lead-card, .lead-mini, .side-item, .home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"], .nav-card, .article-card):hover { transform: none !important; }
+      }
     </style>
   </head>
   <body>
@@ -420,10 +451,10 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       </div>
       {/* Fire faste genveje (desktop). "How we verify" peger indtil videre på Editorial Guidelines (trin 6 laver den rigtige side) */}
       <nav class="top-links" aria-label="Main">
-        <a href="/p/start-here" class={aktiv('/p/start-here') ? 'active' : ''}>Start here</a>
-        <a href="/p/sitemap" class={aktiv('/p/sitemap') ? 'active' : ''}>All answers</a>
-        <a href="/p/editorial-guidelines" class={aktiv('/p/editorial-guidelines') ? 'active' : ''}>How we verify</a>
-        <a href="/p/about-us" class={aktiv('/p/about-us') ? 'active' : ''}>About</a>
+        <a href="/p/start-here" class={aktiv('/p/start-here') ? 'active' : ''} aria-current={aktiv('/p/start-here') ? 'page' : undefined}>Start here</a>
+        <a href="/p/sitemap" class={aktiv('/p/sitemap') ? 'active' : ''} aria-current={aktiv('/p/sitemap') ? 'page' : undefined}>All answers</a>
+        <a href="/p/editorial-guidelines" class={aktiv('/p/editorial-guidelines') ? 'active' : ''} aria-current={aktiv('/p/editorial-guidelines') ? 'page' : undefined}>How we verify</a>
+        <a href="/p/about-us" class={aktiv('/p/about-us') ? 'active' : ''} aria-current={aktiv('/p/about-us') ? 'page' : undefined}>About</a>
       </nav>
       <div class="nav-right">
         <button id="searchBtn" class="icon-btn" aria-label="Open search" aria-expanded="false" aria-controls="searchOverlay">
