@@ -94,8 +94,8 @@ const schema = {
   mainEntityOfPage: SITE + p.href,
   ...(p.image ? { image: SITE + p.image } : {}),
   // Forfatter = en navngiven person (Jacobs valg 27/9-2026): Google og AI-tjenester vægter,
-  // at der står et menneske bag. Navn og titel som på om-siden ("Jacob Olsen Founder & CEO").
-  author: { '@type': 'Person', name: 'Jacob Olsen', jobTitle: 'Founder & CEO', url: SITE + '/p/about-us', worksFor: { '@id': `${SITE}/#organization` } },
+  // at der står et menneske bag. Navn og titel som på om-siden ("Jacob S. Olsen Founder & CEO").
+  author: { '@type': 'Person', name: 'Jacob S. Olsen', jobTitle: 'Founder & CEO', url: SITE + '/p/about-us', worksFor: { '@id': `${SITE}/#organization` } },
   publisher: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/icon-512.png' } },
   ...(p.labels.length ? { keywords: p.labels.join(', ') } : {}),
 };
@@ -265,7 +265,7 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
             Lille udgave (96 px, 2,5 KB) af public/jacob-olsen.png, beskåret om ansigtet, så toppen ikke henter 83 KB. */}
         <img src="/jacob-olsen-96.jpg" alt="" class="byline-avatar byline-foto" width="40" height="40" />
         <div class="byline-text">
-          <span class="byline-name">Published by <a href="#author" rel="author">Jacob Olsen</a></span>
+          <span class="byline-name">Published by <a href="#author" rel="author">Jacob S. Olsen</a></span>
           <span class="byline-meta">
             <time datetime={p.published}>{datoTekst(p.published)}</time>
             {opdateret && <><span class="meta-sep">·</span><span>Updated <time datetime={p.updated}>{datoTekst(p.updated)}</time></span></>}

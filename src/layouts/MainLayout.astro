@@ -27,11 +27,11 @@ const BRAND = 'Tech Media Arch';
 // Adresserne er uden .html (Jacob 29/9-2026, lib/adresse.mjs): /…/navn.html -> /…/navn
 const currentPath = udenHtml(Astro.url.pathname);
 
-const defaultDesc = 'Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.';
+const defaultDesc = 'Clear answers to the tech questions people actually ask: AI tools, cybersecurity, building software, marketing and everyday tech, with the sources named.';
 const desc = description || defaultDesc;
 // Samme regel som techfeedwatch: brandet hænges kun på, hvis der er plads
 const kortTitel = seoTitle || title;
-const fuldTitel = !kortTitel ? `${BRAND} | AI and Tech News, Guides and Analysis`
+const fuldTitel = !kortTitel ? `${BRAND} – the checked tech answer archive`
   : (kortTitel.length + BRAND.length + 3 <= 60 ? `${kortTitel} | ${BRAND}` : kortTitel);
 // Canonical: Astro giver stien kodet (mellemrum = %20), præcis som Blogger skrev den
 const canonicalURL = SITE + currentPath;
@@ -44,7 +44,7 @@ const breadcrumbSchema = {
   })),
 };
 const siteSchema = [
-  { '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, url: SITE + '/',
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, alternateName: 'techmediaarch.com', description: defaultDesc, url: SITE + '/',
     potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${SITE}/search?q={search_term_string}` }, 'query-input': 'required name=search_term_string' } },
   { '@context': 'https://schema.org', '@type': 'Organization', '@id': `${SITE}/#organization`, name: BRAND, url: SITE + '/',
     logo: `${SITE}/icon-512.png` },

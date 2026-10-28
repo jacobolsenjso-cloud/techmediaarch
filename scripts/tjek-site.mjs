@@ -36,6 +36,7 @@ const tekst = (h) => h.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<sty
 // "[IMAGE PLACEHOLDER: …]", gentagne afsnit og én overskrift. Kilden ændres på samme måde, så
 // resten af teksten stadig skal være ord for ord ens — og findes en rettelse ikke, er det en fejl.
 const GMAIL = 'techmediaarch.com@gmail.com';
+const NAVN_GAMMELT = 'Jacob Olsen', NAVN_NYT = 'Jacob S. Olsen';
 const RETTELSER = JSON.parse(fs.readFileSync(path.resolve('scripts/bevidste-rettelser.json'), 'utf8'));
 const PLADS = /\[(?:FEATURED IMAGE PLACEHOLDER|IMAGE PLACEHOLDER|EXTERNAL LINK):[^\]]*\]/g;
 function rettet(sti, k) {
@@ -47,6 +48,8 @@ function rettet(sti, k) {
   k = k.replace(/\bTechMediaArch\b(?![.\w]*\.com|\w)/g, (m, pos, hel) => ('=/.@-_#'.includes(hel[pos - 1] || '') ? m : 'Tech Media Arch'));
   // 29/9 (Jacob): kun info@techmediaarch.com må bruges — gmail-adressen er erstattet i indholdet
   k = k.split(GMAIL).join('info@techmediaarch.com');
+  // 28/10 (Jacob): forfatteren skrives offentligt "Jacob S. Olsen" — "Jacob Olsen" er rettet i indholdet
+  k = k.split(NAVN_GAMMELT).join(NAVN_NYT);
   for (const r of RETTELSER.filter((x) => x.sti === sti)) {
     if (r.type === 'fjern') {
       const x = tekst(r.html); const i = k.lastIndexOf(x);
@@ -66,6 +69,8 @@ const filer = new Set();
 const html = [...filer].filter((f) => f.endsWith('.html'));
 // 29/9 (Jacob): gmail-adressen skal være helt væk fra sitet — kun info@techmediaarch.com
 for (const f of filer) if (/\.(html|xml|txt|json)$/.test(f) && fs.readFileSync(path.join(DIST, f), 'utf8').includes(GMAIL)) fejl.push(`GMAIL-ADRESSE (kun info@techmediaarch.com må bruges): ${f}`);
+// 28/10 (Jacob): forfatternavnet offentligt er "Jacob S. Olsen" — "Jacob Olsen" må ikke stå nogen steder på sitet
+for (const f of filer) if (/\.(html|xml|txt|json)$/.test(f) && fs.readFileSync(path.join(DIST, f), 'utf8').includes(NAVN_GAMMELT)) fejl.push(`FORFATTERNAVN (skal være "${NAVN_NYT}"): ${f}`);
 
 // 1 + 2: Bloggers adresser og teksten
 const posts = laes('posts.json').filter((p) => !SLETTEDE[decodeURI(alt(p).replace('https://www.techmediaarch.com', ''))]), pages = laes('pages.json');

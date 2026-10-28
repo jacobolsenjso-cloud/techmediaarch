@@ -22,7 +22,7 @@ const sporgsmaal = INDLAEG.filter((p) => p.robot && p.keyword).slice(0, 8)
   .map((p) => { const farve = p.emner[0]?.farve || '#0891b2'; return { href: p.href, tekst: somSporgsmaal(p.keyword), farve, tegn: tegnFarve(farve), dato: new Date(p.published).getTime() }; });
 const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q.dato <= UGE);
 ---
-<MainLayout description="Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.">
+<MainLayout description="Clear answers to the tech questions people actually ask: AI tools, cybersecurity, building software, marketing and everyday tech, with the sources named.">
   <style is:global>
     .home-hero { max-width: 1600px; margin: 22px auto 6px auto; padding: 0 20px; box-sizing: border-box; width: 100%; }
     .home-hero-card { position: relative; overflow: hidden; border-radius: 18px; border: 1px solid var(--border-color); background: linear-gradient(135deg, rgba(8,145,178,0.10), rgba(8,145,178,0.02) 62%); padding: 38px 34px; }
