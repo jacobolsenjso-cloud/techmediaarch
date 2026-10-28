@@ -24,9 +24,9 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
 ---
 <MainLayout description="Clear answers to the tech questions people actually ask: AI tools, cybersecurity, building software, marketing and everyday tech, with the sources named.">
   <style is:global>
-    /* Trin 3d (Jacob 28/10 aften: "mere lækker og imødekommende"): blød overgang fra sand til lys blå, større runding,
+    /* Trin 3d (Jacob 28/10 aften: "mere lækker og imødekommende"): farveskyer i topkassen (forslag "H"), større runding,
        én kolonne (overskriften på 2 linjer), nyeste spørgsmål som knapper og "How an answer is made" som 3 trin nederst */
-    .home-hero { max-width: 1160px; width: calc(100% - 40px); margin: 24px auto 32px; padding: 56px 56px 36px; box-sizing: border-box; background: linear-gradient(135deg, var(--hero-bg) 0%, var(--hero-bg-2) 100%); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 18px; }
+    .home-hero { max-width: 1160px; width: calc(100% - 40px); margin: 24px auto 32px; padding: 56px 56px 36px; box-sizing: border-box; /* "H" (Jacob 28/10): tre bløde farveskyer — blå oppe til venstre, lilla oppe til højre, fersken forneden */ background: radial-gradient(55% 85% at 0% 0%, var(--sky-1) 0%, transparent 72%), radial-gradient(45% 75% at 100% 10%, var(--sky-2) 0%, transparent 72%), radial-gradient(55% 70% at 75% 115%, var(--sky-3) 0%, transparent 72%), var(--sky-bund); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 18px; }
     .home-hero-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
     .home-hero-eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--teal-text); text-transform: uppercase; }
     .home-hero-title { margin: 0; font-size: clamp(2.25rem, 4.4vw, 3.4rem); line-height: 1.05; font-weight: 700; font-stretch: 92%; letter-spacing: -0.02em; max-width: 920px; text-wrap: balance; }
