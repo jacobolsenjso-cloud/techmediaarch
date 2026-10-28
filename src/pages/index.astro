@@ -19,36 +19,41 @@ const resten = side1.slice(5);
 // Undertitlen lover "this week" — den står kun, når ALLE viste spørgsmål er højst 7 dage gamle (ellers "recently").
 const UGE = 7 * 24 * 3600 * 1000;
 const sporgsmaal = INDLAEG.filter((p) => p.robot && p.keyword).slice(0, 8)
-  .map((p) => { const farve = p.emner[0]?.farve || '#0891b2'; return { href: p.href, tekst: somSporgsmaal(p.keyword), farve, tegn: tegnFarve(farve), dato: new Date(p.published).getTime() }; });
+  .map((p) => { const farve = p.emner[0]?.farve || '#0e6b57'; return { href: p.href, tekst: somSporgsmaal(p.keyword), farve, tegn: tegnFarve(farve), dato: new Date(p.published).getTime() }; });
 const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q.dato <= UGE);
 ---
 <MainLayout description="Clear answers to the tech questions people actually ask: AI tools, cybersecurity, building software, marketing and everyday tech, with the sources named.">
   <style is:global>
-    .home-hero { max-width: 1600px; margin: 22px auto 6px auto; padding: 0 20px; box-sizing: border-box; width: 100%; }
-    .home-hero-card { position: relative; overflow: hidden; border-radius: 18px; border: 1px solid var(--border-color); background: linear-gradient(135deg, rgba(8,145,178,0.10), rgba(8,145,178,0.02) 62%); padding: 38px 34px; }
-    .home-hero-card::after { content: ''; position: absolute; top: -45%; right: -8%; width: 360px; height: 360px; background: radial-gradient(circle, rgba(8,145,178,0.16), transparent 70%); pointer-events: none; }
-    .home-hero-title { margin: 0 0 10px 0; font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; position: relative; }
-    .home-hero-sub { margin: 0 0 20px 0; font-size: 1.05rem; line-height: 1.6; color: #4b5563; max-width: 640px; position: relative; }
-    body.dark-mode .home-hero-sub { color: #b8b3bd; }
-    .home-hero-links { display: flex; flex-wrap: wrap; gap: 10px; position: relative; }
-    .home-hero-link { display: inline-flex; align-items: center; gap: 7px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); text-decoration: none; padding: 9px 16px; border-radius: 999px; font-weight: 600; font-size: 0.9rem; min-height: 44px; box-sizing: border-box; transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
-    .home-hero-link:hover { transform: translateY(-2px); border-color: var(--teal-text); box-shadow: 0 6px 24px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04); }
-    .hero-link-icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; opacity: 0.7; }
-    @media (max-width: 768px) { .home-hero { margin: 15px auto 4px; padding: 0 15px; } .home-hero-card { padding: 26px 20px; border-radius: 14px; } .home-hero-title { font-size: 1.6rem; } .home-hero-sub { font-size: 0.98rem; } }
+    /* Trin 3: toppen fra designet — mono-linje, stort spørgsmål-svar-løfte, søgefelt og "How an answer is made" */
+    .home-hero { max-width: 1200px; margin: 0 auto; padding: 48px 20px 40px; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 40px; align-items: end; }
+    .home-hero-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+    .home-hero-eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--teal-text); text-transform: uppercase; }
+    .home-hero-title { margin: 0; font-size: 3.5rem; line-height: 1.04; font-weight: 750; font-stretch: 80%; letter-spacing: -0.02em; text-wrap: balance; }
+    .home-hero-sub { margin: 0; font-family: var(--font-serif); font-size: 1.25rem; line-height: 1.55; color: var(--ink-2); max-width: 620px; }
+    .home-search { display: flex; max-width: 640px; margin-top: 6px; }
+    .home-search input { flex: 1; min-width: 0; height: 52px; padding: 0 16px; border: 2px solid var(--text-color); border-right: 0; border-radius: 0; font: inherit; font-size: 17px; background: var(--card-bg); color: var(--text-color); }
+    .home-search input:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+    .home-search button { height: 52px; padding: 0 22px; border: 2px solid var(--text-color); background: var(--text-color); color: var(--bg-color); font: inherit; font-size: 16px; font-weight: 600; border-radius: 0; cursor: pointer; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .home-hero-aside { border: 1px solid var(--border-color); background: var(--card-bg); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+    .home-hero-aside-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+    .home-hero-steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.45; }
+    .home-hero-aside a { font-size: 14px; font-weight: 600; color: var(--teal-text); text-decoration: none; }
+    .home-hero-aside a:hover { text-decoration: underline; }
+    @media (max-width: 860px) { .home-hero { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 32px 16px 28px; } .home-hero-title { font-size: 2.25rem; } .home-hero-sub { font-size: 1.06rem; } .home-search input, .home-search button { height: 48px; } }
 
     .lead-section { display: grid; grid-template-columns: 1.35fr 1fr; gap: 26px; margin-bottom: 42px; align-items: start; }
     .lead-secondary { display: flex; flex-direction: column; gap: 20px; }
     .lead-card { text-decoration: none; color: inherit; display: block; }
-    .lead-card .card-thumb { border-radius: 14px; margin-bottom: 14px; }
+    .lead-card .card-thumb { border-radius: 0; margin-bottom: 14px; }
     .lead-card:hover .card-thumb img { transform: scale(1.04); }
     .lead-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 9px; color: var(--teal-text); }
-    .lead-eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent, #0891b2); }
-    .lead-title { margin: 0 0 9px 0; font-size: 1.75rem; line-height: 1.22; font-weight: 800; letter-spacing: -0.02em; }
+    .lead-eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent, var(--teal)); }
+    .lead-title { margin: 0 0 9px 0; font-size: 2rem; line-height: 1.12; font-weight: 750; font-stretch: 85%; letter-spacing: -0.015em; }
     .lead-card:hover .lead-title { color: var(--teal-text); }
-    .lead-excerpt { margin: 0 0 11px 0; font-size: 1rem; line-height: 1.6; color: #4b5563; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    body.dark-mode .lead-excerpt { color: #a1a1aa; }
+    .lead-excerpt { margin: 0 0 11px 0; font-family: var(--font-serif); font-size: 1.06rem; line-height: 1.55; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .lead-mini { display: grid; grid-template-columns: 132px 1fr; gap: 14px; text-decoration: none; color: inherit; align-items: start; }
-    .lead-mini .card-thumb { border-radius: 10px; margin: 0; }
+    .lead-mini .card-thumb { border-radius: 0; margin: 0; }
     .lead-mini-title { margin: 0 0 5px 0; font-size: 1rem; line-height: 1.35; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .lead-mini:hover .lead-mini-title { color: var(--teal-text); }
     .lead-mini-eyebrow { display: flex; width: fit-content; font-size: 0.66rem; margin-bottom: 5px; }
@@ -59,7 +64,7 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
     /* "Questions people are asking" (29/9) — samme udseende som på Jacobs andet site */
     .home-questions { margin: 6px 0 36px; }
     .home-questions-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 22px; }
-    .home-question { display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 12px; text-decoration: none; color: var(--text-color); border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
+    .home-question { display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: 0; text-decoration: none; color: var(--text-color); border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
     .home-question:hover { background: var(--hover-bg); border-color: var(--border-color); transform: translateX(3px); }
     .home-question-mark { flex: none; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: #fff; background: var(--tag-accent); }
     .home-question-text { font-weight: 600; font-size: 0.95rem; line-height: 1.35; }
@@ -70,15 +75,25 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
   </style>
 
   <section class="home-hero">
-    <div class="home-hero-card">
-      <h1 class="home-hero-title">AI and tech news, guides and analysis.</h1>
-      <p class="home-hero-sub">Tech and AI blog with news, trends, and easy guides on artificial intelligence, tech innovation, and the impact of technology on everyday life.</p>
-      <div class="home-hero-links">
-        <a href="/p/start-here" class="home-hero-link"><svg class="hero-link-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>Start here</a>
-        <a href="/p/watch" class="home-hero-link"><svg class="hero-link-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>Watch</a>
-        <a href="/p/sitemap" class="home-hero-link"><svg class="hero-link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>All articles</a>
-      </div>
+    <div class="home-hero-main">
+      <span class="home-hero-eyebrow">The archive · {INDLAEG.length} articles</span>
+      <h1 class="home-hero-title">Clear answers to the tech questions people actually ask.</h1>
+      <p class="home-hero-sub">Every new page answers one question people search for, short answer first, with the sources named.</p>
+      <form class="home-search" action="/search" method="get" role="search">
+        <label for="homeQ" class="sr-only">Search the archive</label>
+        <input id="homeQ" name="q" type="search" placeholder="Ask a question, e.g. what is phishing?" autocomplete="off" />
+        <button type="submit">Search</button>
+      </form>
     </div>
+    <aside class="home-hero-aside" aria-label="How an answer is made">
+      <span class="home-hero-aside-label">How an answer is made</span>
+      <ol class="home-hero-steps">
+        <li>A real question people search for on Google</li>
+        <li>The short answer first, then the detail</li>
+        <li>Written from sources that are named on the page</li>
+      </ol>
+      <a href="/p/editorial-guidelines">How we work →</a>
+    </aside>
   </section>
 
   <div class="page-wrapper">

@@ -111,23 +111,22 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .article-layout { display: flex; gap: 25px; max-width: 1200px; margin: 0 auto; padding: 30px 20px; box-sizing: border-box; align-items: flex-start; width: 100%; }
     .article-primary { flex: 1; min-width: 0; width: 100%; max-width: 100%; }
     .article-secondary { width: 340px; flex-shrink: 0; position: sticky; top: 80px; max-height: calc(100vh - 100px); /* top: 60 px topbar + 20 px luft (siden ruller i vinduet fra 29/9) */ overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; }
-    .breadcrumbs-bar { background: var(--hover-bg); padding: 0 18px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; }
-    .breadcrumbs-bar a { color: var(--teal-text); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
-    .article-title { margin: 0 0 15px 0; font-size: 2rem; line-height: 1.2; }
+    .breadcrumbs-bar { font-size: 0.9rem; margin-bottom: 8px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .breadcrumbs-bar a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
+    .article-title { margin: 0 0 18px 0; font-size: 2.75rem; line-height: 1.06; font-weight: 750; font-stretch: 80%; letter-spacing: -0.02em; text-wrap: balance; }
     /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
     /* People also ask (29/9) — samme udseende som på Jacobs andet site; nulstiller brødtekstens link- og listestil */
     /* 30/9 (Jacobs valg A): boksen flød ind i teksten. Nu tyk turkis kant i venstre side og en let turkis tone,
        samme stil som forklaringsboksen på Best of each topic — også i mørk tilstand (tonen blandes med kortfarven) */
-    .post-body .paa { margin: 32px 0 10px; padding: 22px 24px; background: color-mix(in srgb, var(--teal) 9%, var(--card-bg)); border: 1px solid color-mix(in srgb, var(--teal) 35%, var(--border-color)); border-left: 5px solid var(--teal); border-radius: 14px; }
+    .post-body .paa { margin: 32px 0 10px; padding: 22px 24px; background: color-mix(in srgb, var(--teal) 9%, var(--card-bg)); border: 1px solid color-mix(in srgb, var(--teal) 35%, var(--border-color)); border-left: 5px solid var(--teal); border-radius: 0; }
     .post-body .paa-title { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
     /* Lille turkis "?" foran titlen (pseudo-element: ingen ekstra tags, som Auto-annoncer kan hæfte sig på) */
-    .post-body .paa-title::before { content: '?'; flex: none; width: 22px; height: 22px; border-radius: 50%; background: #0e7490; color: #fff; font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+    .post-body .paa-title::before { content: '?'; flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--teal); color: var(--bg-color); font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
     /* #4b5563 på den turkise tone giver over 4,5:1 (#6b7280 gav ca. 4,4:1) */
-    .post-body .paa-sub { display: block; margin: 0 0 14px; font-size: 0.85rem; color: #4b5563; line-height: 1.4; }
-    body.dark-mode .post-body .paa-sub { color: #9ca3af; }
+    .post-body .paa-sub { display: block; margin: 0 0 14px; font-size: 0.85rem; color: var(--ink-2); line-height: 1.4; }
     .post-body .paa-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
     .post-body .paa-list li { margin: 0; }
-    .post-body a.paa-link { display: flex; align-items: center; gap: 12px; padding: 9px 10px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: var(--text-color); font-weight: 400; border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
+    .post-body a.paa-link { display: flex; align-items: center; gap: 12px; padding: 9px 10px; min-height: 44px; box-sizing: border-box; border-radius: 0; text-decoration: none; color: var(--text-color); font-weight: 400; border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
     .post-body a.paa-link:hover { background: var(--card-bg); border-color: var(--border-color); transform: translateX(3px); }
     .post-body .paa-mark { flex: none; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; background: var(--tag-accent); }
     .post-body .paa-text { font-weight: 600; font-size: 0.95rem; line-height: 1.35; }
@@ -135,10 +134,10 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .post-body a.paa-link:hover .paa-arrow { transform: translateX(3px); color: var(--teal-text); }
     @media (prefers-reduced-motion: reduce) { .post-body a.paa-link:hover, .post-body a.paa-link:hover .paa-arrow { transform: none; } }
     @media (max-width: 900px) { .post-body .paa { padding: 16px 14px; } }
-    .post-body .faq-box { background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 6px 20px 10px; margin: 32px 0; }
+    .post-body .faq-box { background: transparent; border: 0; border-top: 2px solid var(--text-color); border-radius: 0; padding: 4px 0 10px; margin: 36px 0; }
     .post-body .faq-box > h2 { margin: 14px 0 6px; }
     /* Hvert spørgsmål er et kort — rammen kommer fra den fælles .post-body details-regel i MainLayout */
-    .post-body .faq-box .faq-item { background: var(--card-bg); margin: 10px 0; }
+    .post-body .faq-box .faq-item { background: transparent; border: 0; border-bottom: 1px solid var(--border-color); border-radius: 0; padding: 0; margin: 0; }
     .post-body .faq-item > summary { list-style: none; cursor: pointer; position: relative; padding: 14px 34px 14px 0; font-weight: 600; font-size: 1.02rem; line-height: 1.45; min-height: 24px; }
     .post-body .faq-item > summary::-webkit-details-marker { display: none; }
     .post-body .faq-item > summary::after { content: '+'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; font-weight: 400; color: var(--teal-text); }
@@ -155,71 +154,67 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .byline-name { font-size: 0.92rem; font-weight: 600; }
     .byline-name a { color: inherit; text-decoration: none; }
     .byline-name a:hover { text-decoration: underline; }
-    .byline-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-size: 0.83rem; color: var(--muted); font-weight: 500; }
+    .byline-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); font-weight: 400; }
     .meta-sep { opacity: 0.5; }
     .action-bar { display: flex; gap: 10px; margin-bottom: 22px; align-items: center; flex-wrap: wrap; }
-    .action-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--hover-bg); border-radius: 20px; height: 40px; padding: 0 16px; border: 1px solid var(--border-color); color: var(--text-color); font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
-    .action-pill:hover { background: #e2e8f0; }
-    body.dark-mode .action-pill:hover { background: #334155; }
+    .action-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--card-bg); border-radius: 0; height: 40px; padding: 0 16px; border: 1px solid var(--border-color); color: var(--text-color); font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .action-pill:hover { background: var(--hover-bg); }
     .action-icon { width: 18px; height: 18px; }
     .tag-container { margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .tag-badge { display: inline-flex; align-items: center; gap: 6px; background-color: #e2e8f0; color: #334155; padding: 5px 14px; min-height: 32px; box-sizing: border-box; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; }
+    .tag-badge { display: inline-flex; align-items: center; gap: 6px; background-color: var(--card-bg); color: var(--ink-2); border: 1px solid var(--border-color); padding: 5px 12px; min-height: 32px; box-sizing: border-box; border-radius: 0; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; }
     .tag-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
-    body.dark-mode .tag-badge { background-color: #27272a; color: #d4d4d8; }
-    .tag-badge:hover { background-color: #cbd5e1; color: #0f172a; transform: translateY(-1px); }
+    .tag-badge:hover { background-color: var(--hover-bg); color: var(--text-color); }
     /* Indholdsfortegnelsen står fra 1/10 INDE i brødteksten under første billede (lib/artikelbokse.mjs) — uden ul/li,
        så punkterne er <a> i en <span>. Reglerne er knyttet til .post-body, så de vinder over brødtekstens linkstil. */
-    .post-body .toc-container { display: block; background: var(--hover-bg); border-radius: 8px; padding: 20px; margin: 26px 0 30px; border: 1px solid var(--border-color); }
+    .post-body .toc-container { display: block; background: var(--card-bg); border-radius: 0; padding: 20px; margin: 26px 0 30px; border: 1px solid var(--border-color); }
     .post-body .toc-title { display: block; font-weight: bold; margin-bottom: 12px; font-size: 1.1rem; }
     .post-body .toc-list { display: flex; flex-direction: column; gap: 2px; }
     .post-body .toc-list a { display: block; padding: 4px 0; color: var(--text-color); text-decoration: none; font-weight: 500; border-bottom: 0; line-height: 1.45; }
     .post-body .toc-list a:hover { color: var(--teal-text); border-bottom: 0; }
     .post-body .toc-list a.toc-depth-3 { padding-left: 20px; font-size: 0.95rem; opacity: 0.9; }
     /* "You might also like" (1/10, som på techfeedwatch): 2 forslag midt i artiklen. Kun <span>/<a>, ingen afsnit. */
-    .post-body .ymal { display: block; margin: 30px 0; padding: 20px 22px 22px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 14px; }
+    .post-body .ymal { display: block; margin: 30px 0; padding: 20px 22px 22px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 0; }
     .post-body .ymal-label { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
     .post-body .ymal-label::before { content: '🔎'; letter-spacing: 0; }
     .post-body .ymal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     .post-body a.ymal-card { display: block; color: var(--teal-text); font-weight: 700; border-bottom: 0; text-decoration: none; }
     .post-body a.ymal-card:hover { border-bottom: 0; }
-    .post-body .ymal-thumb { display: block; aspect-ratio: 16/9; overflow: hidden; border-radius: 10px; margin-bottom: 10px; background: var(--border-color); }
+    .post-body .ymal-thumb { display: block; aspect-ratio: 16/9; overflow: hidden; border-radius: 0; margin-bottom: 10px; background: var(--placeholder); }
     .post-body .ymal-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 0; margin: 0; transition: transform 0.3s; }
     .post-body a.ymal-card:hover .ymal-thumb img { transform: scale(1.04); }
     .post-body .ymal-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 1rem; line-height: 1.4; }
     .post-body a.ymal-card:hover .ymal-title { text-decoration: underline; }
     @media (max-width: 600px) { .post-body .ymal { padding: 16px 14px; } .post-body .ymal-grid { gap: 12px; } .post-body .ymal-title { font-size: 0.92rem; } }
     @media (prefers-reduced-motion: reduce) { .post-body a.ymal-card:hover .ymal-thumb img { transform: none; } }
-    .disclosure-box { font-size: 0.85rem; line-height: 1.6; color: var(--muted); background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 18px; margin: 0 0 30px 0; }
+    .disclosure-box { font-size: 0.85rem; line-height: 1.6; color: var(--muted); background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 0; padding: 14px 18px; margin: 0 0 30px 0; }
     .disclosure-box strong { color: var(--text-color); }
     .disclosure-box a { color: var(--teal-text); font-weight: 600; }
     .disclosure-top { margin: 0 0 25px 0; }
-    .share-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px 24px; margin-bottom: 40px; }
+    .share-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 0; padding: 20px 24px; margin-bottom: 40px; }
     .share-cta-title { font-weight: 700; font-size: 1.05rem; margin: 0 0 4px 0; }
     .share-cta-sub { font-size: 0.9rem; color: var(--muted); margin: 0; }
-    .share-cta-btn { display: inline-flex; align-items: center; gap: 8px; background: #0e7490; color: #fff; border: none; border-radius: 8px; padding: 11px 20px; min-height: 44px; font-size: 0.95rem; font-weight: 600; cursor: pointer; flex-shrink: 0; font-family: inherit; transition: background 0.2s, transform 0.2s; }
-    .share-cta-btn:hover { background: #155e75; transform: translateY(-1px); }
+    .share-cta-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: var(--bg-color); border: none; border-radius: 0; padding: 11px 20px; min-height: 44px; font-size: 0.95rem; font-weight: 600; cursor: pointer; flex-shrink: 0; font-family: inherit; transition: background 0.2s, transform 0.2s; }
+    .share-cta-btn:hover { filter: brightness(1.12); }
     .share-cta-btn svg { width: 16px; height: 16px; }
     /* Forfatterboks (29/9, Jacobs ønske): samme udseende som på techfeedwatch, egen tekst til Tech Media Arch */
-    .author-box { display: flex; gap: 20px; align-items: flex-start; width: 100%; box-sizing: border-box; background: var(--hover-bg); border: 1px solid var(--border-color); border-left: 4px solid #0891b2; border-radius: 10px; padding: 28px; margin: 10px 0 30px; }
+    .author-box { display: flex; gap: 20px; align-items: flex-start; width: 100%; box-sizing: border-box; background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--teal); border-radius: 0; padding: 28px; margin: 10px 0 30px; }
     .author-box-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; object-position: center top; flex-shrink: 0; }
     .author-box-name { font-weight: 700; font-size: 1.15rem; margin: 0; }
     .author-box-title { font-size: 0.9rem; font-weight: 600; color: var(--teal-text); margin: 4px 0 14px 0; }
-    body.dark-mode .author-box-title { color: #22d3ee; }
     .author-box-bio { font-size: 1rem; line-height: 1.7; margin: 0 0 16px 0; }
-    .author-box-ai-note { font-size: 0.82rem; font-style: italic; color: #6b7280; margin: 0; padding-top: 16px; margin-top: 4px; border-top: 1px solid var(--border-color); }
-    body.dark-mode .author-box-ai-note { color: #9ca3af; }
+    .author-box-ai-note { font-size: 0.82rem; font-style: italic; color: var(--muted); margin: 0; padding-top: 16px; margin-top: 4px; border-top: 1px solid var(--border-color); }
     .author-box-ai-note a { color: var(--teal-text); text-decoration: none; font-weight: 600; font-style: normal; }
     .author-box-ai-note a:hover { text-decoration: underline; }
     .nav-row { display: flex; gap: 20px; border-top: 1px solid var(--border-color); padding-top: 25px; margin-bottom: 40px; }
-    .nav-card { flex: 1; background: var(--card-bg); border: 2px solid var(--border-color); padding: 15px 20px; border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.2s ease; display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; overflow: hidden; min-width: 0; }
+    .nav-card { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px 20px; border-radius: 0; text-decoration: none; color: var(--text-color); transition: all 0.2s ease; display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; overflow: hidden; min-width: 0; }
     .nav-card:hover { transform: translateY(-3px); border-color: var(--teal-text); box-shadow: 0 6px 24px rgba(0,0,0,0.06); }
     .nav-card.right { text-align: right; }
-    .nav-label { font-size: 0.8rem; color: var(--teal-text); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+    .nav-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
     .nav-title { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .nav-card.disabled { opacity: 0.4; pointer-events: none; }
     /* Related articles i en samlet boks (30/9, Jacob): uden overskrift-tag og uden <p>, så Googles Auto-annoncer
        ikke sætter annoncer ind mellem kortene — samme løsning som "People also ask" */
-    .related-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px 20px 20px; margin-top: 10px; }
+    .related-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 0; padding: 18px 20px 20px; margin-top: 10px; }
     .related-articles-title { display: block; font-size: 1.4rem; font-weight: 700; margin: 0 0 18px 0; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); }
     .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
     .related-grid .card-excerpt { display: none; }
@@ -230,13 +225,13 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .side-title { font-size: 1.1rem; margin: 0 0 15px 0; }
     .side-list { display: flex; flex-direction: column; gap: 14px; }
     .side-item { display: grid; grid-template-columns: 130px 1fr; gap: 12px; text-decoration: none; color: inherit; align-items: start; }
-    .side-item .card-thumb { margin: 0; border-radius: 8px; }
+    .side-item .card-thumb { margin: 0; border-radius: 0; }
     .side-item-title { font-size: 14px; line-height: 1.4; font-weight: 600; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .side-item:hover .side-item-title { color: var(--teal-text); }
     @media (max-width: 900px) {
       .article-layout { flex-direction: column; padding: 15px 12px; }
       .article-secondary { width: 100%; position: static; max-height: none; overflow: visible; padding-right: 0; }
-      .article-title { font-size: 1.5rem; }
+      .article-title { font-size: 2.1rem; }
       .nav-row { flex-direction: column; gap: 12px; }
       .share-cta { flex-direction: column; align-items: flex-start; }
       .share-cta-btn { width: 100%; justify-content: center; }
@@ -254,7 +249,7 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
   <div class="article-layout">
     <div class="article-primary">
       <nav class="breadcrumbs-bar" aria-label="Breadcrumb">
-        <a href="/">Frontpage</a>
+        <a href="/">Archive</a>
         {emne && <><span>/</span><a href={emneUrl(emne)}>{emne.navn}</a></>}
       </nav>
 
