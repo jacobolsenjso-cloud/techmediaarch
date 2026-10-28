@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-26T20:35:45.390Z",
- "fra": "2026-07-29",
- "til": "2026-10-26",
+ "hentet": "2026-10-28T14:08:19.769Z",
+ "fra": "2026-07-31",
+ "til": "2026-10-28",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -10,16 +10,16 @@
    "brugere": 5
   },
   "/2026/09/what-are-phishing-emails": {
-   "visninger": 9,
+   "visninger": 13,
    "brugere": 4
+  },
+  "/2026/09/what-is-mvp-software-development": {
+   "visninger": 9,
+   "brugere": 5
   },
   "/2026/05/unpacking-grubby-ai-is-this-humanizer": {
    "visninger": 9,
    "brugere": 6
-  },
-  "/2026/09/what-is-mvp-software-development": {
-   "visninger": 7,
-   "brugere": 4
   },
   "/2024/09/faq": {
    "visninger": 7,
@@ -69,6 +69,10 @@
    "visninger": 5,
    "brugere": 3
   },
+  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
+   "visninger": 7,
+   "brugere": 4
+  },
   "/2026/10/how-long-learn-python": {
    "visninger": 4,
    "brugere": 3
@@ -99,10 +103,6 @@
   },
   "/2026/05/stop-losing-rankings-how-to-find-and": {
    "visninger": 3,
-   "brugere": 3
-  },
-  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
-   "visninger": 5,
    "brugere": 3
   },
   "/2026/09/what-is-python-used-for": {
@@ -144,6 +144,10 @@
   "/2026/05/decoding-power-of-fintech-what": {
    "visninger": 3,
    "brugere": 2
+  },
+  "/2026/05/exploring-possibilities-of-openfutureai": {
+   "visninger": 2,
+   "brugere": 1
   },
   "/2026/05/google-workspace-studio-analysts-take": {
    "visninger": 2,
