@@ -24,23 +24,31 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
 ---
 <MainLayout description="Clear answers to the tech questions people actually ask: AI tools, cybersecurity, building software, marketing and everyday tech, with the sources named.">
   <style is:global>
-    /* Trin 3: toppen fra designet — mono-linje, stort spørgsmål-svar-løfte, søgefelt og "How an answer is made" */
-    .home-hero { max-width: 1160px; width: calc(100% - 40px); margin: 24px auto 28px; padding: 44px 40px; box-sizing: border-box; background: var(--hero-bg); border: 1px solid var(--border-color); border-radius: var(--radius); display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 40px; align-items: end; }
+    /* Trin 3d (Jacob 28/10 aften: "mere lækker og imødekommende"): blød overgang fra sand til lys blå, større runding,
+       én kolonne (overskriften på 2 linjer), nyeste spørgsmål som knapper og "How an answer is made" som 3 trin nederst */
+    .home-hero { max-width: 1160px; width: calc(100% - 40px); margin: 24px auto 32px; padding: 56px 56px 36px; box-sizing: border-box; background: linear-gradient(135deg, var(--hero-bg) 0%, var(--hero-bg-2) 100%); border: 1px solid var(--border-color); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 18px; }
     .home-hero-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
     .home-hero-eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--teal-text); text-transform: uppercase; }
-    .home-hero-title { margin: 0; font-size: 3.5rem; line-height: 1.04; font-weight: 750; font-stretch: 92%; letter-spacing: -0.02em; text-wrap: balance; }
+    .home-hero-title { margin: 0; font-size: clamp(2.25rem, 4.4vw, 3.4rem); line-height: 1.05; font-weight: 700; font-stretch: 92%; letter-spacing: -0.02em; max-width: 920px; text-wrap: balance; }
+    .home-popular { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .home-popular-label { font-size: 14px; color: var(--muted); margin-right: 2px; }
+    .home-pill { display: inline-flex; align-items: center; min-height: 40px; box-sizing: border-box; padding: 6px 15px; border-radius: 999px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); font-size: 14px; font-weight: 500; line-height: 1.3; text-decoration: none; transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; }
+    @media (hover: hover) { .home-pill:hover { border-color: var(--teal); color: var(--teal-text); transform: translateY(-1px); box-shadow: var(--shadow); } }
+    .home-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 16px; padding-top: 22px; border-top: 1px solid var(--border-color); }
+    .home-steps-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+    .home-steps-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 26px; font-size: 15px; color: var(--ink-2); }
+    .home-steps-list li { display: flex; align-items: center; gap: 10px; }
+    .home-step-n { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--teal); color: var(--bg-color); font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+    .home-steps-link { margin-left: auto; font-size: 14px; font-weight: 600; color: var(--teal-text); text-decoration: none; }
+    .home-steps-link:hover { text-decoration: underline; }
+    @media (max-width: 860px) { .home-steps-list { flex-direction: column; } .home-steps-link { margin-left: 0; } .home-popular-label { width: 100%; } }
     .home-hero-sub { margin: 0; font-family: var(--font-serif); font-size: 1.25rem; line-height: 1.55; color: var(--ink-2); max-width: 620px; }
     .home-search { display: flex; max-width: 640px; margin-top: 6px; border-radius: var(--radius); }
     .home-search input { flex: 1; min-width: 0; height: 52px; padding: 0 16px; border: 2px solid var(--teal); border-right: 0; border-radius: var(--radius) 0 0 var(--radius); font: inherit; font-size: 17px; background: var(--card-bg); color: var(--text-color); }
     .home-search input:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
     .home-search button { height: 52px; padding: 0 22px; border: 2px solid var(--teal); background: var(--teal); color: var(--bg-color); font: inherit; font-size: 16px; font-weight: 600; border-radius: 0 var(--radius) var(--radius) 0; cursor: pointer; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-    .home-hero-aside { border: 1px solid var(--border-color); border-radius: var(--radius); background: var(--card-bg); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
-    .home-hero-aside-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
-    .home-hero-steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.45; }
-    .home-hero-aside a { font-size: 14px; font-weight: 600; color: var(--teal-text); text-decoration: none; }
-    .home-hero-aside a:hover { text-decoration: underline; }
-    @media (max-width: 860px) { .home-hero { grid-template-columns: minmax(0, 1fr); gap: 24px; width: calc(100% - 30px); margin: 15px auto 20px; padding: 28px 18px; } .home-hero-title { font-size: 2.25rem; } .home-hero-sub { font-size: 1.06rem; } .home-search input, .home-search button { height: 48px; } }
+    @media (max-width: 860px) { .home-hero { gap: 16px; width: calc(100% - 30px); margin: 15px auto 20px; padding: 30px 20px 24px; } .home-hero-title { font-size: 2.25rem; } .home-hero-sub { font-size: 1.06rem; } .home-search input, .home-search button { height: 48px; } }
 
     .lead-section { display: grid; grid-template-columns: 1.35fr 1fr; gap: 26px; margin-bottom: 42px; align-items: start; }
     .lead-secondary { display: flex; flex-direction: column; gap: 20px; }
@@ -49,7 +57,7 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
     .lead-card:hover .card-thumb img { transform: scale(1.04); }
     .lead-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 9px; color: var(--teal-text); }
     .lead-eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent, var(--teal)); }
-    .lead-title { margin: 0 0 9px 0; font-size: 2rem; line-height: 1.12; font-weight: 750; font-stretch: 92%; letter-spacing: -0.015em; }
+    .lead-title { margin: 0 0 9px 0; font-size: 2rem; line-height: 1.12; font-weight: 700; font-stretch: 92%; letter-spacing: -0.015em; }
     .lead-card:hover .lead-title { color: var(--teal-text); }
     .lead-excerpt { margin: 0 0 11px 0; font-family: var(--font-serif); font-size: 1.06rem; line-height: 1.55; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .lead-mini { display: grid; grid-template-columns: 132px 1fr; gap: 14px; text-decoration: none; color: inherit; align-items: start; }
@@ -84,16 +92,23 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
         <input id="homeQ" name="q" type="search" placeholder="Ask a question" autocomplete="off" />
         <button type="submit">Search</button>
       </form>
+      {/* De 4 nyeste robotspørgsmål som genveje. "Recently answered", ikke "Popular": popularitet er ikke målt */}
+      {sporgsmaal.length > 0 && (
+        <div class="home-popular">
+          <span class="home-popular-label">Recently answered:</span>
+          {sporgsmaal.slice(0, 4).map((q) => <a href={q.href} class="home-pill">{q.tekst}</a>)}
+        </div>
+      )}
     </div>
-    <aside class="home-hero-aside" aria-label="How an answer is made">
-      <span class="home-hero-aside-label">How an answer is made</span>
-      <ol class="home-hero-steps">
-        <li>A real question people search for on Google</li>
-        <li>The short answer first, then the detail</li>
-        <li>Written from sources that are named on the page</li>
+    <div class="home-steps" role="group" aria-label="How an answer is made">
+      <span class="home-steps-label">How an answer is made</span>
+      <ol class="home-steps-list">
+        <li><span class="home-step-n" aria-hidden="true">1</span>A real question people search for</li>
+        <li><span class="home-step-n" aria-hidden="true">2</span>The short answer first</li>
+        <li><span class="home-step-n" aria-hidden="true">3</span>Sources named on the page</li>
       </ol>
-      <a href="/p/editorial-guidelines">How we work →</a>
-    </aside>
+      <a href="/p/editorial-guidelines" class="home-steps-link">How we work →</a>
+    </div>
   </section>
 
   <div class="page-wrapper">

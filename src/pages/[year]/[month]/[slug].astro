@@ -112,8 +112,9 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .article-primary { flex: 1; min-width: 0; width: 100%; max-width: 100%; }
     .article-secondary { width: 340px; flex-shrink: 0; position: sticky; top: 80px; max-height: calc(100vh - 100px); /* top: 60 px topbar + 20 px luft (siden ruller i vinduet fra 29/9) */ overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; }
     .breadcrumbs-bar { font-size: 0.9rem; margin-bottom: 8px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .breadcrumbs-bar a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
-    .article-title { margin: 0 0 18px 0; font-size: 2.75rem; line-height: 1.06; font-weight: 750; font-stretch: 92%; letter-spacing: -0.02em; text-wrap: balance; }
+    .breadcrumbs-bar a:hover { color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+    .breadcrumbs-bar a { color: var(--muted); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
+    .article-title { margin: 0 0 18px 0; font-size: 2.75rem; line-height: 1.06; font-weight: 700; font-stretch: 92%; letter-spacing: -0.02em; text-wrap: balance; }
     /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
     /* People also ask (29/9) — samme udseende som på Jacobs andet site; nulstiller brødtekstens link- og listestil */
     /* 30/9 (Jacobs valg A): boksen flød ind i teksten. Nu tyk turkis kant i venstre side og en let turkis tone,
@@ -134,7 +135,7 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .post-body a.paa-link:hover .paa-arrow { transform: translateX(3px); color: var(--teal-text); }
     @media (prefers-reduced-motion: reduce) { .post-body a.paa-link:hover, .post-body a.paa-link:hover .paa-arrow { transform: none; } }
     @media (max-width: 900px) { .post-body .paa { padding: 16px 14px; } }
-    .post-body .faq-box { background: transparent; border: 0; border-top: 2px solid var(--text-color); border-radius: 0; padding: 4px 0 10px; margin: 36px 0; }
+    .post-body .faq-box { background: transparent; border: 0; border-top: 1px solid var(--border-color); border-radius: 0; padding: 4px 0 10px; margin: 36px 0; }
     .post-body .faq-box > h2 { margin: 14px 0 6px; }
     /* Hvert spørgsmål er et kort — rammen kommer fra den fælles .post-body details-regel i MainLayout */
     .post-body .faq-box .faq-item { background: transparent; border: 0; border-bottom: 1px solid var(--border-color); border-radius: 0; padding: 0; margin: 0; }
