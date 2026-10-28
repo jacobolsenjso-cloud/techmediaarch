@@ -19,21 +19,21 @@ const resten = side1.slice(5);
 // Undertitlen lover "this week" — den står kun, når ALLE viste spørgsmål er højst 7 dage gamle (ellers "recently").
 const UGE = 7 * 24 * 3600 * 1000;
 const sporgsmaal = INDLAEG.filter((p) => p.robot && p.keyword).slice(0, 8)
-  .map((p) => { const farve = p.emner[0]?.farve || '#0e6b57'; return { href: p.href, tekst: somSporgsmaal(p.keyword), farve, tegn: tegnFarve(farve), dato: new Date(p.published).getTime() }; });
+  .map((p) => { const farve = p.emner[0]?.farve || '#1e40af'; return { href: p.href, tekst: somSporgsmaal(p.keyword), farve, tegn: tegnFarve(farve), dato: new Date(p.published).getTime() }; });
 const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q.dato <= UGE);
 ---
 <MainLayout description="Clear answers to the tech questions people actually ask: AI tools, cybersecurity, building software, marketing and everyday tech, with the sources named.">
   <style is:global>
     /* Trin 3: toppen fra designet — mono-linje, stort spørgsmål-svar-løfte, søgefelt og "How an answer is made" */
-    .home-hero { max-width: 1160px; width: calc(100% - 40px); margin: 24px auto 28px; padding: 44px 40px; box-sizing: border-box; background: color-mix(in srgb, var(--teal) 9%, var(--bg-color)); border: 1px solid color-mix(in srgb, var(--teal) 22%, var(--border-color)); border-radius: var(--radius); display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 40px; align-items: end; }
+    .home-hero { max-width: 1160px; width: calc(100% - 40px); margin: 24px auto 28px; padding: 44px 40px; box-sizing: border-box; background: var(--hero-bg); border: 1px solid var(--border-color); border-radius: var(--radius); display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 40px; align-items: end; }
     .home-hero-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
     .home-hero-eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--teal-text); text-transform: uppercase; }
     .home-hero-title { margin: 0; font-size: 3.5rem; line-height: 1.04; font-weight: 750; font-stretch: 92%; letter-spacing: -0.02em; text-wrap: balance; }
     .home-hero-sub { margin: 0; font-family: var(--font-serif); font-size: 1.25rem; line-height: 1.55; color: var(--ink-2); max-width: 620px; }
     .home-search { display: flex; max-width: 640px; margin-top: 6px; border-radius: var(--radius); }
-    .home-search input { flex: 1; min-width: 0; height: 52px; padding: 0 16px; border: 2px solid var(--text-color); border-right: 0; border-radius: var(--radius) 0 0 var(--radius); font: inherit; font-size: 17px; background: var(--card-bg); color: var(--text-color); }
+    .home-search input { flex: 1; min-width: 0; height: 52px; padding: 0 16px; border: 2px solid var(--teal); border-right: 0; border-radius: var(--radius) 0 0 var(--radius); font: inherit; font-size: 17px; background: var(--card-bg); color: var(--text-color); }
     .home-search input:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
-    .home-search button { height: 52px; padding: 0 22px; border: 2px solid var(--text-color); background: var(--text-color); color: var(--bg-color); font: inherit; font-size: 16px; font-weight: 600; border-radius: 0 var(--radius) var(--radius) 0; cursor: pointer; }
+    .home-search button { height: 52px; padding: 0 22px; border: 2px solid var(--teal); background: var(--teal); color: var(--bg-color); font: inherit; font-size: 16px; font-weight: 600; border-radius: 0 var(--radius) var(--radius) 0; cursor: pointer; }
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .home-hero-aside { border: 1px solid var(--border-color); border-radius: var(--radius); background: var(--card-bg); padding: 22px; display: flex; flex-direction: column; gap: 10px; }
     .home-hero-aside-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }

@@ -66,11 +66,11 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       (function () { try { if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode-preload', 'is-dark'); } catch (e) {} })();
     </script>
     <style is:inline>
-      html.dark-mode-preload { background: #11161b; color-scheme: dark; }
-      html.dark-mode-preload body { background: #11161b; color: #e8ece8; }
+      html.dark-mode-preload { background: #15171c; color-scheme: dark; }
+      html.dark-mode-preload body { background: #15171c; color: #eceae4; }
     </style>
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#11161b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
     <link rel="preload" href={archivoLatinWoff2} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -125,12 +125,13 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
     <style is:global>
       /* Svar-arkivets farver (trin 3, 28/10-2026; designet Jacob godkendte). Variabelnavnene er de gamle,
          så alle sider og komponenter følger med uden at blive rettet én for én.
-         --teal hedder stadig sådan, men er nu arkivets grønne "kontrolleret"-farve (#0E6B57: 5,8:1 på baggrunden).
+         28/10 aften (Jacob): "varmt papir med blå". --teal hedder stadig sådan, men er nu den dybe blå til links og knapper
+         (#1E40AF: ca. 8:1 på papiret). Grøn bruges kun til "Verified"-stemplet (--verified). --hero-bg er forsidens sandfarvede flade.
          --ink-2 er den dæmpede brødtekst; --rule-light de tynde streger mellem rækker. */
-      :root { --bg-color: #f2f4f1; --text-color: #16202b; --card-bg: #fff; --border-color: #d3d8d2; --sidebar-bg: #fff; --hover-bg: #e8ece6; --teal: #0e6b57; --teal-text: #0e6b57; --muted: #56616c; --ink-2: #3b4652; --rule-light: #e3e7e1; --placeholder: #dde3dc; --radius: 10px; --shadow: 0 1px 2px rgba(22, 32, 43, 0.05), 0 6px 18px rgba(22, 32, 43, 0.07);
+      :root { --bg-color: #fbfaf7; --text-color: #1f2328; --card-bg: #fff; --border-color: #e3e0d8; --sidebar-bg: #fff; --hover-bg: #f3f0e8; --teal: #1e40af; --teal-text: #1e40af; --muted: #5e6168; --ink-2: #3d4148; --rule-light: #ece9e1; --placeholder: #ece9e1; --hero-bg: #f3f0e8; --verified: #15803d; --radius: 10px; --shadow: 0 1px 2px rgba(22, 32, 43, 0.05), 0 6px 18px rgba(22, 32, 43, 0.07);
         --font-display: "Archivo Variable", "Helvetica Neue", Arial, sans-serif; --font-serif: "Source Serif 4 Variable", Georgia, "Times New Roman", serif; --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace; }
-      /* Mørk tilstand: samme opbygning, blågrå bund i stedet for sort; grøn gjort lysere, så den kan læses (8,5:1) */
-      body.dark-mode { --bg-color: #11161b; --text-color: #e8ece8; --card-bg: #1a2128; --border-color: #2c353e; --sidebar-bg: #151b21; --hover-bg: #222a32; --teal: #5cc4a6; --teal-text: #5cc4a6; --muted: #9aa5af; --ink-2: #c3cbd2; --rule-light: #232b33; --placeholder: #222a32; --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 22px rgba(0, 0, 0, 0.35); }
+      /* Mørk tilstand: samme opbygning — dyb neutral grå bund, varm lys tekst, lys blå (ca. 8:1) og lys grøn til "Verified" */
+      body.dark-mode { --bg-color: #15171c; --text-color: #eceae4; --card-bg: #1d2026; --border-color: #2e323a; --sidebar-bg: #1a1c21; --hover-bg: #262a31; --teal: #8aa8ff; --teal-text: #8aa8ff; --muted: #a3a6ad; --ink-2: #c9c7c1; --rule-light: #24272e; --placeholder: #262a31; --hero-bg: #1b1e24; --verified: #5bc08a; --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 22px rgba(0, 0, 0, 0.35); }
       body.dark-mode [style*="#1e3a8a"] { --tag-accent: #6d9eff; }
       body { background: var(--bg-color); color: var(--text-color); margin: 0; font-family: var(--font-display); transition: background 0.3s, color 0.3s; display: flex; flex-direction: column; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
       * { -webkit-tap-highlight-color: transparent; }
@@ -169,7 +170,7 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .search-overlay.active { display: flex; }
       .search-input-wrapper { flex: 0 1 520px; margin-right: 10px; position: relative; }
       .search-overlay .icon-btn { margin-left: auto; }
-      .search-input-wrapper input { width: 100%; height: 44px; padding: 0 14px; border-radius: var(--radius); border: 2px solid var(--text-color); background: var(--card-bg); color: var(--text-color); outline: none; font-size: 1rem; box-sizing: border-box; font-family: inherit; }
+      .search-input-wrapper input { width: 100%; height: 44px; padding: 0 14px; border-radius: var(--radius); border: 2px solid var(--teal); background: var(--card-bg); color: var(--text-color); outline: none; font-size: 1rem; box-sizing: border-box; font-family: inherit; }
       .search-suggest { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: 0 14px 36px rgba(0,0,0,0.18); overflow-y: auto; max-height: 72vh; display: none; z-index: 60; }
       .search-suggest.active { display: block; }
       .search-suggest-item { display: flex; gap: 12px; align-items: center; padding: 9px 12px; text-decoration: none; color: var(--text-color); }
@@ -197,13 +198,13 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
          boks var vinduet altid "ved bunden", så boblen foldede sig ud på hver side. Topbaren (sticky)
          og sidemenuen (sticky, egen rulning) står fast som før. Indholdsboksen hedder nu .content-main,
          så Watch-sidens eget script (der ruller .content-area, hvis den findes) ruller vinduet. */
-      html { overflow-y: scroll; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: #b9c1b8 var(--bg-color); }
+      html { overflow-y: scroll; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: #c9c5bb var(--bg-color); }
       html::-webkit-scrollbar { width: 14px; }
       html::-webkit-scrollbar-track { background: var(--bg-color); }
-      html::-webkit-scrollbar-thumb { background-color: #b9c1b8; border-radius: 10px; border: 3px solid var(--bg-color); }
-      html:has(body.dark-mode) { scrollbar-color: #3a444e #11161b; }
-      html:has(body.dark-mode)::-webkit-scrollbar-track { background: #11161b; }
-      html:has(body.dark-mode)::-webkit-scrollbar-thumb { background-color: #3a444e; border: 3px solid #11161b; }
+      html::-webkit-scrollbar-thumb { background-color: #c9c5bb; border-radius: 10px; border: 3px solid var(--bg-color); }
+      html:has(body.dark-mode) { scrollbar-color: #3a3e46 #15171c; }
+      html:has(body.dark-mode)::-webkit-scrollbar-track { background: #15171c; }
+      html:has(body.dark-mode)::-webkit-scrollbar-thumb { background-color: #3a3e46; border: 3px solid #15171c; }
       /* Hop til en overskrift (indholdsfortegnelse, #links) må ikke gemme den under den faste topbar */
       [id] { scroll-margin-top: 80px; }
       .main-layout { display: flex; flex: 1; position: relative; align-items: flex-start; }
@@ -374,18 +375,17 @@ const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
       .card-topic { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
       .card-topic::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
       /* Mærke på kortets billede (ArticleCard badge: "42 clicks", "#1"). Blæk-farve med hvid tekst: over 15:1 */
-      .card-badge { position: absolute; top: 8px; left: 8px; background: #16202b; color: #fff; padding: 3px 9px; border-radius: var(--radius); font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 1; }
+      .card-badge { position: absolute; top: 8px; left: 8px; background: var(--text-color); color: var(--bg-color); padding: 3px 9px; border-radius: var(--radius); font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 1; }
       @media (prefers-reduced-motion: reduce) { .card-thumb { animation: none; } .card-thumb img { transition: none; } .article-card:hover .card-thumb img { transform: none; } }
 
       /* Emne-chips: pille-design med farveprik, som techfeedwatchs emnefilter */
       .chip-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 0; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); }
       .chip { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 7px 16px; border-radius: var(--radius); font-size: 0.85rem; font-weight: 600; text-decoration: none; line-height: 1.5; display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; }
       .chip.active { background: var(--text-color); color: var(--bg-color); border-color: var(--text-color); }
-      .chip-accent { border-color: var(--tag-accent); }
-      .chip-accent::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); margin-right: 7px; }
-      .chip-accent.active { background: var(--tag-accent); color: #fff; border-color: var(--tag-accent); }
-      .chip-accent:not(.active):hover { background: color-mix(in srgb, var(--tag-accent) 14%, var(--hover-bg)); transform: translateY(-1px); box-shadow: 0 3px 10px color-mix(in srgb, var(--tag-accent) 28%, transparent); }
-      body.dark-mode .chip-accent:not(.active):hover { background: color-mix(in srgb, var(--tag-accent) 26%, var(--hover-bg)); }
+      .chip-accent { border-color: var(--border-color); }
+      .chip-accent::before { content: none; }
+      .chip-accent.active { background: var(--text-color); color: var(--bg-color); border-color: var(--text-color); }
+      .chip-accent:not(.active):hover { background: var(--hover-bg); }
       .chip-count { font-weight: 500; opacity: 0.6; margin-left: 6px; font-size: 0.8rem; }
 
       .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 20px 0 40px 0; flex-wrap: wrap; }
