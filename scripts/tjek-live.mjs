@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { SLETTEDE } from '../worker/slettede.js';
+import { NEDLAGTE } from '../worker/nedlagte.js';
 
 const BASE = (process.argv[2] || '').replace(/\/$/, '');
 const EKS = process.argv[3];
@@ -27,8 +28,8 @@ const hent = (sti, opt = {}) => fetch(BASE + sti, { redirect: 'manual', ...opt }
 const laes = (f) => JSON.parse(fs.readFileSync(path.join(EKS, f), 'utf8'));
 const alt = (p) => p.link.find((l) => l.rel === 'alternate').href;
 const stier = [...laes('posts.json'), ...laes('pages.json')].map((p) => new URL(alt(p)).pathname)
-  // Slettede artikler svarer 301 (tjekkes under 3), ikke 200
-  .filter((s) => !SLETTEDE[decodeURI(s)]);
+  // Slettede artikler og nedlagte sider (fx Watch) svarer 301 (tjekkes under 3), ikke 200
+  .filter((s) => !SLETTEDE[decodeURI(s)] && !NEDLAGTE[s.replace(/\.html$/, '')]);
 
 // 1: alle adresser, 8 ad gangen. Fra 29/9-2026 er adresserne UDEN .html (Jacobs beslutning):
 //    Bloggers /navn.html skal svare 301 til /navn, og /navn skal svare 200 med HTML
@@ -68,7 +69,8 @@ for (const s of ['/', '/images/15d326138cfb576f.png', '/rss.xml', '/findes-ikke-
 
 // 3: omdirigeringer og 404
 const forventet = [
-  ['/search/label/AI', 301, '/topic/ai'],
+  // Fra trin 4 (28/10-2026): emner med en hylde har ingen emneside — de sendes direkte til hylden
+  ['/search/label/AI', 301, '/shelf/ai'],
   ['/search/label/Resources', 301, '/topic/resources'],
   ['/search/label/Findes-ikke', 301, '/'],
   // /search er nu selve søgesiden (29/9-2026); andre /search/… fra Blogger -> /latest (30/9; før /trending)
@@ -83,15 +85,23 @@ const forventet = [
   ['/index.html', 301, '/'],
   ['/trending.html', 301, '/trending'],
   ['/search.html?q=claude', 301, '/search?q=claude'],
-  ['/topic/ai.html', 301, '/topic/ai'],
+  ['/topic/ai.html', 301, '/shelf/ai'],
+  ['/topic/resources.html', 301, '/topic/resources'],
+  ['/shelf/ai.html', 301, '/shelf/ai'],
   ['/page/2.html', 301, '/page/2'],
   // (29/10-2026: /2024/09/faq er slettet og sender til /p/faq — derfor en anden artikel her)
   ['/2024/12/how-face-id-keeps-your-data-safe.html?m=1', 301, '/2024/12/how-face-id-keeps-your-data-safe?m=1'],
   ['/trending', 200, null],
-  ['/topic/ai', 200, null],
+  ['/topic/ai', 301, '/shelf/ai'],
+  ['/topic/ai/', 301, '/shelf/ai'],
+  ['/topic/resources', 200, null],
+  ['/shelf/ai', 200, null],
   ['/page/2', 200, null],
   // "/" til sidst: Cloudflare selv sender videre til adressen uden (307)
-  ['/topic/ai/', 307, '/topic/ai'],
+  ['/topic/resources/', 307, '/topic/resources'],
+  ['/shelf/ai/', 307, '/shelf/ai'],
+  // Nedlagte faste sider (worker/nedlagte.js) -> 301, med og uden .html
+  ...Object.entries(NEDLAGTE).flatMap(([s, til]) => [[s, 301, til], [s + '.html', 301, til]]),
   // Slettede artikler (worker/slettede.js) -> 301 til nærmeste levende artikel (gammel og ny form)
   ...Object.entries(SLETTEDE).flatMap(([s, til]) => [[s, 301, til], [s.replace(/\.html$/, ''), 301, til]]),
 ];
