@@ -23,8 +23,20 @@ export function kendtNavn(navn, kilder) {
   return n.length >= 2 && kilder.some((k) => daekker(k, n));
 }
 
-// Kort navneliste til Gemini: "ibm.com (What Are AI Agents? | IBM)"
-export const kildeNavneTekst = (kilder) => kilder.map((k) => `${new URL(k.url).hostname.replace(/^www\./, '')} (${k.titel})`).join('; ');
+// Navneliste til Gemini: "IBM (ibm.com)" — mærket fra titlen ("… | IBM"), ellers domænet.
+// Målt 29/10 (prøve #33): med kun domæner skrev Gemini "According to nhimg.org" og "securityScorecard notes".
+const maerkeAf = (k) => { const d = String(k.titel || '').split(/\s[|–—-]\s|\s·\s/); const m = d.length > 1 ? d[d.length - 1].trim() : ''; return m.length >= 2 && m.length <= 40 ? m : ''; };
+export const kildeNavneTekst = (kilder) => kilder.map((k) => { const host = new URL(k.url).hostname.replace(/^www\./, ''); const m = maerkeAf(k); return m ? `${m} (${host})` : host; }).join('; ');
+
+// Gemini må ikke selv skrive en kildeliste — den lægges på bagefter (robot/lib/links.mjs kildeliste).
+// Målt 29/10 (prøve #33): et afsnit med kun domæner ("nhimg.org, cloudmask.com, …") lige før "Sources".
+// Fjerner (1) afsnit, der kun er domæner/kildenavne fra listen, og (2) egne "Sources"/"References"-afsnit.
+export function udenEgenKildeliste(html) {
+  let ud = String(html); let fjernet = 0;
+  ud = ud.replace(/<h[23]\b[^>]*>\s*(?:Sources|References|Source list|Further sources)\s*:?\s*<\/h[23]>\s*(?:<(ul|ol)\b[\s\S]*?<\/\1>|<p\b[^>]*>[\s\S]*?<\/p>)?/gi, () => { fjernet++; return ''; });
+  ud = ud.replace(/<p\b[^>]*>\s*((?:Sources?\s*:\s*)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\s*[,;]\s*(?:and\s+)?(?:[a-z0-9-]+\.)+[a-z]{2,})+\.?)\s*<\/p>/gi, () => { fjernet++; return ''; });
+  return { html: ud, fjernet };
+}
 
 // Kun punkter fra en kontrolleret kilde beholdes. To veje (29/10-2026):
 //  1. Googles egen kobling (stoette fra robot/lib/gemini.mjs): et stykke af punktet bygger på søgekilde nr. i,

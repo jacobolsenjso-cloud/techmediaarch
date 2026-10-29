@@ -22,7 +22,7 @@ import { skriv, json, gemPrisVedExit } from './lib/gemini.mjs';
 gemPrisVedExit('artikel');   // pristælleren (trin 7): robot/ud/pris-artikel.json, også når artiklen afvises
 import { lav } from './lib/billeder.mjs';
 import { kontrollerKilder, kildeliste } from './lib/links.mjs';
-import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder } from './lib/kildenavne.mjs';
+import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder, udenEgenKildeliste } from './lib/kildenavne.mjs';
 import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
@@ -158,7 +158,8 @@ Rules:
 - Start the article with that short answer as a <p>. The very first element must be the answer paragraph, never a heading (no "Introduction" or "Understanding ..." heading before it).
 - Search phrases are often ungrammatical ("what is phishing attack", "how does seo work"). Never paste a keyword verbatim into a sentence where it reads wrongly; write correct English ("how phishing attacks work"). Never put keywords in bold, quotes or <strong>.
 - Every number, statistic and quoted definition names its source from the facts (an organization, agency, company or publication). Never use vague attributions such as "experts say", "industry experts note", "researchers confirm", "analysts point out", "studies show" or "according to market research".
-- Name ONLY these sources, which are listed under "Sources" at the end of the article: ${kildeNavn}. Never name any other organization, company, publication or website as a source, even if a fact mentions one; then name the listed source the fact comes from.
+- Name ONLY these sources: ${kildeNavn}. Use the name before the brackets ("according to IBM"), never a bare web address. Never name any other organization, company, publication or website as a source, even if a fact mentions one; then name the listed source the fact comes from.
+- Do not write a list of sources, a "Sources" or "References" section, or a line of web addresses: the source list is added automatically.
 - Include one FAQ section (<h2>FAQ</h2>) with AT LEAST 5 questions as <h3>, each followed by a 2-4 sentence answer in <p>.
   Phrase the questions the way people type them into Google, built from the related keywords; every question must be different.
 - Never claim personal testing or experience ("I tested", "in my experience", "we tried").
@@ -338,6 +339,8 @@ ${kand.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
 { const s = samlEnkelte(html); html = s.html; const g = fjernGentagelser(html); html = g.html; log(`- Enkeltsætninger samlet: ${s.samlet} · afsnit med kun én sætning nu: ${g.enSaetning} af ${g.afsnit}`); }
 
 // Kilderne er kontrolleret før skrivningen (se "Kun kilder, der står under Sources" ovenfor).
+// Geminis egen kildeliste/domæne-linje fjernes — den rigtige lægges på til sidst (prøve #33, 29/10).
+{ const u = udenEgenKildeliste(html); html = u.html; log(`- Geminis egen kildeliste fjernet: ${u.fjernet}`); }
 // Sidste vagt: ingen sætning må nævne en kilde uden for listen (fx genindført af liste-omskrivningen).
 {
   const rest = udenForListen();
