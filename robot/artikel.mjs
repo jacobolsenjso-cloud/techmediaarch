@@ -3,7 +3,7 @@
 // gemmer resultatet på en egen gren (udkast-…) — ALDRIG på main. Intet udgives,
 // før Jacob har godkendt artiklen.
 // TRIN 3 (26/9): samme fil bruges af tidsplanen (robot/plan.mjs, workflowet
-// "Robot (tidsplan)"), som udgiver direkte på main — højst 2 om dagen, fri ons+søn.
+// "Robot (tidsplan)"), som udgiver direkte på main — højst 2 om dagen, fridage i robot/plan.mjs (FRIDAGE).
 //
 // Trin:
 //  1. Søgeordslisten laves (robot/soegeord.mjs) og Gemini vælger en pakke, der
@@ -22,6 +22,7 @@ import { skriv, json, gemPrisVedExit } from './lib/gemini.mjs';
 gemPrisVedExit('artikel');   // pristælleren (trin 7): robot/ud/pris-artikel.json, også når artiklen afvises
 import { lav } from './lib/billeder.mjs';
 import { kontrollerKilder, kildeliste } from './lib/links.mjs';
+import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder } from './lib/kildenavne.mjs';
 import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
@@ -120,6 +121,19 @@ for (const model of [undefined, undefined, 'gemini-3.5-flash', 'gemini-2.5-flash
 }
 if (kilder.length < 2) throw new Error(`Research gav kun ${kilder.length} kilder — artiklen afvist`);
 
+// Kun kilder, der står under "Sources" (Jacob 29/10-2026). Før blev kilderne kontrolleret EFTER skrivningen, og kun
+// de første 4 kom på listen — prøve #31 nævnte ca. 15 kilder i teksten med 4 på listen. Nu: kontrollér op til 12,
+// skriv kun ud fra fakta fra de kontrollerede, og vis præcis de kilder, fakta kommer fra. Se robot/lib/kildenavne.mjs.
+const MIN_FAKTA = 12;
+const { sat: kontrollerede, afvist: kildeAfvist } = await kontrollerKilder(kilder, 12);
+const kf = kunKontrolleredeFakta(fakta, kontrollerede);
+const kildeLinks = kf.brugte;
+log(`- Kilder kontrolleret før skrivning: ${kontrollerede.length} bestod (${kildeAfvist.length} afvist) · fakta fra dem: ${kf.beholdt} af ${kf.alle} · kilder med fakta: ${kildeLinks.length}`);
+if (kildeLinks.length < 2) throw new Error(`Kun ${kildeLinks.length} kontrollerede kilder har fakta — artiklen afvist`);
+if (kf.beholdt < MIN_FAKTA) throw new Error(`Kun ${kf.beholdt} fakta fra kontrollerede kilder (mindst ${MIN_FAKTA}) — artiklen afvist`);
+fakta = kf.tekst;
+const kildeNavn = kildeNavneTekst(kildeLinks);
+
 // --- 4. Skriv artiklen ud fra de fakta ---------------------------------------
 const opgave = `Write an in-depth, genuinely helpful English article for techmediaarch.com.
 Main keyword: "${valgt.hoved}"
@@ -142,6 +156,7 @@ Rules:
 - Start the article with that short answer as a <p>. The very first element must be the answer paragraph, never a heading (no "Introduction" or "Understanding ..." heading before it).
 - Search phrases are often ungrammatical ("what is phishing attack", "how does seo work"). Never paste a keyword verbatim into a sentence where it reads wrongly; write correct English ("how phishing attacks work"). Never put keywords in bold, quotes or <strong>.
 - Every number, statistic and quoted definition names its source from the facts (an organization, agency, company or publication). Never use vague attributions such as "experts say", "industry experts note", "researchers confirm", "analysts point out", "studies show" or "according to market research".
+- Name ONLY these sources, which are listed under "Sources" at the end of the article: ${kildeNavn}. Never name any other organization, company, publication or website as a source, even if a fact mentions one; then name the listed source the fact comes from.
 - Include one FAQ section (<h2>FAQ</h2>) with AT LEAST 5 questions as <h3>, each followed by a 2-4 sentence answer in <p>.
   Phrase the questions the way people type them into Google, built from the related keywords; every question must be different.
 - Never claim personal testing or experience ("I tested", "in my experience", "we tried").
@@ -158,7 +173,7 @@ let html = rensMarkdown(tekst.replace(/^```html?\s*|```\s*$/g, '').trim());
 const ordI = (h) => h.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
 if (ordI(html) < 1200) {
   log(`- Udkast 1: ${ordI(html)} ord — beder Gemini uddybe til mindst 1200.`);
-  const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1300 words by deepening the existing sections with concrete explanations, examples and practical guidance taken from the facts below. If the facts do not support more text, add less: never pad with generic sentences. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
+  const udv = await skriv(`Here is a draft article (HTML) about "${valgt.hoved}". Expand it to at least 1300 words by deepening the existing sections with concrete explanations, examples and practical guidance taken from the facts below. If the facts do not support more text, add less: never pad with generic sentences. Use only these researched facts for any numbers, dates or claims:\n${fakta}\nName only these sources, never any other: ${kildeNavn}.\nKeep all existing links exactly as they are, keep the FAQ, add no new links, never claim personal testing.
 Keep the first paragraph exactly as it is (it is a short direct answer). Most paragraphs 2 connected sentences (at most 55 words together) or 3 short ones (at most 40 words), never several one-sentence paragraphs in a row; keep the existing lists. Name the source of numbers and statistics once, varying how; no vague attributions ("experts say", "studies show"). Never repeat a fact or sentence that is already in the article. Every new sentence must add something concrete (a fact, definition, example, step or comparison); no generic filler. Never paste ungrammatical search phrases into sentences, never bold keywords, no markdown.
 Output ONLY the full expanded article body as HTML (<h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>).
 
@@ -236,26 +251,41 @@ ${foerste}`);
   } catch (e) { log(`- Første afsnit: ${antalOrd(foerste)} ord, deling fejlede (${e.message.slice(0, 80)})`); }
 } else log(`- Første afsnit: ${antalOrd(foerste)} ord`);
 // Sætninger med uklare kilder eller klistrede søgeord → Gemini retter netop dem.
-const daarlige = () => saetninger(html).map((s) => ({ s, uklar: uklarKilde(s), klistret: klistretSoegeord(s, soegeord) })).filter((x) => x.uklar || x.klistret);
+const daarlige = () => saetninger(html).map((s) => ({ s, uklar: uklarKilde(s), klistret: klistretSoegeord(s, soegeord), ukendt: ukendteKilder(s, kildeLinks).length > 0 })).filter((x) => x.uklar || x.klistret || x.ukendt);
 const foerRet = daarlige();
 if (foerRet.length) {
   try {
     const r = await json(`Fix each numbered sentence from an article about "${valgt.hoved}".
 - If it uses a vague attribution (marked VAGUE), name the specific source from the facts below, or drop the attribution and keep the plain fact if no source fits.
 - If it contains a search phrase pasted in ungrammatically (marked PHRASE), rephrase it into correct, natural English.
+- If it names a source that is not on the source list below (marked UNLISTED), name the listed source the fact comes from (see the facts), or drop the attribution and keep the plain fact.
 Keep every HTML tag (especially <a ...>...</a>) exactly as it is. Change nothing else.
+Source list (the only sources the article may name): ${kildeNavn}
 Facts with sources:\n${fakta}
 Return JSON {"fixes":[{"n": number, "new": "the corrected sentence with its HTML"}]}
-${foerRet.map((x, i) => `${i + 1}. [${[x.uklar && 'VAGUE', x.klistret && 'PHRASE'].filter(Boolean).join('+')}] ${x.s}`).join('\n')}`);
+${foerRet.map((x, i) => `${i + 1}. [${[x.uklar && 'VAGUE', x.klistret && 'PHRASE', x.ukendt && 'UNLISTED'].filter(Boolean).join('+')}] ${x.s}`).join('\n')}`);
     let rettet = 0;
     for (const f of Array.isArray(r.fixes) ? r.fixes : []) {
       const x = foerRet[parseInt(f.n, 10) - 1]; const ny = rensMarkdown(String(f.new || '').trim());
-      if (!x || !ny || hrefs(ny) !== hrefs(x.s) || uklarKilde(ny) || klistretSoegeord(ny, soegeord) || !html.includes(x.s)) continue;
+      if (!x || !ny || hrefs(ny) !== hrefs(x.s) || uklarKilde(ny) || klistretSoegeord(ny, soegeord) || ukendteKilder(ny, kildeLinks).length || !html.includes(x.s)) continue;
       html = html.replace(x.s, () => ny); rettet++;
     }
-    log(`- Sætninger med uklare kilder/klistrede søgeord: ${foerRet.length} fundet, ${rettet} rettet, ${daarlige().length} tilbage`);
+    log(`- Sætninger med uklare kilder/klistrede søgeord/kilder uden for listen: ${foerRet.length} fundet (heraf ${foerRet.filter((x) => x.ukendt).length} uden for listen), ${rettet} rettet, ${daarlige().length} tilbage`);
   } catch (e) { log(`- Sætningsretning fejlede (${e.message.slice(0, 80)}) — ${foerRet.length} sætninger uændret`); }
-} else log('- Sætninger med uklare kilder/klistrede søgeord: 0');
+} else log('- Sætninger med uklare kilder/klistrede søgeord/kilder uden for listen: 0');
+
+// Kilder uden for listen, der stadig står der efter rettelsen, fjernes (Jacob 29/10-2026: robotten må kun nævne
+// kilder fra "Sources"). Står en i det korte svar, eller er der over 6, afvises artiklen hellere.
+const udenForListen = () => saetninger(html).map((s) => ({ s, navne: ukendteKilder(s, kildeLinks) })).filter((x) => x.navne.length);
+const tomt = (h) => h.replace(/<(p|li)\b[^>]*>\s*<\/\1>/gi, '').replace(/<(ul|ol)\b[^>]*>\s*<\/\1>/gi, '');
+{
+  const rest = udenForListen();
+  if (rest.some((x) => foersteAfsnit(html).includes(x.s))) throw new Error(`Det korte svar nævner en kilde, der ikke står under Sources (${rest[0].navne.join('+')}) — artiklen afvist`);
+  if (rest.length > 6) throw new Error(`${rest.length} sætninger nævner kilder, der ikke står under Sources — artiklen afvist`);
+  for (const x of rest) html = html.replace(x.s, '');
+  html = tomt(html);
+  log(`- Kilder uden for listen: ${rest.length} sætninger fjernet${rest.length ? ` (${rest.map((x) => x.navne.join('+')).join(', ')})` : ''}`);
+}
 
 // Lister (Jacob 5/10-2026): mindst 2. Mangler de, omskriver Gemini 1-2 afsnit, hvor en liste hjælper læseren.
 // Kun hvis afsnittet findes ordret, alle links bevares, og næsten alle ord er med (ingen fakta forsvinder).
@@ -305,9 +335,13 @@ ${kand.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
 // Saml enkeltsætninger, der står lige efter hinanden (Jacob 6/10-2026), robot/lib/afsnit.mjs. Ingen ord ændres.
 { const s = samlEnkelte(html); html = s.html; const g = fjernGentagelser(html); html = g.html; log(`- Enkeltsætninger samlet: ${s.samlet} · afsnit med kun én sætning nu: ${g.enSaetning} af ${g.afsnit}`); }
 
-// Kilder: følg Googles omdirigering, kontrollér live, højst 4, ét pr. domæne.
-const { sat: kildeLinks, afvist: kildeAfvist } = await kontrollerKilder(kilder, 4);
-if (kildeLinks.length < 2) throw new Error(`Kun ${kildeLinks.length} kilder bestod kontrollen — artiklen afvist`);
+// Kilderne er kontrolleret før skrivningen (se "Kun kilder, der står under Sources" ovenfor).
+// Sidste vagt: ingen sætning må nævne en kilde uden for listen (fx genindført af liste-omskrivningen).
+{
+  const rest = udenForListen();
+  if (rest.length) throw new Error(`${rest.length} sætninger nævner stadig kilder uden for Sources (${rest.map((x) => x.navne.join('+')).join(', ')}) — artiklen afvist`);
+  if (antalFaq(html) < 5) throw new Error(`FAQ har kun ${antalFaq(html)} spørgsmål efter kildevagten — artiklen afvist`);
+}
 
 // --- 5. Titel, beskrivelse, billedtekster -----------------------------------
 const meta = await json(`Article about "${valgt.hoved}". First 1500 characters:

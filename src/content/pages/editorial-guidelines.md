@@ -22,7 +22,7 @@ updated: 2026-10-29T12:00:00.000+01:00
 <ol>
 <li><strong>A real question.</strong> It starts from questions people type into Google. The robot prefers the shelf with the fewest answers, and questions an existing answer already covers are skipped, so the site does not publish the same answer twice.</li>
 <li><strong>Research first.</strong> The language model searches the web and collects facts before it writes. If fewer than two sources can be found and opened, the answer is rejected.</li>
-<li><strong>Sources you can check.</strong> The sources are listed at the end of every answer under "Sources", and the text should name where each fact comes from.</li>
+<li><strong>Sources you can check.</strong> Every source is opened and checked before the answer is written, and the answer is written only from facts found in sources that passed. Those sources are listed at the end under "Sources", and the text names only sources from that list. Some older answers also name sources that are not on their list.</li>
 <li><strong>Checks before publishing.</strong> An answer is rejected if it claims personal testing or experience ("I tested"), has too few sources, is too thin, or contains visible formatting errors. Sentences with vague sources such as "experts say" are sent back to be rewritten with a named source.</li>
 <li><strong>Links.</strong> Links inside the text go only to sources that were checked, or to other answers on this site about a related subject.</li>
 <li><strong>Images.</strong> Images are illustrations made with AI, under rules that forbid real people, text, numbers and charts, so they are not mistaken for evidence. Answers do not embed videos.</li>
