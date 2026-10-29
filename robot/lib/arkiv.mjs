@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { HYLDE_FOR_EMNE, EKSTRA_ETIKETTER } from '../../src/lib/adresse.mjs';
+import { planHylde, erSvar } from '../../src/lib/hyldeplan.mjs';
 
 const ROD = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 export const sti = (...d) => path.join(ROD, ...d);
@@ -24,12 +25,19 @@ export function emner() {
     .filter((e) => e.navn && e.hylde);
 }
 
-// Antal artikler pr. hylde — samme regel som sitet (src/lib/hylder.ts): emnets hylde + de ekstra etiketter
-// ("Cyber Security"). En artikel med emner fra to hylder tæller på begge.
+// Antal SVAR pr. hylde — samme regel som sitet (src/lib/hylder.ts, svarIHylde). Skridt 3 (Jacob 29/10-2026): kun
+// robotsvar og tidløse ældre artikler tæller (src/lib/hyldeplan.mjs); ellers ville ~90 gamle AI-nyheder få robotten
+// til at tro, at AI-hylden er fuld. Ældre artikler: planens hylde. Robotartikler: emnets hylde + de ekstra etiketter
+// ("Cyber Security"); en robotartikel med emner fra to hylder tæller på begge.
 export function antalPrHylde(alle = artikler()) {
   const tilHylde = new Map(emner().map((e) => [e.etiket, e.hylde]));
   const ud = Object.fromEntries([...new Set(Object.values(HYLDE_FOR_EMNE))].map((h) => [h, 0]));
-  for (const a of alle) for (const h of new Set(a.labels.map((l) => tilHylde.get(l) || EKSTRA_ETIKETTER[l]).filter(Boolean))) ud[h]++;
+  for (const a of alle) {
+    if (!erSvar(a.sti, a.robot)) continue;
+    const plan = planHylde(a.sti);
+    const hylder = plan !== undefined ? (plan ? [plan] : []) : new Set(a.labels.map((l) => tilHylde.get(l) || EKSTRA_ETIKETTER[l]).filter(Boolean));
+    for (const h of hylder) ud[h]++;
+  }
   return ud;
 }
 
@@ -51,7 +59,7 @@ export function artikler() {
       const d = frontmatter(path.join(mappe, f));
       ud.push({
         // Adresser uden .html (Jacob 29/9-2026) — samme som sitet (src/lib/adresse.mjs)
-        titel: String(d.title || ''), sti: `/${aar}/${md}/${f.replace(/\.md$/, '')}`, labels: d.labels || [],
+        titel: String(d.title || ''), sti: `/${aar}/${md}/${f.replace(/\.md$/, '')}`, labels: d.labels || [], robot: d.robot === true,
         soegeord: [d.keyword, ...(d.relatedKeywords || [])].filter(Boolean).map(String),
       });
     }

@@ -7,7 +7,7 @@ import EmneChips from '../components/EmneChips.astro';
 import Pagination from '../components/Pagination.astro';
 import { INDLAEG, datoTekst, udsnit } from '../lib/indhold';
 import { somSporgsmaal, tegnFarve } from '../lib/sporgsmaal.mjs';
-import { HYLDER, hyldeFor, hyldeUrl, iHylde } from '../lib/hylder';
+import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret } from '../lib/hylder';
 import { FORSIDE_NYESTE, listeSider } from '../lib/liste';
 
 // Forsiden (Jacob 28/10, forslag 2): de 5 nyeste øverst, derefter ét afsnit pr. hylde (1 stor + 3 rækker + "See all").
@@ -18,9 +18,10 @@ const hoved = side1[0];
 const sideHistorier = side1.slice(1, FORSIDE_NYESTE);
 // Mærket over titlerne viser hylden (ikke det gamle emnenavn); uden hylde: emnet
 const maerke = (p: (typeof INDLAEG)[number]) => { const h = hyldeFor(p); return h ? { navn: h.navn, farve: h.farve } : p.emner[0] ? { navn: p.emner[0].navn, farve: p.emner[0].farve } : null; };
-// Hyldeafsnittene: den nyeste med billede som stor, de 3 næste som rækker
+// Hyldeafsnittene: den nyeste med billede som stor, de 3 næste som rækker — svarene først (skridt 3, 29/10-2026),
+// så forsiden ikke viser en AI-nyhed fra 2024 som hyldens ansigt
 const hyldeAfsnit = HYLDER.map((h) => {
-  const liste = iHylde(h);
+  const liste = hyldeSorteret(h);
   const stor = liste.find((p) => p.image) ?? liste[0];
   return { h, antal: liste.length, stor, smaa: liste.filter((p) => p !== stor).slice(0, 3) };
 }).filter((x) => x.stor);

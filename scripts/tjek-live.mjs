@@ -85,7 +85,8 @@ const forventet = [
   ['/search.html?q=claude', 301, '/search?q=claude'],
   ['/topic/ai.html', 301, '/topic/ai'],
   ['/page/2.html', 301, '/page/2'],
-  ['/2024/09/faq.html?m=1', 301, '/2024/09/faq?m=1'],
+  // (29/10-2026: /2024/09/faq er slettet og sender til /p/faq — derfor en anden artikel her)
+  ['/2024/12/how-face-id-keeps-your-data-safe.html?m=1', 301, '/2024/12/how-face-id-keeps-your-data-safe?m=1'],
   ['/trending', 200, null],
   ['/topic/ai', 200, null],
   ['/page/2', 200, null],

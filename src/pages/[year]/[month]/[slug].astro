@@ -7,7 +7,7 @@ import MainLayout from '../../../layouts/MainLayout.astro';
 import ArticleCard from '../../../components/ArticleCard.astro';
 import { INDLAEG, datoTekst, synligeEtiketter } from '../../../lib/indhold';
 import { emneUrl } from '../../../lib/emner';
-import { HYLDER, hyldeFor, hyldeUrl, iHylde, startListe } from '../../../lib/hylder';
+import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret, startListe } from '../../../lib/hylder';
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
@@ -77,7 +77,8 @@ const hylde = hyldeFor(p) ?? serieHylde;
 
 // Trin 6, forslag 4 (Jacob 28/10): ÉN "Read next"-boks midt i teksten (afløser "You might also like" med 2 forslag fra 1/10).
 // Rækkefølge: næste trin i "Start here" → den mest læste på samme hylde → den gamle regel (samme emne, mest læst).
-const hyldeKandidater = hylde ? iHylde(hylde).filter((x) => x !== p && x.image && !paaHref.has(x.href)) : [];
+// Skridt 3 (29/10-2026): hyldens svar først, så "Read next" peger på et tidløst svar frem for en gammel nyhed
+const hyldeKandidater = hylde ? hyldeSorteret(hylde).filter((x) => x !== p && x.image && !paaHref.has(x.href)) : [];
 const naeste = (serieNr && serieNr < serie.length ? serie[serieNr] : null)
   ?? [...hyldeKandidater.slice(0, 12)].sort((a, b) => laest(b) - laest(a))[0]
   ?? gamleForslag[0];
@@ -88,7 +89,7 @@ const forslagHtml = naeste ? `<aside class="las-naeste" data-ekstra="1" aria-lab
 const relaterede = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].filter((x) => !forslag.includes(x)).slice(0, 8);
 // Sidebaren lover "More in <hylde/emne>" — så den må kun vise den. Trin 6, forslag 5: hylden først (ikke det gamle
 // emnenavn, fx "Infosec"). Har hylden/emnet for få artikler, hedder den "Latest articles" og viser de nyeste i stedet.
-const somHylde = hylde ? iHylde(hylde).filter((x) => x !== p) : [];
+const somHylde = hylde ? hyldeSorteret(hylde).filter((x) => x !== p) : [];
 const nokIHylde = somHylde.length >= 3;
 const nokIEmne = somEmne.length >= 3;
 const sidebarTitel = nokIHylde ? `More in ${hylde!.navn}` : nokIEmne ? `More in ${emne!.navn}` : 'Latest articles';

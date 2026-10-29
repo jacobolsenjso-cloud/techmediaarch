@@ -8,6 +8,7 @@
 // ikon: én SVG-sti (24x24, streg), tegnet til hylden.
 import { INDLAEG, type Indlaeg } from './indhold';
 import { HYLDE_FOR_EMNE, EKSTRA_ETIKETTER as EKSTRA } from './adresse.mjs';
+import { PLAN, planHylde, erSvar } from './hyldeplan.mjs';
 
 export interface Hylde { slug: string; navn: string; besk: string; farve: string; ikon: string; emner: string[]; start: string[]; }
 
@@ -33,13 +34,26 @@ export const hyldeUrl = (h: Hylde) => `/shelf/${h.slug}`;
 // Ekstra Blogger-etiketter (fx "Cyber Security"), der også sætter en artikel på en hylde — tabellen står i
 // adresse.mjs, så robotten tæller ens. De mange "AI-*"-etiketter bruges IKKE: de sidder på næsten alt (AI-Video på 105).
 const EKSTRA_ETIKETTER = EKSTRA as Record<string, string>;
-// Alle hylder en artikel hører til (ud fra emner + de ekstra etiketter)
-const hyldeSlugs = (p: Indlaeg) => new Set([
-  ...p.emner.map((e) => (HYLDE_FOR_EMNE as Record<string, string>)[e.slug]),
-  ...p.labels.map((l) => EKSTRA_ETIKETTER[l]),
-].filter(Boolean));
-// Artiklerne på hylden, nyeste først (en artikel kan stå på flere hylder)
+// Alle hylder en artikel hører til. Ældre artikler: præcis den hylde, hyldeplanen siger (src/lib/hyldeplan.mjs,
+// skridt 3, Jacob 29/10-2026) — eller ingen. Robotartikler: emnets hylde + de ekstra etiketter.
+const hyldeSlugs = (p: Indlaeg): Set<string> => {
+  const plan = planHylde(p.sti) as string | null | undefined;
+  if (plan !== undefined) return new Set(plan ? [plan] : []);
+  return new Set([
+    ...p.emner.map((e) => (HYLDE_FOR_EMNE as Record<string, string>)[e.slug]),
+    ...p.labels.map((l) => EKSTRA_ETIKETTER[l]),
+  ].filter(Boolean));
+};
+// Er artiklen et "svar" (robotartikel eller tidløs ældre artikel)? Kun svar tæller på hylden og kan stå i Start here.
+export const erSvarArtikel = (p: Indlaeg): boolean => erSvar(p.sti, p.robot) as boolean;
+// Artiklerne på hylden, nyeste først (en robotartikel kan stå på flere hylder)
 export const iHylde = (h: Hylde): Indlaeg[] => INDLAEG.filter((p) => hyldeSlugs(p).has(h.slug));
+// Svarene på hylden (robotsvar + tidløse ældre artikler), nyeste først
+export const svarIHylde = (h: Hylde): Indlaeg[] => iHylde(h).filter(erSvarArtikel);
+// Hylden med svarene først og derefter arkivet (nyheder og værktøj), begge nyeste først. Bruges af forsiden,
+// hyldesiden og artiklens "Read next"/sidekolonne, så læseren møder de tidløse svar før gamle nyheder.
+export const arkivIHylde = (h: Hylde): Indlaeg[] => iHylde(h).filter((p) => !erSvarArtikel(p));
+export const hyldeSorteret = (h: Hylde): Indlaeg[] => [...svarIHylde(h), ...arkivIHylde(h)];
 // "Start here"-listen som artikler. Reglen (Jacob 29/10-2026): 3-4 tidløse forklaringer i læserækkefølge —
 // "hvad er det" → "hvordan virker det" → "hvad gør jeg"; ingen nyheder, ingen værktøjslister, intet til virksomheder.
 // Under 3 artikler vises listen ikke (hverken på hyldesiden eller som "Part x of y" i artiklerne) — så kan en
@@ -69,5 +83,9 @@ for (const h of HYLDER) {
     const p = INDLAEG.find((x) => x.sti === s);
     if (!p) throw new Error(`Start here på ${h.slug}: ${s} findes ikke`);
     if (!hyldeSlugs(p).has(h.slug)) throw new Error(`Start here på ${h.slug}: "${p.title}" står ikke på hylden`);
+    if (!erSvarArtikel(p)) throw new Error(`Start here på ${h.slug}: "${p.title}" er ikke et svar (nyhed/værktøj i hyldeplanen)`);
   }
 }
+// Kontrol ved byggeriet (29/10-2026): hver ældre artikel står i hyldeplanen, og planen peger kun på artikler, der findes
+for (const p of INDLAEG) if (!p.robot && planHylde(p.sti) === undefined) throw new Error(`Ældre artikel mangler i src/lib/hyldeplan.mjs: ${p.sti}`);
+for (const s of Object.keys(PLAN)) if (!INDLAEG.some((p) => p.sti === s)) throw new Error(`src/lib/hyldeplan.mjs peger på en artikel, der ikke findes: ${s}`);

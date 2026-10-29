@@ -31,4 +31,15 @@ const tilHylde = (html) => html.replace(EMNE_LINK, (m, start, anf, slug) => {
   return h ? `${start}/shelf/${h}` : m;
 });
 
-export const interneLinks = (html) => tilHylde(html.replace(INTERN, (m, start, anf) => (/\/index$/.test(start) ? start.slice(0, -5) : start)));
+// Links til slettede artikler (worker/slettede.js) peger direkte på det mål, workeren sender videre til (29/10-2026,
+// skridt 3: 29 artikler slettet) — så læseren ikke får en 301-omvej, og tjek-site ikke ser døde links.
+// Teksten i src/content røres ikke; det sker, når siden bygges.
+import { SLETTEDE } from '../../worker/slettede.js';
+const ARTIKEL_LINK = /(\shref=(["']))(?:https?:\/\/(?:www\.)?techmediaarch\.com)?(\/\d{4}\/\d{2}\/[^"'#?]+)(?=[#?"'])/g;
+const tilLevende = (html) => html.replace(ARTIKEL_LINK, (m, start, anf, sti) => {
+  let d = sti; try { d = decodeURIComponent(sti); } catch { /* ugyldig kodning: brug stien som den er */ }
+  const maal = SLETTEDE[d.replace(/\.html$/, '') + '.html'];
+  return maal ? `${start}${maal}` : m;
+});
+
+export const interneLinks = (html) => tilLevende(tilHylde(html.replace(INTERN, (m, start, anf) => (/\/index$/.test(start) ? start.slice(0, -5) : start))));

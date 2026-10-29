@@ -77,7 +77,8 @@ for (const f of filer) if (/\.(html|xml|txt|json)$/.test(f) && fs.readFileSync(p
 const posts = laes('posts.json').filter((p) => !SLETTEDE[decodeURI(alt(p).replace('https://www.techmediaarch.com', ''))]), pages = laes('pages.json');
 // Slettede artikler (worker/slettede.js) må IKKE længere ligge som fil — ellers svarer de 200, ikke 301
 for (const s of Object.keys(SLETTEDE)) if (filer.has(s)) fejl.push(`SLETTET artikel findes stadig: ${s}`);
-for (const [s, til] of Object.entries(SLETTEDE)) if (!filer.has(til + '.html')) fejl.push(`SLETTET artikels mål findes ikke: ${s} -> ${til}`);
+// Målet kan være forsiden "/" (29/10-2026: artikler uden for sitets emner sendes dertil) — samme regel som NEDLAGTE nedenfor
+for (const [s, til] of Object.entries(SLETTEDE)) if (!filer.has(til === '/' ? '/index.html' : til + '.html')) fejl.push(`SLETTET artikels mål findes ikke: ${s} -> ${til}`);
 // Nedlagte faste sider (worker/nedlagte.js, fx Watch): må ikke ligge som fil, og målet skal findes
 for (const [s, til] of Object.entries(NEDLAGTE)) {
   if (filer.has(s + '.html')) fejl.push(`NEDLAGT side findes stadig som fil: ${s}`);

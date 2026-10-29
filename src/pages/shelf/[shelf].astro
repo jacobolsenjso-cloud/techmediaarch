@@ -5,7 +5,7 @@
 // og en sidekolonne. Listerne er <a> i <div>/<ol>, ingen afsnit mellem punkterne (Auto-annoncer, se artikelsiden).
 import MainLayout from '../../layouts/MainLayout.astro';
 import EmneChips from '../../components/EmneChips.astro';
-import { HYLDER, hyldeUrl, iHylde, startListe } from '../../lib/hylder';
+import { HYLDER, hyldeUrl, iHylde, svarIHylde, arkivIHylde, hyldeSorteret, startListe } from '../../lib/hylder';
 import { datoTekst } from '../../lib/indhold';
 
 export function getStaticPaths() {
@@ -14,11 +14,13 @@ export function getStaticPaths() {
 const { h } = Astro.props;
 const SITE = 'https://www.techmediaarch.com';
 const liste = iHylde(h);
+const svar = svarIHylde(h);
+const arkiv = arkivIHylde(h);
 const start = startListe(h);
 const schema = {
   '@context': 'https://schema.org', '@type': 'CollectionPage', name: h.navn, description: h.besk,
   url: SITE + hyldeUrl(h),
-  mainEntity: { '@type': 'ItemList', itemListElement: liste.slice(0, 30).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + p.href })) },
+  mainEntity: { '@type': 'ItemList', itemListElement: hyldeSorteret(h).slice(0, 30).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + p.href })) },
 };
 ---
 <MainLayout title={`${h.navn}: answers and guides`} description={`${h.besk} ${liste.length} articles on the ${h.navn} shelf of Tech Media Arch${start.length ? ', with a short reading path to start with' : ''}.`}
@@ -42,6 +44,7 @@ const schema = {
     .hylde-start-liste a { font-size: 1.05rem; font-weight: 650; line-height: 1.35; color: var(--text-color); text-decoration: none; }
     .hylde-start-liste a:hover { color: var(--teal-text); }
     .hylde-liste { display: flex; flex-direction: column; }
+    .hylde-tom { margin: 8px 0 0; font-family: var(--font-serif); color: var(--muted); }
     .hylde-raekke { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--rule-light); color: var(--text-color); text-decoration: none; }
     .hylde-raekke img, .hylde-raekke-tom { width: 112px; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; display: block; background: var(--placeholder); }
     .hylde-raekke-tekst { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
@@ -63,7 +66,7 @@ const schema = {
       <span class="hylde-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d={h.ikon} /></svg></span>
       <div>
         <h1 class="hylde-titel">{h.navn}</h1>
-        <p class="hylde-besk">{h.besk} <span>{liste.length} articles.</span></p>
+        <p class="hylde-besk">{h.besk} <span>{svar.length} {svar.length === 1 ? 'answer' : 'answers'} · {liste.length} articles in all.</span></p>
       </div>
     </header>
 
@@ -79,20 +82,41 @@ const schema = {
           </section>
         )}
 
-        <section aria-labelledby="alle-h">
-          <div class="section-heading"><h2 id="alle-h">All articles on this shelf</h2><span class="section-note">{liste.length}, newest first</span></div>
-          <div class="hylde-liste">
-            {liste.map((p, i) => (
-              <a href={p.href} class="hylde-raekke">
-                {p.image ? <img src={p.image} alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" /> : <span class="hylde-raekke-tom" aria-hidden="true"></span>}
-                <span class="hylde-raekke-tekst">
-                  <span class="hylde-raekke-titel">{p.title}</span>
-                  <span class="hylde-raekke-meta">{datoTekst(p.published)} · {p.minutter} min read</span>
-                </span>
-              </a>
-            ))}
-          </div>
+        {/* Skridt 3 (Jacob 29/10-2026): svarene (robotsvar + tidløse ældre artikler, src/lib/hyldeplan.mjs) står øverst;
+            ældre nyheder og værktøjsanmeldelser står i arkivet nedenunder — de er stadig på sitet, men læseren møder svarene først. */}
+        <section aria-labelledby="svar-h">
+          <div class="section-heading"><h2 id="svar-h">Answers on this shelf</h2><span class="section-note">{svar.length}, newest first</span></div>
+          {svar.length > 0 ? (
+            <div class="hylde-liste">
+              {svar.map((p, i) => (
+                <a href={p.href} class="hylde-raekke">
+                  {p.image ? <img src={p.image} alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" /> : <span class="hylde-raekke-tom" aria-hidden="true"></span>}
+                  <span class="hylde-raekke-tekst">
+                    <span class="hylde-raekke-titel">{p.title}</span>
+                    <span class="hylde-raekke-meta">{datoTekst(p.published)} · {p.minutter} min read</span>
+                  </span>
+                </a>
+              ))}
+            </div>
+          ) : <p class="hylde-tom">The first answers for this shelf are being written.</p>}
         </section>
+
+        {arkiv.length > 0 && (
+          <section aria-labelledby="arkiv-h">
+            <div class="section-heading"><h2 id="arkiv-h">From the archive</h2><span class="section-note">{arkiv.length} older news stories and tool reviews</span></div>
+            <div class="hylde-liste">
+              {arkiv.map((p) => (
+                <a href={p.href} class="hylde-raekke">
+                  {p.image ? <img src={p.image} alt="" loading="lazy" decoding="async" /> : <span class="hylde-raekke-tom" aria-hidden="true"></span>}
+                  <span class="hylde-raekke-tekst">
+                    <span class="hylde-raekke-titel">{p.title}</span>
+                    <span class="hylde-raekke-meta">{datoTekst(p.published)} · {p.minutter} min read</span>
+                  </span>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       <aside class="hylde-side" aria-label="About this shelf">
