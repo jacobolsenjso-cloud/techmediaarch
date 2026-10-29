@@ -49,7 +49,13 @@ export function gemPrisVedExit(navn) {
     try {
       const mappe = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../ud');
       fs.mkdirSync(mappe, { recursive: true });
-      fs.writeFileSync(path.join(mappe, `pris-${navn}.json`), JSON.stringify(prisOpgoerelse(), null, 1));
+      const o = prisOpgoerelse();
+      fs.writeFileSync(path.join(mappe, `pris-${navn}.json`), JSON.stringify(o, null, 1));
+      // Også i kørslens opsummering på GitHub, så prisen kan ses uden at hente zip-filen (29/10: kørsel #31 viste den ikke)
+      if (process.env.GITHUB_STEP_SUMMARY && (o.usd || o.ukendtPris.length)) {
+        const kald = Object.values(o.modeller).reduce((s, m) => s + m.kald, 0);
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `\n**Pris (${navn}):** $${o.usd} ≈ ${o.kr} kr · ${kald} kald, ${o.billeder} billeder, ${o.soegninger} søgninger${o.ukendtPris.length ? ` · UKENDT pris for ${o.ukendtPris.join(', ')}` : ''}\n`);
+      }
     } catch { /* prisen må aldrig stoppe robotten */ }
   });
 }
