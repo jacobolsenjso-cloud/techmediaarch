@@ -1,0 +1,28 @@
+[
+ {
+  "dato": "2026-10-29T20:20:54.446Z",
+  "artikel": "/2026/10/what-are-intelligent-agents-ai",
+  "usd": 0.0904,
+  "kr": 0.62,
+  "dele": {
+   "artikel": {
+    "kr": 0.59,
+    "billeder": 2,
+    "soegninger": 1,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ }
+]

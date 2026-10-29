@@ -1,7 +1,7 @@
 {
- "hentet": "2026-10-28T20:22:08.403Z",
- "fra": "2026-10-22",
- "til": "2026-10-28",
+ "hentet": "2026-10-29T20:20:54.430Z",
+ "fra": "2026-10-23",
+ "til": "2026-10-29",
  "dage": 7,
  "sider": {
   "/2026/09/what-are-phishing-emails": {
@@ -17,6 +17,10 @@
    "brugere": 1
   },
   "/2026/09/what-is-mvp-software-development": {
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/10/how-phishing-resistant-mfa-works": {
    "visninger": 2,
    "brugere": 1
   }
