@@ -78,14 +78,17 @@ async function kald(model, body, forsoeg = 3) {
 
 const tekstAf = (j) => (j.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('');
 
-// Tekst, evt. med Google-søgning. Returnerer { tekst, kilder: [{ uri, titel }] }.
+// Tekst, evt. med Google-søgning. Returnerer { tekst, kilder: [{ uri, titel, i }], stoette: [{ tekst, kilder: [i] }] }.
+// stoette (29/10-2026): Googles egen kobling mellem et stykke af svaret og de kilder (i = nummer i kildelisten), det
+// bygger på. Bruges til kun at skrive ud fra fakta fra kontrollerede kilder (robot/lib/kildenavne.mjs).
 export async function skriv(prompt, { soeg = false, temperatur = 0.7, model = TEKSTMODEL } = {}) {
   const body = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: temperatur } };
   if (soeg) body.tools = [{ google_search: {} }];
   const j = await kald(model, body);
-  const kilder = (j.candidates?.[0]?.groundingMetadata?.groundingChunks || [])
-    .map((c) => c.web).filter(Boolean).map((w) => ({ uri: w.uri, titel: w.title || '' }));
-  return { tekst: tekstAf(j), kilder };
+  const gm = j.candidates?.[0]?.groundingMetadata || {};
+  const kilder = (gm.groundingChunks || []).map((c, i) => (c.web ? { uri: c.web.uri, titel: c.web.title || '', i } : null)).filter(Boolean);
+  const stoette = (gm.groundingSupports || []).map((s) => ({ tekst: String(s.segment?.text || ''), kilder: s.groundingChunkIndices || [] })).filter((s) => s.tekst.trim());
+  return { tekst: tekstAf(j), kilder, stoette };
 }
 
 // Svar som JSON (uden søgning — de to kan ikke kombineres).

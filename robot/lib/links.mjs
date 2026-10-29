@@ -38,9 +38,11 @@ export async function kontrollerKilder(kilder, max = 4) {
     if (FORKORTERE.test(host) || PLATFORME.test(host)) { afvist.push({ kilde: host, grund: 'forkorter/platform' }); continue; }
     if (AFFILIATE_URL.test(url)) { afvist.push({ kilde: host, grund: 'affiliate' }); continue; }
     const dom = hovedNavn(host);
-    if (domaener.has(dom)) { afvist.push({ kilde: host, grund: 'domæne brugt' }); continue; }
+    // Samme domæne igen: ikke et nyt link, men søgekildens nummer huskes på det første (29/10-2026), så fakta fra
+    // den anden side af samme domæne stadig tæller som kontrolleret (robot/lib/kildenavne.mjs).
+    if (domaener.has(dom)) { const tidl = sat.find((x) => x.dom === dom); if (tidl && k.i !== undefined) tidl.idx.push(k.i); afvist.push({ kilde: host, grund: 'domæne brugt' }); continue; }
     domaener.add(dom);
-    sat.push({ url, titel: s.titel.slice(0, 110) });
+    sat.push({ url, titel: s.titel.slice(0, 110), dom, idx: k.i !== undefined ? [k.i] : [] });
   }
   return { sat, afvist };
 }

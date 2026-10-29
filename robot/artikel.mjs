@@ -111,24 +111,26 @@ const researchOpgave = `Use Google Search to research these questions for a fact
 Return 25-40 short bullet points of concrete, verified facts (definitions, how it works, examples, numbers with dates, steps, comparisons, best practices). Cover every question above with at least 3 different facts, and never repeat the same fact in other words. Only include facts you found in search results.
 Start every bullet with the name of the organization, agency, company or publication the fact comes from (e.g. "IBM: ...", "NIST: ...").`;
 // ↑ Kildenavnet i hvert punkt (5/10-2026): uden det skrev Gemini "industry experts note" (18 sætninger i 8 af 15 artikler).
-let fakta = ''; let kilder = [];
+let fakta = ''; let kilder = []; let stoette = [];
 for (const model of [undefined, undefined, 'gemini-3.5-flash', 'gemini-2.5-flash']) {
   try {
     const r = await skriv(researchOpgave, { soeg: true, temperatur: 0.2, ...(model ? { model } : {}) });
-    if (r.kilder.length >= 2) { fakta = r.tekst; kilder = r.kilder; log(`- Research: ${r.kilder.length} kilder, ${(r.tekst.match(/^\s*(?:[-*•]|\d+\.)\s+/gm) || []).length} faktapunkter (${model || 'standardmodel'}).`); break; }
+    if (r.kilder.length >= 2) { fakta = r.tekst; kilder = r.kilder; stoette = r.stoette || []; log(`- Research: ${r.kilder.length} kilder, ${(r.tekst.match(/^\s*(?:[-*•]|\d+\.)\s+/gm) || []).length} faktapunkter (${model || 'standardmodel'}).`); break; }
     log(`- Research (${model || 'standardmodel'}): ${r.kilder.length} kilder — prøver igen.`);
   } catch (e) { log(`- Research (${model}): ${e.message.slice(0, 120)}`); }
 }
 if (kilder.length < 2) throw new Error(`Research gav kun ${kilder.length} kilder — artiklen afvist`);
 
 // Kun kilder, der står under "Sources" (Jacob 29/10-2026). Før blev kilderne kontrolleret EFTER skrivningen, og kun
-// de første 4 kom på listen — prøve #31 nævnte ca. 15 kilder i teksten med 4 på listen. Nu: kontrollér op til 12,
-// skriv kun ud fra fakta fra de kontrollerede, og vis præcis de kilder, fakta kommer fra. Se robot/lib/kildenavne.mjs.
+// de første 4 kom på listen — prøve #31 nævnte ca. 15 kilder i teksten med 4 på listen. Nu: kontrollér op til 20,
+// skriv kun ud fra fakta fra de kontrollerede (Googles kobling, ellers navnet), og vis præcis de kilder, fakta
+// kommer fra. Se robot/lib/kildenavne.mjs. Prøve #32 blev afvist med 10 fakta via navnet alene — derfor koblingen.
 const MIN_FAKTA = 12;
-const { sat: kontrollerede, afvist: kildeAfvist } = await kontrollerKilder(kilder, 12);
-const kf = kunKontrolleredeFakta(fakta, kontrollerede);
+const { sat: kontrollerede, afvist: kildeAfvist } = await kontrollerKilder(kilder, 20);
+const kf = kunKontrolleredeFakta(fakta, kontrollerede, stoette);
 const kildeLinks = kf.brugte;
-log(`- Kilder kontrolleret før skrivning: ${kontrollerede.length} bestod (${kildeAfvist.length} afvist) · fakta fra dem: ${kf.beholdt} af ${kf.alle} · kilder med fakta: ${kildeLinks.length}`);
+log(`- Kilder kontrolleret før skrivning: ${kontrollerede.length} bestod (${kildeAfvist.length} afvist: ${kildeAfvist.map((a) => `${a.kilde} – ${a.grund}`).join('; ') || 'ingen'})`);
+log(`- Fakta fra kontrollerede kilder: ${kf.beholdt} af ${kf.alle} (${kf.viaGoogle} via Googles kobling, ${kf.viaNavn} via navnet; ${stoette.length} koblinger fra Google) · kilder med fakta: ${kildeLinks.length}${kf.smidt.length ? ` · smidt ud: ${kf.smidt.join(', ')}` : ''}`);
 if (kildeLinks.length < 2) throw new Error(`Kun ${kildeLinks.length} kontrollerede kilder har fakta — artiklen afvist`);
 if (kf.beholdt < MIN_FAKTA) throw new Error(`Kun ${kf.beholdt} fakta fra kontrollerede kilder (mindst ${MIN_FAKTA}) — artiklen afvist`);
 fakta = kf.tekst;

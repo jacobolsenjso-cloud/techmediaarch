@@ -26,18 +26,37 @@ export function kendtNavn(navn, kilder) {
 // Kort navneliste til Gemini: "ibm.com (What Are AI Agents? | IBM)"
 export const kildeNavneTekst = (kilder) => kilder.map((k) => `${new URL(k.url).hostname.replace(/^www\./, '')} (${k.titel})`).join('; ');
 
-// Research-punkterne begynder med kildens navn ("- IBM: …"). Kun punkter fra en kontrolleret kilde beholdes.
+// Kun punkter fra en kontrolleret kilde beholdes. To veje (29/10-2026):
+//  1. Googles egen kobling (stoette fra robot/lib/gemini.mjs): et stykke af punktet bygger på søgekilde nr. i,
+//     og i hører til en kontrolleret kilde (k.idx fra robot/lib/links.mjs).
+//  2. Reserve: navnet først i punktet ("- IBM: …") passer på en kontrolleret kilde.
+// Målt 29/10 (prøve #32): kun navnet gav 10 af 21 punkter med 9 kontrollerede kilder — fx "FBI" passer ikke på ic3.gov.
 // brugte: de kilder, mindst ét beholdt punkt kommer fra — kun de skal stå under "Sources".
-export function kunKontrolleredeFakta(fakta, kilder) {
+const krop = (l) => l.replace(/^\s*(?:[-*•]|\d+\.)\s+/, '').replace(/\*\*/g, '').trim();
+const overlap = (l, seg) => { const a = krop(l); const b = krop(seg); return b.length >= 15 && (a.includes(b) || (a.length >= 15 && b.includes(a))); };
+export function kunKontrolleredeFakta(fakta, kilder, stoette = []) {
   const punkter = String(fakta).split(/\r?\n/).filter((l) => /^\s*(?:[-*•]|\d+\.)\s+/.test(l));
-  const brugte = new Set(); const behold = [];
+  const brugte = new Set(); const behold = []; const smidt = []; let viaGoogle = 0; let viaNavn = 0;
   for (const l of punkter) {
+    const nr = new Set(stoette.filter((s) => overlap(l, s.tekst)).flatMap((s) => s.kilder));
+    let hvem = kilder.filter((k) => (k.idx || []).some((i) => nr.has(i)));
     const m = l.match(/^\s*(?:[-*•]|\d+\.)\s+(?:\*\*)?([^:*\n]{2,80}?)(?:\*\*)?\s*:/);
-    const n = m ? norm(m[1].replace(/\(.*?\)/g, '')) : '';
-    const hvem = n.length >= 2 ? kilder.filter((k) => daekker(k, n)) : [];
-    if (hvem.length) { behold.push(l); hvem.forEach((k) => brugte.add(k)); }
+    if (hvem.length) {
+      viaGoogle++;
+      // Navnet i punktet er ikke selve kilden ("Gartner: …" fra en side på sparkout.com): skriv kilden på, så
+      // teksten kan nævne den listede kilde ("…, according to Sparkout") i stedet for et navn uden for listen.
+      if (m && !hvem.some((k) => daekker(k, norm(m[1])))) {
+        const via = new URL(hvem[0].url).hostname.replace(/^www\./, '');
+        brugte.add(hvem[0]); behold.push(l.replace(m[1], `${m[1].trim()} (via ${via})`)); continue;
+      }
+    } else {
+      const n = m ? norm(m[1].replace(/\(.*?\)/g, '')) : '';
+      hvem = n.length >= 2 ? kilder.filter((k) => daekker(k, n)) : [];
+      if (hvem.length) viaNavn++;
+    }
+    if (hvem.length) { behold.push(l); hvem.forEach((k) => brugte.add(k)); } else smidt.push(m ? m[1].trim() : krop(l).slice(0, 30));
   }
-  return { tekst: behold.join('\n'), alle: punkter.length, beholdt: behold.length, brugte: kilder.filter((k) => brugte.has(k)) };
+  return { tekst: behold.join('\n'), alle: punkter.length, beholdt: behold.length, viaGoogle, viaNavn, smidt, brugte: kilder.filter((k) => brugte.has(k)) };
 }
 
 // Navne, teksten henviser til som kilde: "according to X", "as noted by X", "X reports/notes/explains …".
