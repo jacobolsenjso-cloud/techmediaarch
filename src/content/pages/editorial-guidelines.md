@@ -6,7 +6,7 @@ updated: 2026-10-29T12:00:00.000+01:00
 ---
 <p>Tech Media Arch is an archive of checked answers to tech questions, run by Jacob S. Olsen from Denmark. This page explains how the answers are made, what rules they follow, and what to do if you find an error. It describes what actually happens, not what we would like to happen.</p>
 <h2>Five shelves</h2>
-<p>Every answer sits on one of five shelves: <a href="/shelf/ai">AI Tools &amp; Agents</a>, <a href="/shelf/cybersecurity">Cybersecurity</a>, <a href="/shelf/software">Building Software</a>, <a href="/shelf/marketing">Marketing &amp; SEO</a> and <a href="/shelf/everyday-tech">Everyday Tech</a>. Each shelf has a short "Start here" list for readers who are new to the subject.</p>
+<p>Every answer sits on one of five shelves: <a href="/shelf/ai">AI Tools &amp; Agents</a>, <a href="/shelf/cybersecurity">Cybersecurity</a>, <a href="/shelf/software">Building Software</a>, <a href="/shelf/marketing">Marketing &amp; SEO</a> and <a href="/shelf/everyday-tech">Everyday Tech</a>. Most shelves have a short "Start here" list of three or four answers to read in order if you are new to the subject.</p>
 <h2>How an answer is laid out</h2>
 <ul>
 <li><strong>The question is the title.</strong> New answers use the question people search for as the headline.</li>

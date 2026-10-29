@@ -21,7 +21,7 @@ const schema = {
   mainEntity: { '@type': 'ItemList', itemListElement: liste.slice(0, 30).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + p.href })) },
 };
 ---
-<MainLayout title={`${h.navn}: answers and guides`} description={`${h.besk} ${liste.length} articles on the ${h.navn} shelf of Tech Media Arch, with a short reading path to start with.`}
+<MainLayout title={`${h.navn}: answers and guides`} description={`${h.besk} ${liste.length} articles on the ${h.navn} shelf of Tech Media Arch${start.length ? ', with a short reading path to start with' : ''}.`}
   schema={schema} breadcrumb={[{ navn: h.navn, href: hyldeUrl(h) }]}>
   <style is:global>
     .hylde-top { display: flex; align-items: center; gap: 18px; margin: 8px 0 28px; }
