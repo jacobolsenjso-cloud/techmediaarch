@@ -11,7 +11,7 @@ export function GET() {
   const ud: string[] = [
     '# Tech Media Arch',
     '',
-    '> Tech Media Arch (techmediaarch.com) is an English-language blog about artificial intelligence, technology, software development, data, cybersecurity, fintech and crypto. Articles explain how things work and what changes mean, in plain language. Founder, editor and author: Jacob Olsen.',
+    '> Tech Media Arch (techmediaarch.com) is an English-language archive of clear answers to the tech questions people actually ask: AI tools and agents, cybersecurity, building software, marketing and SEO, and everyday tech. Each answer names its sources. Founder, editor and author: Jacob S. Olsen.',
     '',
     `Articles: ${INDLAEG.length}. Every article has a publication date and, where relevant, a list of sources. Full list of addresses: ${SITE}/sitemap.xml`,
     '',

@@ -11,7 +11,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parse } from 'yaml';
 import { sti } from './lib/arkiv.mjs';
-import { json } from './lib/gemini.mjs';
+import { json, gemPrisVedExit } from './lib/gemini.mjs';
+gemPrisVedExit('ogsaa');   // pristælleren (trin 7)
 import { faqBoks } from '../src/lib/faqboks.mjs';
 import { kandidater } from '../src/lib/ogsaaspurgt.mjs';
 

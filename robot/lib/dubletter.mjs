@@ -9,6 +9,7 @@
 //     der slap gennem lag 1-2. Kræver GEMINI_API_KEY (trin 2); uden nøgle
 //     springes laget over, og listen siger det.
 import { kerne, normaliser, daekning } from './tekst.mjs';
+import { noterForbrug } from './gemini.mjs';
 
 // Grænser for lag 2, kalibreret med robot/kalibrer.mjs på techfeedwatchs 126
 // brugte spørgsmål (26/9-2026). To retninger måles:
@@ -99,6 +100,7 @@ export async function geminiSammeHensigt(q, kandidater, { model = 'gemini-3.5-fl
     });
     if (!r.ok) return null;
     const j = await r.json();
+    noterForbrug(model, j);   // pristælleren (robot/lib/gemini.mjs, trin 7)
     const svar = JSON.parse(j.candidates?.[0]?.content?.parts?.[0]?.text || '{}');
     return { samme: Boolean(svar.same), mod: kandidater[(svar.number || 0) - 1] || null };
   } catch { return null; }

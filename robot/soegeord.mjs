@@ -17,9 +17,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { hentForslag, omFroe } from './lib/autoforslag.mjs';
 import { harAdgang, hentSoegninger } from './lib/searchconsole.mjs';
-import { artikler, antalPrEmne, brugte, proevedeForNylig, emner, sti } from './lib/arkiv.mjs';
+import { artikler, antalPrEmne, antalPrHylde, brugte, proevedeForNylig, emner, sti } from './lib/arkiv.mjs';
 import { lavIndeks, tjek, sammenlign, mestEns, geminiSammeHensigt, delvistOverlap } from './lib/dubletter.mjs';
 import { kerne, normaliser } from './lib/tekst.mjs';
+import { gemPrisVedExit } from './lib/gemini.mjs';
+gemPrisVedExit('soegeord');   // pristælleren (trin 7): Geminis dublet-tjek (lag 3) koster også
 
 const arg = (navn, std) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? process.argv[i + 1] : std; };
 const PAKKER = Number(arg('pakker', 3));
@@ -43,10 +45,14 @@ const optalt = antalPrEmne(alle);
 const indeks = lavIndeks(alle, brugte());
 const hvilende = new Set(proevedeForNylig(30).map((x) => normaliser(x.q)));
 
-// Emner i den rækkefølge, rotationen senere vil tage dem: tyndeste først.
-const emneListe = emner().map((e) => e.navn)
+// Emner i den rækkefølge, rotationen senere vil tage dem. Trin 7 (Jacob 29/10-2026): kun emner på de 5 hylder
+// (robot/lib/arkiv.mjs), og den TYNDESTE HYLDE først (så hylderne vokser mod de 20-30 svar hver), derefter det
+// tyndeste emne på hylden. Før gik det efter emnet alene, så Fintech, Crypto og Web3 kom først.
+const prHylde = antalPrHylde(alle);
+const hyldeAf = Object.fromEntries(emner().map((e) => [e.etiket, e.hylde]));
+const emneListe = emner().map((e) => e.etiket)
   .filter((n) => !KUN_EMNE || n.toLowerCase() === KUN_EMNE.toLowerCase())
-  .sort((a, b) => optalt[a] - optalt[b]);
+  .sort((a, b) => prHylde[hyldeAf[a]] - prHylde[hyldeAf[b]] || optalt[a] - optalt[b]);
 
 // --- 1. Autoforslag -------------------------------------------------------
 let raa = {};
@@ -199,7 +205,7 @@ const sumA = Object.values(resultat).reduce((s, r) => s + r.afvist.length, 0);
 L.push(`**${sumF}** spørgsmål fra Google · **${sumA}** afvist som dubletter · **${sumP}** pakker foreslået · Gemini-tjek (lag 3): ${geminiKoert ? `${geminiKoert} kørt (heraf ${geminiDelvis} for delvist overlap)` : process.env.GEMINI_API_KEY ? 'ikke brugt (ingen tvivlstilfælde blandt de valgte)' : 'ikke kørt (ingen nøgle)'}`, '');
 for (const emne of emneListe) {
   const r = resultat[emne];
-  L.push(`## ${emne} — ${r.antal} artikler i dag`, '', `${r.forslag} forslag: ${r.fri} fri, ${r.tvivl} tvivl, ${r.afvist.length} afvist.`, '');
+  L.push(`## ${emne} (hylden ${hyldeAf[emne]}: ${prHylde[hyldeAf[emne]]}) — ${r.antal} artikler i dag`, '', `${r.forslag} forslag: ${r.fri} fri, ${r.tvivl} tvivl, ${r.afvist.length} afvist.`, '');
   if (!r.pakker.length) L.push('_Ingen pakker — for få frie forslag. Startordene bør skiftes._', '');
   r.pakker.forEach((p, i) => {
     L.push(`**${i + 1}. ${p.hoved}**${p.tvivlMod ? `  ⚠ tvivl — ligner: "${p.tvivlMod}"` : ''}`);

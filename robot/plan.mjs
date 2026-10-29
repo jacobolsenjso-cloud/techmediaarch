@@ -1,5 +1,7 @@
 // TRIN 3 — robotten på fast tidsplan (Jacobs valg 26/9-2026):
-//   højst 2 udgivelser pr. døgn, fri tirsdag og fredag (dansk tid; ændret fra ons+søn af Jacob 27/9).
+//   højst 2 udgivelser pr. døgn, fri tirsdag, fredag og søndag (dansk tid; Jacob 29/10-2026 — før tir+fre fra 27/9,
+//   og ons+søn før det). Tidsplanen på GitHub (cron) kører stadig søndag; den rettes ved go-live (trin 8) — indtil
+//   da stopper maaUdgive() søndagens kørsler her, før der bruges penge.
 // Kaldes af workflowet "Robot (tidsplan)". Tre opgaver:
 //   node robot/plan.mjs --tjek     → må der udgives nu? (skriver koer=ja/nej til GitHub)
 //   node robot/plan.mjs --koer     → skriv én artikel og markér søgeordet
@@ -12,10 +14,12 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { parse } from 'yaml';
 import { sti, BRUGTE, PROEVEDE } from './lib/arkiv.mjs';
+import { KURS } from './lib/gemini.mjs';
+const PRIS = 'robot/data/pris.json';   // pristælleren (trin 7): én række pr. kørsel
 
 export const MAKS_PR_DAG = 2;
-export const FRIDAGE = ['Tue', 'Fri'];      // tirsdag og fredag
-export const TOMGANG_TIMER = 60;            // længste normale pause: mandag eftermiddag → onsdag morgen (~40 t) + GitHubs forsinkelse
+export const FRIDAGE = ['Tue', 'Fri', 'Sun']; // tirsdag, fredag og søndag (Jacob 29/10-2026: udgiver man, ons, tor, lør)
+export const TOMGANG_TIMER = 60;            // længste normale pause: fx lørdag eftermiddag → mandag morgen (~40 t) + GitHubs forsinkelse
 const SITE = 'https://www.techmediaarch.com';
 
 const dkDato = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Copenhagen' }).format(d);            // 2026-09-26
@@ -58,6 +62,8 @@ if (arg === '--tjek') {
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `koer=${ok ? 'ja' : 'nej'}\n`);
 } else if (arg === '--koer') {
   fs.rmSync(sti('robot/ud/valgt.json'), { force: true });   // aldrig et gammelt valg fra en tidligere kørsel
+  // Aldrig en gammel prisopgørelse fra en tidligere kørsel (pristælleren, se nederst)
+  if (fs.existsSync(sti('robot/ud'))) for (const f of fs.readdirSync(sti('robot/ud')).filter((x) => /^pris-.+\.json$/.test(x))) fs.rmSync(sti('robot/ud', f));
   const r = spawnSync('node', ['robot/artikel.mjs'], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   process.stdout.write(r.stdout || ''); process.stderr.write(r.stderr || '');
   const valgt = laes('robot/ud/valgt.json', null);
@@ -90,6 +96,24 @@ if (arg === '--tjek') {
   const m = spawnSync('node', ['robot/mest-laest.mjs'], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 3 * 60 * 1000 });
   process.stderr.write(m.stderr || '');
   summary(`**Trending (mest læste):** ${((m.stdout || '').trim().split('\n').pop() || `sluttede med kode ${m.status}`).slice(0, 300)}`);
+  // Pristæller (trin 7, Jacob 29/10-2026): hver del (søgeord, artikel, "People also ask") skriver sin opgørelse
+  // til robot/ud/pris-<del>.json ud fra Googles egne tal (robot/lib/gemini.mjs). Her lægges de sammen og gemmes
+  // i robot/data/pris.json (kommer med i robottens commit), så prisen pr. artikel og pr. måned kan ses.
+  try {
+    const dele = {};
+    if (fs.existsSync(sti('robot/ud'))) for (const f of fs.readdirSync(sti('robot/ud')).filter((x) => /^pris-.+\.json$/.test(x))) dele[f.slice(5, -5)] = laes(`robot/ud/${f}`, null);
+    const usd = Object.values(dele).reduce((s, d) => s + (d?.usd || 0), 0);
+    const a = r.status === 0 ? laes('robot/ud/proeveartikel.json', null) : null;
+    const priser = laes(PRIS, []);
+    priser.push({ dato: new Date().toISOString(), artikel: a?.sti || null, usd: Math.round(usd * 10000) / 10000, kr: Math.round(usd * KURS * 100) / 100,
+      dele: Object.fromEntries(Object.entries(dele).map(([k, d]) => [k, { kr: d?.kr ?? null, billeder: d?.billeder ?? 0, soegninger: d?.soegninger ?? 0, ukendtPris: d?.ukendtPris ?? [] }])) });
+    skrivJson(PRIS, priser);
+    const md = dkDato(new Date()).slice(0, 7);
+    const iMd = priser.filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === md);
+    const krMd = iMd.reduce((s, p) => s + (p.kr || 0), 0);
+    const ukendt = [...new Set(Object.values(dele).flatMap((d) => d?.ukendtPris || []))];
+    summary(`**Pris denne kørsel:** ${(Math.round(usd * KURS * 100) / 100).toFixed(2)} kr (${Object.entries(dele).map(([k, d]) => `${k} ${(d?.kr ?? 0).toFixed(2)}`).join(' · ')})${ukendt.length ? ` — UKENDT pris for ${ukendt.join(', ')}` : ''} · **${md} indtil nu:** ${krMd.toFixed(2)} kr for ${iMd.filter((p) => p.artikel).length} artikler (målt fra 29/10-2026)`);
+  } catch (e) { summary(`**Pris:** kunne ikke opgøres (${String(e.message).slice(0, 120)})`); }
 } else if (arg === '--tomgang') {
   const [nyeste] = robotArtikler();
   if (!nyeste) { summary('Ingen robotartikler endnu.'); process.exit(0); }

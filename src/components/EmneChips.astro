@@ -1,15 +1,18 @@
 ---
-// Emnerne som chips — samme pille-design som techfeedwatchs emnefilter, men som
-// links til emnesiderne (ingen filtrering i browseren).
-import { KATEGORIER, emneUrl } from '../lib/emner';
-import { iEmne } from '../lib/indhold';
+// Knapperne øverst på forsiden, hyldesiderne og de øvrige emnesider.
+// Fra trin 4 (28/10-2026): de 5 hylder (med farveprik og antal) i stedet for de 14 gamle emner,
+// plus "A–Z" til alle artikler. Links til siderne (ingen filtrering i browseren).
+// aktiv: hyldens slug (fx "cybersecurity") eller udeladt på forsiden.
+import { HYLDER, hyldeUrl, iHylde } from '../lib/hylder';
 interface Props { aktiv?: string; }
 const { aktiv } = Astro.props;
-const emner = KATEGORIER.map((e) => ({ e, n: iEmne(e).length })).filter((x) => x.n > 0);
 ---
-<div class="chip-bar">
+<nav class="chip-bar" aria-label="Shelves">
   <a href="/" class={`chip ${!aktiv ? 'active' : ''}`}>All</a>
-  {emner.map(({ e, n }) => (
-    <a href={emneUrl(e)} class={`chip chip-accent ${aktiv === e.slug ? 'active' : ''}`} style={`--tag-accent: ${e.farve}`}>{e.navn}<span class="chip-count">{n}</span></a>
+  {HYLDER.map((h) => (
+    <a href={hyldeUrl(h)} class={`chip chip-hylde ${aktiv === h.slug ? 'active' : ''}`} style={`--h-farve: ${h.farve}`} aria-current={aktiv === h.slug ? 'page' : undefined}>
+      <span class="chip-prik" aria-hidden="true"></span>{h.navn}<span class="chip-count">{iHylde(h).length}</span>
+    </a>
   ))}
-</div>
+  <a href="/a-z" class={`chip ${aktiv === 'a-z' ? 'active' : ''}`}>A–Z</a>
+</nav>

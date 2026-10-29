@@ -5,8 +5,9 @@
 // forrige/næste, relaterede) — uden videoafspilleren og alt det, der hørte til den.
 import MainLayout from '../../../layouts/MainLayout.astro';
 import ArticleCard from '../../../components/ArticleCard.astro';
-import { INDLAEG, datoTekst } from '../../../lib/indhold';
+import { INDLAEG, datoTekst, synligeEtiketter } from '../../../lib/indhold';
 import { emneUrl } from '../../../lib/emner';
+import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret, startListe } from '../../../lib/hylder';
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
@@ -41,7 +42,16 @@ const paa = geminiValg
 const paaHtml = paa.length ? `<aside class="paa" data-ekstra="1" aria-labelledby="paa-heading"><span class="paa-title" id="paa-heading">People also ask</span><span class="paa-sub">Related questions answered on this site.</span><nav class="paa-list" aria-label="People also ask">${
   paa.map((q) => `<a href="${esc(q.href)}" class="paa-link"><span class="paa-mark" style="--tag-accent: ${q.farve}; color: ${tegnFarve(q.farve)}" aria-hidden="true">?</span><span class="paa-text">${esc(q.q)}</span><span class="paa-arrow" aria-hidden="true">→</span></a>`).join('')
 }</nav></aside>` : '';
-const faqStart = p.html.indexOf('<section class="faq-box"');
+// Trin 6, forslag 1 (Jacob 28/10): forspalten. Robotartiklerne er skrevet "kort svar først", så deres første afsnit
+// flyttes op under titlen og står ikke igen i brødteksten. De gamle Blogger-artikler begynder ofte med et billede
+// eller en indledning, der ikke er et svar — de får ingen forspalte (og deres brødtekst skal være ord for ord som på Blogger).
+// Målt 28/10: 11 af 45 robotartikler begynder med svaret; 33 begynder med en indledende <h2> ("Introduction to …",
+// "Understanding …") og har svaret i afsnittet lige under. Overskriften bliver stående; kun afsnittet flyttes op.
+const FOERSTE_AFSNIT = /^(\s*<h2\b[^>]*>(?:(?!<\/h2>)[\s\S])*<\/h2>\s*)?<p>((?:(?!<\/?p[\s>])[\s\S])+?)<\/p>/;
+const fa = p.robot ? p.html.match(FOERSTE_AFSNIT) : null;
+const forspalte = fa && fa[2].replace(/<[^>]+>/g, '').trim().length >= 60 ? fa[2] : null;
+const krop = forspalte ? (fa![1] ?? '') + p.html.slice(fa![0].length) : p.html;
+const faqStart = krop.indexOf('<section class="faq-box"');
 
 const i = INDLAEG.indexOf(p);
 const nyere = INDLAEG[i - 1];
@@ -57,16 +67,40 @@ const laest = (x: typeof p) => (MEST_RAA as { sider?: Record<string, { visninger
 const kandidater = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].filter((x) => x.image && !paaHref.has(x.href));
 // Samme emne vinder altid over et andet emne (målt 1/10: en Product-artikel fik ellers et Infosec-forslag, fordi det var læst mest)
 const sammeEmne = (x: typeof p) => (somEmne.includes(x) ? 1 : 0);
-const forslag = [...kandidater.slice(0, 12)].sort((a, b) => sammeEmne(b) - sammeEmne(a) || laest(b) - laest(a)).slice(0, 2);
-const forslagHtml = forslag.length === 2 ? `<aside class="ymal" data-ekstra="1" aria-label="You might also like"><span class="ymal-label">You might also like</span><span class="ymal-grid">${
-  forslag.map((x) => `<a href="${esc(x.href)}" class="ymal-card"><span class="ymal-thumb"><img src="${esc(x.image!)}" alt="" loading="lazy" decoding="async"></span><span class="ymal-title">${esc(x.title)}</span></a>`).join('')
-}</span></aside>` : '';
+const gamleForslag = [...kandidater.slice(0, 12)].sort((a, b) => sammeEmne(b) - sammeEmne(a) || laest(b) - laest(a));
+
+// Trin 6, forslag 3 (Jacob 28/10): står artiklen på en hyldes "Start here"-liste, vises forløbet øverst
+const serieHylde = HYLDER.find((h) => h.start.includes(p.sti));
+const serie = serieHylde ? startListe(serieHylde) : [];
+const serieNr = serie.indexOf(p) + 1;
+const hylde = hyldeFor(p) ?? serieHylde;
+
+// Trin 6, forslag 4 (Jacob 28/10): ÉN "Read next"-boks midt i teksten (afløser "You might also like" med 2 forslag fra 1/10).
+// Rækkefølge: næste trin i "Start here" → den mest læste på samme hylde → den gamle regel (samme emne, mest læst).
+// Skridt 3 (29/10-2026): hyldens svar først, så "Read next" peger på et tidløst svar frem for en gammel nyhed
+const hyldeKandidater = hylde ? hyldeSorteret(hylde).filter((x) => x !== p && x.image && !paaHref.has(x.href)) : [];
+const naeste = (serieNr && serieNr < serie.length ? serie[serieNr] : null)
+  ?? [...hyldeKandidater.slice(0, 12)].sort((a, b) => laest(b) - laest(a))[0]
+  ?? gamleForslag[0];
+const forslag = naeste ? [naeste] : [];
+const forslagHtml = naeste ? `<aside class="las-naeste" data-ekstra="1" aria-label="Read next" style="--hylde: ${hylde?.farve ?? 'var(--teal)'}"><a href="${esc(naeste.href)}" class="las-naeste-link">${
+  naeste.image ? `<span class="las-naeste-thumb"><img src="${esc(naeste.image)}" alt="" loading="lazy" decoding="async"></span>` : ''
+}<span class="las-naeste-tekst"><span class="las-naeste-label">${hylde ? 'Read next on this shelf' : 'Read next'}</span><span class="las-naeste-titel">${esc(naeste.title)}</span><span class="las-naeste-meta">${esc(datoTekst(naeste.published))} · ${naeste.minutter} min read</span></span></a></aside>` : '';
 const relaterede = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].filter((x) => !forslag.includes(x)).slice(0, 8);
-// Sidebaren lover "More in <emne>" — så den må kun vise det emne. Har emnet
-// for få artikler, hedder den "Latest articles" og viser de nyeste i stedet.
+// Sidebaren lover "More in <hylde/emne>" — så den må kun vise den. Trin 6, forslag 5: hylden først (ikke det gamle
+// emnenavn, fx "Infosec"). Har hylden/emnet for få artikler, hedder den "Latest articles" og viser de nyeste i stedet.
+const somHylde = hylde ? hyldeSorteret(hylde).filter((x) => x !== p) : [];
+const nokIHylde = somHylde.length >= 3;
 const nokIEmne = somEmne.length >= 3;
-const sidebarTitel = nokIEmne ? `More in ${emne!.navn}` : 'Latest articles';
-const sidebarListe = (nokIEmne ? somEmne : INDLAEG.filter((x) => x !== p)).slice(0, 8);
+const sidebarTitel = nokIHylde ? `More in ${hylde!.navn}` : nokIEmne ? `More in ${emne!.navn}` : 'Latest articles';
+const sidebarListe = (nokIHylde ? somHylde : nokIEmne ? somEmne : INDLAEG.filter((x) => x !== p)).slice(0, 8);
+
+// Trin 6, forslag 6: Verification record. Kun det, der er sandt i dag (Jacob 28/10): udgivet/opdateret, de navngivne kilder
+// (artiklens egen "Sources"-liste) og — for robotartikler — at teksten er skrevet med AI ud fra kilderne.
+// "Last verified" kommer først, når robotten faktisk tjekker artiklerne igen (trin 7).
+const kildeStart = krop.search(/<h2[^>]*>\s*Sources\s*<\/h2>/i);
+const kildeListe = kildeStart >= 0 ? (krop.slice(kildeStart).match(/<ul[\s\S]*?<\/ul>/) || [''])[0] : '';
+const kildeVaerter = [...new Set([...kildeListe.matchAll(/href="https?:\/\/(?:www\.)?([^/"]+)/g)].map((m) => m[1]))];
 
 // Indholdsfortegnelse ved 3+ overskrifter. Bliver den lang (de ældre indlæg har
 // op til 40), vises kun hovedafsnittene (h2), så den ikke fylder en hel skærm.
@@ -76,10 +110,10 @@ const toc = p.overskrifter.length < 3 ? [] : p.overskrifter.length > 14 ? p.over
 const tocHtml = toc.length ? `<nav class="toc-container" data-ekstra="1" aria-label="Table of contents"><span class="toc-title">Table of Contents</span><span class="toc-list">${
   toc.map((h) => `<a class="toc-depth-${h.niveau}" href="#${esc(h.id)}">${esc(h.tekst)}</a>`).join('')
 }</span></nav>` : '';
-const slut = faqStart >= 0 ? faqStart : p.html.length;
-const broedtekst = indsaet(p.html, [
-  { pos: efterFoersteBillede(p.html, slut), html: tocHtml },
-  { pos: foranMidterOverskrift(p.html, slut), html: forslagHtml },
+const slut = faqStart >= 0 ? faqStart : krop.length;
+const broedtekst = indsaet(krop, [
+  { pos: efterFoersteBillede(krop, slut), html: tocHtml },
+  { pos: foranMidterOverskrift(krop, slut), html: forslagHtml },
   { pos: slut, html: paaHtml },
 ]);
 
@@ -94,40 +128,42 @@ const schema = {
   mainEntityOfPage: SITE + p.href,
   ...(p.image ? { image: SITE + p.image } : {}),
   // Forfatter = en navngiven person (Jacobs valg 27/9-2026): Google og AI-tjenester vægter,
-  // at der står et menneske bag. Navn og titel som på om-siden ("Jacob Olsen Founder & CEO").
-  author: { '@type': 'Person', name: 'Jacob Olsen', jobTitle: 'Founder & CEO', url: SITE + '/p/about-us', worksFor: { '@id': `${SITE}/#organization` } },
+  // at der står et menneske bag. Navn og titel som på om-siden ("Jacob S. Olsen Founder & CEO").
+  author: { '@type': 'Person', name: 'Jacob S. Olsen', jobTitle: 'Founder & CEO', url: SITE + '/p/about-us', worksFor: { '@id': `${SITE}/#organization` } },
   publisher: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/icon-512.png' } },
-  ...(p.labels.length ? { keywords: p.labels.join(', ') } : {}),
+  ...(synligeEtiketter(p).length ? { keywords: synligeEtiketter(p).join(', ') } : {}),
 };
 // FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs) + de ekstra spørgsmål fra frontmatter,
 // så Google får præcis de spørgsmål, læseren ser i FAQ-boksen
 const egneFaq = faqSchema(p.faqHtml);
 const ekstraQ = p.faqEkstra.map((x) => ({ '@type': 'Question', name: x.q, acceptedAnswer: { '@type': 'Answer', text: x.a } }));
 const faq = egneFaq || ekstraQ.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: [...(egneFaq?.mainEntity || []), ...ekstraQ] } : null;
-const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
+// Brødkrummen viser hylden (trin 4); artikler uden hylde viser deres emne som før
+const krumme = hylde ? { navn: hylde.navn, href: hyldeUrl(hylde) } : emne ? { navn: emne.navn, href: emneUrl(emne) } : null;
+const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.title, href: p.href }];
 ---
 <MainLayout title={p.title} seoTitle={p.seoTitle} description={p.description} image={p.image} schema={faq ? [schema, faq] : schema} ogType="article" breadcrumb={crumbs}>
   <style is:global>
     .article-layout { display: flex; gap: 25px; max-width: 1200px; margin: 0 auto; padding: 30px 20px; box-sizing: border-box; align-items: flex-start; width: 100%; }
     .article-primary { flex: 1; min-width: 0; width: 100%; max-width: 100%; }
     .article-secondary { width: 340px; flex-shrink: 0; position: sticky; top: 80px; max-height: calc(100vh - 100px); /* top: 60 px topbar + 20 px luft (siden ruller i vinduet fra 29/9) */ overflow-y: auto; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--border-color) transparent; }
-    .breadcrumbs-bar { background: var(--hover-bg); padding: 0 18px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; }
-    .breadcrumbs-bar a { color: var(--teal-text); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
-    .article-title { margin: 0 0 15px 0; font-size: 2rem; line-height: 1.2; }
+    .breadcrumbs-bar { font-size: 0.9rem; margin-bottom: 8px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .breadcrumbs-bar a:hover { color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
+    .breadcrumbs-bar a { color: var(--muted); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
+    .article-title { margin: 0 0 18px 0; font-size: 2.75rem; line-height: 1.06; font-weight: 700; font-stretch: 92%; letter-spacing: -0.02em; text-wrap: balance; }
     /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
     /* People also ask (29/9) — samme udseende som på Jacobs andet site; nulstiller brødtekstens link- og listestil */
     /* 30/9 (Jacobs valg A): boksen flød ind i teksten. Nu tyk turkis kant i venstre side og en let turkis tone,
        samme stil som forklaringsboksen på Best of each topic — også i mørk tilstand (tonen blandes med kortfarven) */
-    .post-body .paa { margin: 32px 0 10px; padding: 22px 24px; background: color-mix(in srgb, var(--teal) 9%, var(--card-bg)); border: 1px solid color-mix(in srgb, var(--teal) 35%, var(--border-color)); border-left: 5px solid var(--teal); border-radius: 14px; }
+    .post-body .paa { margin: 32px 0 10px; padding: 22px 24px; background: color-mix(in srgb, var(--teal) 9%, var(--card-bg)); border: 1px solid color-mix(in srgb, var(--teal) 35%, var(--border-color)); border-left: 5px solid var(--teal); border-radius: var(--radius); }
     .post-body .paa-title { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.3; }
     /* Lille turkis "?" foran titlen (pseudo-element: ingen ekstra tags, som Auto-annoncer kan hæfte sig på) */
-    .post-body .paa-title::before { content: '?'; flex: none; width: 22px; height: 22px; border-radius: 50%; background: #0e7490; color: #fff; font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+    .post-body .paa-title::before { content: '?'; flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--teal); color: var(--bg-color); font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
     /* #4b5563 på den turkise tone giver over 4,5:1 (#6b7280 gav ca. 4,4:1) */
-    .post-body .paa-sub { display: block; margin: 0 0 14px; font-size: 0.85rem; color: #4b5563; line-height: 1.4; }
-    body.dark-mode .post-body .paa-sub { color: #9ca3af; }
+    .post-body .paa-sub { display: block; margin: 0 0 14px; font-size: 0.85rem; color: var(--ink-2); line-height: 1.4; }
     .post-body .paa-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
     .post-body .paa-list li { margin: 0; }
-    .post-body a.paa-link { display: flex; align-items: center; gap: 12px; padding: 9px 10px; min-height: 44px; box-sizing: border-box; border-radius: 10px; text-decoration: none; color: var(--text-color); font-weight: 400; border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
+    .post-body a.paa-link { display: flex; align-items: center; gap: 12px; padding: 9px 10px; min-height: 44px; box-sizing: border-box; border-radius: var(--radius); text-decoration: none; color: var(--text-color); font-weight: 400; border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
     .post-body a.paa-link:hover { background: var(--card-bg); border-color: var(--border-color); transform: translateX(3px); }
     .post-body .paa-mark { flex: none; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; background: var(--tag-accent); }
     .post-body .paa-text { font-weight: 600; font-size: 0.95rem; line-height: 1.35; }
@@ -135,10 +171,10 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .post-body a.paa-link:hover .paa-arrow { transform: translateX(3px); color: var(--teal-text); }
     @media (prefers-reduced-motion: reduce) { .post-body a.paa-link:hover, .post-body a.paa-link:hover .paa-arrow { transform: none; } }
     @media (max-width: 900px) { .post-body .paa { padding: 16px 14px; } }
-    .post-body .faq-box { background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 6px 20px 10px; margin: 32px 0; }
+    .post-body .faq-box { background: transparent; border: 0; border-top: 1px solid var(--border-color); border-radius: 0; padding: 4px 0 10px; margin: 36px 0; }
     .post-body .faq-box > h2 { margin: 14px 0 6px; }
     /* Hvert spørgsmål er et kort — rammen kommer fra den fælles .post-body details-regel i MainLayout */
-    .post-body .faq-box .faq-item { background: var(--card-bg); margin: 10px 0; }
+    .post-body .faq-box .faq-item { background: transparent; border: 0; border-bottom: 1px solid var(--border-color); border-radius: 0; padding: 0; margin: 0; }
     .post-body .faq-item > summary { list-style: none; cursor: pointer; position: relative; padding: 14px 34px 14px 0; font-weight: 600; font-size: 1.02rem; line-height: 1.45; min-height: 24px; }
     .post-body .faq-item > summary::-webkit-details-marker { display: none; }
     .post-body .faq-item > summary::after { content: '+'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; font-weight: 400; color: var(--teal-text); }
@@ -155,71 +191,109 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .byline-name { font-size: 0.92rem; font-weight: 600; }
     .byline-name a { color: inherit; text-decoration: none; }
     .byline-name a:hover { text-decoration: underline; }
-    .byline-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-size: 0.83rem; color: var(--muted); font-weight: 500; }
+    .byline-meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); font-weight: 400; }
     .meta-sep { opacity: 0.5; }
     .action-bar { display: flex; gap: 10px; margin-bottom: 22px; align-items: center; flex-wrap: wrap; }
-    .action-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--hover-bg); border-radius: 20px; height: 40px; padding: 0 16px; border: 1px solid var(--border-color); color: var(--text-color); font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
-    .action-pill:hover { background: #e2e8f0; }
-    body.dark-mode .action-pill:hover { background: #334155; }
+    .action-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--card-bg); border-radius: var(--radius); height: 40px; padding: 0 16px; border: 1px solid var(--border-color); color: var(--text-color); font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+    .action-pill:hover { background: var(--hover-bg); }
     .action-icon { width: 18px; height: 18px; }
     .tag-container { margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .tag-badge { display: inline-flex; align-items: center; gap: 6px; background-color: #e2e8f0; color: #334155; padding: 5px 14px; min-height: 32px; box-sizing: border-box; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; }
+    .tag-badge { display: inline-flex; align-items: center; gap: 6px; background-color: var(--card-bg); color: var(--ink-2); border: 1px solid var(--border-color); padding: 5px 12px; min-height: 32px; box-sizing: border-box; border-radius: var(--radius); font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; }
     .tag-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
-    body.dark-mode .tag-badge { background-color: #27272a; color: #d4d4d8; }
-    .tag-badge:hover { background-color: #cbd5e1; color: #0f172a; transform: translateY(-1px); }
+    .tag-badge:hover { background-color: var(--hover-bg); color: var(--text-color); }
     /* Indholdsfortegnelsen står fra 1/10 INDE i brødteksten under første billede (lib/artikelbokse.mjs) — uden ul/li,
        så punkterne er <a> i en <span>. Reglerne er knyttet til .post-body, så de vinder over brødtekstens linkstil. */
-    .post-body .toc-container { display: block; background: var(--hover-bg); border-radius: 8px; padding: 20px; margin: 26px 0 30px; border: 1px solid var(--border-color); }
+    .post-body .toc-container { display: block; background: var(--card-bg); border-radius: var(--radius); padding: 20px; margin: 26px 0 30px; border: 1px solid var(--border-color); }
     .post-body .toc-title { display: block; font-weight: bold; margin-bottom: 12px; font-size: 1.1rem; }
     .post-body .toc-list { display: flex; flex-direction: column; gap: 2px; }
     .post-body .toc-list a { display: block; padding: 4px 0; color: var(--text-color); text-decoration: none; font-weight: 500; border-bottom: 0; line-height: 1.45; }
     .post-body .toc-list a:hover { color: var(--teal-text); border-bottom: 0; }
     .post-body .toc-list a.toc-depth-3 { padding-left: 20px; font-size: 0.95rem; opacity: 0.9; }
-    /* "You might also like" (1/10, som på techfeedwatch): 2 forslag midt i artiklen. Kun <span>/<a>, ingen afsnit. */
-    .post-body .ymal { display: block; margin: 30px 0; padding: 20px 22px 22px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 14px; }
-    .post-body .ymal-label { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-    .post-body .ymal-label::before { content: '🔎'; letter-spacing: 0; }
-    .post-body .ymal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    .post-body a.ymal-card { display: block; color: var(--teal-text); font-weight: 700; border-bottom: 0; text-decoration: none; }
-    .post-body a.ymal-card:hover { border-bottom: 0; }
-    .post-body .ymal-thumb { display: block; aspect-ratio: 16/9; overflow: hidden; border-radius: 10px; margin-bottom: 10px; background: var(--border-color); }
-    .post-body .ymal-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 0; margin: 0; transition: transform 0.3s; }
-    .post-body a.ymal-card:hover .ymal-thumb img { transform: scale(1.04); }
-    .post-body .ymal-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 1rem; line-height: 1.4; }
-    .post-body a.ymal-card:hover .ymal-title { text-decoration: underline; }
-    @media (max-width: 600px) { .post-body .ymal { padding: 16px 14px; } .post-body .ymal-grid { gap: 12px; } .post-body .ymal-title { font-size: 0.92rem; } }
-    @media (prefers-reduced-motion: reduce) { .post-body a.ymal-card:hover .ymal-thumb img { transform: none; } }
-    .disclosure-box { font-size: 0.85rem; line-height: 1.6; color: var(--muted); background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 18px; margin: 0 0 30px 0; }
+    /* ===== Trin 6 (Jacob 28/10): forslag 1–6 fra lærredet "UDKAST 4 artikel" ===== */
+    /* 2: hyldens mærke over titlen (farveprik + en let tone af hyldens farve; tonen blandes med kortfarven, så den virker i mørk tilstand) */
+    .hylde-maerke { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 14px; padding: 6px 12px; border-radius: var(--radius); background: color-mix(in srgb, var(--hylde) 14%, var(--card-bg)); color: var(--text-color); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; }
+    .hylde-maerke::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--hylde); }
+    .hylde-maerke:hover { background: color-mix(in srgb, var(--hylde) 22%, var(--card-bg)); }
+    /* 1: forspalten — det korte svar stort under titlen */
+    .forspalte { margin: 0 0 20px; max-width: 700px; font-family: var(--font-serif); font-size: 1.32rem; line-height: 1.5; color: var(--ink-2); }
+    .forspalte a { color: inherit; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--teal) 45%, transparent); text-underline-offset: 3px; }
+    .forspalte a:hover { color: var(--teal-text); }
+    /* 3: "Start here"-forløbet */
+    .serie { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px 18px; margin: 0 0 26px; box-shadow: var(--shadow); }
+    .serie-top { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap; margin-bottom: 12px; }
+    .serie-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-text); }
+    .serie-forrige { font-size: 0.85rem; font-weight: 600; color: var(--teal-text); text-decoration: none; }
+    .serie-forrige:hover { text-decoration: underline; }
+    .serie-liste { display: grid; grid-template-columns: repeat(var(--antal), minmax(0, 1fr)); gap: 10px; }
+    .serie-trin { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--radius); background: var(--bg-color); border: 1px solid var(--rule-light); color: var(--text-color); text-decoration: none; font-size: 0.85rem; font-weight: 600; line-height: 1.3; transition: border-color 0.2s, background 0.2s; }
+    a.serie-trin:hover { border-color: var(--teal-text); }
+    .serie-nr { width: 24px; height: 24px; border-radius: 50%; background: var(--hero-bg-2); color: var(--teal-text); font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+    .serie-trin.her { background: var(--teal); border-color: var(--teal); color: var(--bg-color); }
+    .serie-trin.her .serie-nr { background: var(--bg-color); color: var(--teal-text); }
+    .serie-her { font-weight: 400; opacity: 0.85; }
+    @media (max-width: 700px) {
+      .serie-liste { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .serie-trin { flex-direction: row; align-items: center; gap: 10px; background: transparent; border: 0; border-top: 1px solid var(--rule-light); border-radius: 0; padding: 9px 0; font-size: 0.9rem; }
+      .serie-trin:first-child { border-top: 0; }
+      .serie-trin.her { background: transparent; color: var(--text-color); font-weight: 700; border-color: var(--rule-light); }
+      .forspalte { font-size: 1.15rem; }
+      .serie-trin.her .serie-nr { background: var(--teal); color: var(--bg-color); }
+      .serie-nr { flex: none; }
+    }
+    /* 4: "Read next" midt i teksten (afløser "You might also like"). Kun <span>/<a>, ingen afsnit (Auto-annoncer). */
+    .post-body .las-naeste { display: block; margin: 30px 0; }
+    .post-body a.las-naeste-link { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; align-items: center; padding: 14px; background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--hylde); border-radius: var(--radius-lg); box-shadow: var(--shadow); color: var(--text-color); text-decoration: none; border-bottom-width: 1px; transition: border-color 0.2s, transform 0.2s; }
+    .post-body a.las-naeste-link:not(:has(.las-naeste-thumb)) { grid-template-columns: minmax(0, 1fr); }
+    .post-body a.las-naeste-link:hover { transform: translateY(-2px); border-color: var(--teal-text); border-left-color: var(--hylde); }
+    .post-body .las-naeste-thumb { display: block; aspect-ratio: 16/10; overflow: hidden; border-radius: var(--radius); background: var(--placeholder); }
+    .post-body .las-naeste-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; margin: 0; border-radius: 0; box-shadow: none; }
+    .post-body .las-naeste-tekst { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .post-body .las-naeste-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-text); }
+    .post-body .las-naeste-titel { font-family: var(--font-display); font-size: 1.05rem; font-weight: 650; line-height: 1.3; }
+    .post-body a.las-naeste-link:hover .las-naeste-titel { color: var(--teal-text); }
+    .post-body .las-naeste-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-transform: uppercase; }
+    @media (max-width: 600px) { .post-body a.las-naeste-link { grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 12px; } .post-body .las-naeste-titel { font-size: 0.98rem; } }
+    @media (prefers-reduced-motion: reduce) { .post-body a.las-naeste-link:hover { transform: none; } }
+    /* 6: Verification record i sidekolonnen (på mobil står sidekolonnen under teksten) */
+    .verif { background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--verified); border-radius: var(--radius-lg); padding: 18px 20px; margin: 0 0 22px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); }
+    .verif-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--verified); }
+    .verif dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 7px 14px; font-size: 0.88rem; line-height: 1.45; }
+    .verif dt { color: var(--muted); }
+    .verif dd { margin: 0; overflow-wrap: anywhere; }
+    .verif-link { font-size: 0.88rem; font-weight: 600; color: var(--teal-text); text-decoration: none; }
+    .verif-link:hover { text-decoration: underline; }
+    /* 5: dato og læsetid på sidelistens artikler */
+    .side-item-tekst { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .side-item-meta { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); text-transform: uppercase; }
+    .disclosure-box { font-size: 0.85rem; line-height: 1.6; color: var(--muted); background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 18px; margin: 0 0 30px 0; }
     .disclosure-box strong { color: var(--text-color); }
     .disclosure-box a { color: var(--teal-text); font-weight: 600; }
     .disclosure-top { margin: 0 0 25px 0; }
-    .share-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--hover-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px 24px; margin-bottom: 40px; }
+    .share-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 40px; }
     .share-cta-title { font-weight: 700; font-size: 1.05rem; margin: 0 0 4px 0; }
     .share-cta-sub { font-size: 0.9rem; color: var(--muted); margin: 0; }
-    .share-cta-btn { display: inline-flex; align-items: center; gap: 8px; background: #0e7490; color: #fff; border: none; border-radius: 8px; padding: 11px 20px; min-height: 44px; font-size: 0.95rem; font-weight: 600; cursor: pointer; flex-shrink: 0; font-family: inherit; transition: background 0.2s, transform 0.2s; }
-    .share-cta-btn:hover { background: #155e75; transform: translateY(-1px); }
+    .share-cta-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: var(--bg-color); border: none; border-radius: var(--radius); padding: 11px 20px; min-height: 44px; font-size: 0.95rem; font-weight: 600; cursor: pointer; flex-shrink: 0; font-family: inherit; transition: background 0.2s, transform 0.2s; }
+    .share-cta-btn:hover { filter: brightness(1.12); }
     .share-cta-btn svg { width: 16px; height: 16px; }
     /* Forfatterboks (29/9, Jacobs ønske): samme udseende som på techfeedwatch, egen tekst til Tech Media Arch */
-    .author-box { display: flex; gap: 20px; align-items: flex-start; width: 100%; box-sizing: border-box; background: var(--hover-bg); border: 1px solid var(--border-color); border-left: 4px solid #0891b2; border-radius: 10px; padding: 28px; margin: 10px 0 30px; }
+    .author-box { display: flex; gap: 20px; align-items: flex-start; width: 100%; box-sizing: border-box; background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--teal); border-radius: var(--radius); padding: 28px; margin: 10px 0 30px; }
     .author-box-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; object-position: center top; flex-shrink: 0; }
     .author-box-name { font-weight: 700; font-size: 1.15rem; margin: 0; }
     .author-box-title { font-size: 0.9rem; font-weight: 600; color: var(--teal-text); margin: 4px 0 14px 0; }
-    body.dark-mode .author-box-title { color: #22d3ee; }
     .author-box-bio { font-size: 1rem; line-height: 1.7; margin: 0 0 16px 0; }
-    .author-box-ai-note { font-size: 0.82rem; font-style: italic; color: #6b7280; margin: 0; padding-top: 16px; margin-top: 4px; border-top: 1px solid var(--border-color); }
-    body.dark-mode .author-box-ai-note { color: #9ca3af; }
+    .author-box-ai-note { font-size: 0.82rem; font-style: italic; color: var(--muted); margin: 0; padding-top: 16px; margin-top: 4px; border-top: 1px solid var(--border-color); }
     .author-box-ai-note a { color: var(--teal-text); text-decoration: none; font-weight: 600; font-style: normal; }
     .author-box-ai-note a:hover { text-decoration: underline; }
     .nav-row { display: flex; gap: 20px; border-top: 1px solid var(--border-color); padding-top: 25px; margin-bottom: 40px; }
-    .nav-card { flex: 1; background: var(--card-bg); border: 2px solid var(--border-color); padding: 15px 20px; border-radius: 8px; text-decoration: none; color: var(--text-color); transition: all 0.2s ease; display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; overflow: hidden; min-width: 0; }
+    .nav-card { flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px 20px; border-radius: var(--radius); text-decoration: none; color: var(--text-color); transition: all 0.2s ease; display: flex; flex-direction: column; gap: 5px; box-sizing: border-box; overflow: hidden; min-width: 0; }
     .nav-card:hover { transform: translateY(-3px); border-color: var(--teal-text); box-shadow: 0 6px 24px rgba(0,0,0,0.06); }
     .nav-card.right { text-align: right; }
-    .nav-label { font-size: 0.8rem; color: var(--teal-text); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+    .nav-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
     .nav-title { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .nav-card.disabled { opacity: 0.4; pointer-events: none; }
     /* Related articles i en samlet boks (30/9, Jacob): uden overskrift-tag og uden <p>, så Googles Auto-annoncer
        ikke sætter annoncer ind mellem kortene — samme løsning som "People also ask" */
-    .related-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px 20px 20px; margin-top: 10px; }
+    .related-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px 20px 20px; margin-top: 10px; }
     .related-articles-title { display: block; font-size: 1.4rem; font-weight: 700; margin: 0 0 18px 0; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); }
     .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
     .related-grid .card-excerpt { display: none; }
@@ -230,13 +304,13 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
     .side-title { font-size: 1.1rem; margin: 0 0 15px 0; }
     .side-list { display: flex; flex-direction: column; gap: 14px; }
     .side-item { display: grid; grid-template-columns: 130px 1fr; gap: 12px; text-decoration: none; color: inherit; align-items: start; }
-    .side-item .card-thumb { margin: 0; border-radius: 8px; }
+    .side-item .card-thumb { margin: 0; border-radius: var(--radius); }
     .side-item-title { font-size: 14px; line-height: 1.4; font-weight: 600; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .side-item:hover .side-item-title { color: var(--teal-text); }
     @media (max-width: 900px) {
       .article-layout { flex-direction: column; padding: 15px 12px; }
       .article-secondary { width: 100%; position: static; max-height: none; overflow: visible; padding-right: 0; }
-      .article-title { font-size: 1.5rem; }
+      .article-title { font-size: 2.1rem; }
       .nav-row { flex-direction: column; gap: 12px; }
       .share-cta { flex-direction: column; align-items: flex-start; }
       .share-cta-btn { width: 100%; justify-content: center; }
@@ -254,18 +328,24 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
   <div class="article-layout">
     <div class="article-primary">
       <nav class="breadcrumbs-bar" aria-label="Breadcrumb">
-        <a href="/">Frontpage</a>
-        {emne && <><span>/</span><a href={emneUrl(emne)}>{emne.navn}</a></>}
+        <a href="/">Archive</a>
+        {krumme && <><span>/</span><a href={krumme.href}>{krumme.navn}</a></>}
       </nav>
 
+      {/* Trin 6, forslag 2: hylden over titlen (erstatter de små emne-mærker under Share). Uden hylde: emnet. */}
+      {hylde ? <a href={hyldeUrl(hylde)} class="hylde-maerke" style={`--hylde: ${hylde.farve}`}>{hylde.navn}</a>
+        : emne && <a href={emneUrl(emne)} class="hylde-maerke" style={`--hylde: ${emne.farve}`}>{emne.navn}</a>}
+
       <h1 class="article-title">{p.title}</h1>
+
+      {forspalte && <p class="forspalte" set:html={forspalte} />}
 
       <div class="article-byline">
         {/* 1/10 (Jacob): hans foto i stedet for logoet; navnet fører ned til forfatterboksen med hvordan artiklen er lavet.
             Lille udgave (96 px, 2,5 KB) af public/jacob-olsen.png, beskåret om ansigtet, så toppen ikke henter 83 KB. */}
         <img src="/jacob-olsen-96.jpg" alt="" class="byline-avatar byline-foto" width="40" height="40" />
         <div class="byline-text">
-          <span class="byline-name">Published by <a href="#author" rel="author">Jacob Olsen</a></span>
+          <span class="byline-name">Published by <a href="#author" rel="author">Jacob S. Olsen</a></span>
           <span class="byline-meta">
             <time datetime={p.published}>{datoTekst(p.published)}</time>
             {opdateret && <><span class="meta-sep">·</span><span>Updated <time datetime={p.updated}>{datoTekst(p.updated)}</time></span></>}
@@ -281,10 +361,22 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
         </button>
       </div>
 
-      {p.emner.length > 0 && (
-        <div class="tag-container">
-          {p.emner.map((e) => <a href={emneUrl(e)} class="tag-badge" style={`--tag-accent: ${e.farve}`}>{e.navn}</a>)}
-        </div>
+      {/* Trin 6, forslag 3: "Start here"-forløbet — kun på artikler, der står på en hyldes "Start here"-liste */}
+      {serieNr > 0 && (
+        <nav class="serie" aria-label={`Start here: ${serieHylde!.navn}`}>
+          <div class="serie-top">
+            <span class="serie-label">Start here · {serieHylde!.navn} · part {serieNr} of {serie.length}</span>
+            <span style="display: flex; gap: 16px">
+              {serieNr > 1 && <a href={serie[serieNr - 2].href} class="serie-forrige">← Previous</a>}
+              {serieNr < serie.length && <a href={serie[serieNr].href} class="serie-forrige">Next →</a>}
+            </span>
+          </div>
+          <div class="serie-liste" style={`--antal: ${serie.length}`}>
+            {serie.map((x, n) => x === p
+              ? <span class="serie-trin her" aria-current="page"><span class="serie-nr">{n + 1}</span><span>{x.title} <span class="serie-her">· you are here</span></span></span>
+              : <a href={x.href} class="serie-trin"><span class="serie-nr">{n + 1}</span><span>{x.title}</span></a>)}
+          </div>
+        </nav>
       )}
 
       {/* Resources-artikler har affiliate-/henvisningslinks: oplysningen skal stå FØR linkene,
@@ -317,7 +409,7 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
           <p class="author-box-title">Runs Tech Media Arch, from Denmark</p>
           {p.robot ? (
             <>
-              <p class="author-box-bio">How this article was made: it starts from a question people search for on Google. A language model researches it on the web and writes the article; it is only published if at least two sources check out. It publishes automatically — I do not read every article before it goes live.</p>
+              <p class="author-box-bio">How this answer was made: it starts from a question people search for on Google. A language model researches it on the web and writes the short answer first, then the details; it is only published if at least two sources check out. It publishes automatically — I do not read every answer before it goes live.</p>
               <p class="author-box-ai-note">What is mine is the machinery and the rules it follows: which subjects, which sources, what gets rejected. <a href="/p/editorial-guidelines">More on that here</a> — and if something is wrong, <a href="/p/contact-us">tell me</a>.</p>
             </>
           ) : (
@@ -348,19 +440,33 @@ const crumbs = emne ? [{ navn: emne.navn, href: emneUrl(emne) }, { navn: p.title
       )}
     </div>
 
-    {sidebarListe.length > 0 && (
-      <aside class="article-secondary" aria-label="More articles">
-        <h2 class="side-title">{sidebarTitel}</h2>
-        <div class="side-list">
-          {sidebarListe.map((r) => (
-            <a href={r.href} class="side-item">
-              {r.image ? <div class="card-thumb"><img src={r.image} alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
-              <h3 class="side-item-title">{r.title}</h3>
-            </a>
-          ))}
-        </div>
-      </aside>
-    )}
+    <aside class="article-secondary" aria-label="About this answer and more articles">
+      {/* Trin 6, forslag 6: Verification record — kun det, der er sandt i dag (se kildeVaerter ovenfor) */}
+      <section class="verif" aria-label="Verification record">
+        <span class="verif-label">VERIFICATION RECORD</span>
+        <dl>
+          <dt>Published</dt><dd><time datetime={p.published}>{datoTekst(p.published)}</time></dd>
+          {opdateret && <><dt>Updated</dt><dd><time datetime={p.updated}>{datoTekst(p.updated)}</time></dd></>}
+          {kildeVaerter.length > 0 && <><dt>Sources</dt><dd>{kildeVaerter.length} named ({kildeVaerter.slice(0, 3).join(', ')}{kildeVaerter.length > 3 ? ' …' : ''})</dd></>}
+          {p.robot && <><dt>Written</dt><dd>With AI from the named sources</dd></>}
+        </dl>
+        <a href="/p/editorial-guidelines" class="verif-link">How we verify →</a>
+      </section>
+      {sidebarListe.length > 0 && (
+        <>
+          <h2 class="side-title">{sidebarTitel}</h2>
+          <div class="side-list">
+            {sidebarListe.map((r) => (
+              <a href={r.href} class="side-item">
+                {r.image ? <div class="card-thumb"><img src={r.image} alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
+                {/* Trin 6, forslag 5: dato og læsetid under titlen */}
+                <span class="side-item-tekst"><h3 class="side-item-title">{r.title}</h3><span class="side-item-meta">{datoTekst(r.published)} · {r.minutter} min read</span></span>
+              </a>
+            ))}
+          </div>
+        </>
+      )}
+    </aside>
   </div>
 
   {/* Del-knapper: telefonens egen del-menu når den findes, ellers kopieres linket. */}

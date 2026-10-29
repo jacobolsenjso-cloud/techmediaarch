@@ -7,6 +7,7 @@
 // Farverne bruges som accent (prik, kant) — aldrig som tekst eller som baggrund
 // under hvid tekst, samme regel som på techfeedwatch.
 // etiket: Blogger-etiketten i indlæggenes data, når den er stavet anderledes end det viste navn
+import { HYLDE_FOR_EMNE } from './adresse.mjs';
 export interface Emne { navn: string; slug: string; farve: string; egenMenu?: boolean; etiket?: string; }
 
 export const EMNER: Emne[] = [
@@ -37,7 +38,12 @@ export const KATEGORIER = EMNER.filter((e) => !e.egenMenu);
 export const emneEtiket = (e: Emne) => e.etiket ?? e.navn;
 export const emneFraNavn = (navn: string) => EMNER.find((e) => e.navn === navn || emneEtiket(e) === navn);
 export const emneFraSlug = (slug: string) => EMNER.find((e) => e.slug === slug);
-export const emneUrl = (e: Emne) => `/topic/${e.slug}`;
+// Fra trin 4 (28/10-2026): et emne, der hører til en hylde, linker til hylden (emnesiden findes ikke mere,
+// den gamle adresse sendes med 301 til hylden). Emner uden hylde beholder /topic/<emne>.
+export const emneUrl = (e: Emne) => (HYLDE_FOR_EMNE[e.slug] ? `/shelf/${HYLDE_FOR_EMNE[e.slug]}` : `/topic/${e.slug}`);
+export const harHylde = (e: Emne) => Boolean(HYLDE_FOR_EMNE[e.slug]);
+// Emnerne uden hylde (fintech, crypto, web3, vlog) — vises under "Other topics" i menuen
+export const ANDRE_EMNER = KATEGORIER.filter((e) => !harHylde(e));
 
 // Et emne med under 3 artikler er en tynd side: den findes (Blogger havde den),
 // men beder ikke Google om at indeksere den.

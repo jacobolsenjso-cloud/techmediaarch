@@ -6,7 +6,7 @@
 // ændre i HTML'en.
 import { parse } from 'yaml';
 import { EMNER, emneEtiket, type Emne } from './emner';
-import { temaKoder, youtubeLazy, vandmaerke, bloggerVideo } from './temakoder.mjs';
+import { temaKoder, youtubeLazy, udenYoutube, udenWatchLink, vandmaerke, bloggerVideo } from './temakoder.mjs';
 import { faqBoks } from './faqboks.mjs';
 import { interneLinks } from './adresse.mjs';
 
@@ -103,7 +103,8 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
   const { data, body: raaBody } = del(raa);
   // Blogger-temaets genvejskoder ({getButton} m.fl.) og YouTube-rammer vises som på Blogger,
   // og videoer uploadet til Blogger afspilles fra vores egen kopi — se temakoder.mjs
-  const body = youtubeLazy(bloggerVideo(temaKoder(raaBody)));
+  // Trin 5: YouTube-videoerne tages ud (udenYoutube) — før: youtubeLazy, der viste dem som billede + afspilknap
+  const body = udenYoutube(bloggerVideo(temaKoder(raaBody)));
   // Vandmærket på billederne (som Blogger-temaets script) — se temakoder.mjs
   // FAQ-boksen (faqboks.mjs): artiklens egen FAQ foldes ud på stedet + ekstra spørgsmål fra frontmatter "faq:"
   const ekstraFaq: { q: string; a: string }[] = Array.isArray(data.faq) ? data.faq.filter((x: any) => x && x.q && x.a) : [];
@@ -131,13 +132,20 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
 export const SIDER: Side[] = Object.entries(sideFiler).map(([fil, raa]) => {
   const navn = fil.match(/\/pages\/(.+)\.md$/)![1];
   const { data, body: raaBody } = del(raa);
-  const body = youtubeLazy(bloggerVideo(temaKoder(raaBody)));
+  const body = udenWatchLink(youtubeLazy(bloggerVideo(temaKoder(raaBody))));
   const sti = `/p/${navn}`;
   return { navn, sti, href: kodet(sti), title: data.title, description: data.description || '',
     published: data.published, updated: data.updated || data.published, html: interneLinks(navn === 'watch' ? vandmaerke(body) : udenSpring(vandmaerke(body))), feedHtml: interneLinks(bloggerVideo(raaBody)), faqHtml: body, bloggerId: String(data.bloggerId || '') };
 });
 
 export const iEmne = (e: Emne) => INDLAEG.filter((p) => p.emner.some((x) => x.slug === e.slug));
+
+// Trin 5: etiketten "Video" vises ikke længere (videoerne er taget ud). p.labels er urørt, så de gamle
+// Blogger-feeds (/feeds/…/-/Video) svarer som før.
+const SKJULTE_ETIKETTER = new Set(['Video']);
+export const synligeEtiketter = (p: Indlaeg) => p.labels.filter((l) => !SKJULTE_ETIKETTER.has(l));
+// Den nedlagte Watch-side (p/_watch.astro, 301 til forsiden i workeren) skal ikke stå i sitemap og feeds
+export const SIDER_UDEN_WATCH = SIDER.filter((s) => s.navn !== 'watch');
 
 export const datoTekst = (d: string) => {
   const x = new Date(d);

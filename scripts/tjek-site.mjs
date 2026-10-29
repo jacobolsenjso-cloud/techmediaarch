@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { temaKoder, vandmaerke, RAA_KODE } from '../src/lib/temakoder.mjs';
 import { SLETTEDE } from '../worker/slettede.js';
+import { NEDLAGTE } from '../worker/nedlagte.js';
 
 const EKS = process.argv[2];
 const DIST = path.resolve('dist');
@@ -36,6 +37,7 @@ const tekst = (h) => h.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<sty
 // "[IMAGE PLACEHOLDER: …]", gentagne afsnit og én overskrift. Kilden ændres på samme måde, så
 // resten af teksten stadig skal være ord for ord ens — og findes en rettelse ikke, er det en fejl.
 const GMAIL = 'techmediaarch.com@gmail.com';
+const NAVN_GAMMELT = 'Jacob Olsen', NAVN_NYT = 'Jacob S. Olsen';
 const RETTELSER = JSON.parse(fs.readFileSync(path.resolve('scripts/bevidste-rettelser.json'), 'utf8'));
 const PLADS = /\[(?:FEATURED IMAGE PLACEHOLDER|IMAGE PLACEHOLDER|EXTERNAL LINK):[^\]]*\]/g;
 function rettet(sti, k) {
@@ -47,6 +49,8 @@ function rettet(sti, k) {
   k = k.replace(/\bTechMediaArch\b(?![.\w]*\.com|\w)/g, (m, pos, hel) => ('=/.@-_#'.includes(hel[pos - 1] || '') ? m : 'Tech Media Arch'));
   // 29/9 (Jacob): kun info@techmediaarch.com må bruges — gmail-adressen er erstattet i indholdet
   k = k.split(GMAIL).join('info@techmediaarch.com');
+  // 28/10 (Jacob): forfatteren skrives offentligt "Jacob S. Olsen" — "Jacob Olsen" er rettet i indholdet
+  k = k.split(NAVN_GAMMELT).join(NAVN_NYT);
   for (const r of RETTELSER.filter((x) => x.sti === sti)) {
     if (r.type === 'fjern') {
       const x = tekst(r.html); const i = k.lastIndexOf(x);
@@ -66,15 +70,32 @@ const filer = new Set();
 const html = [...filer].filter((f) => f.endsWith('.html'));
 // 29/9 (Jacob): gmail-adressen skal være helt væk fra sitet — kun info@techmediaarch.com
 for (const f of filer) if (/\.(html|xml|txt|json)$/.test(f) && fs.readFileSync(path.join(DIST, f), 'utf8').includes(GMAIL)) fejl.push(`GMAIL-ADRESSE (kun info@techmediaarch.com må bruges): ${f}`);
+// 28/10 (Jacob): forfatternavnet offentligt er "Jacob S. Olsen" — "Jacob Olsen" må ikke stå nogen steder på sitet
+for (const f of filer) if (/\.(html|xml|txt|json)$/.test(f) && fs.readFileSync(path.join(DIST, f), 'utf8').includes(NAVN_GAMMELT)) fejl.push(`FORFATTERNAVN (skal være "${NAVN_NYT}"): ${f}`);
 
 // 1 + 2: Bloggers adresser og teksten
 const posts = laes('posts.json').filter((p) => !SLETTEDE[decodeURI(alt(p).replace('https://www.techmediaarch.com', ''))]), pages = laes('pages.json');
 // Slettede artikler (worker/slettede.js) må IKKE længere ligge som fil — ellers svarer de 200, ikke 301
 for (const s of Object.keys(SLETTEDE)) if (filer.has(s)) fejl.push(`SLETTET artikel findes stadig: ${s}`);
-for (const [s, til] of Object.entries(SLETTEDE)) if (!filer.has(til + '.html')) fejl.push(`SLETTET artikels mål findes ikke: ${s} -> ${til}`);
+// Målet kan være forsiden "/" (29/10-2026: artikler uden for sitets emner sendes dertil) — samme regel som NEDLAGTE nedenfor
+for (const [s, til] of Object.entries(SLETTEDE)) if (!filer.has(til === '/' ? '/index.html' : til + '.html')) fejl.push(`SLETTET artikels mål findes ikke: ${s} -> ${til}`);
+// Nedlagte faste sider (worker/nedlagte.js, fx Watch): må ikke ligge som fil, og målet skal findes
+for (const [s, til] of Object.entries(NEDLAGTE)) {
+  if (filer.has(s + '.html')) fejl.push(`NEDLAGT side findes stadig som fil: ${s}`);
+  if (!filer.has(til === '/' ? '/index.html' : til + '.html')) fejl.push(`NEDLAGT sides mål findes ikke: ${s} -> ${til}`);
+}
+// Trin 5 (28/10): artiklerne må ikke have YouTube-videoer eller VideoObject-data (temakoder.mjs: udenYoutube)
+for (const f of html) if (/^\/\d{4}\/\d{2}\//.test(f)) {
+  const s = fs.readFileSync(path.join(DIST, f), 'utf8');
+  // Kun brødteksten: skabelonens klik-kode til videoer nævner selv youtube.com/embed
+  const krop = (s.match(/<article class="post-body"[^>]*>([\s\S]*?)<\/article>/) || ['', ''])[1];
+  if (/<iframe\b[^>]*(youtube(-nocookie)?\.com|youtu\.be)|class="yt-lazy"/i.test(krop)) fejl.push(`YOUTUBE-video i artikel: ${f}`);
+  if (/"@type"\s*:\s*"VideoObject"/.test(s)) fejl.push(`VIDEOOBJECT-data i artikel: ${f}`);
+}
 let tekstOk = 0;
 for (const p of [...posts, ...pages]) {
   const sti = decodeURI(alt(p).replace('https://www.techmediaarch.com', ''));
+  if (NEDLAGTE[sti.replace(/\.html$/, '')]) continue;
   if (!filer.has(sti)) { fejl.push(`MANGLER adresse: ${sti}`); continue; }
   if (!posts.includes(p)) continue;
   const side = fs.readFileSync(path.join(DIST, sti), 'utf8');
@@ -97,6 +118,8 @@ for (const p of [...posts, ...pages]) {
     // 1/10: indholdsfortegnelsen (under første billede) og "You might also like" (midt i) står nu inde i brødteksten
     .replace(/<nav class="toc-container" data-ekstra="1"[\s\S]*?<\/nav>/g, ' ')
     .replace(/<aside class="ymal" data-ekstra="1"[\s\S]*?<\/aside>/g, ' ')
+    // Trin 6 (28/10): "Read next"-boksen afløste "You might also like"
+    .replace(/<aside class="las-naeste" data-ekstra="1"[\s\S]*?<\/aside>/g, ' ')
     .replace(/<details class="faq-item" data-ekstra="1">[\s\S]*?<\/details>/g, ' '));
   if (kilde === ny) tekstOk++;
   else {
