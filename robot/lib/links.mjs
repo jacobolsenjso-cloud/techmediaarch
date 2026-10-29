@@ -7,6 +7,9 @@ const FORKORTERE = /(^|\.)(bit\.ly|tinyurl\.com|t\.co|goo\.gl|ow\.ly|buff\.ly|re
 const PLATFORME = /(^|\.)(youtube\.com|youtu\.be|instagram\.com|facebook\.com|fb\.com|fb\.me|twitter\.com|x\.com|tiktok\.com|linkedin\.com|discord\.gg|discord\.com|patreon\.com|t\.me|telegram\.me|whatsapp\.com|reddit\.com|threads\.net|spotify\.com|podcasts\.apple\.com|snapchat\.com|twitch\.tv|gumroad\.com|amazon\.[a-z.]+|etsy\.com|ko-fi\.com|buymeacoffee\.com|calendly\.com|skool\.com|kajabi\.com|teachable\.com|systeme\.io|whop\.com|techmediaarch\.com|docs\.google\.com|drive\.google\.com|forms\.gle|quora\.com|medium\.com|pinterest\.com)$/i;
 const AFFILIATE_URL = /[?&](ref|referral|aff|affiliate|affid|partner|via|fpr|sscid|irclickid|clickid|coupon|promo|discount|tag|campaign_id)=|\/(ref|go|r|aff|affiliate|partners?|refer|coupon|deal|deals|promo)\//i;
 
+// Forkorter eller platform? AWS (aws.amazon.com, docs.aws.amazon.com) er dokumentation, ikke Amazon-butikken —
+// målt 29/10 (prøve #35): "amazon\." i PLATFORME afviste aws.amazon.com, og 3 fakta fra AWS forsvandt.
+export const erPlatform = (host) => !/(^|\.)aws\.amazon\.com$/i.test(host) && (FORKORTERE.test(host) || PLATFORME.test(host));
 const hovedNavn = (host) => { const d = host.toLowerCase().replace(/^www\./, '').split('.'); return d.length > 2 ? d.slice(-2).join('.') : d.join('.'); };
 const ren = (u) => { const url = new URL(u); for (const k of [...url.searchParams.keys()]) if (/^utm_|^(si|fbclid|gclid|mc_[a-z]+)$/i.test(k)) url.searchParams.delete(k); url.hash = ''; return url.toString(); };
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -35,7 +38,7 @@ export async function kontrollerKilder(kilder, max = 4) {
     if (!s) { afvist.push({ kilde: k.titel, grund: 'svarer ikke med en side' }); continue; }
     let url; try { url = ren(s.url); } catch { afvist.push({ kilde: k.titel, grund: 'ugyldig adresse' }); continue; }
     const host = new URL(url).hostname;
-    if (FORKORTERE.test(host) || PLATFORME.test(host)) { afvist.push({ kilde: host, grund: 'forkorter/platform' }); continue; }
+    if (erPlatform(host)) { afvist.push({ kilde: host, grund: 'forkorter/platform' }); continue; }
     if (AFFILIATE_URL.test(url)) { afvist.push({ kilde: host, grund: 'affiliate' }); continue; }
     const dom = hovedNavn(host);
     // Samme domæne igen: ikke et nyt link, men søgekildens nummer huskes på det første (29/10-2026), så fakta fra
