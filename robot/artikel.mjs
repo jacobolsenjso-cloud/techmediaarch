@@ -22,7 +22,7 @@ import { skriv, json, gemPrisVedExit } from './lib/gemini.mjs';
 gemPrisVedExit('artikel');   // pristælleren (trin 7): robot/ud/pris-artikel.json, også når artiklen afvises
 import { lav } from './lib/billeder.mjs';
 import { kontrollerKilder, kildeliste } from './lib/links.mjs';
-import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder, udenEgenKildeliste } from './lib/kildenavne.mjs';
+import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder, udenEgenKildeliste, KILDE_LOFT, KILDE_LOFT_MAKS } from './lib/kildenavne.mjs';
 import { artikler, sti } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
@@ -127,10 +127,13 @@ if (kilder.length < 2) throw new Error(`Research gav kun ${kilder.length} kilder
 // kommer fra. Se robot/lib/kildenavne.mjs. Prøve #32 blev afvist med 10 fakta via navnet alene — derfor koblingen.
 const MIN_FAKTA = 12;
 const { sat: kontrollerede, afvist: kildeAfvist } = await kontrollerKilder(kilder, 20);
-const kf = kunKontrolleredeFakta(fakta, kontrollerede, stoette);
+const kf = kunKontrolleredeFakta(fakta, kontrollerede, stoette, { loft: KILDE_LOFT, minFakta: MIN_FAKTA, maksLoft: KILDE_LOFT_MAKS });
 const kildeLinks = kf.brugte;
 log(`- Kilder kontrolleret før skrivning: ${kontrollerede.length} bestod (${kildeAfvist.length} afvist: ${kildeAfvist.map((a) => `${a.kilde} – ${a.grund}`).join('; ') || 'ingen'})`);
-log(`- Fakta fra kontrollerede kilder: ${kf.beholdt} af ${kf.alle} (${kf.viaGoogle} via Googles kobling, ${kf.viaNavn} via navnet; ${stoette.length} koblinger fra Google) · kilder med fakta: ${kildeLinks.length}${kf.smidt.length ? ` · smidt ud: ${kf.smidt.join(', ')}` : ''}`);
+log(`- Fakta fra kontrollerede kilder: ${kf.beholdt} af ${kf.alle} (${kf.viaGoogle} via Googles kobling, ${kf.viaNavn} via navnet; ${stoette.length} koblinger fra Google)${kf.smidt.length ? ` · uden kontrolleret kilde: ${kf.smidt.join(', ')}` : ''}`);
+log(`- Kildeloft (${KILDE_LOFT}, højst ${KILDE_LOFT_MAKS}): ${kildeLinks.length} af ${kf.kilderFoerLoft} kilder med fakta bruges · fakta væk pga. loftet: ${kf.overLoft}`);
+// Research-data til måling bagefter (kommer med i kørslens zip, robot-ud): fakta, Googles koblinger og kilderne.
+fs.writeFileSync(sti('robot/ud/research.json'), JSON.stringify({ fakta, stoette, kontrollerede, kildeAfvist }, null, 1));
 if (kildeLinks.length < 2) throw new Error(`Kun ${kildeLinks.length} kontrollerede kilder har fakta — artiklen afvist`);
 if (kf.beholdt < MIN_FAKTA) throw new Error(`Kun ${kf.beholdt} fakta fra kontrollerede kilder (mindst ${MIN_FAKTA}) — artiklen afvist`);
 fakta = kf.tekst;

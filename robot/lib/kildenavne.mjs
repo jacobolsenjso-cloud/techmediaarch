@@ -44,31 +44,42 @@ export function udenEgenKildeliste(html) {
 //  2. Reserve: navnet først i punktet ("- IBM: …") passer på en kontrolleret kilde.
 // Målt 29/10 (prøve #32): kun navnet gav 10 af 21 punkter med 9 kontrollerede kilder — fx "FBI" passer ikke på ic3.gov.
 // brugte: de kilder, mindst ét beholdt punkt kommer fra — kun de skal stå under "Sources".
+// Loft (Jacob 29/10-2026): højst `loft` kilder (8) — dem med flest punkter. Giver de under `minFakta` punkter,
+// tages én kilde mere ad gangen, dog højst `maksLoft` (12). Målt 29/10: prøve #33 og #34 fik 16 og 19 kilder.
 const krop = (l) => l.replace(/^\s*(?:[-*•]|\d+\.)\s+/, '').replace(/\*\*/g, '').trim();
 const overlap = (l, seg) => { const a = krop(l); const b = krop(seg); return b.length >= 15 && (a.includes(b) || (a.length >= 15 && b.includes(a))); };
-export function kunKontrolleredeFakta(fakta, kilder, stoette = []) {
+export const KILDE_LOFT = 8;
+export const KILDE_LOFT_MAKS = 12;
+export function kunKontrolleredeFakta(fakta, kilder, stoette = [], { loft = Infinity, minFakta = 0, maksLoft = loft } = {}) {
   const punkter = String(fakta).split(/\r?\n/).filter((l) => /^\s*(?:[-*•]|\d+\.)\s+/.test(l));
-  const brugte = new Set(); const behold = []; const smidt = []; let viaGoogle = 0; let viaNavn = 0;
-  for (const l of punkter) {
+  // 1. Hvilke kontrollerede kilder står bag hvert punkt — Googles kobling først, ellers navnet
+  const vurderet = punkter.map((l) => {
     const nr = new Set(stoette.filter((s) => overlap(l, s.tekst)).flatMap((s) => s.kilder));
-    let hvem = kilder.filter((k) => (k.idx || []).some((i) => nr.has(i)));
     const m = l.match(/^\s*(?:[-*•]|\d+\.)\s+(?:\*\*)?([^:*\n]{2,80}?)(?:\*\*)?\s*:/);
-    if (hvem.length) {
-      viaGoogle++;
-      // Navnet i punktet er ikke selve kilden ("Gartner: …" fra en side på sparkout.com): skriv kilden på, så
-      // teksten kan nævne den listede kilde ("…, according to Sparkout") i stedet for et navn uden for listen.
-      if (m && !hvem.some((k) => daekker(k, norm(m[1])))) {
-        const via = new URL(hvem[0].url).hostname.replace(/^www\./, '');
-        brugte.add(hvem[0]); behold.push(l.replace(m[1], `${m[1].trim()} (via ${via})`)); continue;
-      }
-    } else {
-      const n = m ? norm(m[1].replace(/\(.*?\)/g, '')) : '';
-      hvem = n.length >= 2 ? kilder.filter((k) => daekker(k, n)) : [];
-      if (hvem.length) viaNavn++;
-    }
-    if (hvem.length) { behold.push(l); hvem.forEach((k) => brugte.add(k)); } else smidt.push(m ? m[1].trim() : krop(l).slice(0, 30));
+    let hvem = kilder.filter((k) => (k.idx || []).some((i) => nr.has(i))); let via = hvem.length ? 'google' : '';
+    if (!hvem.length) { const n = m ? norm(m[1].replace(/\(.*?\)/g, '')) : ''; hvem = n.length >= 2 ? kilder.filter((k) => daekker(k, n)) : []; via = hvem.length ? 'navn' : ''; }
+    return { l, m, hvem, via };
+  });
+  // 2. Loftet: kilderne med flest punkter først (ved lighed: søgningens rækkefølge)
+  const antal = new Map(); for (const v of vurderet) for (const k of v.hvem) antal.set(k, (antal.get(k) || 0) + 1);
+  const raekke = kilder.filter((k) => antal.get(k)).sort((a, b) => antal.get(b) - antal.get(a) || kilder.indexOf(a) - kilder.indexOf(b));
+  const daekket = (n) => { const s = new Set(raekke.slice(0, n)); return vurderet.filter((v) => v.hvem.some((k) => s.has(k))).length; };
+  let n = Math.min(loft, raekke.length);
+  while (n < Math.min(maksLoft, raekke.length) && daekket(n) < minFakta) n++;
+  const valgte = new Set(raekke.slice(0, n));
+  // 3. Behold punkter fra de valgte kilder
+  const brugte = new Set(); const behold = []; const smidt = []; let viaGoogle = 0; let viaNavn = 0; let overLoft = 0;
+  for (const v of vurderet) {
+    const hvem = v.hvem.filter((k) => valgte.has(k));
+    if (!hvem.length) { if (v.hvem.length) overLoft++; else smidt.push(v.m ? v.m[1].trim() : krop(v.l).slice(0, 30)); continue; }
+    if (v.via === 'google') viaGoogle++; else viaNavn++;
+    hvem.forEach((k) => brugte.add(k));
+    // Navnet i punktet er ikke selve kilden ("Gartner: …" fra en side på sparkout.com): skriv kilden på, så
+    // teksten kan nævne den listede kilde ("…, according to Sparkout") i stedet for et navn uden for listen.
+    if (v.m && !hvem.some((k) => daekker(k, norm(v.m[1])))) behold.push(v.l.replace(v.m[1], `${v.m[1].trim()} (via ${new URL(hvem[0].url).hostname.replace(/^www\./, '')})`));
+    else behold.push(v.l);
   }
-  return { tekst: behold.join('\n'), alle: punkter.length, beholdt: behold.length, viaGoogle, viaNavn, smidt, brugte: kilder.filter((k) => brugte.has(k)) };
+  return { tekst: behold.join('\n'), alle: punkter.length, beholdt: behold.length, viaGoogle, viaNavn, smidt, overLoft, kilderFoerLoft: raekke.length, brugte: kilder.filter((k) => brugte.has(k)) };
 }
 
 // Navne, teksten henviser til som kilde: "according to X", "as noted by X", "X reports/notes/explains …".
