@@ -5,18 +5,32 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
+import { HYLDE_FOR_EMNE, EKSTRA_ETIKETTER } from '../../src/lib/adresse.mjs';
 
 const ROD = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 export const sti = (...d) => path.join(ROD, ...d);
 
-// Menuens emner, læst direkte fra src/lib/emner.ts, så robotten og sitet aldrig
-// er uenige om navnene. Vlog og Resources er ikke med i robottens rotation:
-// Vlog er videoindslag, og Resources er håndplukkede links (egen menu).
+// Emnerne, læst direkte fra src/lib/emner.ts, så robotten og sitet aldrig er uenige om navnene.
+// Trin 7 i svar-arkivet (Jacob 29/10-2026): robotten skriver KUN til de 5 hylder. Et emne er med i rotationen,
+// når det hører til en hylde (HYLDE_FOR_EMNE i src/lib/adresse.mjs, samme tabel som sitet) — Fintech, Crypto,
+// Web3, Vlog og Resources er derfor ude.
+// "etiket" er navnet, der står i artiklernes labels (IT hedder "It" der); robotten bruger etiketten overalt,
+// også som nøgle i robot/froe.json, så en ny artikel havner på den rigtige hylde.
 export function emner() {
   const ts = fs.readFileSync(sti('src/lib/emner.ts'), 'utf8');
-  return [...ts.matchAll(/\{\s*navn:\s*'([^']+)',\s*slug:\s*'([^']+)'/g)]
-    .map(([, navn, slug]) => ({ navn, slug }))
-    .filter((e) => !['Vlog', 'Resources'].includes(e.navn));
+  const felt = (obj, navn) => (obj.match(new RegExp(`\\b${navn}:\\s*'([^']+)'`)) || [])[1];
+  return [...ts.matchAll(/\{\s*navn:[^}]*\}/g)].map(([obj]) => ({ navn: felt(obj, 'navn'), slug: felt(obj, 'slug'), etiket: felt(obj, 'etiket') }))
+    .map((e) => ({ ...e, etiket: e.etiket || e.navn, hylde: HYLDE_FOR_EMNE[e.slug] || null }))
+    .filter((e) => e.navn && e.hylde);
+}
+
+// Antal artikler pr. hylde — samme regel som sitet (src/lib/hylder.ts): emnets hylde + de ekstra etiketter
+// ("Cyber Security"). En artikel med emner fra to hylder tæller på begge.
+export function antalPrHylde(alle = artikler()) {
+  const tilHylde = new Map(emner().map((e) => [e.etiket, e.hylde]));
+  const ud = Object.fromEntries([...new Set(Object.values(HYLDE_FOR_EMNE))].map((h) => [h, 0]));
+  for (const a of alle) for (const h of new Set(a.labels.map((l) => tilHylde.get(l) || EKSTRA_ETIKETTER[l]).filter(Boolean))) ud[h]++;
+  return ud;
 }
 
 function frontmatter(fil) {
@@ -50,9 +64,9 @@ export function artikler() {
   return ud;
 }
 
-// Antal artikler pr. emne (et emne = en label med samme navn).
+// Antal artikler pr. emne (et emne = en label med emnets etiket).
 export function antalPrEmne(alle = artikler()) {
-  return Object.fromEntries(emner().map((e) => [e.navn, alle.filter((a) => a.labels.includes(e.navn)).length]));
+  return Object.fromEntries(emner().map((e) => [e.etiket, alle.filter((a) => a.labels.includes(e.etiket)).length]));
 }
 
 const laesJson = (f, tom) => { try { return JSON.parse(fs.readFileSync(sti(f), 'utf8')); } catch { return tom; } };

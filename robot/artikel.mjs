@@ -12,13 +12,14 @@
 //     kilder afvises artiklen (Gemini søger ellers ikke altid — målt 26/9).
 //  3. Interne links: 3-5 til eksisterende artikler (kun adresser, der findes).
 //  4. To billeder med Gemini (Cloudflare som reserve) — Jacobs valg 26/9.
-//  5. Video i ca. 60 % af artiklerne (fast ud fra adressen), kun hvis Gemini
-//     finder en video relevant. Artikler med video får etiketten "Video" (Watch-siden).
+//  5. Trin 7 i svar-arkivet (Jacob 29/10-2026): ingen video (YouTube-delen og etiketten "Video" er fjernet;
+//     sitet viser ikke videoer mere), titlen er spørgsmålet, og artiklen begynder med det korte svar.
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { skriv, json } from './lib/gemini.mjs';
+import { somSporgsmaal } from '../src/lib/sporgsmaal.mjs';
+import { skriv, json, gemPrisVedExit } from './lib/gemini.mjs';
+gemPrisVedExit('artikel');   // pristælleren (trin 7): robot/ud/pris-artikel.json, også når artiklen afvises
 import { lav } from './lib/billeder.mjs';
 import { kontrollerKilder, kildeliste } from './lib/links.mjs';
 import { artikler, sti } from './lib/arkiv.mjs';
@@ -138,6 +139,7 @@ Rules:
 - Every sentence must tell the reader something concrete: a fact, a definition, an example, a step or a clear comparison. No generic filler that could sit in any article on the topic ("Both roles are critical for modern organizations.", "Companies must invest in skilled personnel.").
 - Include at least 2 lists (<ul> or <ol>, 3-6 items each) where they genuinely help the reader: steps, options, key differences, benefits or risks. Introduce each list with one sentence.
 - The first paragraph is a short, direct answer to the main keyword: 2 sentences, at most 50 words, plain language. Context and numbers come after it.
+- Start the article with that short answer as a <p>. The very first element must be the answer paragraph, never a heading (no "Introduction" or "Understanding ..." heading before it).
 - Search phrases are often ungrammatical ("what is phishing attack", "how does seo work"). Never paste a keyword verbatim into a sentence where it reads wrongly; write correct English ("how phishing attacks work"). Never put keywords in bold, quotes or <strong>.
 - Every number, statistic and quoted definition names its source from the facts (an organization, agency, company or publication). Never use vague attributions such as "experts say", "industry experts note", "researchers confirm", "analysts point out", "studies show" or "according to market research".
 - Include one FAQ section (<h2>FAQ</h2>) with AT LEAST 5 questions as <h3>, each followed by a 2-4 sentence answer in <p>.
@@ -165,6 +167,15 @@ ${html}`);
   if (ordI(ny) > ordI(html)) html = ny;
   log(`- Efter uddybning: ${ordI(html)} ord.`);
 } else log(`- Udkast 1: ${ordI(html)} ord — ingen uddybning nødvendig.`);
+
+// Svaret først (trin 7, Jacob 29/10-2026). Målt 28/10: 33 af 45 robotartikler begyndte med en indledende <h2>
+// ("Introduction to …", "Understanding …") og havde svaret i afsnittet under. Står der stadig en overskrift først,
+// flyttes det første afsnit op foran den — ingen ord ændres. Sitet viser det første afsnit som forspalte.
+{
+  const ind = html.match(/^\s*(<h[23]\b[^>]*>[\s\S]*?<\/h[23]>)\s*(<p\b[^>]*>[\s\S]*?<\/p>)/i);
+  if (ind) { html = ind[2] + ind[1] + html.slice(ind[0].length); log(`- Svaret først: afsnittet er flyttet op foran "${ind[1].replace(/<[^>]+>/g, '').slice(0, 60)}"`); }
+  else log('- Svaret først: artiklen begyndte allerede med svaret');
+}
 
 // Fjern alle links, der ikke er et af de tilladte interne (Gemini må ikke selv finde på links).
 const tilladt = new Set(interne.map((l) => l.href));
@@ -303,13 +314,17 @@ const meta = await json(`Article about "${valgt.hoved}". First 1500 characters:
 ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500)}
 
 Return JSON with:
-"title": 50-65 characters, contains the main keyword or a close natural variant, no clickbait, no year,
+"title": the main keyword written as the question a reader would ask, in correct natural English and Title Case, ending with "?" (e.g. "How Does Phishing-Resistant MFA Work?"), at most 70 characters, no extra words, no year,
 "description": 140-160 characters, plain and specific,
 "slug": 3-6 lowercase words joined by hyphens,
 "image1": a prompt for a clean, modern editorial illustration for the top of the article,
 "image2": a different prompt for an illustration further down,
 "alt1": short alt text for image 1, "alt2": short alt text for image 2`);
-const titel = String(meta.title).trim();
+// Titlen er spørgsmålet (trin 7, Jacob 29/10-2026). Er Geminis titel ikke et spørgsmål, bruges søgeordet som
+// spørgsmål (samme regel som forsidens "Questions people are asking", src/lib/sporgsmaal.mjs).
+const geminiTitel = String(meta.title || '').trim();
+const titel = /\?$/.test(geminiTitel) && geminiTitel.length <= 90 ? geminiTitel : somSporgsmaal(valgt.hoved);
+if (titel !== geminiTitel) log(`- Titel: Geminis "${geminiTitel}" var ikke et spørgsmål — bruger "${titel}"`);
 const slug = String(meta.slug || titel).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
 
 // --- 6. Billeder (Gemini, Cloudflare som reserve) ---------------------------
@@ -327,25 +342,7 @@ const h2er = [...html.matchAll(/<h2\b/gi)].map((m) => m.index);
 const midt = h2er.filter((i) => i > html.length * 0.45)[0];
 if (midt) html = html.slice(0, midt) + figur(mid, meta.alt2) + html.slice(midt);
 
-// --- 6. Video (ca. 60 %, fast ud fra adressen) ------------------------------
-const hash = parseInt(crypto.createHash('sha256').update(slug).digest('hex').slice(0, 8), 16);
-let video = null;
-if (hash % 10 < 6) {
-  const y = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&safeSearch=strict&relevanceLanguage=en&videoDuration=medium&maxResults=8&q=${encodeURIComponent(valgt.hoved)}&key=${process.env.YOUTUBE_API_KEY}`).then((r) => r.json()).catch(() => ({}));
-  const vid = (y.items || []).map((v) => ({ id: v.id.videoId, titel: v.snippet.title, kanal: v.snippet.channelTitle, beskrivelse: v.snippet.description }));
-  if (vid.length) {
-    const d = await json(`Article topic: "${valgt.hoved}". Which video (if any) genuinely explains this topic well for a reader of the article? Reject ads, music, reactions, unrelated or clickbait videos.
-Return JSON {"choice": number or 0 for none}
-${vid.map((v, i) => `${i + 1}. ${v.titel} — ${v.kanal} — ${v.beskrivelse.slice(0, 120)}`).join('\n')}`);
-    video = vid[(d.choice || 0) - 1] || null;
-  }
-  log(video ? `- Video: "${video.titel}" (${video.kanal})` : '- Video: skulle have video (60 %), men Gemini fandt ingen relevant');
-} else log('- Video: denne artikel er blandt de ca. 40 % uden video');
-if (video) {
-  const iframe = `<div style="text-align:center;"><iframe allowfullscreen="true" height="360" src="https://www.youtube.com/embed/${video.id}?rel=0" width="640"></iframe></div>`;
-  const efter = [...html.matchAll(/<h2\b/gi)].map((m) => m.index).filter((i) => i > html.length * 0.3)[0];
-  html = efter ? html.slice(0, efter) + iframe + html.slice(efter) : html + iframe;
-}
+// (Video-delen er fjernet i trin 7, 29/10-2026: sitet viser ikke videoer mere — se src/lib/temakoder.mjs udenYoutube.)
 
 // Eksterne links INDE i teksten (Jacobs ønske 26/9): Gemini foreslår for hver
 // kontrolleret kilde en frase, der står ordret i teksten; linket sættes kun, hvis
@@ -389,7 +386,7 @@ const aar = String(nu.getUTCFullYear()); const md = String(nu.getUTCMonth() + 1)
 let navn = slug; let n = 2;
 while (fs.existsSync(sti(`src/content/posts/${aar}/${md}/${navn}.md`))) navn = `${slug}-${n++}`;
 fs.mkdirSync(sti(`src/content/posts/${aar}/${md}`), { recursive: true });
-const labels = [valgt.emne, ...(video ? ['Video'] : [])];
+const labels = [valgt.emne];   // emnets etiket = artiklens hylde (src/lib/hylder.ts)
 const yamlStr = (s) => JSON.stringify(String(s));
 const fm = ['---', `title: ${yamlStr(titel)}`, `description: ${yamlStr(meta.description)}`, `published: ${nu.toISOString()}`, `updated: ${nu.toISOString()}`,
   'labels:', ...labels.map((l) => `  - ${l}`), `image: ${hero.fil}`, `keyword: ${yamlStr(valgt.hoved)}`, 'relatedKeywords:', ...valgt.beslaegtede.map((k) => `  - ${yamlStr(k)}`), 'robot: true', '---'].join('\n');
@@ -421,8 +418,8 @@ ${del[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
 }
 log(`- Links fra ældre artikler til den nye: ${tilbage.length}${tilbage.length ? ' — ' + tilbage.join(' · ') : ''}`);
 
-log(`\n**Titel:** ${titel}  \n**Adresse:** /${aar}/${md}/${navn}  \n**Ord:** ${ord} · **Interne links:** ${antalInterne} · **Kilder:** ${kildeLinks.length} (afvist ${kildeAfvist.length}) · **Video:** ${video ? 'ja' : 'nej'}`);
+log(`\n**Titel:** ${titel}  \n**Adresse:** /${aar}/${md}/${navn}  \n**Ord:** ${ord} · **Interne links:** ${antalInterne} · **Kilder:** ${kildeLinks.length} (afvist ${kildeAfvist.length})`);
 log(`\n**Billeder:** 1: ${hero.fil} (${hero.motor})  \n2: ${mid.fil} (${mid.motor})`);
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
-fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}`, ord, antalInterne, kildeLinks, kildeAfvist, video, billeder: { hero, mid } }, null, 1));
+fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}`, ord, antalInterne, kildeLinks, kildeAfvist, billeder: { hero, mid } }, null, 1));
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, rapport.join('\n') + '\n');

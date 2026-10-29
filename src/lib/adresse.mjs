@@ -21,6 +21,10 @@ export const HYLDE_FOR_EMNE = {
   marketing: 'marketing', design: 'marketing',
   tech: 'everyday-tech', it: 'everyday-tech',
 };
+// Ekstra Blogger-etiketter, der også sætter en artikel på en hylde, selv om de ikke er et af emnerne.
+// Målt 28/10: 19 artikler har "Cyber Security"/"Cyber-Security", men ikke "Infosec". Flyttet hertil fra
+// hylder.ts 29/10, så sitet og robotten (robot/lib/arkiv.mjs) tæller hylderne ens.
+export const EKSTRA_ETIKETTER = { 'Cyber Security': 'cybersecurity', 'Cyber-Security': 'cybersecurity' };
 const EMNE_LINK = /(\shref=(["'])(?:https?:\/\/(?:www\.)?techmediaarch\.com)?)\/topic\/([A-Za-z0-9-]+)(?=[#?"'])/g;
 const tilHylde = (html) => html.replace(EMNE_LINK, (m, start, anf, slug) => {
   const h = HYLDE_FOR_EMNE[slug.toLowerCase()];

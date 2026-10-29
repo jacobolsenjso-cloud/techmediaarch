@@ -1,5 +1,5 @@
 {
-  "_forklaring": "Startord pr. emne til Googles autoforslag. Robotten spørger fx 'what is <startord>', 'how does <startord>' osv. Emnenavnene er menuens emner (src/lib/emner.ts). UDKAST 26/9-2026 — Jacob godkender listen.",
+  "_forklaring": "Startord pr. emne til Googles autoforslag. Robotten spørger fx 'what is <startord>', 'how does <startord>' osv. Nøglerne er emnernes etiket (src/lib/emner.ts). UDKAST 26/9-2026 — Jacob godkender listen. 29/10-2026 (trin 7): kun emner på de 5 hylder; Fintech, Crypto og Web3 er taget ud (de får ingen nye artikler).",
   "AI": ["ai agents", "generative ai", "ai tools", "large language models"],
   "Tech": ["smart glasses", "apple intelligence", "foldable phones", "wearable tech"],
   "Data": ["data analytics", "data engineering", "vector database", "big data"],
@@ -9,8 +9,5 @@
   "Design": ["ux design", "ui design", "graphic design ai", "design system"],
   "Marketing": ["seo", "content marketing", "email marketing", "ai marketing"],
   "Product": ["product management", "saas product", "product roadmap", "mvp development"],
-  "Fintech": ["fintech", "digital banking", "open banking", "payment processing"],
-  "Crypto": ["bitcoin", "ethereum", "stablecoins", "crypto wallet"],
-  "Web3": ["web3", "blockchain", "defi", "smart contracts"],
   "Infosec": ["cybersecurity", "phishing", "ransomware", "zero trust security"]
 }

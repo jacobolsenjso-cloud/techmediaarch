@@ -5,7 +5,7 @@
 // farve: hyldens egen rolige farve (kun til ikon og prik, aldrig til tekst).
 // ikon: én SVG-sti (24x24, streg), tegnet til hylden.
 import { INDLAEG, type Indlaeg } from './indhold';
-import { HYLDE_FOR_EMNE } from './adresse.mjs';
+import { HYLDE_FOR_EMNE, EKSTRA_ETIKETTER as EKSTRA } from './adresse.mjs';
 
 export interface Hylde { slug: string; navn: string; besk: string; farve: string; ikon: string; emner: string[]; start: string[]; }
 
@@ -28,10 +28,9 @@ export const HYLDER: Hylde[] = [
 ];
 
 export const hyldeUrl = (h: Hylde) => `/shelf/${h.slug}`;
-// Ekstra Blogger-etiketter, der også sætter en artikel på en hylde, selv om de ikke er et af de 10 emner.
-// Målt 28/10: 19 artikler har etiketten "Cyber Security"/"Cyber-Security", men ikke "Infosec", og stod ellers
-// ikke på Cybersecurity-hylden. De mange "AI-*"-etiketter bruges IKKE: de sidder på næsten alt (AI-Video på 105).
-const EKSTRA_ETIKETTER: Record<string, string> = { 'Cyber Security': 'cybersecurity', 'Cyber-Security': 'cybersecurity' };
+// Ekstra Blogger-etiketter (fx "Cyber Security"), der også sætter en artikel på en hylde — tabellen står i
+// adresse.mjs, så robotten tæller ens. De mange "AI-*"-etiketter bruges IKKE: de sidder på næsten alt (AI-Video på 105).
+const EKSTRA_ETIKETTER = EKSTRA as Record<string, string>;
 // Alle hylder en artikel hører til (ud fra emner + de ekstra etiketter)
 const hyldeSlugs = (p: Indlaeg) => new Set([
   ...p.emner.map((e) => (HYLDE_FOR_EMNE as Record<string, string>)[e.slug]),
