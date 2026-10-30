@@ -78,7 +78,9 @@ Write a better title and meta description for the SAME text (the text itself wil
 Return JSON {"title": "the question a reader would type into Google that this text answers, Title Case, ending with ?, at most 70 characters, no year", "description": "140-160 characters, plain and specific"}`);
   const titel = String(m.title || '').trim(); const besk = String(m.description || '').trim();
   if (!/\?$/.test(titel) || titel.length > 90 || besk.length < 100 || besk.length > 170) throw new Error(`Ny titel/beskrivelse bestod ikke kontrollen: "${titel}" / ${besk.length} tegn — artiklen afvist`);
-  gemFrontmatter({ ...gammel.fm, title: titel, description: besk, omskrevet: iDag, omskrivning: 'titel' }, gammel.krop);
+  // seoTitle fjernes: det er den, Google viser i <title> (30/10, testkørsel 3: den gamle blev stående og skyggede for den nye)
+  const { seoTitle, ...behold } = gammel.fm;
+  gemFrontmatter({ ...behold, title: titel, description: besk, omskrevet: iDag, omskrivning: 'titel' }, gammel.krop);
   log(`- Kun titel: "${gammel.fm.title}" → "${titel}"\n- Beskrivelse: ${besk}`);
   fs.mkdirSync(sti('robot/ud'), { recursive: true });
   fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ omskrevet: true, maade: 'titel', titel, sti: OMSKRIV }, null, 1));
@@ -440,6 +442,8 @@ let stemme = false;
         mt = tjekStemme(r.tekst, html, seneste, ekstra);
       } catch (e) { mt = { ok: false, grund: e.message.slice(0, 100) }; }
       if (!mt.ok) log(`- Stemme forsøg ${forsoeg + 1} kasseret: ${mt.grund}`);
+      // NONE = modellen finder ingen holdning, der passer. At spørge igen giver samme svar (testkørsel 4: 3 x NONE)
+      if (/ingen holdning passer/.test(mt.grund)) break;
     }
     if (mt.ok) { for (const d of mt.dele) html = fletInd(html, d.sektion, d.tekst); stemme = true; }
     log(`- Stemme: ${mt.ok ? `${mt.dele.length} afsnit (${mt.dele.map((d) => d.sektion.slice(0, 40)).join(' | ')})` : `ikke med (${mt.grund})`}`);

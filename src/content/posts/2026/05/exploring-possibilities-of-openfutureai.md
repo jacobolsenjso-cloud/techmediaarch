@@ -1,6 +1,5 @@
 ---
 title: What Is openfuture.ai and How Does It Work?
-seoTitle: "Exploring openfuture.ai: Your Gateway to AI Innovation"
 description: Discover openfuture.ai, an AI platform designed to transform ideas into digital realities, create unique avatars, and enable interactive character experiences.
 published: 2026-05-16T15:00:00.000+02:00
 updated: 2026-05-16T15:00:00.115+02:00
