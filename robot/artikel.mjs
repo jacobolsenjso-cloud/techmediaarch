@@ -36,6 +36,7 @@ import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, 
 import { laesHjerne, stemmeBlok, stemmePrompt, tjekStemme, fletInd, senesteStemmeAfsnit } from './lib/hjerne.mjs';
 import { kildeHenvisninger } from './lib/kildenavne.mjs';
 import { parse as yamlParse, stringify as yamlStringify } from 'yaml';
+import { hentKildeTekster, vaerdier, talUdenKilde, synligTekst } from './lib/talvagt.mjs';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
 const EMNE = arg('emne');
@@ -94,7 +95,9 @@ if (OMSKRIV) {
   // Omskrivning: søgeordene udledes af den gamle artikel (titel, overskrifter, begyndelse), så den nye
   // tekst svarer på det samme, som læserne fandt den gamle på.
   const overskr = [...gammel.krop.matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h[23]>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim()).filter(Boolean);
-  const s = await json(`An older article on techmediaarch.com will be rewritten as an evergreen explainer on the same subject.
+  // En robotartikel fra før kildevagten (30/10) har allerede sine søgeord — de genbruges, så den svarer på det samme
+  const egne = gammel.fm.keyword && Array.isArray(gammel.fm.relatedKeywords) && gammel.fm.relatedKeywords.length >= 3;
+  const s = egne ? { hoved: gammel.fm.keyword, beslaegtede: gammel.fm.relatedKeywords } : await json(`An older article on techmediaarch.com will be rewritten as an evergreen explainer on the same subject.
 Title: "${gammel.fm.title}"
 Headings: ${overskr.slice(0, 20).join(' | ')}
 Start of text: ${gammel.krop.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500)}
@@ -422,7 +425,45 @@ ${kand.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
   if (antalFaq(html) < 5) throw new Error(`FAQ har kun ${antalFaq(html)} spørgsmål efter kildevagten — artiklen afvist`);
 }
 
-// --- 4c. Jacobs stemme (30/10-2026, robot/lib/hjerne.mjs) ----------------------
+// --- 4c. Talvagten (trin 4, Jacob 30/10-2026, robot/lib/talvagt.mjs) — FØR Jacobs stemme, så den kun kan bruge godkendte tal
+// Hvert tal skal stå i en af artiklens egne kilder (siden selv eller de kontrollerede fakta fra den). Målt 30/10: 59 % af
+// tallene i robotartiklerne fra før kildevagten stod ikke i kilderne. Sætninger med et ukendt tal sendes til Gemini, der
+// skal fjerne eller omskrive tallet; lykkes det ikke, fjernes sætningen. Står det i det korte svar, eller er der for
+// mange, afvises artiklen hellere.
+const TALVAGT_MAKS = 8;
+let kendteTal = new Set();
+{
+  const tekster = await hentKildeTekster(kildeLinks.map((k) => k.url));
+  kendteTal = vaerdier([fakta, ...tekster].join(' '));
+  const foerTal = talUdenKilde(saetninger(html), kendteTal);
+  if (foerTal.length) {
+    try {
+      const r = await json(`Each numbered sentence from an article about "${valgt.hoved}" contains a number that is NOT in the article's sources (the numbers are listed after the sentence).
+Rewrite each sentence so it no longer states those numbers: keep the point in words without the number, or use a number from the facts below if one says the same. Never invent a number.
+Keep every HTML tag (especially <a ...>...</a>) exactly as it is. Change nothing else. If the sentence means nothing without the number, return "".
+Facts with sources (the only numbers allowed):\n${fakta}
+Return JSON {"fixes":[{"n": number, "new": "the corrected sentence with its HTML, or empty"}]}
+${foerTal.map((x, i) => `${i + 1}. ${x.s}  [numbers: ${x.mangler.join(', ')}]`).join('\n')}`);
+      let rettet = 0;
+      for (const f of Array.isArray(r.fixes) ? r.fixes : []) {
+        const x = foerTal[parseInt(f.n, 10) - 1]; const ny = rensMarkdown(String(f.new || '').trim());
+        if (!x || !ny || !html.includes(x.s) || hrefs(ny) !== hrefs(x.s) || talUdenKilde([ny], kendteTal).length || uklarKilde(ny) || ukendteKilder(ny, kildeLinks).length) continue;
+        html = html.replace(x.s, () => ny); rettet++;
+      }
+      log(`- Talvagt: ${foerTal.length} sætninger med tal uden kilde (${foerTal.flatMap((x) => x.mangler).slice(0, 12).join(', ')}), ${rettet} rettet af Gemini`);
+    } catch (e) { log(`- Talvagt: retning fejlede (${e.message.slice(0, 80)})`); }
+    const rest = talUdenKilde(saetninger(html), kendteTal);
+    if (rest.some((x) => foersteAfsnit(html).includes(x.s))) throw new Error(`Det korte svar har et tal, der ikke står i kilderne (${rest[0].mangler.join(', ')}) — artiklen afvist`);
+    if (rest.length > TALVAGT_MAKS) throw new Error(`${rest.length} sætninger har tal, der ikke står i kilderne — artiklen afvist`);
+    for (const x of rest) html = html.replace(x.s, '');
+    html = tomt(html);
+    if (rest.length) log(`- Talvagt: ${rest.length} sætninger fjernet (${rest.flatMap((x) => x.mangler).join(', ')})`);
+    if (antalFaq(html) < 5) throw new Error(`FAQ har kun ${antalFaq(html)} spørgsmål efter talvagten — artiklen afvist`);
+  }
+  log(`- Talvagt: ${tekster.filter(Boolean).length} af ${kildeLinks.length} kildesider læst · ${foerTal.length ? 'se ovenfor' : 'alle tal står i kilderne'} · tilbage uden kilde: ${talUdenKilde(saetninger(html), kendteTal).length}`);
+}
+
+// --- 4d. Jacobs stemme (30/10-2026, robot/lib/hjerne.mjs) ----------------------
 // Kun når emnet rammer en af hans holdninger i emner.md: 1-2 korte afsnit i første person, sat ind sidst i den
 // sektion, hvor de passer. Efter sprog- og kildekontrollen, så de ikke bliver "rettet" eller fjernet som fyld.
 // Et kasseret forsøg sendes tilbage med grunden (højst 3 forsøg). Lykkes det ikke, udgives artiklen uden stemmen.
@@ -433,7 +474,8 @@ let stemme = false;
   const p = stemmePrompt(hjerne, emneTekst, html, valgt.hoved, seneste);
   if (!p) log('- Stemme: ingen af Jacobs holdninger rammer emnet (kun stilen er brugt)');
   else {
-    const ekstra = (t) => (kildeHenvisninger(t).length ? `nævner en kilde (${kildeHenvisninger(t).join(', ')})` : '');
+    const ekstra = (t) => (kildeHenvisninger(t).length ? `nævner en kilde (${kildeHenvisninger(t).join(', ')})`
+      : talUdenKilde([t], kendteTal).length ? `tal, der ikke står i kilderne (${talUdenKilde([t], kendteTal)[0].mangler.join(', ')})` : '');
     let mt = { ok: false, grund: '' };
     for (let forsoeg = 0; forsoeg < 3 && !mt.ok; forsoeg++) {
       try {
@@ -461,6 +503,13 @@ Return JSON with:
 "image1": a prompt for a clean, modern editorial illustration for the top of the article,
 "image2": a different prompt for an illustration further down,
 "alt1": short alt text for image 1, "alt2": short alt text for image 2`);
+// Talvagten gælder også beskrivelsen, som Google viser: har den et tal uden kilde, bruges det korte svar i stedet.
+if (talUdenKilde([String(meta.description || '')], kendteTal).length) {
+  const svar = synligTekst(foersteAfsnit(html)).trim();
+  const kort = svar.length <= 160 ? svar : `${svar.slice(0, 157).replace(/\s+\S*$/, '')}…`;
+  log(`- Talvagt: beskrivelsen havde et tal uden kilde — bruger det korte svar i stedet`);
+  meta.description = kort;
+}
 // Titlen er spørgsmålet (trin 7, Jacob 29/10-2026). Er Geminis titel ikke et spørgsmål, bruges søgeordet som
 // spørgsmål (samme regel som forsidens "Questions people are asking", src/lib/sporgsmaal.mjs).
 const geminiTitel = String(meta.title || '').trim();
