@@ -39,5 +39,20 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-10-30T09:34:45.966Z",
+  "artikel": null,
+  "omskrevet": true,
+  "usd": 0.0041,
+  "kr": 0.03,
+  "dele": {
+   "artikel": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 1,
+    "ukendtPris": []
+   }
+  }
  }
 ]
