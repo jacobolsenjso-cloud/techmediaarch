@@ -1,11 +1,7 @@
 ---
-// Sitets mærke i én farve: A'et formet som en spidsbue med hylden som tværstreg (logoet låst 30/10-2026,
-// lærredet "Tech Media Arch logo", varianten "One colour"). Farven arves (currentColor), så kortet uden
-// billede kan farve det i hyldens farve. Bruges i kort uden billede (ArticleCard).
+// Sitets logo i kort uden billede. Jacob 30/10-2026: logoet skal være ens alle steder, så det er
+// præcis samme fil som i topbjælken og faneikonet (public/logo.svg, laves af scripts/lav-logo.mjs).
 interface Props { class?: string; id?: string; }
 const { class: klasse = '' } = Astro.props;
 ---
-<svg class={klasse} viewBox="20 12 60 74" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-  <path d="M27 79 Q33 40 50 19 Q67 40 73 79" fill="none" stroke="currentColor" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
-  <rect x="35.5" y="54" width="29" height="12.5" rx="6.25" fill="currentColor" fill-opacity="0.55"/>
-</svg>
+<img class:list={['maerke', klasse]} src="/logo.svg" alt="" width="40" height="40" loading="lazy" decoding="async" />

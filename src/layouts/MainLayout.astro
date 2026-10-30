@@ -201,9 +201,8 @@ const nyeste = INDLAEG[0];
       }
       /* Logo: flisen med A'et + navnet (30/10). .logo-sub bruges ikke i markup lige nu. */
       .logo { text-decoration: none; color: inherit; display: flex; flex-direction: row; align-items: center; gap: 10px; min-height: 44px; min-width: 0; }
-      /* Logoet (låst 30/10, lærredet "Final": topbjælke lys og mørk) — samme flise i lys og mørk tilstand */
-      .logo-mark { flex: none; display: block; width: 34px; height: 34px; }
-      .logo-mark svg { display: block; width: 100%; height: 100%; }
+      /* Logoet (Jacob 30/10: én tegning alle steder, public/logo.svg = favicon.svg, laves af scripts/lav-logo.mjs) */
+      .logo-mark { flex: none; display: block; width: 34px; height: 34px; border-radius: 9px; }
       .logo-name { font-size: 22px; line-height: 1.05; font-weight: 800; font-stretch: 92%; letter-spacing: -0.01em; white-space: nowrap; }
       .logo-sub { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
       .logo-sub-kort { display: none; }
@@ -422,7 +421,7 @@ const nyeste = INDLAEG[0];
       .article-card:hover .card-thumb { box-shadow: 0 6px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05); }
       /* Artikler uden billede får et roligt felt i emnets farve i stedet for et hul */
       .card-thumb-empty { animation: none; background: linear-gradient(135deg, color-mix(in srgb, var(--tag-accent, #0891b2) 22%, var(--card-bg)), var(--hover-bg)); display: flex; align-items: center; justify-content: center; }
-      .card-thumb-empty svg { width: 20%; height: auto; opacity: 0.55; color: var(--tag-accent, #6a3fd6); }
+      .card-thumb-empty img.maerke { width: 22%; height: auto; border-radius: 9px; box-shadow: 0 6px 16px -8px rgba(42, 18, 96, 0.5); }
       @keyframes tmaShimmer { 0% { background-position: 150% 0; } 100% { background-position: -150% 0; } }
       .card-title { margin: 0 0 5px 0; font-size: 17px; font-weight: 650; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
       .article-card:hover .card-title { color: var(--teal-text); }
@@ -519,7 +518,7 @@ const nyeste = INDLAEG[0];
     <header class="top-navbar" id="mainHeader">
       <div class="nav-left">
         <a href="/" class="logo" aria-label="Tech Media Arch home">
-          <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tmaLmF" x1="0.1585" y1="0.0085" x2="0.8415" y2="0.9915"><stop offset="0" stop-color="#5b7cfa"/><stop offset="0.55" stop-color="#6a3fd6"/><stop offset="1" stop-color="#b0508f"/></linearGradient><radialGradient id="tmaLmP" cx="1" cy="1.08" r="0.5"><stop offset="0" stop-color="#ffb07c"/><stop offset="0.7" stop-color="#ffb07c" stop-opacity="0"/></radialGradient><linearGradient id="tmaLmT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#fdf3f4"/><stop offset="1" stop-color="#ffe4d6"/></linearGradient><linearGradient id="tmaLmG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd877"/><stop offset="1" stop-color="#f0a531"/></linearGradient></defs><rect width="34" height="34" rx="9" fill="url(#tmaLmF)"/><rect width="34" height="34" rx="9" fill="url(#tmaLmP)"/><g transform="translate(1.5 1.5) scale(0.31)"><path d="M27 79 Q33 40 50 19 Q67 40 73 79" fill="none" stroke="url(#tmaLmT)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/><rect x="35" y="53.5" width="30" height="13.5" rx="6.75" fill="url(#tmaLmG)"/></g></svg></span>
+          <img class="logo-mark" src="/logo.svg" alt="" width="34" height="34" decoding="async" />
           <span class="logo-name">Tech Media Arch</span>
         </a>
       </div>
