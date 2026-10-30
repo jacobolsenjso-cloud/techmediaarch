@@ -52,6 +52,8 @@ const kodet = (s) => s.split('/').map(encodeURIComponent).join('/');
 const hjerne = laesHjerne();
 if (!hjerne) throw new Error('Hjernen mangler (_hjerne / HJERNE_DIR) — intet skrives uden Jacobs stemme. Tjek læsenøglen HJERNE_NOEGLE.');
 log(`- Hjernen er med (${['core', 'voice', 'beliefs', 'emner', 'erfaringer'].filter((k) => hjerne[k]).join(', ')})`);
+// robot/ud oprettes her, før vejene deler sig (30/10: omskrivningen fejlede, fordi mappen kun blev lavet i "ny artikel"-vejen)
+fs.mkdirSync(sti('robot/ud'), { recursive: true });
 
 // Omskrivning: den gamle artikel læses (frontmatter + tekst)
 const gammelFil = OMSKRIV ? sti(`src/content/posts${OMSKRIV}.md`) : '';
