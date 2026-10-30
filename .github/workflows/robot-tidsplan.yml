@@ -1,6 +1,8 @@
 # Robottens TIDSPLAN (trin 3, Jacobs valg 26/9-2026):
 #   højst 2 artikler om dagen, fri tirsdag, fredag og søndag (Jacob 29/10-2026; før tir+fre fra 27/9) — udgives
-#   direkte på main. Udgivelsesdage: mandag, onsdag, torsdag og lørdag (cron 1,3,4,6).
+#   direkte på main. Udgivelsesdage: mandag, onsdag, torsdag og lørdag (robot/plan.mjs FRIDAGE).
+#   Kørslerne sker mandag-lørdag (cron 1-6), fordi omskrivningen kører 6 dage om ugen (Jacob 30/10-2026);
+#   plan.mjs --tjek siger, om dagen har ny artikel (koer) og/eller omskrivning (omskriv).
 #   HUSK: cron-teksten står to steder (schedule og jobbets "if"), og de skal være ens, ellers kører jobbet aldrig.
 # Tider er UTC: 07:17 og 15:17 = kl. 9:17 og 17:17 dansk sommertid (8:17 og 16:17 vintertid).
 # Minuttallet er skævt med vilje: GitHub er mest bagud på hele og halve timer.
@@ -9,13 +11,14 @@
 # Tomgangsalarmen ligger i sit eget workflow (tomgang.yml, 28/9): lå den her, blev den
 # sprunget over sammen med robotten, når GitHub sprang robottens kørsler over.
 # ÉN ROBOT (Jacob 30/10-2026: "samlet i en, ingen tillæg"): den samme kørsel skriver dagens nye artikel OG
-#   skriver én ældre artikel om (robot/plan.mjs --omskriv, højst 1 om dagen — så det sker i dagens første kørsel).
+#   skriver ældre artikler om (robot/plan.mjs --omskriv: 3 om dagen, højst 1 med visninger — dagens kvote tages i
+#   første kørsel, den anden samler op efter afvisninger).
 #   Samme opskrift (robot/artikel.mjs), samme hjerne, ét byg og én udgivelse.
 name: Robot (tidsplan)
 
 on:
   schedule:
-    - cron: '17 7,15 * * 1,3,4,6'
+    - cron: '17 7,15 * * 1-6'
   workflow_dispatch:
     inputs:
       opgave:
@@ -34,7 +37,7 @@ concurrency:
 
 jobs:
   artikel:
-    if: github.event.schedule == '17 7,15 * * 1,3,4,6' || inputs.opgave == 'artikel' || inputs.opgave == 'omskriv'
+    if: github.event.schedule == '17 7,15 * * 1-6' || inputs.opgave == 'artikel' || inputs.opgave == 'omskriv'
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
@@ -73,10 +76,11 @@ jobs:
           name: robot-ud
           path: robot/ud/
           if-no-files-found: ignore
-      # Omskrivning af én ældre artikel (Jacob 29-30/10-2026): køen robot/data/omskriv-koe.json, højst 1 om dagen,
-      # stop ved robot/plan.mjs OMSKRIV_LOFT_KR i måneden. Kører også, hvis artiklen ovenfor blev afvist.
-      - name: Skriv en ældre artikel om
-        if: always() && steps.plan.outputs.koer == 'ja'
+      # Omskrivning af ældre artikler (Jacob 30/10-2026): køen robot/data/omskriv-koe.json, 3 om dagen (højst 1 med
+      # Google-visninger), 6 dage om ugen, stop ved robot/plan.mjs OMSKRIV_LOFT_KR i måneden. Kører også, hvis
+      # artiklen ovenfor blev afvist.
+      - name: Skriv ældre artikler om
+        if: always() && steps.plan.outputs.omskriv == 'ja'
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -84,10 +88,10 @@ jobs:
         run: node robot/plan.mjs --omskriv
       - name: Byg sitet (en artikel, der ødelægger bygget, når aldrig main)
         id: bygget
-        if: steps.plan.outputs.koer == 'ja' && always()
+        if: always() && (steps.plan.outputs.koer == 'ja' || steps.plan.outputs.omskriv == 'ja')
         run: npm run build > /dev/null
       - name: Udgiv på main
-        if: always() && steps.plan.outputs.koer == 'ja' && steps.bygget.outcome == 'success'
+        if: always() && steps.bygget.outcome == 'success'
         run: |
           git config user.name "techmediaarch-robot"
           git config user.email "robot@techmediaarch.com"
@@ -97,7 +101,7 @@ jobs:
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && exit 0; sleep 10; done
           exit 1
       - uses: actions/upload-artifact@v6
-        if: always() && steps.plan.outputs.koer == 'ja'
+        if: always() && steps.plan.outputs.omskriv == 'ja'
         with:
           name: robot-omskriv-ud
           path: robot/ud/
