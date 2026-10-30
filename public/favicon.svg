@@ -1,12 +1,1 @@
-<svg viewBox="0 4 48 36" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="pk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e8188c"/><stop offset="1" stop-color="#b52ec2"/></linearGradient>
-    <linearGradient id="ring" x1="6" y1="0" x2="42" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#b530b5"/><stop offset="0.5" stop-color="#7d44d6"/><stop offset="0.5" stop-color="#3ee4e6"/><stop offset="1" stop-color="#29e9e0"/></linearGradient>
-    <linearGradient id="pu" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a834c4"/><stop offset="1" stop-color="#7d3fd4"/></linearGradient>
-  </defs>
-  <path d="M1 19 L13 25.5 L13 39 L1 39 Z" fill="url(#pk)"/>
-  <path fill-rule="evenodd" fill="url(#ring)" d="M6 15 L24 5 L42 15 L24 25 Z M15 15 L24 10 L33 15 L24 20 Z"/>
-  <path d="M14 19.5 L24 25 L24 31 L14 25.5 Z" fill="url(#pu)"/>
-  <path d="M24 25 L34 19.5 L34 25.5 L24 31 Z" fill="#9a9a9a"/>
-  <path d="M34 19.5 L41 15.5 L47 18.8 L47 39 L42.5 39 L42.5 21.5 L38.5 21.5 L38.5 39 L34 39 Z" fill="#6f6f6f"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><linearGradient id="f" x1="0.1585" y1="0.0085" x2="0.8415" y2="0.9915"><stop offset="0" stop-color="#5b7cfa"/><stop offset="0.55" stop-color="#6a3fd6"/><stop offset="1" stop-color="#b0508f"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#f)"/><g transform="translate(1 1) scale(0.3)"><path d="M27 79 Q33 40 50 19 Q67 40 73 79" fill="none" stroke="#ffffff" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/><rect x="34.5" y="53" width="31" height="14.5" rx="7.25" fill="#f2b33d"/></g></svg>

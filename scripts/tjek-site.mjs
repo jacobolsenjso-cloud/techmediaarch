@@ -95,6 +95,9 @@ for (const f of html) if (/^\/\d{4}\/\d{2}\//.test(f)) {
 let tekstOk = 0; let omskrevne = 0;
 // Omskrevne artikler (30/10-2026, robot/plan.mjs --omskriv): teksten er bevidst ny — adressen skal stadig findes,
 // men ord-for-ord-sammenligningen med Blogger springes over. Kun "omskrivning: fuld" (en ny titel ændrer ikke teksten).
+// Vandmærket (30/10-2026) er brændt ind i billedfilen og står ikke længere som tekst på siden. Kun billeder uden
+// for /images får stadig teksten ovenpå. Teksten er ikke artikeltekst, så den fjernes på begge sider før sammenligning.
+const udenVmTekst = (h) => h.replace(/<span class="tma-wm-tekst">[^<]*<\/span>/g, '');
 const omskrevetFuldt = (s) => { try { return /^omskrivning:\s*fuld\s*$/m.test(fs.readFileSync(path.resolve(`src/content/posts${s.replace(/\.html$/, '')}.md`), 'utf8').split(/\r?\n---/)[0]); } catch { return false; } };
 for (const p of [...posts, ...pages]) {
   const sti = decodeURI(alt(p).replace('https://www.techmediaarch.com', ''));
@@ -108,12 +111,12 @@ for (const p of [...posts, ...pages]) {
   // Kilden minus det, konverteren bevidst fjerner (TOC-knap og feed-fodnote), og med
   // temaets genvejskoder og vandmærker vist som på Blogger ({getButton} blev til en knap)
   // Rå markdown-rester "[ord](adresse)" fra Blogger er bevidst rettet til almindelig tekst/link (28/9, 7 artikler)
-  const kilde = rettet(sti, tekst(vandmaerke(temaKoder(p.content.$t.replace(/<div class=["']mbtTOC2["']>[\s\S]*?<div id=["']mbtTOC2["']><\/div>\s*<\/div>/gi, '')
+  const kilde = rettet(sti, tekst(udenVmTekst(vandmaerke(temaKoder(p.content.$t.replace(/<div class=["']mbtTOC2["']>[\s\S]*?<div id=["']mbtTOC2["']><\/div>\s*<\/div>/gi, '')
     .replace(/<div class=["']blogger-post-footer["']>[\s\S]*?<\/div>\s*$/i, '')
     .replace(/\[((?:[^\[\]\n<]|<[^>]+>){2,300}?)\]\((https?:\/\/[^)\s"<>]+)\)/g, '$1')
     // og søgeords-rester med understregning i Fintech-artiklen ("fintech_banks" -> "fintech banks", 28/9)
-    .replace(/\b([Ff]intech)_(companies|Companies|meaning|banks)\b/g, '$1 $2')))));
-  const ny = tekst(m[1]
+    .replace(/\b([Ff]intech)_(companies|Companies|meaning|banks)\b/g, '$1 $2'))))));
+  const ny = tekst(udenVmTekst(m[1])
     // FAQ-boksens EKSTRA spørgsmål (frontmatter "faq:", lib/faqboks.mjs) findes ikke på Blogger og tælles ikke med;
     // artiklens egne FAQ-spørgsmål står i boksen med de samme ord og SKAL stadig være ens
     .replace(/<section class="faq-box" data-ekstra="1">[\s\S]*?<\/section>/g, ' ')

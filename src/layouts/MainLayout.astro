@@ -14,6 +14,7 @@ import { HAR_BEDSTE } from '../lib/bedste';
 import { udenHtml } from '../lib/adresse.mjs';
 import { HYLDER, hyldeUrl, iHylde } from '../lib/hylder';
 import { INDLAEG } from '../lib/indhold';
+import { maerketBillede } from '../lib/temakoder.mjs';
 
 interface Props {
   title?: string;
@@ -41,7 +42,8 @@ const fuldTitel = !kortTitel ? `${BRAND} – the checked tech answer archive`
   : (kortTitel.length + BRAND.length + 3 <= 60 ? `${kortTitel} | ${BRAND}` : kortTitel);
 // Canonical: Astro giver stien kodet (mellemrum = %20), præcis som Blogger skrev den
 const canonicalURL = SITE + currentPath;
-const ogImage = image ? (image.startsWith('http') ? image : SITE + image) : `${SITE}/og-default.png`;
+// Delingsbilledet peger på kopien med indbrændt vandmærke (30/10-2026, src/lib/temakoder.mjs)
+const ogImage = image ? (image.startsWith('http') ? image : SITE + maerketBillede(image)) : `${SITE}/og-default.png`;
 
 const breadcrumbSchema = {
   '@context': 'https://schema.org', '@type': 'BreadcrumbList',
@@ -79,6 +81,8 @@ const nyeste = INDLAEG[0];
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {/* 30/10 (Jacob): logoet skal også kunne bruges som app-ikon — manifestet giver Android ikonerne (scripts/lav-logo.mjs) */}
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
     <title>{fuldTitel}</title>
 
@@ -195,8 +199,11 @@ const nyeste = INDLAEG[0];
         .search-input-wrapper { margin: 0 auto; }
         .search-overlay .icon-btn { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); margin-left: 0; }
       }
-      /* Ordmærke: navnet + en lille mono-linje under, som i designet */
-      .logo { text-decoration: none; color: inherit; display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 44px; min-width: 0; }
+      /* Logo: flisen med A'et + navnet (30/10). .logo-sub bruges ikke i markup lige nu. */
+      .logo { text-decoration: none; color: inherit; display: flex; flex-direction: row; align-items: center; gap: 10px; min-height: 44px; min-width: 0; }
+      /* Logoet (låst 30/10, lærredet "Final": topbjælke lys og mørk) — samme flise i lys og mørk tilstand */
+      .logo-mark { flex: none; display: block; width: 34px; height: 34px; }
+      .logo-mark svg { display: block; width: 100%; height: 100%; }
       .logo-name { font-size: 22px; line-height: 1.05; font-weight: 800; font-stretch: 92%; letter-spacing: -0.01em; white-space: nowrap; }
       .logo-sub { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
       .logo-sub-kort { display: none; }
@@ -300,7 +307,9 @@ const nyeste = INDLAEG[0];
       /* Under 780 px er der ikke plads til de tre links i topbjælken (målt 28/10): hylderne m.m. står i menuen i stedet */
       @media (max-width: 780px) { .top-links { display: none; } .mega, .mega-dim { display: none !important; } }
       /* De smalleste telefoner (ca. 320 px): navnet en anelse mindre, så det ikke skæres af ved knapperne */
-      @media (max-width: 380px) { .logo-name { font-size: 17px !important; } }
+      @media (max-width: 380px) { .logo-name { font-size: 17px !important; } .logo { gap: 8px; } .logo-mark { width: 30px; height: 30px; } }
+      /* Under 360 px er der ikke plads til flisen OG navnet før knapperne (målt 30/10: 320 px gav 25 px overlap) — kun navnet */
+      @media (max-width: 359px) { .logo-mark { display: none; } }
       @media (max-width: 768px) {
         .top-navbar { padding: 0 12px; gap: 10px; }
         .logo-name { font-size: 19px; }
@@ -413,7 +422,7 @@ const nyeste = INDLAEG[0];
       .article-card:hover .card-thumb { box-shadow: 0 6px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05); }
       /* Artikler uden billede får et roligt felt i emnets farve i stedet for et hul */
       .card-thumb-empty { animation: none; background: linear-gradient(135deg, color-mix(in srgb, var(--tag-accent, #0891b2) 22%, var(--card-bg)), var(--hover-bg)); display: flex; align-items: center; justify-content: center; }
-      .card-thumb-empty svg { width: 34%; height: auto; opacity: 0.55; }
+      .card-thumb-empty svg { width: 20%; height: auto; opacity: 0.55; color: var(--tag-accent, #6a3fd6); }
       @keyframes tmaShimmer { 0% { background-position: 150% 0; } 100% { background-position: -150% 0; } }
       .card-title { margin: 0 0 5px 0; font-size: 17px; font-weight: 650; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
       .article-card:hover .card-title { color: var(--teal-text); }
@@ -510,6 +519,7 @@ const nyeste = INDLAEG[0];
     <header class="top-navbar" id="mainHeader">
       <div class="nav-left">
         <a href="/" class="logo" aria-label="Tech Media Arch home">
+          <span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tmaLmF" x1="0.1585" y1="0.0085" x2="0.8415" y2="0.9915"><stop offset="0" stop-color="#5b7cfa"/><stop offset="0.55" stop-color="#6a3fd6"/><stop offset="1" stop-color="#b0508f"/></linearGradient><radialGradient id="tmaLmP" cx="1" cy="1.08" r="0.5"><stop offset="0" stop-color="#ffb07c"/><stop offset="0.7" stop-color="#ffb07c" stop-opacity="0"/></radialGradient><linearGradient id="tmaLmT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#fdf3f4"/><stop offset="1" stop-color="#ffe4d6"/></linearGradient><linearGradient id="tmaLmG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd877"/><stop offset="1" stop-color="#f0a531"/></linearGradient></defs><rect width="34" height="34" rx="9" fill="url(#tmaLmF)"/><rect width="34" height="34" rx="9" fill="url(#tmaLmP)"/><g transform="translate(1.5 1.5) scale(0.31)"><path d="M27 79 Q33 40 50 19 Q67 40 73 79" fill="none" stroke="url(#tmaLmT)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/><rect x="35" y="53.5" width="30" height="13.5" rx="6.75" fill="url(#tmaLmG)"/></g></svg></span>
           <span class="logo-name">Tech Media Arch</span>
         </a>
       </div>

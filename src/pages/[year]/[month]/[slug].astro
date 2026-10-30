@@ -10,6 +10,7 @@ import { emneUrl } from '../../../lib/emner';
 import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret, startListe } from '../../../lib/hylder';
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
+import { maerketBillede } from '../../../lib/temakoder.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
 import { tegnFarve } from '../../../lib/sporgsmaal.mjs';
 import OGSAA_SPURGT from '../../../../robot/data/ogsaa-spurgt.json';
@@ -126,7 +127,7 @@ const schema = {
   datePublished: p.published,
   dateModified: p.updated,
   mainEntityOfPage: SITE + p.href,
-  ...(p.image ? { image: SITE + p.image } : {}),
+  ...(p.image ? { image: SITE + maerketBillede(p.image) } : {}),
   // Forfatter = en navngiven person (Jacobs valg 27/9-2026): Google og AI-tjenester vægter,
   // at der står et menneske bag. Navn og titel som på om-siden ("Jacob S. Olsen Founder & CEO").
   author: { '@type': 'Person', name: 'Jacob S. Olsen', jobTitle: 'Founder & CEO', url: SITE + '/p/about-us', worksFor: { '@id': `${SITE}/#organization` } },

@@ -153,9 +153,25 @@ export function vandmaerke(html) {
     const uden = attrs.replace(/\shref=("[^"]*"|'[^']*'|[^\s>]+)/i, '');
     return `<a${uden} data-tma-uden-link="">${indre}</a>`;
   });
-  // 2) Kassen med vandmærket rundt om hvert billede
-  ud = ud.replace(/<img\b[^>]*>/gi, (img) => faarMaerke(img)
-    ? `<span class="tma-wm">${img}<span class="tma-wm-tekst">${VANDMAERKE_TEKST}</span></span>`
-    : img);
+  // 2) Kassen rundt om hvert billede. Fra 30/10-2026 er vandmærket brændt ind i en kopi af billedfilen
+  //    (scripts/vandmaerk-billeder.mjs → /images/m/), så siden peger på kopien og lægger ingen tekst ovenpå.
+  //    Kun billeder, der ikke ligger i /images (fx gamle Blogger-adresser), får stadig teksten ovenpå.
+  ud = ud.replace(/<img\b[^>]*>/gi, (img) => {
+    if (!faarMaerke(img)) return img;
+    const src = (img.match(/\ssrc=["']([^"']+)["']/i) || [])[1] || '';
+    const m = maerketBillede(src);
+    if (m !== src) return `<span class="tma-wm">${img.replace(/(\ssrc=["'])[^"']+/i, `$1${m}`)}</span>`;
+    return `<span class="tma-wm">${img}<span class="tma-wm-tekst">${VANDMAERKE_TEKST}</span></span>`;
+  });
   return ud;
+}
+
+// Adressen på kopien med indbrændt vandmærke for et billede i /images (bredde mindst 150 px og jpg/png/webp
+// — samme regel som scripts/vandmaerk-billeder.mjs). Andre adresser returneres uændret.
+// Bruges også til delingsbilledet (og:image), så et delt billede bærer vandmærket.
+export function maerketBillede(src) {
+  const m = String(src || '').match(/^\/images\/([\w.-]+\.(?:jpe?g|png|webp))$/i);
+  if (!m) return src;
+  const b = billedBredde(src);
+  return b !== null && b >= 150 ? `/images/m/${m[1]}` : src;
 }

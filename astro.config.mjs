@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import { vandmaerkeIntegration } from './scripts/vandmaerk-billeder.mjs';
 
 // Adresserne er /2024/10/navn og /p/navn - uden .html (Jacob 29/9-2026, src/lib/adresse.mjs).
 // build.format 'file' får Astro til at skrive navn.html i stedet for navn/index.html;
@@ -11,6 +12,8 @@ export default defineConfig({
   // så fx "Published by <b>X</b> · <span>" kan klistre sammen. true = de gamle
   // HTML-regler fra Astro 6, som siderne er bygget og målt med.
   compressHTML: true,
+  // Vandmærket brændes ind i kopier af billederne efter byggeriet (dist/images/m/) — 30/10-2026
+  integrations: [vandmaerkeIntegration()],
   build: {
     format: 'file',
     // Som techfeedwatch: CSS inlines i HTML'en, så første visning ikke venter på
