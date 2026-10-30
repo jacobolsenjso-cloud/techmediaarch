@@ -1,6 +1,6 @@
 // Kald til Gemini (tekst, JSON og billeder). Nøglen kommer fra GEMINI_API_KEY
 // og skrives aldrig ud. Projektet "Gemini Project Tech Media Arch" har betaling
-// og et beløbsloft på 50 kr/md (sat af Jacob 26/9-2026).
+// og et beløbsloft på 200 kr/md (Jacob 30/10-2026; 50 kr fra 26/9-2026).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

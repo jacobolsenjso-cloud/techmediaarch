@@ -6,7 +6,7 @@
 //   node robot/plan.mjs --tjek     → må der udgives nu? (skriver koer=ja/nej til GitHub)
 //   node robot/plan.mjs --koer     → skriv én artikel og markér søgeordet
 //   node robot/plan.mjs --tomgang  → rød kørsel (= mail til Jacob), hvis robotten er gået i stå
-//   node robot/plan.mjs --omskriv  → skriv næste ældre artikel i køen om (30/10-2026, workflowet "Robot (omskriv)")
+//   node robot/plan.mjs --omskriv  → skriv næste ældre artikel i køen om (30/10-2026, samme kørsel som --koer)
 // Loftet og fridagene tjekkes HER og ikke kun i tidsplanen, fordi GitHub kan
 // være timer bagud med planlagte kørsler (målt på techfeedwatch 22-24/9), og
 // fordi knappen kan trykkes i hånden.
@@ -54,7 +54,7 @@ export function maaUdgive(nu = new Date(), liste = robotArtikler()) {
 
 const OMSKRIV_KOE = 'robot/data/omskriv-koe.json';         // [{ sti, maade: 'fuld' | 'titel' }] i Jacobs rækkefølge
 const OMSKRIV_PROEVET = 'robot/data/omskriv-proevet.json'; // [{ sti, dato, grund }] — afvist; hviler 30 dage
-export const OMSKRIV_LOFT_KR = 40;                         // omskrivning stopper ved 40 kr i måneden (Googles loft er 50)
+export const OMSKRIV_LOFT_KR = 150;                        // omskrivning stopper ved 150 kr i måneden (Googles loft er 200, Jacob 30/10-2026)
 
 // Pristæller (trin 7, Jacob 29/10-2026): hver del (søgeord, artikel, "People also ask") skriver sin opgørelse
 // til robot/ud/pris-<del>.json ud fra Googles egne tal (robot/lib/gemini.mjs). Her lægges de sammen og gemmes
@@ -126,7 +126,7 @@ if (arg === '--tjek') {
   gemPris(r.status === 0);
 } else if (arg === '--omskriv') {
   // Omskrivning af ældre artikler (Jacob 29-30/10-2026): højst 1 om dagen, aldrig over OMSKRIV_LOFT_KR i måneden
-  // (så der altid er plads til nye artikler under Googles beløbsloft på 50 kr). Køen: robot/data/omskriv-koe.json
+  // (så der altid er plads til nye artikler under Googles beløbsloft på 200 kr). Køen: robot/data/omskriv-koe.json
   // (rækkefølgen er Jacobs: først artiklerne med Google-visninger, så videoopsummeringerne, så resten af T/V).
   // En afvist artikel hviler 30 dage (robot/data/omskriv-proevet.json), så køen ikke sidder fast på den.
   const koe = laes(OMSKRIV_KOE, []);
@@ -139,16 +139,24 @@ if (arg === '--tjek') {
   const naeste = koe.find((k) => !fm(k.sti).omskrevet && !hviler.has(k.sti));
   const tilbage = koe.filter((k) => !fm(k.sti).omskrevet).length;
   if (!naeste) { summary(`**Omskrivning:** intet at gøre (${tilbage} tilbage i køen, ${hviler.size} hviler)`); process.exit(0); }
-  if (iDag >= 1 && !process.argv.includes('--test')) { summary(`**Omskrivning:** springer over — allerede ${iDag} i dag`); process.exit(0); }
+  if (iDag >= 1) { summary(`**Omskrivning:** springer over — allerede ${iDag} i dag`); process.exit(0); }
   if (krMd >= OMSKRIV_LOFT_KR) { summary(`**Omskrivning:** springer over — ${krMd.toFixed(2)} kr brugt i ${md} (loft for omskrivning ${OMSKRIV_LOFT_KR} kr)`); process.exit(0); }
   summary(`**Omskrivning:** ${naeste.sti} (${naeste.maade}) · ${tilbage} tilbage i køen · ${krMd.toFixed(2)} kr brugt i ${md}`);
   if (fs.existsSync(sti('robot/ud'))) for (const f of fs.readdirSync(sti('robot/ud')).filter((x) => /^pris-.+\.json$|^proeveartikel\.json$/.test(x))) fs.rmSync(sti('robot/ud', f));
+  // Hvad der allerede er ændret FØR omskrivningen (dagens nye artikel i samme kørsel). Fejler omskrivningen, ryddes
+  // KUN det, omskrivningen selv har lavet — aldrig dagens nye artikel (30/10: én robot, én kørsel).
+  const aendret = () => new Set(execFileSync('git', ['status', '--porcelain', '--untracked-files=all', '--', 'src', 'public'], { cwd: sti(), encoding: 'utf8' }).split('\n').filter(Boolean));
+  const foer = aendret();
   const r = spawnSync('node', ['robot/artikel.mjs', '--omskriv', naeste.sti, '--maade', naeste.maade], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   process.stdout.write(r.stdout || ''); process.stderr.write(r.stderr || '');
   if (r.status === 0) summary(`**Skrevet om:** ${laes('robot/ud/proeveartikel.json', {}).titel} — ${SITE}${naeste.sti}`);
   else {
     const fejl = ((r.stderr || '').match(/Error: (.+)/) || [])[1] || `artikel.mjs sluttede med kode ${r.status}`;
-    if (process.env.CI) { execFileSync('git', ['checkout', '--', 'src', 'public'], { cwd: sti() }); execFileSync('git', ['clean', '-fdq', '--', 'src/content', 'public/images'], { cwd: sti() }); }
+    for (const linje of [...aendret()].filter((l) => !foer.has(l))) {
+      const fil = linje.slice(3).replace(/^"|"$/g, '');
+      if (linje.startsWith('??')) fs.rmSync(sti(fil), { force: true });
+      else execFileSync('git', ['checkout', '--', fil], { cwd: sti() });
+    }
     if (AFVIST.test(fejl)) {
       proevet.push({ sti: naeste.sti, dato: new Date().toISOString(), grund: fejl.slice(0, 160) }); skrivJson(OMSKRIV_PROEVET, proevet);
       summary(`**Ingen omskrivning denne gang** (kvalitetskontrollen sagde nej): ${fejl} — ${naeste.sti} hviler i 30 dage`);
