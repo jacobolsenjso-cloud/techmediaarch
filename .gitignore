@@ -10,3 +10,5 @@ _*.out
 _*.err
 scripts/billeder-brugt.json
 robot/ud/
+# Jacobs hjerne (privat repo, hentes af robottens workflows) — må aldrig komme med i dette repo
+_hjerne/

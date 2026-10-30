@@ -410,7 +410,7 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
           {p.robot ? (
             <>
               <p class="author-box-bio">How this answer was made: it starts from a question people search for on Google. A language model researches it on the web and writes the short answer first, then the details; it is only published if at least two sources check out. It publishes automatically — I do not read every answer before it goes live.</p>
-              <p class="author-box-ai-note">What is mine is the machinery and the rules it follows: which subjects, which sources, what gets rejected. <a href="/p/editorial-guidelines">More on that here</a> — and if something is wrong, <a href="/p/contact-us">tell me</a>.</p>
+              <p class="author-box-ai-note">What is mine is the machinery and the rules it follows: which subjects, which sources, what gets rejected.{p.stemme && ' The paragraphs written as "I" are my own views, taken from my notes and put into words by the model.'} <a href="/p/editorial-guidelines">More on that here</a> — and if something is wrong, <a href="/p/contact-us">tell me</a>.</p>
             </>
           ) : (
             <>

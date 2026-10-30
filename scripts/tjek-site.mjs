@@ -92,12 +92,16 @@ for (const f of html) if (/^\/\d{4}\/\d{2}\//.test(f)) {
   if (/<iframe\b[^>]*(youtube(-nocookie)?\.com|youtu\.be)|class="yt-lazy"/i.test(krop)) fejl.push(`YOUTUBE-video i artikel: ${f}`);
   if (/"@type"\s*:\s*"VideoObject"/.test(s)) fejl.push(`VIDEOOBJECT-data i artikel: ${f}`);
 }
-let tekstOk = 0;
+let tekstOk = 0; let omskrevne = 0;
+// Omskrevne artikler (30/10-2026, robot/plan.mjs --omskriv): teksten er bevidst ny — adressen skal stadig findes,
+// men ord-for-ord-sammenligningen med Blogger springes over. Kun "omskrivning: fuld" (en ny titel ændrer ikke teksten).
+const omskrevetFuldt = (s) => { try { return /^omskrivning:\s*fuld\s*$/m.test(fs.readFileSync(path.resolve(`src/content/posts${s.replace(/\.html$/, '')}.md`), 'utf8').split(/\r?\n---/)[0]); } catch { return false; } };
 for (const p of [...posts, ...pages]) {
   const sti = decodeURI(alt(p).replace('https://www.techmediaarch.com', ''));
   if (NEDLAGTE[sti.replace(/\.html$/, '')]) continue;
   if (!filer.has(sti)) { fejl.push(`MANGLER adresse: ${sti}`); continue; }
   if (!posts.includes(p)) continue;
+  if (omskrevetFuldt(sti)) { omskrevne++; continue; }
   const side = fs.readFileSync(path.join(DIST, sti), 'utf8');
   const m = side.match(/<article class="post-body"[^>]*>([\s\S]*?)<\/article>/);
   if (!m) { fejl.push(`INGEN brødtekst: ${sti}`); continue; }
@@ -198,7 +202,7 @@ for (const f of [...filer].filter((x) => /\.(xml|txt|json)$/.test(x))) {
   if (side !== fil.join(' ')) fejl.push(`/p/securitytxt viser ikke det samme som /.well-known/security.txt: «${side}» / «${fil.join(' ')}»`);
 }
 const unik = [...new Set(fejl)];
-console.log(`sider: ${html.length} · Blogger-adresser: ${posts.length + pages.length} · tekst ens: ${tekstOk} af ${posts.length}`);
+console.log(`sider: ${html.length} · Blogger-adresser: ${posts.length + pages.length} · tekst ens: ${tekstOk} af ${posts.length - omskrevne}${omskrevne ? ` (+ ${omskrevne} omskrevet)` : ''}`);
 console.log(`strukturerede data: ${ldJson} blokke · sider med FAQ-data: ${faqSider.size}`);
 console.log(`interne links: ${links} · interne src: ${billeder} · kendte døde links fra Blogger: ${kendteFundet.size} af ${KENDTE.size} · fejl: ${unik.length}`);
 const VIS = Number(process.env.VIS || 60);

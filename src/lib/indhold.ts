@@ -22,6 +22,7 @@ export interface Indlaeg {
   bloggerId: string;
   robot: boolean;       // skrevet af robotten (frontmatter "robot: true") — styrer teksten i forfatterboksen
   keyword: string;      // robottens Google-søgespørgsmål (frontmatter "keyword") — forsidens "Questions people are asking"
+  stemme: boolean;      // 30/10-2026: artiklen har Jacobs egne afsnit i første person (frontmatter "stemme: true", robot/lib/hjerne.mjs)
   html: string;
   feedHtml: string;     // indholdet som i Blogger-eksporten (kun Blogger-videoer peger på vores kopi) — til /feeds/-svarene
   faqHtml: string;      // indholdet før vandmærket — FAQ-data laves af det (som på Blogger)
@@ -123,6 +124,7 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
     bloggerId: String(data.bloggerId || ''),
     robot: data.robot === true,
     keyword: String(data.keyword || ''),
+    stemme: data.stemme === true,
     html, feedHtml: interneLinks(bloggerVideo(raaBody)), faqHtml: body, overskrifter: liste, minutter: minutter(body),
     faqEkstra: ekstraFaq, faqStatus: fb.status, faqEgne: fb.egne,
   };

@@ -14,6 +14,10 @@
 //  4. To billeder med Gemini (Cloudflare som reserve) — Jacobs valg 26/9.
 //  5. Trin 7 i svar-arkivet (Jacob 29/10-2026): ingen video (YouTube-delen og etiketten "Video" er fjernet;
 //     sitet viser ikke videoer mere), titlen er spørgsmålet, og artiklen begynder med det korte svar.
+//  6. Jacobs hjerne (30/10-2026): stilen fra jacob-hjerne er altid med i skriveprompten, og når emnet rammer
+//     hans holdninger, flettes 1-2 korte afsnit i første person ind (robot/lib/hjerne.mjs). Uden hjerne: ingen artikel.
+//  7. Omskrivning (30/10-2026): --omskriv <sti> skriver en ældre artikel om med samme opskrift. Adressen og den
+//     oprindelige udgivelsesdato beholdes, "updated" sættes. --maade titel: kun ny titel og beskrivelse.
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -29,16 +33,73 @@ import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
 import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
 import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord } from './lib/sprog.mjs';
+import { laesHjerne, stemmeBlok, stemmePrompt, tjekStemme, fletInd, senesteStemmeAfsnit } from './lib/hjerne.mjs';
+import { kildeHenvisninger } from './lib/kildenavne.mjs';
+import { parse as yamlParse, stringify as yamlStringify } from 'yaml';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
 const EMNE = arg('emne');
 const HOVED = arg('hoved').trim().toLowerCase();
+const OMSKRIV = arg('omskriv').trim().replace(/\.html$/, '');   // fx /2026/05/the-best-ai-detector-free-tools-to-spot
+const MAADE = arg('maade') || 'fuld';                           // 'fuld' eller 'titel'
 const rapport = [];
 const log = (t) => { rapport.push(t); console.log(t); };
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const kodet = (s) => s.split('/').map(encodeURIComponent).join('/');
 
+// Jacobs hjerne (30/10-2026): uden hjernen skrives intet (samme regel som techfeedwatch 25/10). Tjekkes FØR noget
+// koster penge, og før et søgeord vælges (så et søgeord ikke hviler 30 dage pga. en manglende nøgle).
+const hjerne = laesHjerne();
+if (!hjerne) throw new Error('Hjernen mangler (_hjerne / HJERNE_DIR) — intet skrives uden Jacobs stemme. Tjek læsenøglen HJERNE_NOEGLE.');
+log(`- Hjernen er med (${['core', 'voice', 'beliefs', 'emner', 'erfaringer'].filter((k) => hjerne[k]).join(', ')})`);
+
+// Omskrivning: den gamle artikel læses (frontmatter + tekst)
+const gammelFil = OMSKRIV ? sti(`src/content/posts${OMSKRIV}.md`) : '';
+let gammel = null;
+if (OMSKRIV) {
+  if (!fs.existsSync(gammelFil)) throw new Error(`Omskrivning: ${OMSKRIV} findes ikke`);
+  const raa = fs.readFileSync(gammelFil, 'utf8');
+  const d = raa.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  gammel = { fm: yamlParse(d[1]) || {}, krop: d[2] };
+  if (gammel.fm.omskrevet) throw new Error(`Omskrivning: ${OMSKRIV} er allerede skrevet om (${gammel.fm.omskrevet})`);
+}
+const gemFrontmatter = (fm, krop) => fs.writeFileSync(gammelFil, `---\n${yamlStringify(fm, { lineWidth: 0 }).trimEnd()}\n---\n${krop}`);
+const iDag = new Date().toISOString().slice(0, 10);
+
+// --- 0. Kun ny titel og beskrivelse (Jacob 29/10: OpenFutureAI ligger på plads 6,8 — teksten røres ikke) ----
+if (OMSKRIV && MAADE === 'titel') {
+  const t = gammel.krop.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 3000);
+  const m = await json(`An older article on techmediaarch.com is titled "${gammel.fm.title}". Its text starts:
+${t}
+
+Write a better title and meta description for the SAME text (the text itself will not change, so promise nothing it does not cover).
+Return JSON {"title": "the question a reader would type into Google that this text answers, Title Case, ending with ?, at most 70 characters, no year", "description": "140-160 characters, plain and specific"}`);
+  const titel = String(m.title || '').trim(); const besk = String(m.description || '').trim();
+  if (!/\?$/.test(titel) || titel.length > 90 || besk.length < 100 || besk.length > 170) throw new Error(`Ny titel/beskrivelse bestod ikke kontrollen: "${titel}" / ${besk.length} tegn — artiklen afvist`);
+  gemFrontmatter({ ...gammel.fm, title: titel, description: besk, omskrevet: iDag, omskrivning: 'titel' }, gammel.krop);
+  log(`- Kun titel: "${gammel.fm.title}" → "${titel}"\n- Beskrivelse: ${besk}`);
+  fs.mkdirSync(sti('robot/ud'), { recursive: true });
+  fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ omskrevet: true, maade: 'titel', titel, sti: OMSKRIV }, null, 1));
+  if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, rapport.join('\n') + '\n');
+  process.exit(0);
+}
+
 // --- 1. Vælg pakke -----------------------------------------------------------
+let valgt;
+if (OMSKRIV) {
+  // Omskrivning: søgeordene udledes af den gamle artikel (titel, overskrifter, begyndelse), så den nye
+  // tekst svarer på det samme, som læserne fandt den gamle på.
+  const overskr = [...gammel.krop.matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h[23]>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim()).filter(Boolean);
+  const s = await json(`An older article on techmediaarch.com will be rewritten as an evergreen explainer on the same subject.
+Title: "${gammel.fm.title}"
+Headings: ${overskr.slice(0, 20).join(' | ')}
+Start of text: ${gammel.krop.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500)}
+
+Return JSON {"hoved": "the main search phrase people type into Google for this subject, lowercase, 2-7 words", "beslaegtede": ["5 different related search phrases, lowercase"]}`);
+  valgt = { hoved: String(s.hoved || '').trim().toLowerCase(), beslaegtede: (Array.isArray(s.beslaegtede) ? s.beslaegtede : []).map((x) => String(x).trim().toLowerCase()).filter(Boolean).slice(0, 5), emne: (gammel.fm.labels || [])[0] || '' };
+  if (!valgt.hoved || valgt.beslaegtede.length < 3) throw new Error('Omskrivning: Gemini gav ingen brugbare søgeord — artiklen afvist');
+  log(`# Omskrivning\n\n**Adresse:** ${OMSKRIV}  \n**Gammel titel:** ${gammel.fm.title}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}`);
+} else {
 // --brug-liste: genbrug robot/ud/soegeord-liste.json (kun til afprøvning uden net)
 if (!process.argv.includes('--brug-liste')) execFileSync('node', ['robot/soegeord.mjs', '--pakker', '5', ...(EMNE ? ['--emne', EMNE] : [])], { cwd: sti(), stdio: ['ignore', 'ignore', 'inherit'] });
 const liste = JSON.parse(fs.readFileSync(sti('robot/ud/soegeord-liste.json'), 'utf8'));
@@ -50,12 +111,13 @@ const vurdering = await json(`You pick topics for evergreen explainer articles o
 For each numbered keyword, answer whether it is a sensible, evergreen article topic in correct English: not news of the day, not prices/stock moves, not local/legal advice, not a product accessory, not nonsense.
 Return JSON: {"ok":[numbers of acceptable keywords, best first]}
 ${kandidater.slice(0, 8).map((p, i) => `${i + 1}. ${p.hoved}`).join('\n')}`);
-const valgt = kandidater[(vurdering.ok?.[0] || 0) - 1];
+valgt = kandidater[(vurdering.ok?.[0] || 0) - 1];
 if (!valgt) throw new Error('Gemini godkendte ingen af pakkerne');
 // Til tidsplanen (robot/plan.mjs): så et afvist søgeord kan hvile i 30 dage.
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
 fs.writeFileSync(sti('robot/ud/valgt.json'), JSON.stringify({ hoved: valgt.hoved, emne: valgt.emne }));
 log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}`);
+}
 
 // --- 2. Interne link-kandidater ---------------------------------------------
 const arkiv = artikler();
@@ -67,7 +129,8 @@ const titelAf = (s) => arkiv.find((a) => a.sti === s)?.titel || s;
 // (kørsel #11): ordlisten alene fandt ingen LLM-artikler til en LLM-artikel,
 // fordi titlerne siger "DeepSeek", "ChatGPT", "Claude" — ikke "language model".
 const iEmne = arkiv.filter((a) => a.sti.startsWith('/20') && a.labels.includes(valgt.emne)).map((a) => ({ sti: a.sti }));
-const kandListe = [...linkKand.slice(0, 12), ...iEmne].filter((m, i, arr) => arr.findIndex((x) => x.sti === m.sti) === i)
+// Ved omskrivning aldrig et link til artiklen selv
+const kandListe = [...linkKand.filter((m) => m.sti !== OMSKRIV).slice(0, 12), ...iEmne.filter((m) => m.sti !== OMSKRIV)].filter((m, i, arr) => arr.findIndex((x) => x.sti === m.sti) === i)
   .slice(0, 40).map((m) => ({ href: kodet(m.sti), sti: m.sti, titel: titelAf(m.sti) }));
 // Kun artikler, der reelt handler om det samme. Prøveartikel 2 (26/9) fik tvunget
 // 3 links ind via ordet "market" (bl.a. Trump/Stargate) — relevans vinder over antal.
@@ -140,9 +203,13 @@ fakta = kf.tekst;
 const kildeNavn = kildeNavneTekst(kildeLinks);
 
 // --- 4. Skriv artiklen ud fra de fakta ---------------------------------------
+// Omskrivning: emnerne fra den gamle version (kun overskrifterne — dens tekst og tal er ikke kontrolleret)
+const gamleEmner = gammel ? [...gammel.krop.matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h[23]>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim()).filter((h) => h && !/^(FAQ|Frequently Asked|Key Takeaways|Conclusion|Wrapping Up)/i.test(h)).slice(0, 15) : [];
 const opgave = `Write an in-depth, genuinely helpful English article for techmediaarch.com.
 Main keyword: "${valgt.hoved}"
 Related keywords (cover each naturally, once or twice): ${valgt.beslaegtede.map((k) => `"${k}"`).join(', ')}
+${gamleEmner.length ? `This article replaces an older one on the same page titled "${gammel.fm.title}". Readers came for these subjects, so cover them where the researched facts allow (never take facts from the old article): ${gamleEmner.join(' | ')}\n` : ''}
+${stemmeBlok(hjerne)}
 
 Base all factual claims on these researched facts (do not add other numbers, dates or quotes):
 ${fakta}
@@ -351,6 +418,32 @@ ${kand.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
   if (antalFaq(html) < 5) throw new Error(`FAQ har kun ${antalFaq(html)} spørgsmål efter kildevagten — artiklen afvist`);
 }
 
+// --- 4c. Jacobs stemme (30/10-2026, robot/lib/hjerne.mjs) ----------------------
+// Kun når emnet rammer en af hans holdninger i emner.md: 1-2 korte afsnit i første person, sat ind sidst i den
+// sektion, hvor de passer. Efter sprog- og kildekontrollen, så de ikke bliver "rettet" eller fjernet som fyld.
+// Et kasseret forsøg sendes tilbage med grunden (højst 3 forsøg). Lykkes det ikke, udgives artiklen uden stemmen.
+let stemme = false;
+{
+  const emneTekst = `${valgt.emne} ${valgt.hoved} ${valgt.beslaegtede.join(' ')}`;
+  const seneste = senesteStemmeAfsnit(sti('src/content/posts'), gammelFil);
+  const p = stemmePrompt(hjerne, emneTekst, html, valgt.hoved, seneste);
+  if (!p) log('- Stemme: ingen af Jacobs holdninger rammer emnet (kun stilen er brugt)');
+  else {
+    const ekstra = (t) => (kildeHenvisninger(t).length ? `nævner en kilde (${kildeHenvisninger(t).join(', ')})` : '');
+    let mt = { ok: false, grund: '' };
+    for (let forsoeg = 0; forsoeg < 3 && !mt.ok; forsoeg++) {
+      try {
+        const pp = forsoeg && mt.grund ? `${p}\n\nYOUR PREVIOUS ATTEMPT WAS REJECTED: ${mt.grund}. Write it again and avoid exactly that.` : p;
+        const r = await skriv(pp, { temperatur: 0.5 });
+        mt = tjekStemme(r.tekst, html, seneste, ekstra);
+      } catch (e) { mt = { ok: false, grund: e.message.slice(0, 100) }; }
+      if (!mt.ok) log(`- Stemme forsøg ${forsoeg + 1} kasseret: ${mt.grund}`);
+    }
+    if (mt.ok) { for (const d of mt.dele) html = fletInd(html, d.sektion, d.tekst); stemme = true; }
+    log(`- Stemme: ${mt.ok ? `${mt.dele.length} afsnit (${mt.dele.map((d) => d.sektion.slice(0, 40)).join(' | ')})` : `ikke med (${mt.grund})`}`);
+  }
+}
+
 // --- 5. Titel, beskrivelse, billedtekster -----------------------------------
 const meta = await json(`Article about "${valgt.hoved}". First 1500 characters:
 ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500)}
@@ -424,15 +517,26 @@ if (ord < 1000) throw new Error(`Artiklen er kun ${ord} ord — afvist (mindst 1
 
 // --- 7. Gem artiklen --------------------------------------------------------
 const nu = new Date();
-const aar = String(nu.getUTCFullYear()); const md = String(nu.getUTCMonth() + 1).padStart(2, '0');
-let navn = slug; let n = 2;
+let aar; let md; let navn;
+if (OMSKRIV) {
+  // Omskrivning: samme fil og adresse. Udgivelsesdato, etiketter (= hylden via hyldeplanen) og bloggerId beholdes;
+  // gamle frontmatter-felter, der hørte til den gamle tekst (seoTitle, ekstra FAQ, hadToc), fjernes.
+  [, aar, md, navn] = OMSKRIV.match(/^\/(\d{4})\/(\d{2})\/(.+)$/);
+  const { seoTitle, faq, hadToc, ...behold } = gammel.fm;
+  gemFrontmatter({ ...behold, title: titel, description: String(meta.description || ''), updated: nu.toISOString(), image: hero.fil,
+    keyword: valgt.hoved, relatedKeywords: valgt.beslaegtede, robot: true, ...(stemme ? { stemme: true } : {}), omskrevet: iDag, omskrivning: 'fuld',
+    gammelTitel: String(gammel.fm.title || '') }, `${html}\n`);
+} else {
+aar = String(nu.getUTCFullYear()); md = String(nu.getUTCMonth() + 1).padStart(2, '0');
+navn = slug; let n = 2;
 while (fs.existsSync(sti(`src/content/posts/${aar}/${md}/${navn}.md`))) navn = `${slug}-${n++}`;
 fs.mkdirSync(sti(`src/content/posts/${aar}/${md}`), { recursive: true });
 const labels = [valgt.emne];   // emnets etiket = artiklens hylde (src/lib/hylder.ts)
 const yamlStr = (s) => JSON.stringify(String(s));
 const fm = ['---', `title: ${yamlStr(titel)}`, `description: ${yamlStr(meta.description)}`, `published: ${nu.toISOString()}`, `updated: ${nu.toISOString()}`,
-  'labels:', ...labels.map((l) => `  - ${l}`), `image: ${hero.fil}`, `keyword: ${yamlStr(valgt.hoved)}`, 'relatedKeywords:', ...valgt.beslaegtede.map((k) => `  - ${yamlStr(k)}`), 'robot: true', '---'].join('\n');
+  'labels:', ...labels.map((l) => `  - ${l}`), `image: ${hero.fil}`, `keyword: ${yamlStr(valgt.hoved)}`, 'relatedKeywords:', ...valgt.beslaegtede.map((k) => `  - ${yamlStr(k)}`), 'robot: true', ...(stemme ? ['stemme: true'] : []), '---'].join('\n');
 fs.writeFileSync(sti(`src/content/posts/${aar}/${md}/${navn}.md`), `${fm}\n${html}\n`);
+}
 
 // --- 8. Links FRA ældre artikler til den nye (Jacobs ønske 26/9) --------------
 // Kun de artikler, Gemini vurderede relevante (trin 2), højst 3. I hver foreslår
@@ -463,5 +567,5 @@ log(`- Links fra ældre artikler til den nye: ${tilbage.length}${tilbage.length 
 log(`\n**Titel:** ${titel}  \n**Adresse:** /${aar}/${md}/${navn}  \n**Ord:** ${ord} · **Interne links:** ${antalInterne} · **Kilder:** ${kildeLinks.length} (afvist ${kildeAfvist.length})`);
 log(`\n**Billeder:** 1: ${hero.fil} (${hero.motor})  \n2: ${mid.fil} (${mid.motor})`);
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
-fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}`, ord, antalInterne, kildeLinks, kildeAfvist, billeder: { hero, mid } }, null, 1));
+fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}`, ord, antalInterne, kildeLinks, kildeAfvist, billeder: { hero, mid }, stemme, ...(OMSKRIV ? { omskrevet: true, maade: 'fuld', gammelTitel: gammel.fm.title } : {}) }, null, 1));
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, rapport.join('\n') + '\n');

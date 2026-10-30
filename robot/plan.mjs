@@ -6,6 +6,7 @@
 //   node robot/plan.mjs --tjek     → må der udgives nu? (skriver koer=ja/nej til GitHub)
 //   node robot/plan.mjs --koer     → skriv én artikel og markér søgeordet
 //   node robot/plan.mjs --tomgang  → rød kørsel (= mail til Jacob), hvis robotten er gået i stå
+//   node robot/plan.mjs --omskriv  → skriv næste ældre artikel i køen om (30/10-2026, workflowet "Robot (omskriv)")
 // Loftet og fridagene tjekkes HER og ikke kun i tidsplanen, fordi GitHub kan
 // være timer bagud med planlagte kørsler (målt på techfeedwatch 22-24/9), og
 // fordi knappen kan trykkes i hånden.
@@ -49,6 +50,32 @@ export function maaUdgive(nu = new Date(), liste = robotArtikler()) {
   const iDag = liste.filter((a) => dkDato(a.udgivet) === dkDato(nu)).length;
   if (iDag >= MAKS_PR_DAG) return { ok: false, grund: `loftet er nået: ${iDag} af ${MAKS_PR_DAG} i dag` };
   return { ok: true, grund: `${iDag} af ${MAKS_PR_DAG} i dag` };
+}
+
+const OMSKRIV_KOE = 'robot/data/omskriv-koe.json';         // [{ sti, maade: 'fuld' | 'titel' }] i Jacobs rækkefølge
+const OMSKRIV_PROEVET = 'robot/data/omskriv-proevet.json'; // [{ sti, dato, grund }] — afvist; hviler 30 dage
+export const OMSKRIV_LOFT_KR = 40;                         // omskrivning stopper ved 40 kr i måneden (Googles loft er 50)
+
+// Pristæller (trin 7, Jacob 29/10-2026): hver del (søgeord, artikel, "People also ask") skriver sin opgørelse
+// til robot/ud/pris-<del>.json ud fra Googles egne tal (robot/lib/gemini.mjs). Her lægges de sammen og gemmes
+// i robot/data/pris.json (kommer med i robottens commit), så prisen pr. artikel og pr. måned kan ses.
+// 30/10: en omskrivning gemmes med "omskrevet: true", så nye artikler og omskrivninger kan tælles hver for sig.
+function gemPris(lykkedes) {
+  try {
+    const dele = {};
+    if (fs.existsSync(sti('robot/ud'))) for (const f of fs.readdirSync(sti('robot/ud')).filter((x) => /^pris-.+\.json$/.test(x))) dele[f.slice(5, -5)] = laes(`robot/ud/${f}`, null);
+    const usd = Object.values(dele).reduce((s, d) => s + (d?.usd || 0), 0);
+    const a = lykkedes ? laes('robot/ud/proeveartikel.json', null) : null;
+    const priser = laes(PRIS, []);
+    priser.push({ dato: new Date().toISOString(), artikel: a?.sti || null, ...(arg === '--omskriv' ? { omskrevet: true } : {}), usd: Math.round(usd * 10000) / 10000, kr: Math.round(usd * KURS * 100) / 100,
+      dele: Object.fromEntries(Object.entries(dele).map(([k, d]) => [k, { kr: d?.kr ?? null, billeder: d?.billeder ?? 0, soegninger: d?.soegninger ?? 0, ukendtPris: d?.ukendtPris ?? [] }])) });
+    skrivJson(PRIS, priser);
+    const md = dkDato(new Date()).slice(0, 7);
+    const iMd = priser.filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === md);
+    const krMd = iMd.reduce((s, p) => s + (p.kr || 0), 0);
+    const ukendt = [...new Set(Object.values(dele).flatMap((d) => d?.ukendtPris || []))];
+    summary(`**Pris denne kørsel:** ${(Math.round(usd * KURS * 100) / 100).toFixed(2)} kr (${Object.entries(dele).map(([k, d]) => `${k} ${(d?.kr ?? 0).toFixed(2)}`).join(' · ')})${ukendt.length ? ` — UKENDT pris for ${ukendt.join(', ')}` : ''} · **${md} indtil nu:** ${krMd.toFixed(2)} kr for ${iMd.filter((p) => p.artikel && !p.omskrevet).length} nye artikler og ${iMd.filter((p) => p.artikel && p.omskrevet).length} omskrivninger (målt fra 29/10-2026)`);
+  } catch (e) { summary(`**Pris:** kunne ikke opgøres (${String(e.message).slice(0, 120)})`); }
 }
 
 // Afvisninger, der er robottens egen kvalitetskontrol (ikke en fejl i maskineriet).
@@ -96,24 +123,38 @@ if (arg === '--tjek') {
   const m = spawnSync('node', ['robot/mest-laest.mjs'], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 3 * 60 * 1000 });
   process.stderr.write(m.stderr || '');
   summary(`**Trending (mest læste):** ${((m.stdout || '').trim().split('\n').pop() || `sluttede med kode ${m.status}`).slice(0, 300)}`);
-  // Pristæller (trin 7, Jacob 29/10-2026): hver del (søgeord, artikel, "People also ask") skriver sin opgørelse
-  // til robot/ud/pris-<del>.json ud fra Googles egne tal (robot/lib/gemini.mjs). Her lægges de sammen og gemmes
-  // i robot/data/pris.json (kommer med i robottens commit), så prisen pr. artikel og pr. måned kan ses.
-  try {
-    const dele = {};
-    if (fs.existsSync(sti('robot/ud'))) for (const f of fs.readdirSync(sti('robot/ud')).filter((x) => /^pris-.+\.json$/.test(x))) dele[f.slice(5, -5)] = laes(`robot/ud/${f}`, null);
-    const usd = Object.values(dele).reduce((s, d) => s + (d?.usd || 0), 0);
-    const a = r.status === 0 ? laes('robot/ud/proeveartikel.json', null) : null;
-    const priser = laes(PRIS, []);
-    priser.push({ dato: new Date().toISOString(), artikel: a?.sti || null, usd: Math.round(usd * 10000) / 10000, kr: Math.round(usd * KURS * 100) / 100,
-      dele: Object.fromEntries(Object.entries(dele).map(([k, d]) => [k, { kr: d?.kr ?? null, billeder: d?.billeder ?? 0, soegninger: d?.soegninger ?? 0, ukendtPris: d?.ukendtPris ?? [] }])) });
-    skrivJson(PRIS, priser);
-    const md = dkDato(new Date()).slice(0, 7);
-    const iMd = priser.filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === md);
-    const krMd = iMd.reduce((s, p) => s + (p.kr || 0), 0);
-    const ukendt = [...new Set(Object.values(dele).flatMap((d) => d?.ukendtPris || []))];
-    summary(`**Pris denne kørsel:** ${(Math.round(usd * KURS * 100) / 100).toFixed(2)} kr (${Object.entries(dele).map(([k, d]) => `${k} ${(d?.kr ?? 0).toFixed(2)}`).join(' · ')})${ukendt.length ? ` — UKENDT pris for ${ukendt.join(', ')}` : ''} · **${md} indtil nu:** ${krMd.toFixed(2)} kr for ${iMd.filter((p) => p.artikel).length} artikler (målt fra 29/10-2026)`);
-  } catch (e) { summary(`**Pris:** kunne ikke opgøres (${String(e.message).slice(0, 120)})`); }
+  gemPris(r.status === 0);
+} else if (arg === '--omskriv') {
+  // Omskrivning af ældre artikler (Jacob 29-30/10-2026): højst 1 om dagen, aldrig over OMSKRIV_LOFT_KR i måneden
+  // (så der altid er plads til nye artikler under Googles beløbsloft på 50 kr). Køen: robot/data/omskriv-koe.json
+  // (rækkefølgen er Jacobs: først artiklerne med Google-visninger, så videoopsummeringerne, så resten af T/V).
+  // En afvist artikel hviler 30 dage (robot/data/omskriv-proevet.json), så køen ikke sidder fast på den.
+  const koe = laes(OMSKRIV_KOE, []);
+  const proevet = laes(OMSKRIV_PROEVET, []);
+  const hviler = new Set(proevet.filter((p) => Date.now() - new Date(p.dato) < 30 * 864e5).map((p) => p.sti));
+  const fm = (s) => { try { return parse(fs.readFileSync(sti(`src/content/posts${s}.md`), 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)[1]) || {}; } catch { return {}; } };
+  const iDag = koe.filter((k) => fm(k.sti).omskrevet === new Date().toISOString().slice(0, 10)).length;
+  const md = dkDato(new Date()).slice(0, 7);
+  const krMd = laes(PRIS, []).filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === md).reduce((s, p) => s + (p.kr || 0), 0);
+  const naeste = koe.find((k) => !fm(k.sti).omskrevet && !hviler.has(k.sti));
+  const tilbage = koe.filter((k) => !fm(k.sti).omskrevet).length;
+  if (!naeste) { summary(`**Omskrivning:** intet at gøre (${tilbage} tilbage i køen, ${hviler.size} hviler)`); process.exit(0); }
+  if (iDag >= 1 && !process.argv.includes('--test')) { summary(`**Omskrivning:** springer over — allerede ${iDag} i dag`); process.exit(0); }
+  if (krMd >= OMSKRIV_LOFT_KR) { summary(`**Omskrivning:** springer over — ${krMd.toFixed(2)} kr brugt i ${md} (loft for omskrivning ${OMSKRIV_LOFT_KR} kr)`); process.exit(0); }
+  summary(`**Omskrivning:** ${naeste.sti} (${naeste.maade}) · ${tilbage} tilbage i køen · ${krMd.toFixed(2)} kr brugt i ${md}`);
+  if (fs.existsSync(sti('robot/ud'))) for (const f of fs.readdirSync(sti('robot/ud')).filter((x) => /^pris-.+\.json$|^proeveartikel\.json$/.test(x))) fs.rmSync(sti('robot/ud', f));
+  const r = spawnSync('node', ['robot/artikel.mjs', '--omskriv', naeste.sti, '--maade', naeste.maade], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  process.stdout.write(r.stdout || ''); process.stderr.write(r.stderr || '');
+  if (r.status === 0) summary(`**Skrevet om:** ${laes('robot/ud/proeveartikel.json', {}).titel} — ${SITE}${naeste.sti}`);
+  else {
+    const fejl = ((r.stderr || '').match(/Error: (.+)/) || [])[1] || `artikel.mjs sluttede med kode ${r.status}`;
+    if (process.env.CI) { execFileSync('git', ['checkout', '--', 'src', 'public'], { cwd: sti() }); execFileSync('git', ['clean', '-fdq', '--', 'src/content', 'public/images'], { cwd: sti() }); }
+    if (AFVIST.test(fejl)) {
+      proevet.push({ sti: naeste.sti, dato: new Date().toISOString(), grund: fejl.slice(0, 160) }); skrivJson(OMSKRIV_PROEVET, proevet);
+      summary(`**Ingen omskrivning denne gang** (kvalitetskontrollen sagde nej): ${fejl} — ${naeste.sti} hviler i 30 dage`);
+    } else { summary(`**FEJL:** ${fejl}`); process.exitCode = 1; }
+  }
+  gemPris(r.status === 0);
 } else if (arg === '--tomgang') {
   const [nyeste] = robotArtikler();
   if (!nyeste) { summary('Ingen robotartikler endnu.'); process.exit(0); }

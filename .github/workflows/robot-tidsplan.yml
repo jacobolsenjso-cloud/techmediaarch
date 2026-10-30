@@ -36,6 +36,17 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
+      # Jacobs hjerne (30/10-2026): stemme og holdninger fra det PRIVATE repo jacob-hjerne, hentet med læsenøglen
+      # HJERNE_NOEGLE (en "deploy key" med kun læseadgang) til mappen _hjerne (står i .gitignore). Samme opskrift som
+      # techfeedwatch. continue-on-error: mangler nøglen, stopper robot/artikel.mjs selv med en tydelig fejl — og
+      # skriver INGEN artikel (Jacob: hjernen skal altid bruges).
+      - name: Hent hjernen (jacob-hjerne, privat, kun læsning)
+        continue-on-error: true
+        uses: actions/checkout@v5
+        with:
+          repository: jacobolsenjso-cloud/jacob-hjerne
+          ssh-key: ${{ secrets.HJERNE_NOEGLE }}
+          path: _hjerne
       - uses: actions/setup-node@v5
         with:
           node-version-file: .node-version

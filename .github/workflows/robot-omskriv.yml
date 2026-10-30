@@ -1,0 +1,76 @@
+# Robottens OMSKRIVNING af ældre artikler (Jacob 29-30/10-2026):
+#   ca. 4 om ugen — mandag, onsdag, torsdag og lørdag (samme dage som nye artikler), højst 1 om dagen.
+#   Køen står i robot/data/omskriv-koe.json; robot/plan.mjs --omskriv vælger næste, holder loftet
+#   (højst 1 om dagen, stop ved 40 kr i måneden) og tæller prisen med i robot/data/pris.json.
+#   Adressen og den oprindelige udgivelsesdato beholdes; "updated" sættes. Jacobs hjerne er altid med.
+# Tiden er UTC: 11:43 = kl. 12:43 dansk vintertid — midt mellem robottens to artikel-kørsler.
+#   HUSK: cron-teksten står to steder (schedule og jobbets "if"), og de skal være ens.
+# Test på en gren (30/10): et push til grenen hjerne-omskriv med "[test-omskriv]" i commit-beskeden kører én
+#   omskrivning og gemmer resultatet på GRENEN — aldrig på main. Udgivelse på main sker kun fra main.
+name: Robot (omskriv)
+
+on:
+  schedule:
+    - cron: '43 11 * * 1,3,4,6'
+  workflow_dispatch:
+  push:
+    branches: [hjerne-omskriv]
+
+permissions:
+  contents: write
+
+# Samme gruppe som "Robot (tidsplan)": aldrig to robotkørsler på én gang (de skubber begge til main)
+concurrency:
+  group: robot-tidsplan
+  cancel-in-progress: false
+
+jobs:
+  omskriv:
+    if: github.event.schedule == '43 11 * * 1,3,4,6' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[test-omskriv]'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      # Jacobs hjerne: samme hentning som i robot-tidsplan.yml (læsenøglen HJERNE_NOEGLE, mappen _hjerne)
+      - name: Hent hjernen (jacob-hjerne, privat, kun læsning)
+        continue-on-error: true
+        uses: actions/checkout@v5
+        with:
+          repository: jacobolsenjso-cloud/jacob-hjerne
+          ssh-key: ${{ secrets.HJERNE_NOEGLE }}
+          path: _hjerne
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Skriv næste artikel i køen om
+        id: omskriv
+        env:
+          # Nøglerne kommer fra GitHub Secrets og skrives aldrig ud.
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLOUDFLARE_AI_TOKEN: ${{ secrets.CLOUDFLARE_AI_TOKEN }}
+        # --test på grenen: dagsloftet gælder ikke (beløbsloftet gælder altid)
+        run: node robot/plan.mjs --omskriv ${{ github.ref != 'refs/heads/main' && '--test' || '' }}
+      - name: Byg sitet (en omskrivning, der ødelægger bygget, når aldrig main)
+        id: bygget
+        if: always()
+        run: npm run build > /dev/null
+      - name: Gem (main fra tidsplanen, ellers kun på grenen)
+        if: always() && steps.bygget.outcome == 'success'
+        run: |
+          git config user.name "techmediaarch-robot"
+          git config user.email "robot@techmediaarch.com"
+          git add src/content public/images robot/data
+          git diff --cached --quiet && { echo "Intet at gemme"; exit 0; }
+          git commit -m "Robot rewrite $(date -u +%F) (run ${{ github.run_number }})"
+          GREN="${GITHUB_REF#refs/heads/}"
+          for i in 1 2 3; do git pull --rebase -q origin "$GREN" && git push -q origin "HEAD:$GREN" && exit 0; sleep 10; done
+          exit 1
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: robot-omskriv-ud
+          path: robot/ud/
+          if-no-files-found: ignore
