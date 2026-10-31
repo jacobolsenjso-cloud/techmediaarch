@@ -168,6 +168,12 @@ for (const f of html) {
   // Markdown-rester (5/10-2026: "**what is phishing attack**" stod synligt i en robotartikel)
   const md = krop.match(/\*\*[^*]{1,200}\*\*|`[^`]{1,100}`/);
   if (md) fejl.push(`MARKDOWN-rest «${md[0].slice(0, 60)}» synlig på ${f}`);
+  // 1/11-2026: webadresse som kildenavn ("according to uptimerobot.com") og dobbelt-kodede tegn ("&amp;ndash;" vises
+  // som "&ndash;") stod i 6 robotartikler fra før rettelserne 31/10.
+  const dom = krop.match(/\b(?:[Aa]ccording to|as (?:noted|reported|explained) by|highlighted by|reports by) (?:[a-z0-9-]+\.)+(?:com|org|net|io|ai|co|app|pro)\b/);
+  if (dom) fejl.push(`WEBADRESSE som kildenavn «${dom[0]}» på ${f}`);
+  const kode = (s.match(/<body[\s\S]*<\/body>/) || [''])[0].replace(/<script[\s\S]*?<\/script>/gi, '').match(/&amp;(?:ndash|mdash|rsquo|lsquo|rdquo|ldquo|hellip|nbsp|quot|#\d+);/);
+  if (kode) fejl.push(`HTML-TEGN synligt «${kode[0]}» på ${f}`);
   for (const [, j] of s.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     ldJson++; if (j.includes('"FAQPage"')) faqSider.add(f);
     try { JSON.parse(j); } catch { fejl.push(`UGYLDIG JSON-LD på ${f}`); }

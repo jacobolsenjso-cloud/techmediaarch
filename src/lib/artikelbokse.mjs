@@ -74,3 +74,16 @@ export function udenAnnonceHuller(html) {
     return `<aside class="tma-overblik" aria-label="${titel.replace(/"/g, '&quot;')}"><span class="tma-overblik-titel">${titel}</span><span class="tma-overblik-liste" role="list">${punkter}</span></aside>`;
   });
 }
+
+// Artiklens første billede er det største på skærmen (Googles LCP-mål). Robotten skriver loading="lazy" på alle
+// billeder, så browseren ventede med at hente det, til siden var lagt ud — målt 1/11-2026: mobil LCP 7,6 s.
+// Her: første billede hentes med det samme og med høj prioritet; resten forbliver lazy.
+export function foersteBilledeHurtigt(html) {
+  let foerst = true;
+  return String(html).replace(/<img\b[^>]*>/i, (img) => {
+    if (!foerst) return img; foerst = false;
+    let ud = img.replace(/\sloading=["']?lazy["']?/i, '');
+    if (!/fetchpriority=/i.test(ud)) ud = ud.replace(/^<img\b/i, '<img fetchpriority="high"');
+    return ud.replace(/^<img\b/i, '<img loading="eager"');
+  });
+}

@@ -15,7 +15,7 @@ import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
 import { tegnFarve } from '../../../lib/sporgsmaal.mjs';
 import OGSAA_SPURGT from '../../../../robot/data/ogsaa-spurgt.json';
 import MEST_RAA from '../../../../robot/data/mest-laest.json';
-import { efterFoersteBillede, foranMidterOverskrift, indsaet, udenAnnonceHuller } from '../../../lib/artikelbokse.mjs';
+import { efterFoersteBillede, foranMidterOverskrift, indsaet, udenAnnonceHuller, foersteBilledeHurtigt } from '../../../lib/artikelbokse.mjs';
 
 export function getStaticPaths() {
   return INDLAEG.map((p) => ({ params: { year: p.aar, month: p.maaned, slug: p.navn }, props: { p } }));
@@ -52,7 +52,7 @@ const FOERSTE_AFSNIT = /^(\s*<h2\b[^>]*>(?:(?!<\/h2>)[\s\S])*<\/h2>\s*)?<p>((?:(
 const fa = p.robot ? p.html.match(FOERSTE_AFSNIT) : null;
 const forspalte = fa && fa[2].replace(/<[^>]+>/g, '').trim().length >= 60 ? fa[2] : null;
 // "Key takeaways" uden <p>/<ul>/<li> (31/10-2026): Auto-annoncer satte en annonce ind midt mellem punkterne.
-const krop = udenAnnonceHuller(forspalte ? (fa![1] ?? '') + p.html.slice(fa![0].length) : p.html);
+const krop = foersteBilledeHurtigt(udenAnnonceHuller(forspalte ? (fa![1] ?? '') + p.html.slice(fa![0].length) : p.html));
 const faqStart = krop.indexOf('<section class="faq-box"');
 
 const i = INDLAEG.indexOf(p);

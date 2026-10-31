@@ -25,7 +25,19 @@ export function kendtNavn(navn, kilder) {
 
 // Navneliste til Gemini: "IBM (ibm.com)" — mærket fra titlen ("… | IBM"), ellers domænet.
 // Målt 29/10 (prøve #33): med kun domæner skrev Gemini "According to nhimg.org" og "securityScorecard notes".
-const maerkeAf = (k) => { const d = String(k.titel || '').split(/\s[|–—-]\s|\s·\s/); const m = d.length > 1 ? d[d.length - 1].trim() : ''; return m.length >= 2 && m.length <= 40 ? m : ''; };
+// Mærket skal ligne domænet (1/11-2026): sidste titeldel var tit et slogan — steve.ai blev til
+// "Animated AI Videos in minutes" og krikey.ai til "AI Animation App". Nu: den titeldel, der indeholder domænets navn
+// (sidste del foretrækkes), ellers et ord i titlen, der staves som domænet ("HeyGen" for heygen.com).
+const maerkeAf = (k) => {
+  const host = new URL(k.url).hostname.toLowerCase();
+  const baser = host.split('.').filter((d) => d.length >= 3 && !TOM.has(d)).map(norm);
+  const titel = String(k.titel || '');
+  const dele = titel.split(/\s[|–—-]\s|\s·\s|:\s/).map((d) => d.trim()).filter((d) => d.length >= 2 && d.length <= 40);
+  const ligner = (d) => { const n = norm(d); return n.length >= 2 && baser.some((b) => n.includes(b) || (b.includes(n) && n.length >= b.length * 0.6)); };
+  const del = [...dele].reverse().find(ligner);
+  if (del) return del;
+  return (titel.match(/[A-Za-z0-9][A-Za-z0-9.]*/g) || []).find((o) => baser.includes(norm(o))) || '';
+};
 // Faste navne for kendte domæner (31/10-2026): sidetitlen "MIT News | Massachusetts Institute of Tech" er afkortet, og
 // artiklen skrev "Massachusetts Institute of Tech" 4 gange. Gælder også underdomæner (news.mit.edu, csail.mit.edu).
 const KENDTE_NAVNE = {
@@ -41,18 +53,29 @@ export const kildeNavn = (k) => { const host = new URL(k.url).hostname.replace(/
 export const kildeNavneTekst = (kilder) => kilder.map((k) => `${kildeNavn(k)} (${new URL(k.url).hostname.replace(/^www\./, '')})`).join('; ');
 // Står et kildedomæne som navn i teksten ("according to superops.com"), skiftes det til kildens navn. Kun synlig tekst,
 // aldrig inde i tags (href'er røres ikke).
+// 1/11-2026: kun domæner skrevet som webadresse (små bogstaver, evt. stort første bogstav i en sætning). Mærkenavne
+// som "AlgoMaster.io" og "Steve.AI" og tekst inde i links (fx kildetitler) røres ikke — før blev "Steve.AI" til et slogan.
 export function domaenerTilNavne(html, kilder) {
-  let n = 0;
+  let n = 0; let iLink = 0;
+  // Staver artiklen selv mærket med domænet ("Steve.AI"), bruges den stavemåde — ellers blev det "According to Steve".
+  const synlig = String(html).replace(/<[^>]+>/g, ' ');
+  const navnFor = (k, host) => {
+    const egen = (synlig.match(new RegExp(`\\b${host.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi')) || []).find((s) => s !== s.toLowerCase() && s.slice(1) !== host.slice(1));
+    return egen || kildeNavn(k);
+  };
   const ud = String(html).split(/(<[^>]+>)/).map((d) => {
-    if (d.startsWith('<')) return d;
+    if (d.startsWith('<')) { if (/^<a\b/i.test(d)) iLink++; else if (/^<\/a>/i.test(d)) iLink = Math.max(0, iLink - 1); return d; }
+    if (iLink) return d;
     let t = d;
     for (const k of kilder) {
-      const host = new URL(k.url).hostname.replace(/^www\./, '');
-      const h = `(?:www\\.)?${host.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`;
+      const host = new URL(k.url).hostname.replace(/^www\./, '').toLowerCase();
+      const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const h = `(?:[wW]ww\\.)?[${host[0]}${host[0].toUpperCase()}]${esc(host.slice(1))}`;
       // Gemini kopierer navnelistens form "Navn (domæne)" — parentesen fjernes helt (kørsel #55, 31/10-2026:
       // "According to Microsoft Learn (Microsoft Learn)"). Derefter skiftes et domæne, der står alene, til navnet.
       t = t.replace(new RegExp(`\\s*\\(${h}\\)`, 'gi'), () => { n++; return ''; });
-      t = t.replace(new RegExp(`\\b${h}\\b`, 'gi'), () => { n++; return kildeNavn(k); });
+      // Uden 'i': store/små bogstaver skal passe, så "AlgoMaster.io" ikke rammes (se ovenfor)
+      t = t.replace(new RegExp(`\\b${h}\\b`, 'g'), () => { n++; return navnFor(k, host); });
     }
     // Og hvis parentesen allerede er blevet til navnet: "Coursera (Coursera)" → "Coursera"
     t = t.replace(/\b([A-Z][\w&.'’ -]{1,40}?) \(\1\)/g, (_, navn) => { n++; return navn; });

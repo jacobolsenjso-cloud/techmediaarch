@@ -6,7 +6,7 @@
 // ændre i HTML'en.
 import { parse } from 'yaml';
 import { EMNER, emneEtiket, type Emne } from './emner';
-import { temaKoder, youtubeLazy, udenYoutube, udenWatchLink, vandmaerke, bloggerVideo } from './temakoder.mjs';
+import { temaKoder, youtubeLazy, udenYoutube, udenWatchLink, vandmaerke, bloggerVideo, maerketBillede } from './temakoder.mjs';
 import { faqBoks } from './faqboks.mjs';
 import { interneLinks } from './adresse.mjs';
 
@@ -120,7 +120,9 @@ export const INDLAEG: Indlaeg[] = Object.entries(postFiler).map(([fil, raa]) => 
     published: data.published, updated: data.updated || data.published,
     labels, emner: EMNER.filter((e) => labels.includes(emneEtiket(e))),
     // Uden eget billede bruges miniaturen af den første indlejrede YouTube-video
-    image: data.image || youtubeBillede(raaBody),
+    // 1/11-2026: altid kopien med vandmærke + "AI-generated" (/images/m/), så også miniaturer på forsiden, i menuen,
+    // "relaterede" og RSS/Pinterest bærer mærkerne — før viste de originalen uden mærker i fuld størrelse.
+    image: maerketBillede(data.image) || youtubeBillede(raaBody),
     bloggerId: String(data.bloggerId || ''),
     robot: data.robot === true,
     keyword: String(data.keyword || ''),
