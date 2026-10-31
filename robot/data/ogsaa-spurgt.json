@@ -669,54 +669,50 @@
   ]
  },
  "/2026/04/ai-models-lie-to-protect-each-other": {
-  "dato": "2026-09-30T20:07:57.657Z",
+  "dato": "2026-10-31T19:22:48.937Z",
   "valg": [
    {
-    "q": "How did JITRO protect the older AI model during the experiment?",
-    "sti": "/2026/04/jitro-explained-why-googles-latest-ai-is-raising-alarms"
+    "q": "Can AI agents talk to each other?",
+    "sti": "/2026/10/what-are-intelligent-agents-ai"
    }
   ]
  },
  "/2026/04/create-hollywood-style-films-with-this-free-ai-workflow": {
-  "dato": "2026-09-30T20:07:58.202Z",
+  "dato": "2026-10-31T19:22:49.462Z",
   "valg": [
    {
-    "q": "What parameters can be customized when generating a video clip?",
-    "sti": "/2026/04/generate-unlimited-free-ai-videos-with-sound"
+    "q": "What is the best ai video generator from script?",
+    "sti": "/2026/05/exploring-claude-just-changed-making"
    },
    {
-    "q": "What if I want a cartoon or an animated video instead of a real-looking one?",
+    "q": "Can Kling AI make videos that look real, like ones you see in movies?",
     "sti": "/2026/05/kling-ai-in-action-10-creative"
-   },
-   {
-    "q": "How can creators generate video using a starting image on Kling AI?",
-    "sti": "/2026/05/kling-ai-tutorial-create-stunning-ai"
    }
   ]
  },
  "/2026/03/guide-to-databricks-success": {
-  "dato": "2026-09-30T20:07:58.773Z",
+  "dato": "2026-10-31T19:22:49.794Z",
   "valg": []
  },
  "/2024/10/nvida-ai-predicts-that-ai-will-be-able-to-do-some-jobs": {
-  "dato": "2026-09-30T20:07:59.381Z",
+  "dato": "2026-10-31T19:22:50.221Z",
   "valg": [
+   {
+    "q": "Will AI take away jobs?",
+    "sti": "/2024/10/ai gadgets 2024 ai revolution how genai tools will change"
+   },
    {
     "q": "How does AI impact jobs?",
     "sti": "/2024/09/blog-post_14"
    },
    {
-    "q": "How does AI affect jobs in the finance sector?",
-    "sti": "/2025/01/market-insights-trumps-stargate-and-ais-rising-tide"
-   },
-   {
-    "q": "Will AI take away jobs in finance?",
-    "sti": "/2024/09/blog-post_16"
+    "q": "How do AI models impact jobs and the economy?",
+    "sti": "/2025/01/can-we-keep-up-the-quest-to-create-a-test-that-beats-ai"
    }
   ]
  },
  "/2025/01/overcome-your-fears-discover-the-surprising-benefits-of-chatting-with-ai": {
-  "dato": "2026-09-30T20:08:00.503Z",
+  "dato": "2026-10-31T19:22:50.795Z",
   "valg": [
    {
     "q": "What is ChatGPT's advanced voice mode?",
@@ -725,62 +721,62 @@
    {
     "q": "Do I need special skills to use AI for writing?",
     "sti": "/2024/10/write without boundaries ai story writing"
-   },
-   {
-    "q": "How will ChatGPT be used in Apple Intelligence?",
-    "sti": "/2024/09/apple intelligence compatibility just got a whole lot smarter"
    }
   ]
  },
  "/2025/01/chinas-deepseek-ai-models-send-shockwaves-through-tech-community": {
-  "dato": "2026-09-30T20:08:01.098Z",
+  "dato": "2026-10-31T19:22:51.359Z",
   "valg": [
    {
     "q": "What makes DeepSeek-R1 different from other AI models?",
     "sti": "/2025/01/breakthrough-in-ai-deepseek-r1-matches-openais-o1-at-a-fraction-of-the-cost"
    },
    {
-    "q": "How did the entry of DeepSeek impact major American indices such as Nasdaq and S&P 500?",
-    "sti": "/2025/01/The-1-trillion-question-can-tech-stocks-recover-from-deepseeks-impact"
-   },
-   {
     "q": "How are China's tech giants approaching AI?",
     "sti": "/2025/01/open-source-chatbot-revolution-china"
+   },
+   {
+    "q": "What features do the new AI tools from China offer creators?",
+    "sti": "/2026/05/chinas-new-free-ai-tools-are-beating"
    }
   ]
  },
  "/2025/01/open-source-chatbot-revolution-china": {
-  "dato": "2026-09-30T20:08:02.348Z",
+  "dato": "2026-10-31T19:22:51.849Z",
   "valg": [
    {
     "q": "How is DeepSeek affecting global AI competition?",
     "sti": "/2025/01/chinas-deepseek-ai-models-send-shockwaves-through-tech-community"
    },
    {
-    "q": "How did the entry of DeepSeek impact major American indices such as Nasdaq and S&P 500?",
-    "sti": "/2025/01/The-1-trillion-question-can-tech-stocks-recover-from-deepseeks-impact"
-   },
-   {
     "q": "What is DeepSeek-R1?",
     "sti": "/2025/01/breakthrough-in-ai-deepseek-r1-matches-openais-o1-at-a-fraction-of-the-cost"
+   },
+   {
+    "q": "What features do the new AI tools from China offer creators?",
+    "sti": "/2026/05/chinas-new-free-ai-tools-are-beating"
    }
   ]
  },
  "/2025/01/can-we-keep-up-the-quest-to-create-a-test-that-beats-ai": {
-  "dato": "2026-09-30T20:08:02.912Z",
+  "dato": "2026-10-31T19:22:52.520Z",
   "valg": [
    {
-    "q": "What are the key points of comparison between human thought and data processing?",
-    "sti": "/2024/10/ted-ai-conference-shock-ai-expert"
+    "q": "How does AI impact jobs?",
+    "sti": "/2024/09/blog-post_14"
    },
    {
-    "q": "Why is ensuring content sounds human considered a new form of quality control for marketers?",
-    "sti": "/2026/05/can-ai-detection-be-trusted-blind-tests"
+    "q": "How might AI world models affect different industries?",
+    "sti": "/2025/01/breakthrough-google-launches-new-ai"
+   },
+   {
+    "q": "How do AI agents affect jobs?",
+    "sti": "/2025/01/the-rise-of-ai-agents-game-changer-or-job-killer"
    }
   ]
  },
  "/2025/01/revolutionizing-tomorrow-how-ai-is-illuminating-a-brighter-future-with-google": {
-  "dato": "2026-09-30T20:08:03.638Z",
+  "dato": "2026-10-31T19:22:53.015Z",
   "valg": [
    {
     "q": "What are the ethical concerns surrounding AI?",
@@ -789,7 +785,7 @@
   ]
  },
  "/2025/01/the-future-of-ai-microsoft-and-openai-strengthen-partnership": {
-  "dato": "2026-09-30T20:08:04.124Z",
+  "dato": "2026-10-31T19:22:53.442Z",
   "valg": [
    {
     "q": "What changes is OpenAI making to become a for-profit company?",
@@ -798,20 +794,12 @@
    {
     "q": "What is the Global AI Infrastructure Investment Partnership?",
     "sti": "/2024/09/blog-post_18"
-   },
-   {
-    "q": "What is OpenAI?",
-    "sti": "/2024/08/the-most-powerful-man-youve-never-heard"
    }
   ]
  },
  "/2025/01/breakthrough-in-ai-deepseek-r1-matches-openais-o1-at-a-fraction-of-the-cost": {
-  "dato": "2026-09-30T20:08:04.612Z",
+  "dato": "2026-10-31T19:22:53.776Z",
   "valg": [
-   {
-    "q": "How did the entry of DeepSeek impact major American indices such as Nasdaq and S&P 500?",
-    "sti": "/2025/01/The-1-trillion-question-can-tech-stocks-recover-from-deepseeks-impact"
-   },
    {
     "q": "How does DeepSeek-V3 compare to other AI models?",
     "sti": "/2025/01/chinas-deepseek-ai-models-send-shockwaves-through-tech-community"
@@ -819,7 +807,7 @@
   ]
  },
  "/2025/01/market-insights-trumps-stargate-and-ais-rising-tide": {
-  "dato": "2026-09-30T20:08:05.203Z",
+  "dato": "2026-10-31T19:22:54.360Z",
   "valg": [
    {
     "q": "What is the Stargate Project?",
@@ -828,11 +816,15 @@
    {
     "q": "What is the Global AI Infrastructure Investment Partnership?",
     "sti": "/2024/09/blog-post_18"
+   },
+   {
+    "q": "How is DeepSeek affecting global AI competition?",
+    "sti": "/2025/01/chinas-deepseek-ai-models-send-shockwaves-through-tech-community"
    }
   ]
  },
  "/2025/01/the-rise-of-ai-agents-game-changer-or-job-killer": {
-  "dato": "2026-09-30T20:08:05.671Z",
+  "dato": "2026-10-31T19:22:54.702Z",
   "valg": [
    {
     "q": "How can workers prepare for an AI-driven job market?",
@@ -843,13 +835,13 @@
     "sti": "/2026/06/blueprint-for-building-your-first"
    },
    {
-    "q": "How does an AI Agent function during operation?",
-    "sti": "/2026/06/agentic-ai-vs-ai-agents-technical"
+    "q": "What is an AI agent?",
+    "sti": "/2024/10/Get ready to deploy a fleet of ai agents startups"
    }
   ]
  },
  "/2025/01/chat on the brink army cio warns of high costs for genai": {
-  "dato": "2026-09-30T20:08:06.163Z",
+  "dato": "2026-10-31T19:22:55.221Z",
   "valg": [
    {
     "q": "Is there a cost to use ChatGPT with Siri?",
@@ -858,10 +850,10 @@
   ]
  },
  "/2025/01/supercharging-your-security-benefits-of": {
-  "dato": "2026-09-30T20:08:06.643Z",
+  "dato": "2026-10-31T19:22:55.854Z",
   "valg": [
    {
-    "q": "What defines Agentic AI as a behavioral property?",
+    "q": "Agentic AI vs AI agents?",
     "sti": "/2026/06/agentic-ai-vs-ai-agents-technical"
    },
    {
@@ -875,15 +867,15 @@
   ]
  },
  "/2025/01/how-artificial-intelligence-can-enhance-your-cybersecurity-strategy": {
-  "dato": "2026-09-30T20:08:07.814Z",
+  "dato": "2026-10-31T19:22:56.332Z",
   "valg": [
    {
     "q": "How does AI improve threat detection and response times?",
     "sti": "/2025/01/supercharging-your-security-benefits-of"
    },
    {
-    "q": "How does AI enhance threat detection in industrial settings?",
-    "sti": "/2024/07/ciscos-report-reveals-ai-and"
+    "q": "Why is traditional security not enough for AI?",
+    "sti": "/2024/09/Artificial Intelligence AI has transformed the cybersecurity"
    },
    {
     "q": "What percentage of cybersecurity teams are using AI for endpoint security?",
@@ -892,19 +884,19 @@
   ]
  },
  "/2025/01/breakthrough-google-launches-new-ai": {
-  "dato": "2026-09-30T20:08:08.344Z",
+  "dato": "2026-10-31T19:22:56.920Z",
   "valg": []
  },
  "/2024/12/find long lost friends and family with a single photo facecheck id": {
-  "dato": "2026-09-30T20:08:10.225Z",
+  "dato": "2026-10-31T19:22:57.389Z",
   "valg": []
  },
  "/2024/12/how-face-id-keeps-your-data-safe": {
-  "dato": "2026-09-30T20:08:10.854Z",
+  "dato": "2026-10-31T19:22:57.926Z",
   "valg": []
  },
  "/2024/12/how google makes custom cloud chips": {
-  "dato": "2026-09-30T20:08:11.347Z",
+  "dato": "2026-10-31T19:22:58.273Z",
   "valg": [
    {
     "q": "How does Google Gemini AI compare to its competitors?",
@@ -913,15 +905,15 @@
   ]
  },
  "/2024/10/cybersecurity teams left out of ai policy global survey reveals": {
-  "dato": "2026-09-30T20:08:11.868Z",
+  "dato": "2026-10-31T19:22:58.752Z",
   "valg": [
    {
     "q": "What role do policies play in AI cybersecurity?",
     "sti": "/2024/10/unprepared for the ai threats to cybersecurity"
    },
    {
-    "q": "What are the risks of using AI in cybersecurity?",
-    "sti": "/2024/09/the-ai-takeover-why-personhood-is"
+    "q": "Why are AI and cybersecurity top investment areas for industrial organizations?",
+    "sti": "/2024/07/ciscos-report-reveals-ai-and"
    },
    {
     "q": "What are the risks of AI in cybersecurity?",
@@ -930,7 +922,7 @@
   ]
  },
  "/2024/10/perplexitys new ceo faces legal firestorm": {
-  "dato": "2026-09-30T20:08:12.363Z",
+  "dato": "2026-10-31T19:22:59.259Z",
   "valg": [
    {
     "q": "What is the main issue in the lawsuit between News Corp and Perplexity Pro?",
@@ -939,16 +931,20 @@
   ]
  },
  "/2024/10/ted-ai-conference-shock-ai-expert": {
-  "dato": "2026-09-30T20:08:12.957Z",
+  "dato": "2026-10-31T19:22:59.705Z",
   "valg": [
    {
     "q": "Can AI models be smarter than humans?",
     "sti": "/2025/01/can-we-keep-up-the-quest-to-create-a-test-that-beats-ai"
+   },
+   {
+    "q": "Why is human oversight important in AI cybersecurity?",
+    "sti": "/2024/09/the-ai-takeover-why-personhood-is"
    }
   ]
  },
  "/2024/10/Siris chatgpt integration brings ai Power": {
-  "dato": "2026-09-30T20:08:13.695Z",
+  "dato": "2026-10-31T19:23:00.250Z",
   "valg": [
    {
     "q": "What improvements are being made to Siri with Apple Intelligence?",
@@ -961,24 +957,24 @@
   ]
  },
  "/2024/10/Get ready to deploy a fleet of ai agents startups": {
-  "dato": "2026-09-30T20:08:16.596Z",
+  "dato": "2026-10-31T19:23:00.989Z",
   "valg": [
    {
     "q": "What are the recommended security practices when deploying AI agents with broad access?",
     "sti": "/2026/06/blueprint-for-building-your-first"
    },
    {
-    "q": "How does an AI Agent function during operation?",
-    "sti": "/2026/06/agentic-ai-vs-ai-agents-technical"
+    "q": "How can businesses ensure AI is used ethically in security?",
+    "sti": "/2025/01/supercharging-your-security-benefits-of"
    },
    {
-    "q": "What are AI agents?",
-    "sti": "/2025/01/the-rise-of-ai-agents-game-changer-or-job-killer"
+    "q": "How can companies ensure data privacy and security?",
+    "sti": "/2024/10/the trust in ai systems how companies"
    }
   ]
  },
  "/2024/10/news corp takes aim at perplexity pro": {
-  "dato": "2026-09-30T20:08:17.090Z",
+  "dato": "2026-10-31T19:23:01.479Z",
   "valg": [
    {
     "q": "How are investors reacting to Perplexity's ongoing legal challenges?",
@@ -987,7 +983,7 @@
   ]
  },
  "/2024/10/penguin random house slams the door on ai generated content": {
-  "dato": "2026-09-30T20:08:17.606Z",
+  "dato": "2026-10-31T19:23:01.955Z",
   "valg": [
    {
     "q": "How are AI detection tools compared to other standard software in the modern content toolkit?",
@@ -1004,19 +1000,15 @@
   ]
  },
  "/2024/10/amazon-shifts-into-high-gear-with-ai": {
-  "dato": "2026-09-30T20:08:18.095Z",
+  "dato": "2026-10-31T19:23:02.282Z",
   "valg": []
  },
  "/2024/10/microsoft and more bring ai tools in health care": {
-  "dato": "2026-09-30T20:08:18.595Z",
+  "dato": "2026-10-31T19:23:02.815Z",
   "valg": [
    {
     "q": "How does NVIDIA contribute to the ongoing artificial intelligence revolution?",
     "sti": "/2024/10/nvida-ai-predicts-that-ai-will-be-able-to-do-some-jobs"
-   },
-   {
-    "q": "How do the US and China differ in their approach to AI in healthcare?",
-    "sti": "/2024/09/blog-post"
    },
    {
     "q": "How can AI be used in personal health and wellness?",
@@ -1025,29 +1017,15 @@
   ]
  },
  "/2024/10/midJourney editing photo has plan that allows": {
-  "dato": "2026-09-30T20:08:19.007Z",
-  "valg": [
-   {
-    "q": "When will Canvas be available to everyone?",
-    "sti": "/2024/10/ghatgpt with canvas for writing and coding"
-   },
-   {
-    "q": "Is DeepSeek-R1 available for everyone to use?",
-    "sti": "/2025/01/breakthrough-in-ai-deepseek-r1-matches-openais-o1-at-a-fraction-of-the-cost"
-   }
-  ]
+  "dato": "2026-10-31T19:23:03.144Z",
+  "valg": []
  },
  "/2024/10/how technology can help you get a good nights sleep": {
-  "dato": "2026-09-30T20:08:20.226Z",
-  "valg": [
-   {
-    "q": "How does sentiment analysis enhance user experience in AI gadgets?",
-    "sti": "/2024/08/the-ultimate-review-of-ai-gadgets"
-   }
-  ]
+  "dato": "2026-10-31T19:23:03.482Z",
+  "valg": []
  },
  "/2024/10/checking eu ai guidelines laws major tech companies": {
-  "dato": "2026-09-30T20:08:20.917Z",
+  "dato": "2026-10-31T19:23:03.953Z",
   "valg": [
    {
     "q": "What happens if a company doesn't follow the EU AI Act?",
@@ -1058,95 +1036,86 @@
     "sti": "/2024/10/unprepared for the ai threats to cybersecurity"
    },
    {
-    "q": "What does it mean to build trust through compliance?",
-    "sti": "/2024/10/the trust in ai systems how companies"
+    "q": "What is the purpose of the Open Regulatory Compliance Working Group?",
+    "sti": "/2024/09/Eclipse Initiative Takes On Cybersecurity AI Regulations Industry to Take Note"
    }
   ]
  },
  "/2024/10/google quits big tech to focus on ai in nuclear energy": {
-  "dato": "2026-09-30T20:08:21.477Z",
+  "dato": "2026-10-31T19:23:04.446Z",
   "valg": []
  },
  "/2024/10/the new ai aria is a multimodal ai free ": {
-  "dato": "2026-09-30T20:08:22.003Z",
-  "valg": [
-   {
-    "q": "How are China's tech giants approaching AI?",
-    "sti": "/2025/01/open-source-chatbot-revolution-china"
-   }
-  ]
+  "dato": "2026-10-31T19:23:04.935Z",
+  "valg": []
  },
  "/2024/10/ai in government a proactive approach to responsible ai institute": {
-  "dato": "2026-09-30T20:08:22.517Z",
+  "dato": "2026-10-31T19:23:05.410Z",
   "valg": [
    {
     "q": "What are ethical AI practices?",
     "sti": "/2024/10/the trust in ai systems how companies"
-   },
-   {
-    "q": "How is the Chinese government regulating AI technologies?",
-    "sti": "/2025/01/open-source-chatbot-revolution-china"
-   },
-   {
-    "q": "How does government funding affect AI progress in the US and China?",
-    "sti": "/2024/09/blog-post"
    }
   ]
  },
  "/2024/10/ai gadgets 2024 ai revolution how genai tools will change": {
-  "dato": "2026-09-30T20:08:23.064Z",
+  "dato": "2026-10-31T19:23:05.810Z",
   "valg": [
-   {
-    "q": "What are the main features of AI gadgets?",
-    "sti": "/2024/08/the-ultimate-review-of-ai-gadgets"
-   },
    {
     "q": "How are modern AI gadgets changing user interfaces away from traditional screens?",
     "sti": "/2026/05/exploring-15-ai-devices-you-can-buy"
    },
    {
-    "q": "Are AI-powered gadgets safe to use?",
-    "sti": "/2024/08/the-future-of-ai-discover-3-most"
+    "q": "What are the main features of AI gadgets?",
+    "sti": "/2024/08/the-ultimate-review-of-ai-gadgets"
+   },
+   {
+    "q": "In what specific ways is artificial intelligence transforming the healthcare sector?",
+    "sti": "/2024/10/nvida-ai-predicts-that-ai-will-be-able-to-do-some-jobs"
    }
   ]
  },
  "/2024/10/unprepared for the ai threats to cybersecurity": {
-  "dato": "2026-09-30T20:08:24.220Z",
+  "dato": "2026-10-31T19:23:06.161Z",
   "valg": [
    {
-    "q": "How does AI help in fighting cyber threats?",
-    "sti": "/2024/09/blog-post_147"
-   },
-   {
-    "q": "How can AI improve cybersecurity?",
-    "sti": "/2024/09/Artificial Intelligence AI has transformed the cybersecurity"
+    "q": "What future trends should we watch in AI and cybersecurity?",
+    "sti": "/2024/09/the-ai-takeover-why-personhood-is"
    },
    {
     "q": "How does traditional cybersecurity differ from AI-driven approaches?",
     "sti": "/2025/01/how-artificial-intelligence-can-enhance-your-cybersecurity-strategy"
+   },
+   {
+    "q": "How does AI help in fighting cyber threats?",
+    "sti": "/2024/09/blog-post_147"
    }
   ]
  },
  "/2024/10/the fake gmail com inbox that fooled the world": {
-  "dato": "2026-09-30T20:08:24.928Z",
+  "dato": "2026-10-31T19:23:06.831Z",
   "valg": [
    {
     "q": "What are phishing emails?",
     "sti": "/2026/09/what-are-phishing-emails"
    },
    {
-    "q": "How can I keep myself safe from cybercrime?",
-    "sti": "/2024/10/ai driven cybercrime threatens global security"
+    "q": "What are phishing attacks?",
+    "sti": "/2026/10/what-are-phishing-attacks"
    },
    {
-    "q": "What are common types of cyber threats?",
-    "sti": "/2024/08/a-comprehensive-review-of-cyber"
+    "q": "How does phishing resistant MFA work?",
+    "sti": "/2026/10/how-phishing-resistant-mfa-works"
    }
   ]
  },
  "/2024/10/write without boundaries ai story writing": {
-  "dato": "2026-09-30T20:08:25.806Z",
+  "dato": "2026-10-31T19:23:07.287Z",
   "valg": [
+   {
+    "q": "Why is Penguin Random House blocking AI from its books?",
+    "sti": "/2024/10/penguin random house slams the door on ai generated content"
+   },
    {
     "q": "How can Canvas help with writing?",
     "sti": "/2024/10/ghatgpt with canvas for writing and coding"
@@ -1158,7 +1127,7 @@
   ]
  },
  "/2024/10/googles gemini ai studio stumbles with flawed prompts": {
-  "dato": "2026-09-30T20:08:26.370Z",
+  "dato": "2026-10-31T19:23:07.735Z",
   "valg": [
    {
     "q": "What is Google Gemini AI?",
@@ -1167,8 +1136,12 @@
   ]
  },
  "/2024/10/ai driven cybercrime threatens global security": {
-  "dato": "2026-09-30T20:08:26.942Z",
+  "dato": "2026-10-31T19:23:08.221Z",
   "valg": [
+   {
+    "q": "How does AI help in fighting cyber threats?",
+    "sti": "/2024/09/blog-post_147"
+   },
    {
     "q": "How does traditional cybersecurity differ from AI-driven approaches?",
     "sti": "/2025/01/how-artificial-intelligence-can-enhance-your-cybersecurity-strategy"
@@ -1176,32 +1149,28 @@
    {
     "q": "Why is traditional security not enough for AI?",
     "sti": "/2024/09/Artificial Intelligence AI has transformed the cybersecurity"
-   },
-   {
-    "q": "How does AI help in fighting cyber threats?",
-    "sti": "/2024/09/blog-post_147"
    }
   ]
  },
  "/2024/10/meta-unveils-revolutionary-ai-video": {
-  "dato": "2026-09-30T20:08:27.483Z",
+  "dato": "2026-10-31T19:23:08.654Z",
   "valg": [
-   {
-    "q": "What level of realism can users expect from the generated video outputs?",
-    "sti": "/2026/05/kling-ai-tutorial-create-stunning-ai"
-   },
    {
     "q": "What parameters can be customized when generating a video clip?",
     "sti": "/2026/04/generate-unlimited-free-ai-videos-with-sound"
    },
    {
-    "q": "How much revenue did Meta report for Q2 2024?",
-    "sti": "/2024/08/meta-surpasses-q2-forecasts-but-warns"
+    "q": "What level of realism can users expect from the generated video outputs?",
+    "sti": "/2026/05/kling-ai-tutorial-create-stunning-ai"
+   },
+   {
+    "q": "What is an ai video generation workflow?",
+    "sti": "/2026/04/create-hollywood-style-films-with-this-free-ai-workflow"
    }
   ]
  },
  "/2024/10/ghatgpt with canvas for writing and coding": {
-  "dato": "2026-09-30T20:08:28.042Z",
+  "dato": "2026-10-31T19:23:09.138Z",
   "valg": [
    {
     "q": "How good is Claude AI at real coding tasks compared to others?",
@@ -1210,11 +1179,15 @@
    {
     "q": "What is ChatGPT's advanced voice mode?",
     "sti": "/2024/07/openai-is-making-waves-again-by"
+   },
+   {
+    "q": "What is ChatGPT?",
+    "sti": "/2025/01/overcome-your-fears-discover-the-surprising-benefits-of-chatting-with-ai"
    }
   ]
  },
  "/2024/10/the trust in ai systems how companies": {
-  "dato": "2026-09-30T20:08:28.653Z",
+  "dato": "2026-10-31T19:23:09.650Z",
   "valg": [
    {
     "q": "What is the 'Zero Trust' principle in AI security?",
@@ -1227,8 +1200,16 @@
   ]
  },
  "/2026/10/what-are-ransomware-canary-files": {
-  "dato": "2026-10-01T14:34:10.474Z",
+  "dato": "2026-10-31T19:23:10.100Z",
   "valg": [
+   {
+    "q": "Can ransomware spread to multiple computers on a network?",
+    "sti": "/2026/10/how-ransomware-gets-installed"
+   },
+   {
+    "q": "How to access ransomware protection?",
+    "sti": "/2026/10/how-to-access-ransomware-protection"
+   },
    {
     "q": "What is ransomware in cyber security?",
     "sti": "/2026/09/what-is-ransomware-cyber-security"
@@ -1236,7 +1217,7 @@
   ]
  },
  "/2024/10/rtx recharged web 3.0 leo ai brave browser unlocks the power of local llm experience": {
-  "dato": "2026-10-01T14:34:10.997Z",
+  "dato": "2026-10-31T19:23:10.465Z",
   "valg": [
    {
     "q": "How does Brave Browser protect my privacy?",
@@ -1245,20 +1226,20 @@
   ]
  },
  "/2024/10/ai-shocks-again-claude-alexa-smarter": {
-  "dato": "2026-10-01T14:34:11.487Z",
+  "dato": "2026-10-31T19:23:10.936Z",
   "valg": [
-   {
-    "q": "Why is OpenAI shifting to a for-profit model?",
-    "sti": "/2024/09/AI Giant OpenAI Poised for Radical Transformation into For-Profit Empire"
-   },
    {
     "q": "Can AI models be smarter than humans?",
     "sti": "/2025/01/can-we-keep-up-the-quest-to-create-a-test-that-beats-ai"
+   },
+   {
+    "q": "What exactly is Claude AI?",
+    "sti": "/2026/05/capabilities-of-claude-ai-deep-dive"
    }
   ]
  },
  "/2024/10/the-coming-wave-how-ai-will-change": {
-  "dato": "2026-10-01T14:34:12.201Z",
+  "dato": "2026-10-31T19:23:11.353Z",
   "valg": [
    {
     "q": "How do AI models impact jobs and the economy?",
@@ -1275,7 +1256,7 @@
   ]
  },
  "/2024/10/meet harbor the ai seo blog writer that dominates google rankings": {
-  "dato": "2026-10-01T14:34:12.696Z",
+  "dato": "2026-10-31T19:23:11.964Z",
   "valg": [
    {
     "q": "What is the future of SEO with AI?",
@@ -1288,24 +1269,19 @@
   ]
  },
  "/2024/10/Googles rtt reveals the full extent of web rtt data logging": {
-  "dato": "2026-10-01T14:34:13.196Z",
+  "dato": "2026-10-31T19:23:12.409Z",
   "valg": []
  },
  "/2024/10/when-postgres-indexing-database-does-not-work": {
-  "dato": "2026-10-01T14:34:13.768Z",
+  "dato": "2026-10-31T19:23:12.742Z",
   "valg": []
  },
  "/2024/09/Youre LEAKING Your LOCATION": {
-  "dato": "2026-10-01T14:34:16.720Z",
-  "valg": [
-   {
-    "q": "How do the privacy settings work?",
-    "sti": "/2024/09/instagram exposes teen accounts"
-   }
-  ]
+  "dato": "2026-10-31T19:23:13.146Z",
+  "valg": []
  },
  "/2024/09/Eclipse Initiative Takes On Cybersecurity AI Regulations Industry to Take Note": {
-  "dato": "2026-10-01T14:34:17.489Z",
+  "dato": "2026-10-31T19:23:13.635Z",
   "valg": [
    {
     "q": "What is the expected timeline for the European Union AI Act to take effect?",
@@ -1314,46 +1290,50 @@
    {
     "q": "Why is compliance important for global tech companies?",
     "sti": "/2024/10/checking eu ai guidelines laws major tech companies"
+   },
+   {
+    "q": "What is the EU AI Act?",
+    "sti": "/2024/08/ai-oversight-unveiled-eu-introduces"
    }
   ]
  },
  "/2024/09/staying-ahead-of-scammers-comprehensive": {
-  "dato": "2026-10-01T14:34:18.063Z",
+  "dato": "2026-10-31T19:23:14.182Z",
   "valg": [
    {
-    "q": "How do machine learning models identify potential digital threats?",
-    "sti": "/2025/01/how-artificial-intelligence-can-enhance-your-cybersecurity-strategy"
+    "q": "What is the Fake Gmail Inbox scam?",
+    "sti": "/2024/10/the fake gmail com inbox that fooled the world"
    }
   ]
  },
  "/2024/09/AI Giant OpenAI Poised for Radical Transformation into For-Profit Empire": {
-  "dato": "2026-10-01T14:34:19.269Z",
+  "dato": "2026-10-31T19:23:14.652Z",
   "valg": [
    {
     "q": "What is the main focus of the partnership between Microsoft and OpenAI?",
     "sti": "/2025/01/the-future-of-ai-microsoft-and-openai-strengthen-partnership"
    },
    {
-    "q": "What is Sam Altman's vision for the future?",
-    "sti": "/2024/08/the-most-powerful-man-youve-never-heard"
-   },
-   {
     "q": "How do operational costs affect ChatGPT's pricing model?",
     "sti": "/2025/01/chat on the brink army cio warns of high costs for genai"
+   },
+   {
+    "q": "How does DeepSeek-R1 save costs compared to OpenAI's o1?",
+    "sti": "/2025/01/breakthrough-in-ai-deepseek-r1-matches-openais-o1-at-a-fraction-of-the-cost"
    }
   ]
  },
  "/2024/09/necro-trojan-infections-reach-11-million-android-users-warned-of-imminent-danger": {
-  "dato": "2026-10-01T14:34:19.845Z",
+  "dato": "2026-10-31T19:23:14.989Z",
   "valg": [
    {
-    "q": "Can airplane mode completely stop location tracking on your phone?",
-    "sti": "/2024/09/Youre LEAKING Your LOCATION"
+    "q": "How can individuals protect themselves online?",
+    "sti": "/2024/08/a-comprehensive-review-of-cyber"
    }
   ]
  },
  "/2024/09/The Rise of AI-Powered Recruitment in Europe Navigating Change and Opportunity": {
-  "dato": "2026-10-01T14:34:20.348Z",
+  "dato": "2026-10-31T19:23:15.355Z",
   "valg": [
    {
     "q": "What can be done to prepare for an AI-driven economy?",
@@ -1366,12 +1346,8 @@
   ]
  },
  "/2024/09/meta terminates crowdtangle despite opposition": {
-  "dato": "2026-10-01T14:34:20.936Z",
+  "dato": "2026-10-31T19:23:15.875Z",
   "valg": [
-   {
-    "q": "How much revenue did Meta report for Q2 2024?",
-    "sti": "/2024/08/meta-surpasses-q2-forecasts-but-warns"
-   },
    {
     "q": "What is Meta's plan for using public posts on Facebook and Instagram?",
     "sti": "/2024/09/Metas Posts using metas ai tools"
@@ -1379,8 +1355,13 @@
   ]
  },
  "/2024/09/instagram exposes teen accounts": {
-  "dato": "2026-10-01T14:34:21.395Z",
-  "valg": []
+  "dato": "2026-10-31T19:23:16.359Z",
+  "valg": [
+   {
+    "q": "What is Meta's plan for using public posts on Facebook and Instagram?",
+    "sti": "/2024/09/Metas Posts using metas ai tools"
+   }
+  ]
  },
  "/2024/09/blog-post_575": {
   "dato": "2026-10-01T14:34:22.016Z",

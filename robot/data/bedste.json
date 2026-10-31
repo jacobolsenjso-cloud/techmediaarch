@@ -1,5 +1,5 @@
 {
- "hentet": "2026-10-31T13:45:00.155Z",
+ "hentet": "2026-10-31T19:23:17.965Z",
  "fra": "2026-08-03",
  "til": "2026-10-31",
  "dage": 90,
@@ -320,6 +320,10 @@
   "/2026/06/blueprint-for-building-your-first": {
    "visninger": 2,
    "brugere": 2
+  },
+  "/2026/10/how-generative-ai-creates-images": {
+   "visninger": 1,
+   "brugere": 1
   },
   "/2026/10/how-payment-processors-work": {
    "visninger": 1,

@@ -231,5 +231,31 @@
   "usd": 0.8423,
   "note": "prøve #40 (manuel, gemini-3.5-flash), lagt på main",
   "kr": 5.79
+ },
+ {
+  "dato": "2026-10-31T19:23:18.552Z",
+  "artikel": null,
+  "usd": 0.2179,
+  "kr": 1.5,
+  "dele": {
+   "artikel": {
+    "kr": 1.35,
+    "billeder": 0,
+    "soegninger": 1,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0.12,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
  }
 ]
