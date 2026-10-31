@@ -257,5 +257,31 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-10-31T22:31:28.614Z",
+  "artikel": "/2026/10/what-is-included-in-microsoft-365",
+  "usd": 0.6038,
+  "kr": 4.15,
+  "dele": {
+   "artikel": {
+    "kr": 4.03,
+    "billeder": 3,
+    "soegninger": 2,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0.08,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
  }
 ]
