@@ -24,6 +24,10 @@ export function efterFoersteBillede(html, slut = html.length) {
     // Gå op til den største blok omkring billedet, der ikke rummer en overskrift (figur, Bloggers tabel/div, afsnit)
     let blok = n;
     while (blok.parentNode && blok.parentNode !== rod && !harOverskrift(blok.parentNode)) blok = blok.parentNode;
+    // Står "Key takeaways"-boksen lige efter billedet, kommer fortegnelsen efter den (31/10-2026: resuméet først)
+    const soeskende = blok.parentNode?.childNodes || [];
+    const naeste = soeskende.slice(soeskende.indexOf(blok) + 1).find((c) => erElement(c) || (c.nodeName === '#text' && c.value.trim()));
+    if (erElement(naeste) && (naeste.attrs || []).some((a) => a.name === 'class' && /\btma-overblik\b/.test(a.value))) return naeste.sourceCodeLocation?.endOffset ?? 0;
     return blok.sourceCodeLocation?.endOffset ?? 0;
   }
   return 0;
