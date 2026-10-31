@@ -23,6 +23,8 @@ async function hent(u, timeoutMs = 10000) {
     const html = (await res.text()).slice(0, 300000);
     // Afkod HTML-tegn i titlen (ellers blev "What's" til "What&amp;#39;s" i kildelisten, målt 26/9).
     const afkod = (t) => t.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(n)).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)))
+      // Navngivne tegn (målt 31/10, prøve #37: "&ndash; ACEMAGIC" stod ordret i kildelisten)
+      .replace(/&(ndash|mdash|rsquo|lsquo|rdquo|ldquo|hellip|middot|bull|trade|reg|copy);/g, (_, n) => ({ ndash: '–', mdash: '—', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“', hellip: '…', middot: '·', bull: '•', trade: '™', reg: '®', copy: '©' })[n])
       .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
     const titel = afkod(afkod((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '').replace(/\s+/g, ' '))).trim();
     return titel ? { url: res.url, titel } : null;

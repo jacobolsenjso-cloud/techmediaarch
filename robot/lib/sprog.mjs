@@ -124,3 +124,16 @@ export function storeBogstaver(tekst) {
   const t = String(tekst).replace(/[A-Za-z][\w-]*/g, (w) => (w === 'i' ? 'I' : STORE[w] && w === w.toLowerCase() ? STORE[w] : w));
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
+
+// Gentager en liste sig selv? Intro (<p>) og punkter (<li>) sammenlignes parvis på indholdsord; deler to dele
+// mindst 70 % af den korteste dels ord, siger de det samme (målt 31/10, prøve #37: samme sætning 3 gange).
+export function gentagerSig(h) {
+  const dele = [...String(h).matchAll(/<(p|li)\b[^>]*>([\s\S]*?)<\/\1>/gi)]
+    .map((m) => new Set(synlig(m[2]).toLowerCase().match(/[a-z0-9]{4,}/g) || [])).filter((s) => s.size >= 3);
+  for (let i = 0; i < dele.length; i++) for (let j = i + 1; j < dele.length; j++) {
+    const [a, b] = dele[i].size <= dele[j].size ? [dele[i], dele[j]] : [dele[j], dele[i]];
+    let faelles = 0; for (const w of a) if (b.has(w)) faelles++;
+    if (faelles / a.size >= 0.7) return true;
+  }
+  return false;
+}

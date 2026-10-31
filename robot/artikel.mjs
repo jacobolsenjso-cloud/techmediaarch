@@ -33,9 +33,9 @@ import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
 import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
-import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord, storeBogstaver } from './lib/sprog.mjs';
+import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord, storeBogstaver, gentagerSig } from './lib/sprog.mjs';
 import { laesHjerne, stemmeBlok, stemmePrompt, tjekStemme, fletInd, senesteStemmeAfsnit } from './lib/hjerne.mjs';
-import { kildeHenvisninger } from './lib/kildenavne.mjs';
+import { kildeHenvisninger, kendtNavn } from './lib/kildenavne.mjs';
 import { parse as yamlParse, stringify as yamlStringify } from 'yaml';
 import { hentKildeTekster, vaerdier, talUdenKilde, synligTekst } from './lib/talvagt.mjs';
 
@@ -408,6 +408,9 @@ ${kandAfsnit.slice(0, 30).map((p, i) => `${i + 1}. ${p}`).join('\n')}`);
     for (const x of (Array.isArray(r.lists) ? r.lists : []).slice(0, 2)) {
       const fra = kandAfsnit[parseInt(x.n, 10) - 1]; const til = rensMarkdown(String(x.html || '').trim());
       if (!fra || !html.includes(fra) || !/<(ul|ol)\b/i.test(til) || hrefs(til) !== hrefs(fra) || antalOrd(til) < antalOrd(fra) * 0.8 || uklarKilde(til)) continue;
+      // Målt 31/10 (prøve #37): Gemini fyldte listen op med samme sætning tre gange (intro + 2 punkter, der gentog
+      // hinanden). Afvis, hvis listen er markant længere end afsnittet, eller to dele siger næsten det samme.
+      if (antalOrd(til) > antalOrd(fra) * 1.25 || gentagerSig(til)) continue;
       html = html.replace(fra, () => til); lavet++;
     }
     log(`- Lister: ${antalLister() - lavet} skrevet af Gemini, ${lavet} lavet bagefter → ${antalLister()} i alt`);
@@ -564,13 +567,14 @@ const midFigur = figur(mid, meta.alt2);
 if (midt) html = html.slice(0, midt) + midFigur + html.slice(midt);
 // Billede 3 (Jacob 31/10-2026): i artikler over 1.200 ord, før en overskrift mellem billede 2 og FAQ — så der ikke
 // er lange stræk uden billede. Er der ingen overskrift dér, eller fejler billedet, udgives artiklen med 2.
+let tredje = null;
 if (antalOrd(html) > 1200) {
   const efterMid = html.indexOf(midFigur) + midFigur.length;
   const faqPos = html.search(/<h2[^>]*>\s*(?:FAQ|Frequently Asked Questions)/i);
   const steder = [...html.matchAll(/<h2\b/gi)].map((m) => m.index).filter((i) => i > efterMid && (faqPos < 0 || i < faqPos));
   if (midt && steder.length) {
     try {
-      const tredje = await lav({ motiv: meta.image3, titel, besk: meta.description, hylde });
+      tredje = await lav({ motiv: meta.image3, titel, besk: meta.description, hylde });
       const sted = steder[Math.floor((steder.length - 1) / 2)];
       html = html.slice(0, sted) + figur(tredje, meta.alt3 || meta.alt2) + html.slice(sted);
       log(`- Billede 3: ${tredje.motor}${tredje.forsoeg > 1 ? ` · ${tredje.forsoeg} forsøg` : ''}${tredje.noter.length ? ` · ${tredje.noter.join(' · ')}` : ''}`);
@@ -585,6 +589,12 @@ if (antalOrd(html) > 1200) {
 // frasen findes, og teksten er ord for ord uændret bagefter. Kildelisten bliver.
 let eksterneITekst = 0;
 const brugteFraser = new Set();
+// Linket må kun stå i et afsnit, der ikke tilskriver oplysningen en ANDEN kilde (prøve #37, 31/10-2026)
+const passerKilde = (blok, k) => {
+  const navne = kildeHenvisninger(blok);
+  if (!navne.length || navne.some((n) => kendtNavn(n, [k]))) return true;
+  return !navne.some((n) => kendtNavn(n, kildeLinks.filter((x) => x !== k)));
+};
 try {
   const fr = await json(`For each numbered source, give up to 3 alternative SHORT phrases (2-4 words each) copied exactly, character for character, from the article text below, that the source is specifically about. Skip a source if nothing fits.
 Return JSON {"links":[{"n": number, "phrases": ["...", "..."]}]}
@@ -598,7 +608,7 @@ ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
     for (const frase of [].concat(l.phrases || l.phrase || []).slice(0, 3)) {
       // Hver frase kun én gang (kørsel #14: to kilder fik begge "large language models").
       if (brugteFraser.has(String(frase).toLowerCase().trim())) continue;
-      const ny = linkIndsaet(html, frase, k.url.replace(/"/g, '%22'), { ekstern: true });
+      const ny = linkIndsaet(html, frase, k.url.replace(/"/g, '%22'), { ekstern: true, passer: (blok) => passerKilde(blok, k) });
       if (ny) brugteFraser.add(String(frase).toLowerCase().trim());
       if (ny && udenLinks(ny) === udenLinks(html)) { html = ny; eksterneITekst++; break; }
     }
@@ -698,7 +708,7 @@ ${del[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
 log(`- Links fra ældre artikler til den nye: ${tilbage.length}${tilbage.length ? ' — ' + tilbage.join(' · ') : ''}`);
 
 log(`\n**Titel:** ${titel}  \n**Adresse:** /${aar}/${md}/${navn}  \n**Ord:** ${ord} · **Interne links:** ${antalInterne} · **Kilder:** ${kildeLinks.length} (afvist ${kildeAfvist.length})`);
-log(`\n**Billeder:** 1: ${hero.fil} (${hero.motor})  \n2: ${mid.fil} (${mid.motor})`);
+log(`\n**Billeder:** 1: ${hero.fil} (${hero.motor})  \n2: ${mid.fil} (${mid.motor})${tredje ? `  \n3: ${tredje.fil} (${tredje.motor})` : ''}`);
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
-fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}`, ord, antalInterne, kildeLinks, kildeAfvist, billeder: { hero, mid }, stemme, ...(OMSKRIV ? { omskrevet: true, maade: 'fuld', gammelTitel: gammel.fm.title } : {}) }, null, 1));
+fs.writeFileSync(sti('robot/ud/proeveartikel.json'), JSON.stringify({ valgt, titel, sti: `/${aar}/${md}/${navn}`, ord, antalInterne, kildeLinks, kildeAfvist, billeder: { hero, mid, ...(tredje ? { tredje } : {}) }, stemme, ...(OMSKRIV ? { omskrevet: true, maade: 'fuld', gammelTitel: gammel.fm.title } : {}) }, null, 1));
 if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, rapport.join('\n') + '\n');

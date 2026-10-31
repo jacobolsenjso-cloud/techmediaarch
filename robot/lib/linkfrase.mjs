@@ -6,7 +6,9 @@
 // Returnerer den nye HTML, eller null hvis frasen ikke kunne bruges.
 const esc = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-export function linkIndsaet(html, frase, href, { ekstern = false } = {}) {
+// passer(blok): valgfri kontrol af afsnittet, fx at det ikke nævner en ANDEN kilde (målt 31/10, prøve #37:
+// "Microsoft Q&A notes that Windows 11 Pro …" fik et link til Acemagic).
+export function linkIndsaet(html, frase, href, { ekstern = false, passer = null } = {}) {
   const f = String(frase || '').trim().replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, '');
   if (f.split(/\s+/).length < 2 || f.length < 6) return null; // for kort til at være et meningsfuldt link
   if (html.includes(`href="${href}"`)) return null;            // linker allerede dertil
@@ -15,6 +17,7 @@ export function linkIndsaet(html, frase, href, { ekstern = false } = {}) {
   let m;
   while ((m = blok.exec(html))) {
     const indre = m[2];
+    if (passer && !passer(indre)) continue;
     // Del op i tags og tekst; spring tekst over, der ligger inde i <a>…</a>.
     const dele = indre.split(/(<[^>]+>)/);
     let iLink = 0;
