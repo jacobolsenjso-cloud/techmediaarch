@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { parse } from 'yaml';
-import { sti, BRUGTE, PROEVEDE } from './lib/arkiv.mjs';
+import { sti, BRUGTE, PROEVEDE, OPSKRIFT } from './lib/arkiv.mjs';
 import { KURS } from './lib/gemini.mjs';
 const PRIS = 'robot/data/pris.json';   // pristælleren (trin 7): én række pr. kørsel
 
@@ -143,6 +143,8 @@ if (arg === '--tjek') {
   const fm = (s) => { try { return parse(fs.readFileSync(sti(`src/content/posts${s}.md`), 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)[1]) || {}; } catch { return {}; } };
   const iDagDato = new Date().toISOString().slice(0, 10);
   const md = dkDato(new Date()).slice(0, 7);
+  // Færdig = skrevet om — undtagen punkter med "igen": true, hvor artiklen er lavet med en ældre opskrift (31/10-2026)
+  const faerdig = (k) => { const f = fm(k.sti); return !!f.omskrevet && !(k.igen && (Number(f.opskrift) || 1) < OPSKRIFT); };
   // Hvad der allerede er ændret FØR en omskrivning (dagens nye artikel og tidligere omskrivninger i samme kørsel).
   // Fejler en omskrivning, ryddes KUN det, den selv har lavet (30/10: én robot, én kørsel).
   const aendret = () => new Set(execFileSync('git', ['status', '--porcelain', '--untracked-files=all', '--', 'src', 'public'], { cwd: sti(), encoding: 'utf8' }).split('\n').filter(Boolean));
@@ -151,16 +153,16 @@ if (arg === '--tjek') {
     const iDag = koe.filter((k) => fm(k.sti).omskrevet === iDagDato);
     const visIDag = iDag.filter((k) => k.visninger).length;
     const krMd = laes(PRIS, []).filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === md).reduce((s, p) => s + (p.kr || 0), 0);
-    const tilbage = koe.filter((k) => !fm(k.sti).omskrevet).length;
+    const tilbage = koe.filter((k) => !faerdig(k)).length;
     // Næste i køen; er dagens kvote for artikler med visninger brugt, springes de over til i morgen
-    const naeste = koe.find((k) => !fm(k.sti).omskrevet && !hviler.has(k.sti) && !(k.visninger && visIDag >= OMSKRIV_VISNINGER_PR_DAG));
+    const naeste = koe.find((k) => !faerdig(k) && !hviler.has(k.sti) && !(k.visninger && visIDag >= OMSKRIV_VISNINGER_PR_DAG));
     if (iDag.length >= OMSKRIV_PR_DAG) { summary(`**Omskrivning:** færdig for i dag — ${iDag.length} af ${OMSKRIV_PR_DAG} (heraf ${visIDag} med visninger) · ${tilbage} tilbage i køen`); break; }
     if (!naeste) { summary(`**Omskrivning:** intet at gøre lige nu (${tilbage} tilbage i køen, ${hviler.size} hviler, ${visIDag} med visninger i dag)`); break; }
     if (krMd >= OMSKRIV_LOFT_KR) { summary(`**Omskrivning:** springer over — ${krMd.toFixed(2)} kr brugt i ${md} (loft for omskrivning ${OMSKRIV_LOFT_KR} kr)`); break; }
     summary(`**Omskrivning ${iDag.length + 1} af ${OMSKRIV_PR_DAG} i dag:** ${naeste.sti} (${naeste.maade}${naeste.visninger ? ', har visninger' : ''}) · ${tilbage} tilbage i køen · ${krMd.toFixed(2)} kr brugt i ${md}`);
     if (fs.existsSync(sti('robot/ud'))) for (const f of fs.readdirSync(sti('robot/ud')).filter((x) => /^pris-.+\.json$|^proeveartikel\.json$/.test(x))) fs.rmSync(sti('robot/ud', f));
     const foer = aendret();
-    const r = spawnSync('node', ['robot/artikel.mjs', '--omskriv', naeste.sti, '--maade', naeste.maade], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    const r = spawnSync('node', ['robot/artikel.mjs', '--omskriv', naeste.sti, '--maade', naeste.maade, ...(naeste.igen ? ['--igen'] : [])], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
     process.stdout.write(r.stdout || ''); process.stderr.write(r.stderr || '');
     let stop = false;
     if (r.status === 0) summary(`**Skrevet om:** ${laes('robot/ud/proeveartikel.json', {}).titel} — ${SITE}${naeste.sti}`);

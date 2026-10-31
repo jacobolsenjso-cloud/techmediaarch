@@ -28,7 +28,7 @@ gemPrisVedExit('artikel');   // pristælleren (trin 7): robot/ud/pris-artikel.js
 import { lav, MOTIVREGLER } from './lib/billeder.mjs';
 import { kontrollerKilder, kildeliste } from './lib/links.mjs';
 import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder, udenEgenKildeliste, KILDE_LOFT, KILDE_LOFT_MAKS } from './lib/kildenavne.mjs';
-import { artikler, sti, emner } from './lib/arkiv.mjs';
+import { artikler, sti, emner, OPSKRIFT } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
@@ -59,13 +59,15 @@ fs.mkdirSync(sti('robot/ud'), { recursive: true });
 
 // Omskrivning: den gamle artikel læses (frontmatter + tekst)
 const gammelFil = OMSKRIV ? sti(`src/content/posts${OMSKRIV}.md`) : '';
-let gammel = null;
+let gammel = null; let igen = false;
 if (OMSKRIV) {
   if (!fs.existsSync(gammelFil)) throw new Error(`Omskrivning: ${OMSKRIV} findes ikke`);
   const raa = fs.readFileSync(gammelFil, 'utf8');
   const d = raa.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   gammel = { fm: yamlParse(d[1]) || {}, krop: d[2] };
-  if (gammel.fm.omskrevet) throw new Error(`Omskrivning: ${OMSKRIV} er allerede skrevet om (${gammel.fm.omskrevet})`);
+  // --igen (31/10-2026): må skrives om igen, hvis den er lavet med en ældre opskrift (robot/lib/arkiv.mjs OPSKRIFT)
+  igen = process.argv.includes('--igen') && (Number(gammel.fm.opskrift) || 1) < OPSKRIFT;
+  if (gammel.fm.omskrevet && !igen) throw new Error(`Omskrivning: ${OMSKRIV} er allerede skrevet om (${gammel.fm.omskrevet})`);
 }
 const gemFrontmatter = (fm, krop) => fs.writeFileSync(gammelFil, `---\n${yamlStringify(fm, { lineWidth: 0 }).trimEnd()}\n---\n${krop}`);
 const iDag = new Date().toISOString().slice(0, 10);
@@ -97,9 +99,10 @@ if (OMSKRIV) {
   // tekst svarer på det samme, som læserne fandt den gamle på.
   const overskr = [...gammel.krop.matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h[23]>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim()).filter(Boolean);
   // En robotartikel fra før kildevagten (30/10) har allerede sine søgeord — de genbruges, så den svarer på det samme
-  const egne = gammel.fm.keyword && Array.isArray(gammel.fm.relatedKeywords) && gammel.fm.relatedKeywords.length >= 3;
+  // — men ikke ved --igen: de gamle søgeord gav fx titlen "What Is An Apple MDM Enrollment Guide?" (31/10-2026)
+  const egne = !igen && gammel.fm.keyword && Array.isArray(gammel.fm.relatedKeywords) && gammel.fm.relatedKeywords.length >= 3;
   const s = egne ? { hoved: gammel.fm.keyword, beslaegtede: gammel.fm.relatedKeywords } : await json(`An older article on techmediaarch.com will be rewritten as an evergreen explainer on the same subject.
-Title: "${gammel.fm.title}"
+Title: "${gammel.fm.gammelTitel || gammel.fm.title}"
 Headings: ${overskr.slice(0, 20).join(' | ')}
 Start of text: ${gammel.krop.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500)}
 
@@ -180,14 +183,9 @@ ${kandListe.map((k, i) => `${i + 1}. ${k.titel}`).join('\n')}`);
   // Mindst 2 interne links (Jacob 5/10-2026): prøve #23 og #24 fik 0, fordi ingen af 13 kandidater fik 2+.
   // Fyldes op med karakter 1 ("løst beslægtet") fra SAMME emne, mest lignende først. Karakter 0 kommer
   // aldrig med (26/9-reglen: hellere færre end forkerte). Links fra ældre artikler bruger kun de relevante.
-  if (interne.length < 2) {
-    const iEmneSti = new Set(iEmne.map((m) => m.sti));
-    const ekstra = alleKar.filter((r) => r.score === 1 && iEmneSti.has(r.k.sti) && !interne.includes(r.k))
-      .sort((x, y) => kandListe.indexOf(x.k) - kandListe.indexOf(y.k)).map((r) => r.k)
-      .filter((k, i, arr) => arr.indexOf(k) === i).slice(0, 2 - interne.length);
-    interne = [...interne, ...ekstra];
-    log(`- Løst beslægtede (karakter 1, samme emne) lagt til: ${ekstra.length}${ekstra.length ? ` (${ekstra.map((k) => k.titel.slice(0, 40)).join(' | ')})` : ''}`);
-  }
+  // Ændret 31/10-2026 (Jacob, prøve #37): "løst beslægtet" (karakter 1) gav et Apple MDM-link i en Windows-artikel.
+  // Karakter 1 bruges ikke mere — hellere færre interne links end forkerte (26/9-reglen vinder over "mindst 2").
+  if (interne.length < 2) log(`- Interne links: kun ${interne.length} med karakter 2+ — løst beslægtede bruges ikke`);
 }
 log(`- Interne link-kandidater: ${kandListe.length}, relevante ifølge Gemini: ${relevante.length}, til artiklen i alt: ${interne.length}`);
 
@@ -200,11 +198,13 @@ const researchOpgave = `Use Google Search to research these questions for a fact
 - ${[valgt.hoved, ...valgt.beslaegtede].join('\n- ')}
 Return 25-40 short bullet points of concrete, verified facts (definitions, how it works, examples, numbers with dates, steps, comparisons, best practices). Cover every question above with at least 3 different facts, and never repeat the same fact in other words. Only include facts you found in search results.
 Start every bullet with the name of the organization, agency, company or publication the fact comes from (e.g. "IBM: ...", "NIST: ...").
-Prefer primary, authoritative sources: the official documentation and help pages of the product's maker (e.g. Apple, Microsoft, Google), standards bodies and government agencies (e.g. NIST, CISA), universities and research labs, and established publications. Use a company's marketing blog only for facts about that company's own product, and only when no better source has the fact.`;
+Prefer primary, authoritative sources: the official documentation and help pages of the product's maker (e.g. Apple, Microsoft, Google), standards bodies and government agencies (e.g. NIST, CISA), universities and research labs, and established publications. Use a company's marketing blog only for facts about that company's own product, and only when no better source has the fact.
+Only facts that are true today (${new Date().toISOString().slice(0, 10)}): leave out products, features, plans and prices that have been discontinued, deprecated or replaced - or state clearly that they were.`;
 // ↑ Kildeorden (Jacob 31/10-2026): målt 31/10 var de fleste kilder sælgernes egne blogs (DomoAI, Animaker, CityMac, Iru).
 // ↑ Kildenavnet i hvert punkt (5/10-2026): uden det skrev Gemini "industry experts note" (18 sætninger i 8 af 15 artikler).
 let fakta = ''; let kilder = []; let stoette = [];
-for (const model of [undefined, undefined, 'gemini-3.5-flash', 'gemini-2.5-flash']) {
+// (gemini-2.5-flash fjernet 31/10-2026: svarer 404 "no longer available to new users" — reserven kunne aldrig virke)
+for (const model of [undefined, undefined, 'gemini-3.5-flash', 'gemini-3.5-flash']) {
   try {
     const r = await skriv(researchOpgave, { soeg: true, temperatur: 0.2, ...(model ? { model } : {}) });
     if (r.kilder.length >= 2) { fakta = r.tekst; kilder = r.kilder; stoette = r.stoette || []; log(`- Research: ${r.kilder.length} kilder, ${(r.tekst.match(/^\s*(?:[-*•]|\d+\.)\s+/gm) || []).length} faktapunkter (${model || 'standardmodel'}).`); break; }
@@ -491,6 +491,35 @@ ${foerTal.map((x, i) => `${i + 1}. ${x.s}  [numbers: ${x.mangler.join(', ')}]`).
   log(`- Talvagt: ${tekster.filter(Boolean).length} af ${kildeLinks.length} kildesider læst · ${foerTal.length ? 'se ovenfor' : 'alle tal står i kilderne'} · tilbage uden kilde: ${talUdenKilde(saetninger(html), kendteTal).length}`);
 }
 
+// --- 4c2. Forældet-vagten (Jacob 31/10-2026, prøve #37) ------------------------
+// Talvagten fanger kun tal. Prøve #37 nævnte "Microsoft Defender App Guard" som en del af Windows 11 Pro, selv om
+// Microsoft har udfaset den. Gemini søger her på Google efter produkter, funktioner og priser i teksten, der er
+// udfaset, nedlagt eller erstattet; de sætninger fjernes (ingen omskrivning). Står én i det korte svar, afvises
+// artiklen. Kun fund, hvor søgningen gav kilder, tæller.
+{
+  const alle = saetninger(html).filter((s) => !/<h[1-6]\b/i.test(s));
+  const tekst = (s) => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  try {
+    const idag = new Date().toISOString().slice(0, 10);
+    const r = await skriv(`Today is ${idag}. Use Google Search to check the numbered sentences below from an article about "${valgt.hoved}".
+Find sentences that present a product, feature, program, plan or price as current although it has been discontinued, deprecated, retired, removed or replaced (check each named product or feature you are unsure about).
+Do not mark sentences that already say it was discontinued or replaced. Do not mark anything you could not confirm in search results.
+Return ONLY JSON {"stale": [{"n": number, "what": "<name>", "status": "<e.g. deprecated in 2024>"}]} - an empty list if nothing is outdated.
+${alle.map((s, i) => `${i + 1}. ${tekst(s)}`).join('\n')}`, { soeg: true, temperatur: 0.1 });
+    let j = null; try { j = JSON.parse((r.tekst.match(/\{[\s\S]*\}/) || ['null'])[0]); } catch { /* nedenfor */ }
+    const fund = (Array.isArray(j?.stale) ? j.stale : []).map((x) => ({ ...x, s: alle[parseInt(x.n, 10) - 1] })).filter((x) => x.s);
+    if (!j) log('- Forældet-vagt: svaret kunne ikke læses — intet fjernet');
+    else if (fund.length && !r.kilder.length) log(`- Forældet-vagt: ${fund.length} fund uden søgekilder — intet fjernet`);
+    else {
+      if (fund.some((x) => foersteAfsnit(html).includes(x.s))) throw new Error(`Det korte svar nævner noget forældet (${fund[0].what}) — artiklen afvist`);
+      for (const x of fund) html = html.replace(x.s, '');
+      html = tomt(html);
+      log(`- Forældet-vagt: ${fund.length} sætninger fjernet${fund.length ? ` (${fund.map((x) => `${x.what}: ${x.status}`).join(' · ')})` : ''}`);
+      if (antalFaq(html) < 5) throw new Error(`FAQ har kun ${antalFaq(html)} spørgsmål efter forældet-vagten — artiklen afvist`);
+    }
+  } catch (e) { if (/artiklen afvist/.test(e.message)) throw e; log(`- Forældet-vagt: tjek fejlede (${e.message.slice(0, 80)}) — intet fjernet`); }
+}
+
 // --- 4d. Jacobs stemme (30/10-2026, robot/lib/hjerne.mjs) ----------------------
 // Kun når emnet rammer en af hans holdninger i emner.md: 1-2 korte afsnit i første person, sat ind sidst i den
 // sektion, hvor de passer. Efter sprog- og kildekontrollen, så de ikke bliver "rettet" eller fjernet som fyld.
@@ -665,10 +694,12 @@ if (OMSKRIV) {
   // Omskrivning: samme fil og adresse. Udgivelsesdato, etiketter (= hylden via hyldeplanen) og bloggerId beholdes;
   // gamle frontmatter-felter, der hørte til den gamle tekst (seoTitle, ekstra FAQ, hadToc), fjernes.
   [, aar, md, navn] = OMSKRIV.match(/^\/(\d{4})\/(\d{2})\/(.+)$/);
-  const { seoTitle, faq, hadToc, ...behold } = gammel.fm;
+  // "stemme" og "opskrift" fra en tidligere omskrivning følger ikke med (31/10: ellers stod stemme: true, selv om den
+  // nye tekst ikke har hans afsnit). gammelTitel er altid den OPRINDELIGE titel, også ved anden omskrivning.
+  const { seoTitle, faq, hadToc, stemme: _gammelStemme, opskrift: _gammelOpskrift, ...behold } = gammel.fm;
   gemFrontmatter({ ...behold, title: titel, description: String(meta.description || ''), updated: nu.toISOString(), image: hero.fil,
     keyword: valgt.hoved, relatedKeywords: valgt.beslaegtede, robot: true, ...(stemme ? { stemme: true } : {}), omskrevet: iDag, omskrivning: 'fuld',
-    gammelTitel: String(gammel.fm.title || '') }, `${html}\n`);
+    opskrift: OPSKRIFT, gammelTitel: String(gammel.fm.gammelTitel || gammel.fm.title || '') }, `${html}\n`);
 } else {
 aar = String(nu.getUTCFullYear()); md = String(nu.getUTCMonth() + 1).padStart(2, '0');
 navn = slug; let n = 2;
@@ -677,7 +708,7 @@ fs.mkdirSync(sti(`src/content/posts/${aar}/${md}`), { recursive: true });
 const labels = [valgt.emne];   // emnets etiket = artiklens hylde (src/lib/hylder.ts)
 const yamlStr = (s) => JSON.stringify(String(s));
 const fm = ['---', `title: ${yamlStr(titel)}`, `description: ${yamlStr(meta.description)}`, `published: ${nu.toISOString()}`, `updated: ${nu.toISOString()}`,
-  'labels:', ...labels.map((l) => `  - ${l}`), `image: ${hero.fil}`, `keyword: ${yamlStr(valgt.hoved)}`, 'relatedKeywords:', ...valgt.beslaegtede.map((k) => `  - ${yamlStr(k)}`), 'robot: true', ...(stemme ? ['stemme: true'] : []), '---'].join('\n');
+  'labels:', ...labels.map((l) => `  - ${l}`), `image: ${hero.fil}`, `keyword: ${yamlStr(valgt.hoved)}`, 'relatedKeywords:', ...valgt.beslaegtede.map((k) => `  - ${yamlStr(k)}`), 'robot: true', ...(stemme ? ['stemme: true'] : []), `opskrift: ${OPSKRIFT}`, '---'].join('\n');
 fs.writeFileSync(sti(`src/content/posts/${aar}/${md}/${navn}.md`), `${fm}\n${html}\n`);
 }
 

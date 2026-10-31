@@ -77,7 +77,7 @@ RULES
 - Use ONLY what his notes state. Never invent experiences, tests, details, numbers, dates or names. Never claim he tested or reviewed a product unless his notes say so. Do not mention employers, places, his age, family, partner or private life. Never mention AdSense.
 - Do not repeat facts the article already gives. A number may only appear if the article already states it. Name no organisation, company or publication as a source.${seneste.length ? `
 - His voice already appears in other recent articles (below). Do NOT reuse their stories, examples or phrasing.${ob.length ? ` Used up for now - do not use at all: ${ob.join('; ')}.` : ''}${slidte.length ? ` Worn phrases - do not use them or close variants: ${slidte.map((v) => `"${v}"`).join(', ')}.` : ''}` : ''}
-- If his notes say he has no experience with the topic, say so honestly in one short clause, then give his view.
+- Write only where his notes give him a real view or real experience. Never claim experience he does not have, and never write that he lacks experience ("I do not have personal experience with ...") - choose another section, or write fewer paragraphs.
 - No headings, no lists, no HTML, no quotation marks around the text, no sign-off.
 - If nothing in his notes genuinely bears on this question, output exactly NONE.
 
@@ -177,6 +177,7 @@ function genbrugtFrase(tekst, seneste) {
 
 const PRIVAT = /\b(54|fifty-four|girlfriend|partner|wife|children|kids|Scotland|Zealand|Sj[æa]lland|Brabrand)\b/i;
 const FIRMAER = /M[æa]e?rsk|Musikhus|Concert Hall of Aarhus|AarBus|Bang\s*&\s*Olufsen|DS Dental|Beumer|Terma|Semco|Keolis|Region Midtjylland/i;
+const INGEN_ERFARING = /\bI (?:do not|don't|did not|didn't|never|have never|haven't|have not)\b[^.]{0,30}\b(?:experience|expertise|an expert)\b|\bI'?m not (?:an? )?(?:expert|gamer|developer|programmer|specialist)\b|\b(?:no|little|limited) (?:personal |hands-on |real )?experience\b/i;
 const TESTET = /\bI (have )?(tested|reviewed|benchmarked|compared)\b|\bin my tests?\b/i;
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -194,6 +195,8 @@ export function tjekStemme(svar, html, seneste = [], ekstraTjek = () => '') {
     const t = String(x?.text || '').trim().replace(/^["“]|["”]$/g, '').replace(/<[^>]+>/g, '').replace(/\s*\n+\s*/g, ' ').trim();
     const sektion = String(x?.section || '').trim();
     if (!t) continue;
+    // "Jeg har ingen erfaring med …" lyder svagt midt i en artikel (Jacob 31/10-2026, prøve #37): afsnittet springes over
+    if (INGEN_ERFARING.test(t)) continue;
     if (!tilladte.includes(sektion)) return { ok: false, grund: `sektionen "${sektion.slice(0, 50)}" findes ikke` };
     const ss = t.split(/(?<=[.!?])\s+/).filter((y) => y.split(/\s+/).length >= 3);
     if (ss.length < 2 || ss.length > 3) return { ok: false, grund: `et afsnit har ${ss.length} sætninger (skal være 2-3)` };

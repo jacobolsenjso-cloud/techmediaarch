@@ -19,8 +19,12 @@ on:
       opgave:
         description: 'Hvad skal robotten gøre?'
         type: choice
-        options: [soegeord, noegletjek, proeveartikel, faq-ekstra]
+        options: [soegeord, noegletjek, proeveartikel, proeveomskriv, faq-ekstra]
         default: soegeord
+      omskriv:
+        description: 'proeveomskriv: artiklens adresse, fx /2026/04/mdm-activate-your-mac-with-this-essential-guide'
+        required: false
+        default: ''
       emne:
         description: 'Emne (fx AI) - tomt = alle / robotten vælger'
         required: false
@@ -69,6 +73,7 @@ jobs:
           EMNE: ${{ inputs.emne }}
           PAKKER: ${{ inputs.pakker }}
           HOVED: ${{ inputs.hovedsoegeord }}
+          OMSKRIV: ${{ inputs.omskriv }}
         run: |
           case "$OPGAVE" in
             soegeord)
@@ -78,13 +83,16 @@ jobs:
               node robot/noegletjek.mjs > /dev/null ;;
             proeveartikel)
               node robot/artikel.mjs --emne "$EMNE" --hoved "$HOVED" ;;
+            proeveomskriv)
+              # 31/10-2026: prøv en omskrivning (også --igen af en artikel fra en ældre opskrift) på en gren
+              node robot/artikel.mjs --omskriv "$OMSKRIV" --maade fuld --igen ;;
             faq-ekstra)
               # 32 minutter, så der er tid til at gemme grenen inden jobbets loft på 40
               node robot/faq-ekstra.mjs --minutter 32 ;;
             *) echo "Ukendt opgave"; exit 1 ;;
           esac
       - name: Gem prøveartiklen på en egen gren (ikke main)
-        if: inputs.opgave == 'proeveartikel'
+        if: inputs.opgave == 'proeveartikel' || inputs.opgave == 'proeveomskriv'
         run: |
           git config user.name "techmediaarch-robot"
           git config user.email "robot@techmediaarch.com"

@@ -78,6 +78,11 @@ export function antalPrEmne(alle = artikler()) {
 }
 
 const laesJson = (f, tom) => { try { return JSON.parse(fs.readFileSync(sti(f), 'utf8')); } catch { return tom; } };
+// Opskriftens version (31/10-2026): skrives i frontmatter som "opskrift: N" på nye og omskrevne artikler. Et punkt i
+// omskriv-køen med "igen": true skrives om igen, hvis artiklen er lavet med en ældre opskrift. Hæv tallet, når
+// opskriften bliver markant bedre, og ældre robotartikler skal kunne laves om.
+// 2 = naturligt sprog, Key takeaways, 3 billeder, forældet-vagt, ingen løst beslægtede links.
+export const OPSKRIFT = 2;
 export const BRUGTE = 'robot/data/brugte-soegeord.json';   // [{ q, emne, dato, artikel }] — skrevet ind, når en artikel er udgivet
 export const PROEVEDE = 'robot/data/proevede-soegeord.json'; // [{ q, emne, dato, grund }] — prøvet uden held; hviler 30 dage
 export const brugte = () => laesJson(BRUGTE, []);
