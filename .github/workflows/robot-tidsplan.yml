@@ -91,6 +91,7 @@ jobs:
         if: always() && (steps.plan.outputs.koer == 'ja' || steps.plan.outputs.omskriv == 'ja')
         run: npm run build > /dev/null
       - name: Udgiv på main
+        id: udgiv
         if: always() && steps.bygget.outcome == 'success'
         run: |
           git config user.name "techmediaarch-robot"
@@ -98,8 +99,16 @@ jobs:
           git add src/content public/images robot/data
           git diff --cached --quiet && { echo "Intet at udgive"; exit 0; }
           git commit -m "Robot article $(date -u +%F) (run ${{ github.run_number }})"
-          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && exit 0; sleep 10; done
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && { echo "udgivet=ja" >> "$GITHUB_OUTPUT"; exit 0; }; sleep 10; done
           exit 1
+      # IndexNow (Jacob 31/10-2026): de artikler, robottens commit ændrede, meldes til Bing, når Cloudflare viser dem
+      # (robot/indexnow.mjs venter højst 12 min). Fejler det, går robotten ikke i stå.
+      - name: Meld nye og omskrevne artikler til Bing (IndexNow)
+        if: always() && steps.udgiv.outputs.udgivet == 'ja'
+        continue-on-error: true
+        timeout-minutes: 15
+        # -z/xargs -0: flere af de gamle Blogger-adresser har mellemrum i filnavnet
+        run: git diff -z --name-only HEAD~1 HEAD -- src/content/posts | xargs -0 -r node robot/indexnow.mjs
       - uses: actions/upload-artifact@v6
         if: always() && steps.plan.outputs.omskriv == 'ja'
         with:
