@@ -14,7 +14,7 @@
 // Laver:
 //   public/logo.svg (topbjælken og kort uden billede) = public/favicon.svg, public/favicon.ico,
 //   public/apple-touch-icon.png, icon-192/512.png, icon-maskable-512.png, icon-monochrome-512.png,
-//   public/og-default.png (1200x630), scripts/vandmaerke.png (brændes ind i billederne af byggeriet),
+//   public/og-default.png (1200x630),
 //   brand/*.png (app-ikoner i lys, mørk og én farve + afrundet logo, til en senere app)
 import fs from 'node:fs';
 import os from 'node:os';
@@ -108,11 +108,8 @@ const OG = side(`<div class="og"><div class="ik">${logo({ rx: AFRUNDET, id: 'og'
  .navn { font-size: 92px; font-weight: 750; font-stretch: 88%; letter-spacing: -0.02em; color: #1f2328; line-height: 1; }
  .under { font-size: 31px; font-weight: 450; color: #4b5160; }`);
 
-// Vandmærket: logoet (samme tegning) + techmediaarch.com i en mørkeblå pille, tegnet 4 gange større
-// end det vises, så det kan skaleres ned til hvert billede uden at blive grumset
-const VM = side(`<div class="vm"><div class="ik">${logo({ rx: AFRUNDET, id: 'vm' })}</div><span>techmediaarch.com</span></div>`,
-`body { padding: 20px; } .vm { display: inline-flex; align-items: center; gap: 28px; padding: 20px 44px 20px 24px; border-radius: 36px; background: rgba(15, 31, 85, 0.55); font-family: "Archivo", Arial, sans-serif; }
- .vm .ik { width: 80px; height: 80px; } .vm span { font-size: 56px; font-weight: 650; color: #ffffff; line-height: 1; }`);
+// (Vandmærket med den mørkeblå pille er fjernet 1/11-2026: siden 31/10 tegnes mærkerne uden baggrund af
+// scripts/lav-maerker.mjs og lægges på af scripts/maerker.mjs.)
 
 // --- Favicon.ico: PNG-billeder pakket i en .ico-fil -------------------------------------------
 function ico(pngs) {
@@ -156,9 +153,8 @@ const morkBag = '<defs><linearGradient id="e" x1="0.329" y1="0.03" x2="0.671" y2
 skriv('brand/app-ikon-en-farve-1024.png', await png(await tegnSvg(enFarve(MAAL, morkBag), 1024), 1024, true));
 skriv('public/icon-monochrome-512.png', await png(await tegnSvg(enFarve(MAAL * 0.84), 1024), 512));
 
-// Delingsbillede og vandmærke
+// Delingsbillede
 skriv('public/og-default.png', await sharp(await tegn(OG, 1200, 630)).png(PALET).toBuffer());
-skriv('scripts/vandmaerke.png', await sharp(await tegn(VM, 1400, 240)).trim({ threshold: 0 }).png({ compressionLevel: 9 }).toBuffer());
 
 fs.rmSync(TMP, { recursive: true, force: true });
 console.log('Færdig.');
