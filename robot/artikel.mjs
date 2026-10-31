@@ -35,7 +35,7 @@ import { faqSchema } from '../src/lib/faqschema.mjs';
 import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
 import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord, storeBogstaver, gentagerSig } from './lib/sprog.mjs';
 import { laesHjerne, stemmeBlok, stemmePrompt, tjekStemme, fletInd, senesteStemmeAfsnit } from './lib/hjerne.mjs';
-import { kildeHenvisninger, kendtNavn } from './lib/kildenavne.mjs';
+import { kildeHenvisninger, kendtNavn, domaenerTilNavne } from './lib/kildenavne.mjs';
 import { parse as yamlParse, stringify as yamlStringify } from 'yaml';
 import { hentKildeTekster, vaerdier, talUdenKilde, synligTekst } from './lib/talvagt.mjs';
 
@@ -398,6 +398,8 @@ const tomt = (h) => h.replace(/<(p|li)\b[^>]*>\s*<\/\1>/gi, '').replace(/<(ul|ol
   html = tomt(html);
   log(`- Kilder uden for listen: ${rest.length} sætninger fjernet${rest.length ? ` (${rest.map((x) => x.navne.join('+')).join(', ')})` : ''}`);
 }
+// "According to superops.com" → "According to Superops" (31/10-2026, prøve #39), robot/lib/kildenavne.mjs
+{ const d = domaenerTilNavne(html, kildeLinks); html = d.html; if (d.rettet) log(`- Webadresser som kildenavn rettet: ${d.rettet}`); }
 
 // Lister (Jacob 5/10-2026): mindst 2. Mangler de, omskriver Gemini 1-2 afsnit, hvor en liste hjælper læseren.
 // Kun hvis afsnittet findes ordret, alle links bevares, og næsten alle ord er med (ingen fakta forsvinder).

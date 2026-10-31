@@ -35,7 +35,26 @@ const KENDTE_NAVNE = {
   'support.google.com': 'Google Help', 'developers.google.com': 'Google for Developers', 'research.ibm.com': 'IBM Research',
 };
 const kendtNavnFor = (host) => Object.entries(KENDTE_NAVNE).find(([d]) => host === d || host.endsWith(`.${d}`))?.[1] || '';
-export const kildeNavneTekst = (kilder) => kilder.map((k) => { const host = new URL(k.url).hostname.replace(/^www\./, ''); const m = kendtNavnFor(host) || maerkeAf(k); return m ? `${m} (${host})` : host; }).join('; ');
+// Kildens navn i teksten. Uden fast navn og uden mærke i titlen bruges domænets navn med stort ("goworkwize.com" →
+// "Goworkwize") — målt 31/10-2026 (prøve #39): med kun domænet skrev Gemini "According to goworkwize.com".
+export const kildeNavn = (k) => { const host = new URL(k.url).hostname.replace(/^www\./, ''); const base = host.split('.').slice(-2, -1)[0] || host; return kendtNavnFor(host) || maerkeAf(k) || base.charAt(0).toUpperCase() + base.slice(1); };
+export const kildeNavneTekst = (kilder) => kilder.map((k) => `${kildeNavn(k)} (${new URL(k.url).hostname.replace(/^www\./, '')})`).join('; ');
+// Står et kildedomæne som navn i teksten ("according to superops.com"), skiftes det til kildens navn. Kun synlig tekst,
+// aldrig inde i tags (href'er røres ikke).
+export function domaenerTilNavne(html, kilder) {
+  let n = 0;
+  const ud = String(html).split(/(<[^>]+>)/).map((d) => {
+    if (d.startsWith('<')) return d;
+    let t = d;
+    for (const k of kilder) {
+      const host = new URL(k.url).hostname.replace(/^www\./, '');
+      const re = new RegExp(`\\b(?:www\\.)?${host.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+      t = t.replace(re, () => { n++; return kildeNavn(k); });
+    }
+    return t;
+  }).join('');
+  return { html: ud, rettet: n };
+}
 
 // Gemini må ikke selv skrive en kildeliste — den lægges på bagefter (robot/lib/links.mjs kildeliste).
 // Målt 29/10 (prøve #33): et afsnit med kun domæner ("nhimg.org, cloudmask.com, …") lige før "Sources".
