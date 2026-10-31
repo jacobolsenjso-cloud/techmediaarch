@@ -43,6 +43,15 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v5
+      # Jacobs hjerne (31/10-2026): manglede her, så proeveartikel stoppede med "Hjernen mangler" — robot/artikel.mjs
+      # skriver aldrig uden hans stemme. Samme trin som i robot-tidsplan.yml (privat repo, kun læsenøgle).
+      - name: Hent hjernen (jacob-hjerne, privat, kun læsning)
+        continue-on-error: true
+        uses: actions/checkout@v5
+        with:
+          repository: jacobolsenjso-cloud/jacob-hjerne
+          ssh-key: ${{ secrets.HJERNE_NOEGLE }}
+          path: _hjerne
       - uses: actions/setup-node@v5
         with:
           node-version-file: .node-version
