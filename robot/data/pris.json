@@ -202,5 +202,34 @@
     ]
    }
   }
+ },
+ {
+  "dato": "2026-10-31T16:00:00.000Z",
+  "artikel": null,
+  "usd": 0.14,
+  "note": "prøve #37 (manuel, ikke udgivet)",
+  "kr": 0.96
+ },
+ {
+  "dato": "2026-10-31T16:36:00.000Z",
+  "artikel": null,
+  "usd": 0.2223,
+  "note": "prøve #38 (manuel, ikke udgivet)",
+  "kr": 1.53
+ },
+ {
+  "dato": "2026-10-31T16:41:00.000Z",
+  "artikel": null,
+  "usd": 0.0984,
+  "note": "prøve #39 (manuel, ikke udgivet)",
+  "kr": 0.68
+ },
+ {
+  "dato": "2026-10-31T17:00:00.000Z",
+  "artikel": "/2026/06/agentic-ai-vs-ai-agents-technical",
+  "omskrevet": true,
+  "usd": 0.8423,
+  "note": "prøve #40 (manuel, gemini-3.5-flash), lagt på main",
+  "kr": 5.79
  }
 ]
