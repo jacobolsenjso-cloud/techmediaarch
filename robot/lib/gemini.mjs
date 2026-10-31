@@ -1,11 +1,17 @@
 // Kald til Gemini (tekst, JSON og billeder). Nøglen kommer fra GEMINI_API_KEY
 // og skrives aldrig ud. Projektet "Gemini Project Tech Media Arch" har betaling
-// og et beløbsloft på 200 kr/md (Jacob 30/10-2026; 50 kr fra 26/9-2026).
+// og et beløbsloft på 300 kr/md (Jacob 31/10-2026; 200 kr fra 30/10, 50 kr fra 26/9-2026).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const TEKSTMODEL = 'gemini-3.5-flash-lite';
+// Artiklerne skrives med den stærkere model (Jacob 31/10-2026): flash-lite gav svingende kvalitet (prøve #38: 8 kilder
+// og 1.500 ord, #39: 4 kilder, 1.100 ord og mange enkeltsætninger). robot/artikel.mjs vælger den; resten (søgeordslisten,
+// dubletter) bruger stadig flash-lite.
+export const ARTIKELMODEL = 'gemini-3.5-flash';
+let tekstModel = TEKSTMODEL;
+export const brugTekstmodel = (m) => { tekstModel = m; };
 // 31/10-2026 (Jacob): samme billedmodel som techfeedwatch — den gav de rige, fortællende billeder i prøverne.
 // Før: gemini-3.1-flash-lite-image ($0,0336). techfeedwatch måler ca. $0,034 pr. billede (prisliste 12/10).
 export const BILLEDMODEL = 'gemini-nano-banana-2.1';
@@ -85,7 +91,7 @@ const tekstAf = (j) => (j.candidates?.[0]?.content?.parts || []).map((p) => p.te
 // Tekst, evt. med Google-søgning. Returnerer { tekst, kilder: [{ uri, titel, i }], stoette: [{ tekst, kilder: [i] }] }.
 // stoette (29/10-2026): Googles egen kobling mellem et stykke af svaret og de kilder (i = nummer i kildelisten), det
 // bygger på. Bruges til kun at skrive ud fra fakta fra kontrollerede kilder (robot/lib/kildenavne.mjs).
-export async function skriv(prompt, { soeg = false, temperatur = 0.7, model = TEKSTMODEL } = {}) {
+export async function skriv(prompt, { soeg = false, temperatur = 0.7, model = tekstModel } = {}) {
   const body = { contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: temperatur } };
   if (soeg) body.tools = [{ google_search: {} }];
   const j = await kald(model, body);
@@ -97,7 +103,7 @@ export async function skriv(prompt, { soeg = false, temperatur = 0.7, model = TE
 
 // Svar som JSON (uden søgning — de to kan ikke kombineres).
 export async function json(prompt) {
-  const j = await kald(TEKSTMODEL, { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json', temperature: 0.2 } });
+  const j = await kald(tekstModel, { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json', temperature: 0.2 } });
   return JSON.parse(tekstAf(j));
 }
 

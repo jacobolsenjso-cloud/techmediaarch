@@ -23,7 +23,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { somSporgsmaal } from '../src/lib/sporgsmaal.mjs';
 import { EKSTRA_ETIKETTER } from '../src/lib/adresse.mjs';
-import { skriv, json, gemPrisVedExit } from './lib/gemini.mjs';
+import { skriv, json, gemPrisVedExit, brugTekstmodel, ARTIKELMODEL } from './lib/gemini.mjs';
+brugTekstmodel(ARTIKELMODEL);   // den stærkere model til artiklerne (Jacob 31/10-2026), robot/lib/gemini.mjs
 gemPrisVedExit('artikel');   // pristælleren (trin 7): robot/ud/pris-artikel.json, også når artiklen afvises
 import { lav, MOTIVREGLER } from './lib/billeder.mjs';
 import { kontrollerKilder, kildeliste } from './lib/links.mjs';
