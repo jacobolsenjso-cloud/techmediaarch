@@ -49,11 +49,16 @@ export function maaUdgive(nu = new Date(), liste = robotArtikler()) {
   if (FRIDAGE.includes(dkDag(nu))) return { ok: false, grund: `fridag (${dkDag(nu)}, dansk tid)` };
   const iDag = liste.filter((a) => dkDato(a.udgivet) === dkDato(nu)).length;
   if (iDag >= MAKS_PR_DAG) return { ok: false, grund: `loftet er nået: ${iDag} af ${MAKS_PR_DAG} i dag` };
+  // Månedsloft (31/10-2026): Googles beløbsloft er 300 kr. Nye artikler stopper ved MAANED_LOFT_KR, så robotten aldrig
+  // løber ind i Googles loft midt i en artikel (med den stærkere model koster en artikel målt ca. 5,8 kr).
+  const krMd = laes(PRIS, []).filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === dkDato(nu).slice(0, 7)).reduce((s, p) => s + (p.kr || 0), 0);
+  if (krMd >= MAANED_LOFT_KR) return { ok: false, grund: `månedsloftet er nået: ${krMd.toFixed(2)} af ${MAANED_LOFT_KR} kr` };
   return { ok: true, grund: `${iDag} af ${MAKS_PR_DAG} i dag` };
 }
 
 const OMSKRIV_KOE = 'robot/data/omskriv-koe.json';         // [{ sti, maade: 'fuld' | 'titel' }] i Jacobs rækkefølge
 const OMSKRIV_PROEVET = 'robot/data/omskriv-proevet.json'; // [{ sti, dato, grund }] — afvist; hviler 30 dage
+export const MAANED_LOFT_KR = 290;                         // nye artikler stopper her (10 kr luft under Googles 300)
 export const OMSKRIV_LOFT_KR = 250;                        // omskrivning stopper ved 250 kr i måneden (Googles loft er 300, Jacob 31/10-2026; før 150 af 200)
 // Tempo (Jacob 30/10-2026): 3 om dagen, 6 dage om ugen (fri søndag), højst 1 af de 3 med Google-visninger
 // ("visninger: true" i køen) — så et eventuelt fald i Google kan ses og bremses, før det rammer dem alle.
