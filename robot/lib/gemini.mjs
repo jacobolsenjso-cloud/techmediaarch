@@ -6,7 +6,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const TEKSTMODEL = 'gemini-3.5-flash-lite';
-export const BILLEDMODEL = 'gemini-3.1-flash-lite-image'; // $0,0336 pr. billede (prisside 26/9-2026)
+// 31/10-2026 (Jacob): samme billedmodel som techfeedwatch — den gav de rige, fortællende billeder i prøverne.
+// Før: gemini-3.1-flash-lite-image ($0,0336). techfeedwatch måler ca. $0,034 pr. billede (prisliste 12/10).
+export const BILLEDMODEL = 'gemini-nano-banana-2.1';
+export const KONTROLMODEL = 'gemini-3.5-flash';   // billedkontrollen (stærkere end flash-lite, som lod et skelet slippe igennem)
 
 // --- Pristæller (trin 7, Jacob 29/10-2026) ---------------------------------------------------------
 // Hvert kald tælles ud fra Googles eget svar (usageMetadata), så prisen er målt, ikke gættet.
@@ -15,8 +18,9 @@ export const BILLEDMODEL = 'gemini-3.1-flash-lite-image'; // $0,0336 pr. billede
 export const PRISER = {
   'gemini-3.5-flash-lite': { ind: 0.30, ud: 2.50 },
   'gemini-2.5-flash': { ind: 0.30, ud: 2.50 },
+  'gemini-3.5-flash': { ind: 1.50, ud: 9.00 },  // 31/10: manglede, så prisen stod som "UKENDT" (Googles prisliste via pricepertoken.com m.fl.)
 };
-export const BILLEDPRIS = 0.0336;            // USD pr. billede (1K), samme prisside
+export const BILLEDPRIS = 0.034;             // USD pr. billede (nano-banana-2.1, som techfeedwatch måler)
 export const SOEG_GRATIS_PR_MD = 5000;       // Google-søgning: 5.000 gratis pr. måned (Gemini 3+), derefter $14 pr. 1.000
 export const KURS = 6.87;                    // DKK pr. USD (Wise, midtkurs 29/10-2026)
 export const forbrug = { modeller: {}, billeder: 0, soegninger: 0 };
@@ -94,6 +98,13 @@ export async function skriv(prompt, { soeg = false, temperatur = 0.7, model = TE
 // Svar som JSON (uden søgning — de to kan ikke kombineres).
 export async function json(prompt) {
   const j = await kald(TEKSTMODEL, { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json', temperature: 0.2 } });
+  return JSON.parse(tekstAf(j));
+}
+
+// Billedkontrol (31/10-2026): Gemini ser på et billede og svarer i JSON.
+export async function seBillede(buf, prompt, model = KONTROLMODEL) {
+  const mime = buf[0] === 0xff ? 'image/jpeg' : 'image/png';
+  const j = await kald(model, { contents: [{ parts: [{ inlineData: { mimeType: mime, data: buf.toString('base64') } }, { text: prompt }] }], generationConfig: { responseMimeType: 'application/json', temperature: 0 } });
   return JSON.parse(tekstAf(j));
 }
 

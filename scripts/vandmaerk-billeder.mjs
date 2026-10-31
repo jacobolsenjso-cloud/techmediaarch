@@ -8,36 +8,26 @@
 //  - Billeder i artiklernes brødtekst og delingsbilledet (og:image) peger på /images/m/<fil>
 //    (src/lib/temakoder.mjs). Kortene på forsiden og hylderne bruger de rene originaler.
 //  - Ny adresse betyder også, at ingen browser viser en gammel cachet udgave (/images/* caches i et år).
-// Udseendet er lærredets "Watermark on an article image" (logoet låst 30/10): mørkeblå pille med det
-// lille A og techmediaarch.com nederst til højre. Pillen tegnes af scripts/lav-logo.mjs (vandmaerke.png).
+// Udseendet (Jacob 31/10-2026): logoet og techmediaarch.com nederst til højre UDEN baggrund — hvid tekst med
+// blød skygge på mørke billeder, mørk tekst med lys glorie på lyse. Mærket er tegnet på forhånd
+// (scripts/lav-maerker.mjs) og lægges på af scripts/maerker.mjs. Før 31/10: en mørkeblå pille (vandmaerke.png).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import { maerkeLag } from './maerker.mjs';
 
-const PILLE = fileURLToPath(new URL('./vandmaerke.png', import.meta.url));
 export const MAPPE = 'm';        // dist/images/m/
 export const MIN_BREDDE = 150;   // smallere billeder (ikoner, pixels) får intet mærke — samme regel som på Blogger
 
-// Pillen fylder 22 % af billedets bredde: på en artikel (ca. 720 px bred) bliver teksten ca. 14 px,
-// samme størrelse som det gamle vandmærke. Afstand til kanten: 2 % af bredden.
-const ANDEL = 0.22;
-const pilleCache = new Map();
-async function pille(bredde) {
-  if (!pilleCache.has(bredde)) pilleCache.set(bredde, await sharp(PILLE).resize({ width: bredde, kernel: 'lanczos3' }).png().toBuffer());
-  return pilleCache.get(bredde);
-}
-
 export async function braendInd(buf) {
   const billede = sharp(buf, { failOn: 'none' });
-  const { width: b, height: h, format } = await billede.metadata();
+  const { width: b, format } = await billede.metadata();
   if (!b || b < MIN_BREDDE) return null;
   if (!['jpeg', 'png', 'webp'].includes(format)) return buf; // fx en GIF med .jpg-navn: kopien er originalen
-  const pb = Math.round(b * ANDEL), p = await pille(pb);
-  const { height: ph } = await sharp(p).metadata();
-  const kant = Math.round(b * 0.02);
-  if (ph + kant * 2 > h) return buf; // ekstremt lavt banner: ingen plads — kopien er originalen
-  const ud = billede.composite([{ input: p, left: b - pb - kant, top: h - ph - kant }]);
+  const lag = await maerkeLag(buf, { type: 'vm', hjoerne: 'nh' });
+  if (!lag) return buf; // ekstremt lavt banner: ingen plads — kopien er originalen
+  const ud = billede.composite([{ input: lag.input, left: lag.left, top: lag.top }]);
   if (format === 'png') return ud.png({ compressionLevel: 9 }).toBuffer();
   if (format === 'webp') return ud.webp({ quality: 82 }).toBuffer();
   return ud.jpeg({ quality: 82, mozjpeg: true }).toBuffer();

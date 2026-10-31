@@ -11,7 +11,7 @@
 //  2. Gemini skriver artiklen MED Google-søgning. Uden mindst 2 kontrollerede
 //     kilder afvises artiklen (Gemini søger ellers ikke altid — målt 26/9).
 //  3. Interne links: 3-5 til eksisterende artikler (kun adresser, der findes).
-//  4. To billeder med Gemini (Cloudflare som reserve) — Jacobs valg 26/9.
+//  4. To billeder med Gemini (Cloudflare som reserve) — Jacobs valg 26/9. Ny billedopskrift 31/10 (robot/lib/billeder.mjs).
 //  5. Trin 7 i svar-arkivet (Jacob 29/10-2026): ingen video (YouTube-delen og etiketten "Video" er fjernet;
 //     sitet viser ikke videoer mere), titlen er spørgsmålet, og artiklen begynder med det korte svar.
 //  6. Jacobs hjerne (30/10-2026): stilen fra jacob-hjerne er altid med i skriveprompten, og når emnet rammer
@@ -22,12 +22,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { somSporgsmaal } from '../src/lib/sporgsmaal.mjs';
+import { EKSTRA_ETIKETTER } from '../src/lib/adresse.mjs';
 import { skriv, json, gemPrisVedExit } from './lib/gemini.mjs';
 gemPrisVedExit('artikel');   // pristælleren (trin 7): robot/ud/pris-artikel.json, også når artiklen afvises
-import { lav } from './lib/billeder.mjs';
+import { lav, MOTIVREGLER } from './lib/billeder.mjs';
 import { kontrollerKilder, kildeliste } from './lib/links.mjs';
 import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder, udenEgenKildeliste, KILDE_LOFT, KILDE_LOFT_MAKS } from './lib/kildenavne.mjs';
-import { artikler, sti } from './lib/arkiv.mjs';
+import { artikler, sti, emner } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
@@ -500,8 +501,8 @@ Return JSON with:
 "title": the main keyword written as the question a reader would ask, in correct natural English and Title Case, ending with "?" (e.g. "How Does Phishing-Resistant MFA Work?"), at most 70 characters, no extra words, no year,
 "description": 140-160 characters, plain and specific,
 "slug": 3-6 lowercase words joined by hyphens,
-"image1": a prompt for a clean, modern editorial illustration for the top of the article,
-"image2": a different prompt for an illustration further down,
+"image1": the cover image for the article's main idea: ${MOTIVREGLER},
+"image2": a different image idea for another key point of the article, following the same rules,
 "alt1": short alt text for image 1, "alt2": short alt text for image 2`);
 // Talvagten gælder også beskrivelsen, som Google viser: har den et tal uden kilde, bruges det korte svar i stedet.
 if (talUdenKilde([String(meta.description || '')], kendteTal).length) {
@@ -518,12 +519,14 @@ if (titel !== geminiTitel) log(`- Titel: Geminis "${geminiTitel}" var ikke et sp
 const slug = String(meta.slug || titel).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
 
 // --- 6. Billeder (Gemini, Cloudflare som reserve) ---------------------------
-// Fast tilføjelse til begge billed-prompts. Prøveartikel 1-2 (26/9) fik tekst i
-// billederne, et falsk diagram med tal, og et motiv beskåret i toppen.
-const BILLEDREGLER = ' Wide 16:9 landscape composition, main subject centered with generous empty margins on all sides. Absolutely no text, no letters, no words, no numbers, no labels, no charts or graphs, no logos, no brand or product symbols (e.g. no programming-language logos), no real people.';
-const hero = await lav(meta.image1 + BILLEDREGLER);
-const mid = await lav(meta.image2 + BILLEDREGLER);
+// Ny opskrift 31/10-2026 (robot/lib/billeder.mjs): motiverne ovenfor (image1/image2), techfeedwatchs billedmodel,
+// billedkontrol, dæmpede lyspletter, hyldens accentfarve, "AI-generated" og IPTC-mærket.
+// Hylden giver accentfarven. Omskrivninger har Bloggers etiket som emne ("Cyber Security" o.l.); ukendt → AI-farven.
+const hylde = emner().find((e) => e.etiket === valgt.emne)?.hylde || EKSTRA_ETIKETTER[valgt.emne];
+const hero = await lav({ motiv: meta.image1, titel, besk: meta.description, hylde });
+const mid = await lav({ motiv: meta.image2, titel, besk: meta.description, hylde });
 if (!hero?.fil || !mid?.fil) throw new Error('Mindst ét af billederne kunne ikke laves');
+for (const [n, b] of [[1, hero], [2, mid]]) log(`- Billede ${n}: ${b.motor}${b.forsoeg > 1 ? ` · ${b.forsoeg} forsøg` : ''}${b.noter.length ? ` · ${b.noter.join(' · ')}` : ''}`);
 const figur = (b, alt) => `<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="${esc(alt)}" height="768" src="${b.fil}" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">${esc(alt)}</td></tr></tbody></table>`;
 
 // Billede 1 efter første afsnit, billede 2 før overskriften nærmest 60 % inde.
