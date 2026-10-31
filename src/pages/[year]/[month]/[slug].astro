@@ -15,7 +15,7 @@ import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
 import { tegnFarve } from '../../../lib/sporgsmaal.mjs';
 import OGSAA_SPURGT from '../../../../robot/data/ogsaa-spurgt.json';
 import MEST_RAA from '../../../../robot/data/mest-laest.json';
-import { efterFoersteBillede, foranMidterOverskrift, indsaet } from '../../../lib/artikelbokse.mjs';
+import { efterFoersteBillede, foranMidterOverskrift, indsaet, udenAnnonceHuller } from '../../../lib/artikelbokse.mjs';
 
 export function getStaticPaths() {
   return INDLAEG.map((p) => ({ params: { year: p.aar, month: p.maaned, slug: p.navn }, props: { p } }));
@@ -51,7 +51,8 @@ const paaHtml = paa.length ? `<aside class="paa" data-ekstra="1" aria-labelledby
 const FOERSTE_AFSNIT = /^(\s*<h2\b[^>]*>(?:(?!<\/h2>)[\s\S])*<\/h2>\s*)?<p>((?:(?!<\/?p[\s>])[\s\S])+?)<\/p>/;
 const fa = p.robot ? p.html.match(FOERSTE_AFSNIT) : null;
 const forspalte = fa && fa[2].replace(/<[^>]+>/g, '').trim().length >= 60 ? fa[2] : null;
-const krop = forspalte ? (fa![1] ?? '') + p.html.slice(fa![0].length) : p.html;
+// "Key takeaways" uden <p>/<ul>/<li> (31/10-2026): Auto-annoncer satte en annonce ind midt mellem punkterne.
+const krop = udenAnnonceHuller(forspalte ? (fa![1] ?? '') + p.html.slice(fa![0].length) : p.html);
 const faqStart = krop.indexOf('<section class="faq-box"');
 
 const i = INDLAEG.indexOf(p);
@@ -154,13 +155,13 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .article-title { margin: 0 0 18px 0; font-size: 2.75rem; line-height: 1.06; font-weight: 700; font-stretch: 92%; letter-spacing: -0.02em; text-wrap: balance; }
     /* Key takeaways (Jacob 31/10-2026): robotten lægger 3-4 punkter under det første billede (robot/artikel.mjs).
        Skal springe i øjnene: hyldens farve som tonet baggrund, kraftig venstrekant, rundt ikon og farvede punkter. */
-    .post-body .tma-overblik { position: relative; margin: 26px 0 34px; padding: 22px 26px 22px 28px; background: linear-gradient(135deg, color-mix(in srgb, var(--hylde) 17%, var(--card-bg)) 0%, color-mix(in srgb, var(--hylde) 6%, var(--card-bg)) 100%); border: 1px solid color-mix(in srgb, var(--hylde) 45%, var(--border-color)); border-left: 7px solid var(--hylde); border-radius: var(--radius-lg); box-shadow: 0 10px 28px color-mix(in srgb, var(--hylde) 18%, transparent), var(--shadow); }
+    .post-body .tma-overblik { display: block; position: relative; margin: 26px 0 34px; padding: 22px 26px 22px 28px; background: linear-gradient(135deg, color-mix(in srgb, var(--hylde) 17%, var(--card-bg)) 0%, color-mix(in srgb, var(--hylde) 6%, var(--card-bg)) 100%); border: 1px solid color-mix(in srgb, var(--hylde) 45%, var(--border-color)); border-left: 7px solid var(--hylde); border-radius: var(--radius-lg); box-shadow: 0 10px 28px color-mix(in srgb, var(--hylde) 18%, transparent), var(--shadow); }
     .post-body .tma-overblik-titel { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; color: var(--text-color); }
     .post-body .tma-overblik-titel::before { content: '✦'; flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--hylde); color: #fff; font-size: 0.95rem; box-shadow: 0 3px 10px color-mix(in srgb, var(--hylde) 45%, transparent); }
-    .post-body .tma-overblik ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-    .post-body .tma-overblik li { position: relative; margin: 0; padding: 0 0 0 30px; font-size: 1.02rem; font-weight: 600; line-height: 1.5; color: var(--text-color); }
-    .post-body .tma-overblik li::before { content: ''; position: absolute; left: 7px; top: 0.5em; width: 10px; height: 10px; border-radius: 3px; background: var(--hylde); transform: rotate(45deg); }
-    @media (max-width: 600px) { .post-body .tma-overblik { padding: 18px 18px 18px 20px; border-left-width: 6px; } .post-body .tma-overblik li { font-size: 0.98rem; } }
+    .post-body .tma-overblik-liste { margin: 0; padding: 0; display: grid; gap: 10px; }
+    .post-body .tma-overblik-punkt { display: block; position: relative; margin: 0; padding: 0 0 0 30px; font-size: 1.02rem; font-weight: 600; line-height: 1.5; color: var(--text-color); }
+    .post-body .tma-overblik-punkt::before { content: ''; position: absolute; left: 7px; top: 0.5em; width: 10px; height: 10px; border-radius: 3px; background: var(--hylde); transform: rotate(45deg); }
+    @media (max-width: 600px) { .post-body .tma-overblik { padding: 18px 18px 18px 20px; border-left-width: 6px; } .post-body .tma-overblik-punkt { font-size: 0.98rem; } }
     /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
     /* People also ask (29/9) — samme udseende som på Jacobs andet site; nulstiller brødtekstens link- og listestil */
     /* 30/9 (Jacobs valg A): boksen flød ind i teksten. Nu tyk turkis kant i venstre side og en let turkis tone,

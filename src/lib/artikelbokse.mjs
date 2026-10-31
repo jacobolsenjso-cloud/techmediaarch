@@ -63,3 +63,14 @@ export function indsaet(html, stykker) {
   for (const { pos, html: s } of [...stykker].filter((x) => x.html && x.pos != null).sort((a, b) => b.pos - a.pos)) ud = ud.slice(0, pos) + s + ud.slice(pos);
   return ud;
 }
+
+// "Key takeaways"-boksen (robotten skriver den med <div>/<p>/<ul>/<li>) bygges om til <aside>/<span> med samme tekst,
+// så Googles Auto-annoncer ikke kan sætte en annonce ind mellem punkterne (målt 31/10-2026 på
+// /2026/06/agentic-ai-vs-ai-agents-technical). Samme regel som indholdsfortegnelsen og "People also ask".
+export function udenAnnonceHuller(html) {
+  return String(html).replace(/<div class="tma-overblik">([\s\S]*?)<\/ul>\s*<\/div>/g, (_, indre) => {
+    const titel = (indre.match(/<p class="tma-overblik-titel">([\s\S]*?)<\/p>/) || [, 'Key takeaways'])[1];
+    const punkter = [...indre.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => `<span class="tma-overblik-punkt" role="listitem">${m[1]}</span>`).join('');
+    return `<aside class="tma-overblik" aria-label="${titel.replace(/"/g, '&quot;')}"><span class="tma-overblik-titel">${titel}</span><span class="tma-overblik-liste" role="list">${punkter}</span></aside>`;
+  });
+}
