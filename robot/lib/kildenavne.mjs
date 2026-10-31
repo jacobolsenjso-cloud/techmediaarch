@@ -26,7 +26,16 @@ export function kendtNavn(navn, kilder) {
 // Navneliste til Gemini: "IBM (ibm.com)" — mærket fra titlen ("… | IBM"), ellers domænet.
 // Målt 29/10 (prøve #33): med kun domæner skrev Gemini "According to nhimg.org" og "securityScorecard notes".
 const maerkeAf = (k) => { const d = String(k.titel || '').split(/\s[|–—-]\s|\s·\s/); const m = d.length > 1 ? d[d.length - 1].trim() : ''; return m.length >= 2 && m.length <= 40 ? m : ''; };
-export const kildeNavneTekst = (kilder) => kilder.map((k) => { const host = new URL(k.url).hostname.replace(/^www\./, ''); const m = maerkeAf(k); return m ? `${m} (${host})` : host; }).join('; ');
+// Faste navne for kendte domæner (31/10-2026): sidetitlen "MIT News | Massachusetts Institute of Tech" er afkortet, og
+// artiklen skrev "Massachusetts Institute of Tech" 4 gange. Gælder også underdomæner (news.mit.edu, csail.mit.edu).
+const KENDTE_NAVNE = {
+  'mit.edu': 'MIT', 'stanford.edu': 'Stanford University', 'harvard.edu': 'Harvard University', 'berkeley.edu': 'UC Berkeley',
+  'nist.gov': 'NIST', 'cisa.gov': 'CISA', 'ftc.gov': 'FTC', 'weforum.org': 'World Economic Forum',
+  'learn.microsoft.com': 'Microsoft Learn', 'support.apple.com': 'Apple Support', 'developer.apple.com': 'Apple Developer',
+  'support.google.com': 'Google Help', 'developers.google.com': 'Google for Developers', 'research.ibm.com': 'IBM Research',
+};
+const kendtNavnFor = (host) => Object.entries(KENDTE_NAVNE).find(([d]) => host === d || host.endsWith(`.${d}`))?.[1] || '';
+export const kildeNavneTekst = (kilder) => kilder.map((k) => { const host = new URL(k.url).hostname.replace(/^www\./, ''); const m = kendtNavnFor(host) || maerkeAf(k); return m ? `${m} (${host})` : host; }).join('; ');
 
 // Gemini må ikke selv skrive en kildeliste — den lægges på bagefter (robot/lib/links.mjs kildeliste).
 // Målt 29/10 (prøve #33): et afsnit med kun domæner ("nhimg.org, cloudmask.com, …") lige før "Sources".

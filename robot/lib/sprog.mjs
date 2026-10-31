@@ -79,7 +79,7 @@ export function uklarKilde(s) {
 // sætning; "why seo is important" eller "how to use" kan stå naturligt. Et
 // spørgsmål (sætning med "?") må gerne bruge søgeordet.
 const OMVENDT = /^(?:(?:what|how|which|when|where|who|why)\s+(?:is|are|does|do|did|can|should|will)|is|are|can|does|do|did|should|will)\b/i;
-export function klistretSoegeord(s, soegeord) {
+function klistretOmvendt(s, soegeord) {
   const t = synlig(s).replace(/\s+/g, ' ').trim();
   if (t.includes('?')) return null;
   const lav = t.toLowerCase();
@@ -90,4 +90,37 @@ export function klistretSoegeord(s, soegeord) {
     if (i > 0 && !/["“'‘]/.test(t[i - 1])) return k;   // et citeret eksempel ("what is seo") er fint
   }
   return null;
+}
+
+// Klistret søgeord (rettetrinnet i robot/artikel.mjs omskriver sætningen): enten et omvendt spørgsmål ("what is
+// phishing attack"), eller — 31/10-2026 (Jacob: kvaliteten skal op) — søgeordet ordret med små bogstaver, hvor et
+// navn eller en forkortelse skal have store ("An apple mdm enrollment guide", "for youtube videos"). Målt i 3 artikler 31/10.
+export function klistretSoegeord(s, soegeord) {
+  const omvendt = klistretOmvendt(s, soegeord);
+  if (omvendt) return omvendt;
+  const t = synlig(s).replace(/\s+/g, ' ').trim();
+  const lav = t.toLowerCase();
+  for (const k of soegeord) {
+    const kk = renSoeg(k);
+    const i = lav.indexOf(kk);
+    if (i < 0) continue;
+    const bid = t.slice(i, i + kk.length);
+    if (bid.split(/\s+/).some((w) => STORE[w] && w !== STORE[w])) return k;
+  }
+  return null;
+}
+
+// Navne og forkortelser med deres rigtige stavemåde. Nøglen er søgeordets små-bogstavs-form.
+export const STORE = Object.fromEntries(['AI', 'SEO', 'SEM', 'MDM', 'API', 'APIs', 'UI', 'UX', 'iOS', 'macOS', 'Mac', 'Macs', 'Apple', 'YouTube', 'Google',
+  'Microsoft', 'Windows', 'iPhone', 'iPad', 'Android', 'Python', 'Java', 'JavaScript', 'ChatGPT', 'Claude', 'Gemini', 'OpenAI', 'AWS', 'Azure',
+  'VPN', 'MFA', 'SSO', 'CRM', 'SaaS', 'B2B', 'LLM', 'LLMs', 'GPT', 'NIST', 'PDF', 'HTML', 'CSS', 'SQL', 'CEO', 'GDPR', 'Linux', 'Docker',
+  'Kubernetes', 'DevOps', 'Copilot', 'Intune', 'Figma', 'Canva', 'TikTok', 'Instagram', 'Facebook', 'LinkedIn', 'WordPress',
+  'Shopify', 'PayPal', 'Bitcoin', 'Ethereum', 'NFT', 'VR', 'GPU', 'CPU', 'RAM', 'SSD', 'USB', 'IoT', 'URL', 'DNS', 'HTTP',
+  'HTTPS', 'PPC', 'CTR', 'ROI', 'KPI', 'AEO']
+  .map((n) => [n.toLowerCase(), n]));
+// "i", navne og forkortelser får de rigtige store bogstaver, og første bogstav bliver stort. Bruges på FAQ-spørgsmålene,
+// som Gemini bygger af søgeord med små bogstaver ("Should i learn generative ai?" → "Should I learn generative AI?").
+export function storeBogstaver(tekst) {
+  const t = String(tekst).replace(/[A-Za-z][\w-]*/g, (w) => (w === 'i' ? 'I' : STORE[w] && w === w.toLowerCase() ? STORE[w] : w));
+  return t.charAt(0).toUpperCase() + t.slice(1);
 }

@@ -152,6 +152,15 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .breadcrumbs-bar a:hover { color: var(--teal-text); text-decoration: underline; text-underline-offset: 3px; }
     .breadcrumbs-bar a { color: var(--muted); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; }
     .article-title { margin: 0 0 18px 0; font-size: 2.75rem; line-height: 1.06; font-weight: 700; font-stretch: 92%; letter-spacing: -0.02em; text-wrap: balance; }
+    /* Key takeaways (Jacob 31/10-2026): robotten lægger 3-4 punkter under det første billede (robot/artikel.mjs).
+       Skal springe i øjnene: hyldens farve som tonet baggrund, kraftig venstrekant, rundt ikon og farvede punkter. */
+    .post-body .tma-overblik { position: relative; margin: 26px 0 34px; padding: 22px 26px 22px 28px; background: linear-gradient(135deg, color-mix(in srgb, var(--hylde) 17%, var(--card-bg)) 0%, color-mix(in srgb, var(--hylde) 6%, var(--card-bg)) 100%); border: 1px solid color-mix(in srgb, var(--hylde) 45%, var(--border-color)); border-left: 7px solid var(--hylde); border-radius: var(--radius-lg); box-shadow: 0 10px 28px color-mix(in srgb, var(--hylde) 18%, transparent), var(--shadow); }
+    .post-body .tma-overblik-titel { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.25; color: var(--text-color); }
+    .post-body .tma-overblik-titel::before { content: '✦'; flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--hylde); color: #fff; font-size: 0.95rem; box-shadow: 0 3px 10px color-mix(in srgb, var(--hylde) 45%, transparent); }
+    .post-body .tma-overblik ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    .post-body .tma-overblik li { position: relative; margin: 0; padding: 0 0 0 30px; font-size: 1.02rem; font-weight: 600; line-height: 1.5; color: var(--text-color); }
+    .post-body .tma-overblik li::before { content: ''; position: absolute; left: 7px; top: 0.5em; width: 10px; height: 10px; border-radius: 3px; background: var(--hylde); transform: rotate(45deg); }
+    @media (max-width: 600px) { .post-body .tma-overblik { padding: 18px 18px 18px 20px; border-left-width: 6px; } .post-body .tma-overblik li { font-size: 0.98rem; } }
     /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
     /* People also ask (29/9) — samme udseende som på Jacobs andet site; nulstiller brødtekstens link- og listestil */
     /* 30/9 (Jacobs valg A): boksen flød ind i teksten. Nu tyk turkis kant i venstre side og en let turkis tone,
@@ -386,7 +395,7 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
         <p class="disclosure-box disclosure-top"><strong>Affiliate disclosure:</strong> This article contains affiliate or referral links. If you sign up or buy through them, Tech Media Arch may earn a commission at no extra cost to you. Partners cannot pay for a positive review, and nothing here is financial or investment advice. Read our full <a href="/p/disclosure">Disclosure</a>.</p>
       )}
 
-      <article class="post-body" set:html={broedtekst} />
+      <article class="post-body" set:html={broedtekst} style={`--hylde: ${hylde?.farve ?? 'var(--teal)'}`} />
 
       {/* Stod før som fodnote i hvert indlæg (Blogger-feedets fodnote). Resources-artikler har den øverst i stedet. */}
       {!erResources && <p class="disclosure-box"><strong>Affiliate disclosure:</strong> Please note that some links on TechMediaArch.com are affiliate links. We may receive a commission, at no extra cost to you, if you click through our links and make a purchase from one of our partners.</p>}

@@ -33,7 +33,7 @@ import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
 import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
-import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord } from './lib/sprog.mjs';
+import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord, storeBogstaver } from './lib/sprog.mjs';
 import { laesHjerne, stemmeBlok, stemmePrompt, tjekStemme, fletInd, senesteStemmeAfsnit } from './lib/hjerne.mjs';
 import { kildeHenvisninger } from './lib/kildenavne.mjs';
 import { parse as yamlParse, stringify as yamlStringify } from 'yaml';
@@ -127,6 +127,25 @@ fs.writeFileSync(sti('robot/ud/valgt.json'), JSON.stringify({ hoved: valgt.hoved
 log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}`);
 }
 
+// --- 1b. Kun beslægtede søgeord om selve emnet (Jacob 31/10-2026) ----------------
+// Målt 31/10: "How does generative AI create images" fik "should i learn generative ai" og "how long does it take to
+// learn generative ai" med, og halvdelen af artiklen kom til at handle om jobs og læring. Nu vurderer Gemini, hvilke
+// beslægtede søgeord artiklen naturligt svarer på; resten droppes (også fra research, FAQ og frontmatter).
+{
+  try {
+    const r = await json(`Main topic of an explainer article: "${valgt.hoved}".
+For each related search phrase, answer whether it asks about the SAME subject, so an article on the main topic would naturally answer it.
+Say no to side topics: careers, whether/how long to learn it, salaries, prices of unrelated products, other products or brands, news.
+Return JSON {"samme": [numbers of the phrases on the same subject]}
+${valgt.beslaegtede.map((k, i) => `${i + 1}. ${k}`).join('\n')}`);
+    const ok = new Set((Array.isArray(r.samme) ? r.samme : []).map((n) => parseInt(n, 10)));
+    const beholdt = valgt.beslaegtede.filter((_, i) => ok.has(i + 1));
+    const droppet = valgt.beslaegtede.filter((_, i) => !ok.has(i + 1));
+    if (beholdt.length) valgt.beslaegtede = beholdt;
+    log(`- Beslægtede søgeord om selve emnet: ${beholdt.length} af ${beholdt.length + droppet.length}${droppet.length && beholdt.length ? ` · droppet: ${droppet.join(' · ')}` : ''}${beholdt.length ? '' : ' (ingen vurderet relevante — alle beholdt)'}`);
+  } catch (e) { log(`- Beslægtede søgeord: vurdering fejlede (${e.message.slice(0, 80)}) — alle beholdt`); }
+}
+
 // --- 2. Interne link-kandidater ---------------------------------------------
 const arkiv = artikler();
 const indeks = lavIndeks(arkiv.filter((a) => a.sti.startsWith('/20')));
@@ -180,7 +199,9 @@ log(`- Interne link-kandidater: ${kandListe.length}, relevante ifølge Gemini: $
 const researchOpgave = `Use Google Search to research these questions for a factual explainer article:
 - ${[valgt.hoved, ...valgt.beslaegtede].join('\n- ')}
 Return 25-40 short bullet points of concrete, verified facts (definitions, how it works, examples, numbers with dates, steps, comparisons, best practices). Cover every question above with at least 3 different facts, and never repeat the same fact in other words. Only include facts you found in search results.
-Start every bullet with the name of the organization, agency, company or publication the fact comes from (e.g. "IBM: ...", "NIST: ...").`;
+Start every bullet with the name of the organization, agency, company or publication the fact comes from (e.g. "IBM: ...", "NIST: ...").
+Prefer primary, authoritative sources: the official documentation and help pages of the product's maker (e.g. Apple, Microsoft, Google), standards bodies and government agencies (e.g. NIST, CISA), universities and research labs, and established publications. Use a company's marketing blog only for facts about that company's own product, and only when no better source has the fact.`;
+// ↑ Kildeorden (Jacob 31/10-2026): målt 31/10 var de fleste kilder sælgernes egne blogs (DomoAI, Animaker, CityMac, Iru).
 // ↑ Kildenavnet i hvert punkt (5/10-2026): uden det skrev Gemini "industry experts note" (18 sætninger i 8 af 15 artikler).
 let fakta = ''; let kilder = []; let stoette = [];
 for (const model of [undefined, undefined, 'gemini-3.5-flash', 'gemini-2.5-flash']) {
@@ -215,7 +236,7 @@ const kildeNavn = kildeNavneTekst(kildeLinks);
 const gamleEmner = gammel ? [...gammel.krop.matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h[23]>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim()).filter((h) => h && !/^(FAQ|Frequently Asked|Key Takeaways|Conclusion|Wrapping Up)/i.test(h)).slice(0, 15) : [];
 const opgave = `Write an in-depth, genuinely helpful English article for techmediaarch.com.
 Main keyword: "${valgt.hoved}"
-Related keywords (cover each naturally, once or twice): ${valgt.beslaegtede.map((k) => `"${k}"`).join(', ')}
+Related questions readers ask (answer each where it fits — they are topics, not phrases to copy): ${valgt.beslaegtede.map((k) => `"${k}"`).join(', ')}
 ${gamleEmner.length ? `This article replaces an older one on the same page titled "${gammel.fm.title}". Readers came for these subjects, so cover them where the researched facts allow (never take facts from the old article): ${gamleEmner.join(' | ')}\n` : ''}
 ${stemmeBlok(hjerne)}
 
@@ -235,11 +256,13 @@ Rules:
 - The first paragraph is a short, direct answer to the main keyword: 2 sentences, at most 50 words, plain language. Context and numbers come after it.
 - Start the article with that short answer as a <p>. The very first element must be the answer paragraph, never a heading (no "Introduction" or "Understanding ..." heading before it).
 - Search phrases are often ungrammatical ("what is phishing attack", "how does seo work"). Never paste a keyword verbatim into a sentence where it reads wrongly; write correct English ("how phishing attacks work"). Never put keywords in bold, quotes or <strong>.
+- Search phrases are written in lowercase; your text never is. Write every name and abbreviation with correct capitals (Apple, MDM, AI, YouTube, macOS, SEO). Never copy a search phrase word for word into a sentence ("An apple mdm enrollment guide explains ..."); describe the subject the way an expert would ("Enrolling Macs in Apple's device management ...").
+- Explain the subject in depth: how it works, why, and what the reader should do. Stay on the main topic; do not drift into careers, learning paths or general market trends unless the main keyword asks about them.
 - Every number, statistic and quoted definition names its source from the facts (an organization, agency, company or publication). Never use vague attributions such as "experts say", "industry experts note", "researchers confirm", "analysts point out", "studies show" or "according to market research".
 - Name ONLY these sources: ${kildeNavn}. Use the name before the brackets ("according to IBM"), never a bare web address. Never name any other organization, company, publication or website as a source, even if a fact mentions one; then name the listed source the fact comes from.
 - Do not write a list of sources, a "Sources" or "References" section, or a line of web addresses: the source list is added automatically.
 - Include one FAQ section (<h2>FAQ</h2>) with AT LEAST 5 questions as <h3>, each followed by a 2-4 sentence answer in <p>.
-  Phrase the questions the way people type them into Google, built from the related keywords; every question must be different.
+  Phrase the questions the way people ask them, built from the related questions and the main topic, in correct English with capitals ("How do I enroll a Mac in Apple MDM?"); every question must be different.
 - Never claim personal testing or experience ("I tested", "in my experience", "we tried").
 - Link to 3-5 of these existing articles where relevant, using the exact href and a natural anchor text:
 ${interne.map((l) => `  ${l.href}  (${l.titel})`).join('\n') || '  (none)'}
@@ -402,6 +425,7 @@ ${kandAfsnit.slice(0, 30).map((p, i) => `${i + 1}. ${p}`).join('\n')}`);
     try {
       const r = await json(`Below are numbered sentences from an article about "${valgt.hoved}".
 Mark only the FILLER sentences: generic statements a reader learns nothing from, which could sit in any article on the topic, with no concrete fact, definition, example, step or comparison.
+Also mark a sentence that repeats a fact already given in an EARLIER numbered sentence (mark the later one, even if it explains something; 31/10-2026: an article said twice that tokens expire after a year).
 Examples of filler: "Both roles are critical for modern organizations." "Companies must invest in skilled personnel." "Malicious actors constantly evolve their tactics."
 Do NOT mark sentences that explain how something works, define a term, compare two things, give an example or tell the reader what to do. When unsure, do not mark.
 Return JSON {"filler": [numbers]}.
@@ -498,11 +522,13 @@ const meta = await json(`Article about "${valgt.hoved}". First 1500 characters:
 ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500)}
 
 Return JSON with:
-"title": the main keyword written as the question a reader would ask, in correct natural English and Title Case, ending with "?" (e.g. "How Does Phishing-Resistant MFA Work?"), at most 70 characters, no extra words, no year,
+"title": the question a person searching the main keyword actually wants answered, in correct natural English and Title Case, ending with "?" (e.g. keyword "phishing resistant mfa" → "How Does Phishing-Resistant MFA Work?"; keyword "apple mdm enrollment guide" → "How Do You Enroll Macs in Apple MDM?"). Never a title that only restates the search phrase ("What Is An Apple MDM Enrollment Guide?"). At most 70 characters, no year,
 "description": 140-160 characters, plain and specific,
 "slug": 3-6 lowercase words joined by hyphens,
 "image1": the cover image for the article's main idea: ${MOTIVREGLER},
 "image2": a different image idea for another key point of the article, following the same rules,
+"image3": a third, different image idea for a later point of the article, following the same rules,
+"alt3": short alt text for image 3,
 "alt1": short alt text for image 1, "alt2": short alt text for image 2`);
 // Talvagten gælder også beskrivelsen, som Google viser: har den et tal uden kilde, bruges det korte svar i stedet.
 if (talUdenKilde([String(meta.description || '')], kendteTal).length) {
@@ -530,10 +556,27 @@ for (const [n, b] of [[1, hero], [2, mid]]) log(`- Billede ${n}: ${b.motor}${b.f
 const figur = (b, alt) => `<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="${esc(alt)}" height="768" src="${b.fil}" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">${esc(alt)}</td></tr></tbody></table>`;
 
 // Billede 1 efter første afsnit, billede 2 før overskriften nærmest 60 % inde.
-html = html.replace(/<\/p>/i, `</p>${figur(hero, meta.alt1)}`);
+const heroFigur = figur(hero, meta.alt1);
+html = html.replace(/<\/p>/i, `</p>${heroFigur}`);
 const h2er = [...html.matchAll(/<h2\b/gi)].map((m) => m.index);
 const midt = h2er.filter((i) => i > html.length * 0.45)[0];
-if (midt) html = html.slice(0, midt) + figur(mid, meta.alt2) + html.slice(midt);
+const midFigur = figur(mid, meta.alt2);
+if (midt) html = html.slice(0, midt) + midFigur + html.slice(midt);
+// Billede 3 (Jacob 31/10-2026): i artikler over 1.200 ord, før en overskrift mellem billede 2 og FAQ — så der ikke
+// er lange stræk uden billede. Er der ingen overskrift dér, eller fejler billedet, udgives artiklen med 2.
+if (antalOrd(html) > 1200) {
+  const efterMid = html.indexOf(midFigur) + midFigur.length;
+  const faqPos = html.search(/<h2[^>]*>\s*(?:FAQ|Frequently Asked Questions)/i);
+  const steder = [...html.matchAll(/<h2\b/gi)].map((m) => m.index).filter((i) => i > efterMid && (faqPos < 0 || i < faqPos));
+  if (midt && steder.length) {
+    try {
+      const tredje = await lav({ motiv: meta.image3, titel, besk: meta.description, hylde });
+      const sted = steder[Math.floor((steder.length - 1) / 2)];
+      html = html.slice(0, sted) + figur(tredje, meta.alt3 || meta.alt2) + html.slice(sted);
+      log(`- Billede 3: ${tredje.motor}${tredje.forsoeg > 1 ? ` · ${tredje.forsoeg} forsøg` : ''}${tredje.noter.length ? ` · ${tredje.noter.join(' · ')}` : ''}`);
+    } catch (e) { log(`- Billede 3: kunne ikke laves (${String(e.message).slice(0, 80)}) — artiklen har 2 billeder`); }
+  } else log('- Billede 3: ingen plads mellem billede 2 og FAQ — artiklen har 2 billeder');
+}
 
 // (Video-delen er fjernet i trin 7, 29/10-2026: sitet viser ikke videoer mere — se src/lib/temakoder.mjs udenYoutube.)
 
@@ -564,6 +607,38 @@ ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 14000)}`);
 log(`- Eksterne links inde i teksten: ${eksterneITekst}`);
 
 html += kildeliste(kildeLinks);
+
+// FAQ-spørgsmålene med rigtige store bogstaver (31/10-2026: "Should i learn generative ai?"), robot/lib/sprog.mjs
+{
+  let rettet = 0;
+  html = html.replace(/(<h2[^>]*>\s*(?:FAQ|Frequently Asked Questions)\s*<\/h2>)([\s\S]*?)(?=<h2\b|$)/i, (m, h, krop) => h + krop.replace(/(<h3\b[^>]*>)([\s\S]*?)(<\/h3>)/gi, (x, a, t, b) => {
+    const ny = storeBogstaver(t); if (ny !== t) rettet++; return a + ny + b;
+  }));
+  log(`- FAQ-spørgsmål med rettede store bogstaver: ${rettet}`);
+}
+
+// Key takeaways (Jacob 31/10-2026): 3-4 korte punkter lige under det første billede til læsere, der skimmer.
+// Kun ud fra artiklens egen tekst: et punkt med et tal, der ikke står i artiklen, droppes (talvagten gælder også her).
+// Udseendet står i src/pages/[year]/[month]/[slug].astro (.tma-overblik) i hyldens farve.
+{
+  try {
+    const tekstNu = synligTekst(html).replace(/\s+/g, ' ');
+    const r = await json(`Below is an article titled "${titel}". Write 3-4 key takeaways for a reader who only skims: each one short sentence (at most 22 words), concrete and specific, in correct natural English with proper capitals.
+Use ONLY information stated in the article; never add numbers, names or claims that are not in it. No source names, no links, no markdown, no bold.
+Return JSON {"punkter": ["...", "..."]}
+
+${tekstNu.slice(0, 9000)}`);
+    const punkter = (Array.isArray(r.punkter) ? r.punkter : [])
+      .map((p) => storeBogstaver(String(p).replace(/<[^>]+>/g, '').replace(/\*+/g, '').trim()))
+      .filter((p) => p && p.split(/\s+/).length <= 30 && (p.match(/\d[\d.,]*\d|\d/g) || []).every((tal) => tekstNu.includes(tal)))
+      .slice(0, 4);
+    if (punkter.length >= 3 && html.includes(heroFigur)) {
+      const boks = `<div class="tma-overblik"><p class="tma-overblik-titel">Key takeaways</p><ul>${punkter.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></div>`;
+      html = html.replace(heroFigur, () => heroFigur + boks);
+      log(`- Key takeaways: ${punkter.length} punkter`);
+    } else log(`- Key takeaways: kun ${punkter.length} punkter bestod kontrollen — ingen boks`);
+  } catch (e) { log(`- Key takeaways: fejlede (${String(e.message).slice(0, 80)}) — ingen boks`); }
+}
 
 // Sidste vagt (5/10-2026): ingen synlige markdown-rester må udgives. Rensningen ovenfor
 // fanger det normale; står der stadig noget, er det hellere en afvist artikel end en synlig fejl.
