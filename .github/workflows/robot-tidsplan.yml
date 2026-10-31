@@ -11,7 +11,7 @@
 # Tomgangsalarmen ligger i sit eget workflow (tomgang.yml, 28/9): lå den her, blev den
 # sprunget over sammen med robotten, når GitHub sprang robottens kørsler over.
 # ÉN ROBOT (Jacob 30/10-2026: "samlet i en, ingen tillæg"): den samme kørsel skriver dagens nye artikel OG
-#   skriver ældre artikler om (robot/plan.mjs --omskriv: 3 om dagen, højst 1 med visninger — dagens kvote tages i
+#   skriver ældre artikler om (robot/plan.mjs --omskriv: 2 om dagen (fra 31/10), højst 1 med visninger — dagens kvote tages i
 #   første kørsel, den anden samler op efter afvisninger).
 #   Samme opskrift (robot/artikel.mjs), samme hjerne, ét byg og én udgivelse.
 name: Robot (tidsplan)
@@ -76,7 +76,7 @@ jobs:
           name: robot-ud
           path: robot/ud/
           if-no-files-found: ignore
-      # Omskrivning af ældre artikler (Jacob 30/10-2026): køen robot/data/omskriv-koe.json, 3 om dagen (højst 1 med
+      # Omskrivning af ældre artikler (Jacob 30/10-2026): køen robot/data/omskriv-koe.json, 2 om dagen (fra 31/10) (højst 1 med
       # Google-visninger), 6 dage om ugen, stop ved robot/plan.mjs OMSKRIV_LOFT_KR i måneden. Kører også, hvis
       # artiklen ovenfor blev afvist.
       - name: Skriv ældre artikler om

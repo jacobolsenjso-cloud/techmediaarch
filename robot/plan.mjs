@@ -49,7 +49,7 @@ export function maaUdgive(nu = new Date(), liste = robotArtikler()) {
   if (FRIDAGE.includes(dkDag(nu))) return { ok: false, grund: `fridag (${dkDag(nu)}, dansk tid)` };
   const iDag = liste.filter((a) => dkDato(a.udgivet) === dkDato(nu)).length;
   if (iDag >= MAKS_PR_DAG) return { ok: false, grund: `loftet er nået: ${iDag} af ${MAKS_PR_DAG} i dag` };
-  // Månedsloft (31/10-2026): Googles beløbsloft er 300 kr. Nye artikler stopper ved MAANED_LOFT_KR, så robotten aldrig
+  // Månedsloft (31/10-2026): Googles beløbsloft er 400 kr. Nye artikler stopper ved MAANED_LOFT_KR, så robotten aldrig
   // løber ind i Googles loft midt i en artikel (med den stærkere model koster en artikel målt ca. 5,8 kr).
   const krMd = laes(PRIS, []).filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === dkDato(nu).slice(0, 7)).reduce((s, p) => s + (p.kr || 0), 0);
   if (krMd >= MAANED_LOFT_KR) return { ok: false, grund: `månedsloftet er nået: ${krMd.toFixed(2)} af ${MAANED_LOFT_KR} kr` };
@@ -58,11 +58,12 @@ export function maaUdgive(nu = new Date(), liste = robotArtikler()) {
 
 const OMSKRIV_KOE = 'robot/data/omskriv-koe.json';         // [{ sti, maade: 'fuld' | 'titel' }] i Jacobs rækkefølge
 const OMSKRIV_PROEVET = 'robot/data/omskriv-proevet.json'; // [{ sti, dato, grund }] — afvist; hviler 30 dage
-export const MAANED_LOFT_KR = 290;                         // nye artikler stopper her (10 kr luft under Googles 300)
-export const OMSKRIV_LOFT_KR = 250;                        // omskrivning stopper ved 250 kr i måneden (Googles loft er 300, Jacob 31/10-2026; før 150 af 200)
-// Tempo (Jacob 30/10-2026): 3 om dagen, 6 dage om ugen (fri søndag), højst 1 af de 3 med Google-visninger
+// Googles beløbsloft er 400 kr/md (Jacob 31/10-2026). Med den stærke model koster en artikel målt ca. 5,80 kr.
+export const MAANED_LOFT_KR = 390;                         // nye artikler stopper her (10 kr luft under Googles 400)
+export const OMSKRIV_LOFT_KR = 290;                        // omskrivning stopper ved 290 kr i alt i måneden, så ca. 100 kr altid er til nye artikler
+// Tempo (Jacob 31/10-2026: 2 om dagen; før 3 fra 30/10), 6 dage om ugen (fri søndag), højst 1 med Google-visninger
 // ("visninger: true" i køen) — så et eventuelt fald i Google kan ses og bremses, før det rammer dem alle.
-export const OMSKRIV_PR_DAG = 3;
+export const OMSKRIV_PR_DAG = 2;
 export const OMSKRIV_VISNINGER_PR_DAG = 1;
 export const OMSKRIV_FRIDAGE = ['Sun'];
 const OMSKRIV_FORSOEG_PR_KOERSEL = 5;                      // også afviste tæller, så en kørsel aldrig løber løbsk
@@ -140,7 +141,7 @@ if (arg === '--tjek') {
 } else if (arg === '--omskriv') {
   // Omskrivning af ældre artikler (Jacob 29-30/10-2026): OMSKRIV_PR_DAG om dagen (højst OMSKRIV_VISNINGER_PR_DAG af dem
   // med Google-visninger), aldrig over OMSKRIV_LOFT_KR i måneden (så der altid er plads til nye artikler under Googles
-  // beløbsloft på 300 kr — 50 kr er altid til nye artikler). Køen: robot/data/omskriv-koe.json (Jacobs rækkefølge: først artiklerne med Google-visninger,
+  // beløbsloft på 400 kr — ca. 100 kr er altid til nye artikler). Køen: robot/data/omskriv-koe.json (Jacobs rækkefølge: først artiklerne med Google-visninger,
   // så videoopsummeringerne, så resten af T/V). En afvist artikel hviler 30 dage (robot/data/omskriv-proevet.json).
   // Hele dagens kvote tages i dagens første kørsel; den anden kørsel samler op, hvis noget blev afvist.
   const koe = laes(OMSKRIV_KOE, []);
