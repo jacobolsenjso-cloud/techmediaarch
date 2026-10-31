@@ -124,13 +124,14 @@ export async function lav({ motiv, titel, besk = '', hylde }) {
       const buf = await geminiBillede(billedPrompt(titel, m, accent));
       const k = await kontroller(buf);
       if (k.note) noter.push(k.note);
-      if (k.ok) return { ...(await gem(buf, 'gm', titel)), motor: 'Gemini', forsoeg, noter };
+      // motiv/nytMotiv (31/10-2026, prøve #38): ved et nyt motiv passer den planlagte alt-tekst ikke længere til billedet
+      if (k.ok) return { ...(await gem(buf, 'gm', titel)), motor: 'Gemini', forsoeg, noter, motiv: m, nytMotiv: m !== String(motiv || '').trim() };
       noter.push(`forsøg ${forsoeg} afvist (${k.grund})`);
       if (forsoeg < 3) m = String((await json(nytMotivPrompt(titel, besk, k.grund))).motiv || m);
     }
     throw new Error('afvist af billedkontrollen 3 gange');
   } catch (e) {
     const r = await gem(await cloudflare(billedPrompt(titel, m, accent)), 'cf', titel);
-    return { ...r, motor: `Cloudflare (Gemini: ${String(e.message).slice(0, 80)})`, forsoeg: 0, noter };
+    return { ...r, motor: `Cloudflare (Gemini: ${String(e.message).slice(0, 80)})`, forsoeg: 0, noter, motiv: m, nytMotiv: m !== String(motiv || '').trim() };
   }
 }

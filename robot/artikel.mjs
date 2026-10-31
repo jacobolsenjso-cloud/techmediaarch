@@ -130,6 +130,14 @@ fs.writeFileSync(sti('robot/ud/valgt.json'), JSON.stringify({ hoved: valgt.hoved
 log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}`);
 }
 
+// Formord bag på hovedsøgeordet fjernes (31/10-2026, prøve #38): "apple mdm enrollment guide" gav både titlen
+// "What Is An Apple MDM Enrollment Guide?" og første sætning "An Apple MDM enrollment guide outlines …" — artiklen
+// ER guiden og skal handle om emnet, ikke om "en guide".
+{
+  const ren = valgt.hoved.replace(/\s+(?:a\s+)?(?:complete\s+|ultimate\s+|beginners?\s+|step[- ]by[- ]step\s+)?(?:guide|tutorial|explained|overview|tips|walkthrough|for beginners)$/i, '').trim();
+  if (ren !== valgt.hoved && ren.split(/\s+/).length >= 2) { log(`- Hovedsøgeord uden formord: "${valgt.hoved}" → "${ren}"`); valgt.hoved = ren; }
+}
+
 // --- 1b. Kun beslægtede søgeord om selve emnet (Jacob 31/10-2026) ----------------
 // Målt 31/10: "How does generative AI create images" fik "should i learn generative ai" og "how long does it take to
 // learn generative ai" med, og halvdelen af artiklen kom til at handle om jobs og læring. Nu vurderer Gemini, hvilke
@@ -249,7 +257,7 @@ Rules:
   lead with the most important facts, attribute facts to their source in the sentence ("according to IBM", "NIST defines ..."),
   short paragraphs, concrete examples, neutral tone, no hype words, no "our analysis", "the verdict" or "key takeaways" framing.
 - Paragraphs like a news site (Jacob 5/10-2026, rule C 6/10): most paragraphs are 2 connected sentences of at most 55 words together, or 3 short sentences of at most 40 words. Use a one-sentence paragraph only now and then for emphasis, never several in a row.
-- Attribute a fact once, where it first appears. Vary how sources are named and where ("CompTIA defines ...", "..., according to Coursera"); sentences that explain, compare or give context need no source. Never start most sentences with "X notes/reports/states that".
+- Attribute a fact once, where it first appears. Vary how sources are named and where ("CompTIA defines ...", "..., according to Coursera"); sentences that explain, compare or give context need no source. Never start most sentences with "X notes/reports/states that". Name the same source at most 3 times in the whole article (31/10-2026: one draft said "according to Apple Support" 10 times); once a section has named its source, the following sentences from it need no attribution.
 - Never repeat a fact, number or sentence that already appears in another section (the FAQ may summarise).
 - Every sentence must tell the reader something concrete: a fact, a definition, an example, a step or a clear comparison. No generic filler that could sit in any article on the topic ("Both roles are critical for modern organizations.", "Companies must invest in skilled personnel.").
 - Include at least 2 lists (<ul> or <ol>, 3-6 items each) where they genuinely help the reader: steps, options, key differences, benefits or risks. Introduce each list with one sentence.
@@ -587,12 +595,21 @@ if (!hero?.fil || !mid?.fil) throw new Error('Mindst ét af billederne kunne ikk
 for (const [n, b] of [[1, hero], [2, mid]]) log(`- Billede ${n}: ${b.motor}${b.forsoeg > 1 ? ` · ${b.forsoeg} forsøg` : ''}${b.noter.length ? ` · ${b.noter.join(' · ')}` : ''}`);
 const figur = (b, alt) => `<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="${esc(alt)}" height="768" src="${b.fil}" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">${esc(alt)}</td></tr></tbody></table>`;
 
+// Alt-tekst/billedtekst skal beskrive det billede, der faktisk blev lavet (31/10-2026, prøve #38: billede 1 fik et nyt
+// motiv efter 2 afvisninger — robotarm og bærbare — men beholdt teksten "a metallic bridge … in a forest").
+const altTil = async (b, planlagt) => {
+  if (!b.nytMotiv && planlagt) return planlagt;
+  try { const a = String((await json(`Write a short, plain alt text (one sentence, at most 15 words, no "image of") for a picture showing: ${b.motiv}
+Return JSON {"alt": "..."}`)).alt || '').trim(); if (a.length >= 10) return a; } catch { /* nedenfor */ }
+  return String(b.motiv || planlagt || titel).split(/(?<=[.;])\s/)[0].slice(0, 120);
+};
+const alt1 = await altTil(hero, meta.alt1); const alt2 = await altTil(mid, meta.alt2);
 // Billede 1 efter første afsnit, billede 2 før overskriften nærmest 60 % inde.
-const heroFigur = figur(hero, meta.alt1);
+const heroFigur = figur(hero, alt1);
 html = html.replace(/<\/p>/i, `</p>${heroFigur}`);
 const h2er = [...html.matchAll(/<h2\b/gi)].map((m) => m.index);
 const midt = h2er.filter((i) => i > html.length * 0.45)[0];
-const midFigur = figur(mid, meta.alt2);
+const midFigur = figur(mid, alt2);
 if (midt) html = html.slice(0, midt) + midFigur + html.slice(midt);
 // Billede 3 (Jacob 31/10-2026): i artikler over 1.200 ord, før en overskrift mellem billede 2 og FAQ — så der ikke
 // er lange stræk uden billede. Er der ingen overskrift dér, eller fejler billedet, udgives artiklen med 2.
@@ -605,7 +622,7 @@ if (antalOrd(html) > 1200) {
     try {
       tredje = await lav({ motiv: meta.image3, titel, besk: meta.description, hylde });
       const sted = steder[Math.floor((steder.length - 1) / 2)];
-      html = html.slice(0, sted) + figur(tredje, meta.alt3 || meta.alt2) + html.slice(sted);
+      html = html.slice(0, sted) + figur(tredje, await altTil(tredje, meta.alt3)) + html.slice(sted);
       log(`- Billede 3: ${tredje.motor}${tredje.forsoeg > 1 ? ` · ${tredje.forsoeg} forsøg` : ''}${tredje.noter.length ? ` · ${tredje.noter.join(' · ')}` : ''}`);
     } catch (e) { log(`- Billede 3: kunne ikke laves (${String(e.message).slice(0, 80)}) — artiklen har 2 billeder`); }
   } else log('- Billede 3: ingen plads mellem billede 2 og FAQ — artiklen har 2 billeder');

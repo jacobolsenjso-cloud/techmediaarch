@@ -3,6 +3,7 @@
 // (src/lib/eksterne-links.mjs), hvor de er målt i drift: ingen forkortere,
 // ingen sociale medier/butikker, ingen affiliate-links, højst ét pr. domæne.
 const UA = 'techmediaarch-robot/1.0 (+https://www.techmediaarch.com)';
+export const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
 const FORKORTERE = /(^|\.)(bit\.ly|tinyurl\.com|t\.co|goo\.gl|ow\.ly|buff\.ly|rebrand\.ly|cutt\.ly|is\.gd|amzn\.to|geni\.us|linktr\.ee|lnk\.to|bitdefend\.me|shorturl\.at|tiny\.cc|rb\.gy|s\.id|bl\.ink|dub\.sh|shor\.by|smarturl\.it|hyperurl\.co|kit\.co|beacons\.ai|stan\.store|bio\.link)$/i;
 const PLATFORME = /(^|\.)(youtube\.com|youtu\.be|instagram\.com|facebook\.com|fb\.com|fb\.me|twitter\.com|x\.com|tiktok\.com|linkedin\.com|discord\.gg|discord\.com|patreon\.com|t\.me|telegram\.me|whatsapp\.com|reddit\.com|threads\.net|spotify\.com|podcasts\.apple\.com|snapchat\.com|twitch\.tv|gumroad\.com|amazon\.[a-z.]+|etsy\.com|ko-fi\.com|buymeacoffee\.com|calendly\.com|skool\.com|kajabi\.com|teachable\.com|systeme\.io|whop\.com|techmediaarch\.com|docs\.google\.com|drive\.google\.com|forms\.gle|quora\.com|medium\.com|pinterest\.com)$/i;
 const AFFILIATE_URL = /[?&](ref|referral|aff|affiliate|affid|partner|via|fpr|sscid|irclickid|clickid|coupon|promo|discount|tag|campaign_id)=|\/(ref|go|r|aff|affiliate|partners?|refer|coupon|deal|deals|promo)\//i;
@@ -18,7 +19,10 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 async function hent(u, timeoutMs = 10000) {
   const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': UA, accept: 'text/html' } });
+    let res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': UA, accept: 'text/html' } });
+    // Målt 31/10-2026 (prøve #38): support.apple.com svarer 429 til robottens navn, men 200 til en almindelig browser —
+    // 7 Apple-kilder blev afvist som "svarer ikke". Ved 403/429 prøves én gang til som browser (kun ét sidekald).
+    if (res.status === 403 || res.status === 429) res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': BROWSER_UA, accept: 'text/html' } });
     if (res.status !== 200 || !/text\/html/i.test(res.headers.get('content-type') || '')) return null;
     const html = (await res.text()).slice(0, 300000);
     // Afkod HTML-tegn i titlen (ellers blev "What's" til "What&amp;#39;s" i kildelisten, målt 26/9).
