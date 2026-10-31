@@ -48,9 +48,14 @@ export function domaenerTilNavne(html, kilder) {
     let t = d;
     for (const k of kilder) {
       const host = new URL(k.url).hostname.replace(/^www\./, '');
-      const re = new RegExp(`\\b(?:www\\.)?${host.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
-      t = t.replace(re, () => { n++; return kildeNavn(k); });
+      const h = `(?:www\\.)?${host.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`;
+      // Gemini kopierer navnelistens form "Navn (domæne)" — parentesen fjernes helt (kørsel #55, 31/10-2026:
+      // "According to Microsoft Learn (Microsoft Learn)"). Derefter skiftes et domæne, der står alene, til navnet.
+      t = t.replace(new RegExp(`\\s*\\(${h}\\)`, 'gi'), () => { n++; return ''; });
+      t = t.replace(new RegExp(`\\b${h}\\b`, 'gi'), () => { n++; return kildeNavn(k); });
     }
+    // Og hvis parentesen allerede er blevet til navnet: "Coursera (Coursera)" → "Coursera"
+    t = t.replace(/\b([A-Z][\w&.'’ -]{1,40}?) \(\1\)/g, (_, navn) => { n++; return navn; });
     return t;
   }).join('');
   return { html: ud, rettet: n };
