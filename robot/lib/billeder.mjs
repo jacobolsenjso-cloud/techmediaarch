@@ -34,15 +34,21 @@ Composition: a wide, rich scene that fills the full width of the frame from edge
 Strict rules: absolutely NO text, letters, numbers, words, labels or symbols anywhere; NO logos, brand names or trademarked products; NO people, faces, hands, skeletons, skulls or body parts; no screenshots of real apps or websites.
 Avoid objects that usually carry writing: screens, monitors, phones, dashboards, charts, signs, documents, books, labels, price tags, banknotes and keyboards. Show the idea with shapes, light, materials and physical objects instead.`;
 
-const KONTROL = `Inspect this image carefully, including small details on objects.
-Answer as JSON: {"tekst": true/false, "logo": true/false, "person": true/false, "hvad": "short description of any problem"}
-"tekst" = any readable or pseudo letters, numbers, words, currency or other symbols, even tiny or blurred.
-"logo" = any brand logo or trademark. "person" = any human, face, hand, skeleton, skull or other body part (also sculpted, robotic-looking or stylised ones).`;
+// Testen 31/10 viste, at et kort ja/nej lod falske bogstaver ("CCO 8" på en maskine) slippe igennem. Nu skal
+// kontrollen først skrive alt op, den ser, og er den i tvivl, tæller det som et fund.
+const KONTROL = `You are a strict quality checker for article illustrations. Scan the whole image systematically: every object surface, panel, button, label area, screen-like area, sign, edge and the background.
+First list EVERYTHING that looks like writing or a mark: letters, numbers, words, pseudo-letters or glyph-like shapes, currency or other symbols, logos or brand marks — even tiny, blurred, partial or decorative ones. Also list any human, face, hand, skeleton, skull or other body part (also sculpted, robotic-looking or stylised).
+Answer as JSON in this order:
+{"fund": ["each finding, short"], "tekst": true/false, "logo": true/false, "person": true/false, "hvad": "short summary of the problems, or empty"}
+"tekst" is true if any letters, numbers, pseudo-letters, glyphs or symbols are listed. If you are unsure whether something is writing, count it as writing.`;
+// Modellen svarer af og til "false" som tekst i stedet for false (testen 31/10: afvist med begrundelsen "ingen")
+const sand = (v) => v === true || String(v).trim().toLowerCase() === 'true';
 
+// grund: hvorfor det forrige billede blev afvist (tom = der var intet motiv fra artikel.mjs)
 const nytMotivPrompt = (titel, besk, grund) => `You design the cover image for a technology article.
 Title: "${titel}"
 Summary: ${besk}
-A previous image idea was rejected because: ${grund}. Invent a completely different idea: ${MOTIVREGLER}.
+${grund ? `A previous image idea was rejected because: ${grund}. Invent a completely different idea: ` : 'Invent '}${MOTIVREGLER}.
 Answer as JSON: {"motiv": "..."}`;
 
 // Kontrollen: tekst/logo/person → afvist. Svarer kontrollen selv med en fejl, prøves den én gang til; fejler den
@@ -52,11 +58,14 @@ async function kontroller(buf) {
   for (let i = 1; i <= 2; i++) {
     try {
       const k = await seBillede(buf, KONTROL);
-      const fejl = [k.tekst && 'tekst', k.logo && 'logo', k.person && 'person'].filter(Boolean);
-      return { ok: !fejl.length, grund: fejl.length ? `${fejl.join(', ')}: ${String(k.hvad || '').slice(0, 120)}` : '' };
+      const fejl = [sand(k.tekst) && 'tekst', sand(k.logo) && 'logo', sand(k.person) && 'person'].filter(Boolean);
+      const hvad = String(k.hvad || (Array.isArray(k.fund) ? k.fund.join('; ') : '')).slice(0, 120);
+      return { ok: !fejl.length, grund: fejl.length ? `${fejl.join(', ')}: ${hvad}` : '' };
     } catch (e) { if (i === 2) return { ok: true, grund: '', note: `kontrollen fejlede (${String(e.message).slice(0, 80)}) — godkendt uden kontrol` }; }
   }
 }
+
+export const kontrollerTest = kontroller; // kun til afprøvning af kontrollen alene
 
 // Dæmper lyspletterne: øverst til venstre meget, til højre lidt (det godkendte MFA-billede 31/10)
 async function daemp(buf) {
@@ -107,8 +116,10 @@ export async function gem(buf, kilde, titel = '') {
 export async function lav({ motiv, titel, besk = '', hylde }) {
   const accent = accentFor(hylde);
   const noter = [];
-  let m = motiv;
+  let m = String(motiv || '').trim();
   try {
+    // Testen 31/10: tekstmodellen gav af og til intet motiv ("undefined") — så skrives et her
+    if (m.length < 20) { m = String((await json(nytMotivPrompt(titel, besk, ''))).motiv || titel); noter.push('motiv skrevet her (manglede)'); }
     for (let forsoeg = 1; forsoeg <= 3; forsoeg++) {
       const buf = await geminiBillede(billedPrompt(titel, m, accent));
       const k = await kontroller(buf);
