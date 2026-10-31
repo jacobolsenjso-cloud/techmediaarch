@@ -112,11 +112,16 @@ export function kunKontrolleredeFakta(fakta, kilder, stoette = [], { loft = Infi
 
 // Navne, teksten henviser til som kilde: "according to X", "as noted by X", "X reports/notes/explains …".
 const NAVN = "([A-Z][A-Za-z0-9&.'’-]*(?:\\s+(?:of|for|and|&|[A-Z][A-Za-z0-9&.'’-]*)){0,4})";
-const VERBER = '(?:reports?|reported|notes?|noted|explains?|explained|observes?|observed|adds?|added|predicts?|predicted|estimates?|estimated|found|finds|warns?|warned|says|said|states?|stated|describes?|described|recommends?|recommended|defines?|defined|projects?|projected|highlights?|emphasizes?|cautions?|advises?|suggests?)';
+const VERBER = '(?:reports?|reported|notes?|noted|explains?|explained|observes?|observed|predicts?|predicted|estimates?|estimated|warns?|warned|says|said|states?|stated|describes?|described|recommends?|recommended|defines?|defined|highlights?|emphasizes?|cautions?|advises?|suggests?)';
+// Verber, der lige så tit handler om et produkt ("while Pro adds BitLocker", "Windows found …") — tæller kun med
+// "that" efter. Målt 31/10-2026 (kørsel #54): "Pro" blev læst som en kilde, og en god artikel blev afvist.
+const SVAGE_VERBER = '(?:adds?|added|found|finds|projects?|projected)';
 const MOENSTRE = [
-  new RegExp(`\\baccording to (?:the\\s+)?${NAVN}`, 'g'),
-  new RegExp(`\\bas (?:noted|reported|described|explained|highlighted|defined|observed|stated) by (?:the\\s+)?${NAVN}`, 'g'),
+  // [Aa] (31/10-2026): "According to X," i starten af en sætning blev ikke fundet før — kun "according to" midt i
+  new RegExp(`\\b[Aa]ccording to (?:the\\s+)?${NAVN}`, 'g'),
+  new RegExp(`\\b[Aa]s (?:noted|reported|described|explained|highlighted|defined|observed|stated) by (?:the\\s+)?${NAVN}`, 'g'),
   new RegExp(`(?:^|[.;:]\\s+|,\\s+|\\b(?:while|and|but|whereas)\\s+)(?:the\\s+)?${NAVN}\\s+${VERBER}\\b`, 'g'),
+  new RegExp(`(?:^|[.;:]\\s+|,\\s+|\\b(?:while|and|but|whereas)\\s+)(?:the\\s+)?${NAVN}\\s+${SVAGE_VERBER}\\s+that\\b`, 'g'),
 ];
 // Ord, der kan stå med stort uden at være en kilde. Målt 29/10 på 46 robotartikler: 278 navne, heraf ca. 12
 // falske (Security, Compliance, Insights, Managing, Anything, Fintech, CO …) — de står her.
