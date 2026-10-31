@@ -19,10 +19,14 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 async function hent(u, timeoutMs = 10000) {
   const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    let res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': UA, accept: 'text/html' } });
-    // Målt 31/10-2026 (prøve #38): support.apple.com svarer 429 til robottens navn, men 200 til en almindelig browser —
-    // 7 Apple-kilder blev afvist som "svarer ikke". Ved 403/429 prøves én gang til som browser (kun ét sidekald).
-    if (res.status === 403 || res.status === 429) res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': BROWSER_UA, accept: 'text/html' } });
+    // Målt 31/10-2026: support.apple.com svarer 429 (prøve #38), og microsoft.com lukker forbindelsen helt (kørsel #55,
+    // 10 Microsoft-kilder afvist) til robottens navn — begge svarer 200 til en almindelig browser. Ved 403/429 eller
+    // en afbrudt forbindelse prøves én gang til som browser (kun ét sidekald mere).
+    const somBrowser = () => fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': BROWSER_UA, accept: 'text/html' } });
+    let res;
+    try { res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': UA, accept: 'text/html' } }); }
+    catch (e) { if (ctrl.signal.aborted) throw e; res = await somBrowser(); }
+    if (res.status === 403 || res.status === 429) res = await somBrowser();
     if (res.status !== 200 || !/text\/html/i.test(res.headers.get('content-type') || '')) return null;
     const html = (await res.text()).slice(0, 300000);
     // Afkod HTML-tegn i titlen (ellers blev "What's" til "What&amp;#39;s" i kildelisten, målt 26/9).

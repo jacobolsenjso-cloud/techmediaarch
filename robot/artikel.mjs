@@ -23,6 +23,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { somSporgsmaal } from '../src/lib/sporgsmaal.mjs';
 import { EKSTRA_ETIKETTER } from '../src/lib/adresse.mjs';
+import { planHylde } from '../src/lib/hyldeplan.mjs';
 import { skriv, json, gemPrisVedExit, brugTekstmodel, ARTIKELMODEL } from './lib/gemini.mjs';
 brugTekstmodel(ARTIKELMODEL);   // den stærkere model til artiklerne (Jacob 31/10-2026), robot/lib/gemini.mjs
 gemPrisVedExit('artikel');   // pristælleren (trin 7): robot/ud/pris-artikel.json, også når artiklen afvises
@@ -168,9 +169,15 @@ const titelAf = (s) => arkiv.find((a) => a.sti === s)?.titel || s;
 // (kørsel #11): ordlisten alene fandt ingen LLM-artikler til en LLM-artikel,
 // fordi titlerne siger "DeepSeek", "ChatGPT", "Claude" — ikke "language model".
 const iEmne = arkiv.filter((a) => a.sti.startsWith('/20') && a.labels.includes(valgt.emne)).map((a) => ({ sti: a.sti }));
+// + alle artikler på samme hylde (31/10-2026, kørsel #55): emne-etiketten "It" havde næsten ingen artikler, så en
+// Microsoft 365-artikel fik 0 interne links, selv om Everyday Tech-hylden har ~20 artikler om Windows, pc'er o.l.
+const hyldeAf = (a) => planHylde(a.sti) || a.labels.map((l) => emner().find((e) => e.etiket === l)?.hylde || EKSTRA_ETIKETTER[l]).find(Boolean);
+const egenHylde = emner().find((e) => e.etiket === valgt.emne)?.hylde || EKSTRA_ETIKETTER[valgt.emne] || (OMSKRIV ? hyldeAf({ sti: OMSKRIV, labels: gammel.fm.labels || [] }) : undefined);
+const paaHylde = egenHylde ? arkiv.filter((a) => a.sti.startsWith('/20') && hyldeAf(a) === egenHylde).map((a) => ({ sti: a.sti })) : [];
 // Ved omskrivning aldrig et link til artiklen selv
-const kandListe = [...linkKand.filter((m) => m.sti !== OMSKRIV).slice(0, 12), ...iEmne.filter((m) => m.sti !== OMSKRIV)].filter((m, i, arr) => arr.findIndex((x) => x.sti === m.sti) === i)
-  .slice(0, 40).map((m) => ({ href: kodet(m.sti), sti: m.sti, titel: titelAf(m.sti) }));
+const kandListe = [...linkKand.filter((m) => m.sti !== OMSKRIV).slice(0, 12), ...iEmne.filter((m) => m.sti !== OMSKRIV), ...paaHylde.filter((m) => m.sti !== OMSKRIV)]
+  .filter((m, i, arr) => arr.findIndex((x) => x.sti === m.sti) === i)
+  .slice(0, 45).map((m) => ({ href: kodet(m.sti), sti: m.sti, titel: titelAf(m.sti) }));
 // Kun artikler, der reelt handler om det samme. Prøveartikel 2 (26/9) fik tvunget
 // 3 links ind via ordet "market" (bl.a. Trump/Stargate) — relevans vinder over antal.
 let interne = [];
@@ -518,9 +525,24 @@ Do not mark sentences that already say it was discontinued or replaced. Do not m
 Return ONLY JSON {"stale": [{"n": number, "what": "<name>", "status": "<e.g. deprecated in 2024>"}]} - an empty list if nothing is outdated.
 ${alle.map((s, i) => `${i + 1}. ${tekst(s)}`).join('\n')}`, { soeg: true, temperatur: 0.1 });
     let j = null; try { j = JSON.parse((r.tekst.match(/\{[\s\S]*\}/) || ['null'])[0]); } catch { /* nedenfor */ }
-    const fund = (Array.isArray(j?.stale) ? j.stale : []).map((x) => ({ ...x, s: alle[parseInt(x.n, 10) - 1] })).filter((x) => x.s);
+    let fund = (Array.isArray(j?.stale) ? j.stale : []).map((x) => ({ ...x, s: alle[parseInt(x.n, 10) - 1] })).filter((x) => x.s);
+    // Målt 31/10-2026 (kørsel #55): 3 fund, men Google-søgningen gav ingen kilder i det samlede svar, så intet blev
+    // fjernet. Nu tjekkes hvert fund for sig med en målrettet søgning; kun fund, som søgningen bekræfter med kilder, tæller.
+    if (j && fund.length && !r.kilder.length) {
+      const bekraeftet = [];
+      for (const x of fund.slice(0, 5)) {
+        try {
+          const s = await skriv(`Today is ${idag}. Use Google Search to check whether "${x.what}" has been discontinued, deprecated, retired, removed or replaced.
+The sentence in our article says: "${tekst(x.s)}"
+Return ONLY JSON {"outdated": true or false, "status": "<what happened and when, or 'still current'>"}`, { soeg: true, temperatur: 0 });
+          const v = JSON.parse((s.tekst.match(/\{[\s\S]*\}/) || ['{}'])[0]);
+          if (v.outdated === true && s.kilder.length) bekraeftet.push({ ...x, status: String(v.status || x.status) });
+          else log(`- Forældet-vagt: "${x.what}" ikke bekræftet (${v.outdated === true ? 'ingen søgekilder' : String(v.status || 'stadig aktuel').slice(0, 60)})`);
+        } catch (e) { log(`- Forældet-vagt: tjek af "${x.what}" fejlede (${e.message.slice(0, 60)})`); }
+      }
+      fund = bekraeftet;
+    }
     if (!j) log('- Forældet-vagt: svaret kunne ikke læses — intet fjernet');
-    else if (fund.length && !r.kilder.length) log(`- Forældet-vagt: ${fund.length} fund uden søgekilder — intet fjernet`);
     else {
       if (fund.some((x) => foersteAfsnit(html).includes(x.s))) throw new Error(`Det korte svar nævner noget forældet (${fund[0].what}) — artiklen afvist`);
       for (const x of fund) html = html.replace(x.s, '');
