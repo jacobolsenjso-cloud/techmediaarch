@@ -1,18 +1,26 @@
 {
- "hentet": "2026-10-29T20:20:54.430Z",
- "fra": "2026-10-23",
- "til": "2026-10-29",
+ "hentet": "2026-10-31T13:45:00.709Z",
+ "fra": "2026-10-25",
+ "til": "2026-10-31",
  "dage": 7,
  "sider": {
+  "/2026/10/what-are-intelligent-agents-ai": {
+   "visninger": 7,
+   "brugere": 3
+  },
   "/2026/09/what-are-phishing-emails": {
    "visninger": 4,
    "brugere": 1
   },
-  "/2026/05/exploring-possibilities-of-openfutureai": {
-   "visninger": 2,
+  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
+   "visninger": 3,
+   "brugere": 2
+  },
+  "/2026/10/how-phishing-resistant-mfa-works": {
+   "visninger": 3,
    "brugere": 1
   },
-  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
+  "/2026/05/exploring-possibilities-of-openfutureai": {
    "visninger": 2,
    "brugere": 1
   },
@@ -20,8 +28,20 @@
    "visninger": 2,
    "brugere": 1
   },
-  "/2026/10/how-phishing-resistant-mfa-works": {
-   "visninger": 2,
+  "/2024/08/a-comprehensive-review-of-cyber": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/how-payment-processors-work": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/what-is-cybersecurity-importance": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/what-to-do-after-product-management": {
+   "visninger": 1,
    "brugere": 1
   }
  }

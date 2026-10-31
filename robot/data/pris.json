@@ -99,5 +99,108 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-10-31T13:45:00.717Z",
+  "artikel": "/2026/10/how-generative-ai-creates-images",
+  "usd": 0.1157,
+  "kr": 0.79,
+  "dele": {
+   "artikel": {
+    "kr": 0.65,
+    "billeder": 2,
+    "soegninger": 2,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0.12,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-10-31T13:45:25.400Z",
+  "artikel": null,
+  "omskrevet": true,
+  "usd": 0.0173,
+  "kr": 0.12,
+  "dele": {
+   "artikel": {
+    "kr": 0.12,
+    "billeder": 0,
+    "soegninger": 1,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-10-31T13:45:39.565Z",
+  "artikel": null,
+  "omskrevet": true,
+  "usd": 0.0027,
+  "kr": 0.02,
+  "dele": {
+   "artikel": {
+    "kr": 0.02,
+    "billeder": 0,
+    "soegninger": 1,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-10-31T13:46:20.838Z",
+  "artikel": "/2026/04/mdm-activate-your-mac-with-this-essential-guide",
+  "omskrevet": true,
+  "usd": 0.0875,
+  "kr": 0.6,
+  "dele": {
+   "artikel": {
+    "kr": 0.6,
+    "billeder": 2,
+    "soegninger": 1,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-10-31T13:46:57.989Z",
+  "artikel": "/2026/04/create-hollywood-style-films-with-this-free-ai-workflow",
+  "omskrevet": true,
+  "usd": 0.0857,
+  "kr": 0.59,
+  "dele": {
+   "artikel": {
+    "kr": 0.59,
+    "billeder": 2,
+    "soegninger": 2,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-10-31T13:48:16.014Z",
+  "artikel": "/2026/05/exploring-claude-just-changed-making",
+  "omskrevet": true,
+  "usd": 0.0901,
+  "kr": 0.62,
+  "dele": {
+   "artikel": {
+    "kr": 0.62,
+    "billeder": 2,
+    "soegninger": 3,
+    "ukendtPris": [
+     "gemini-3.5-flash"
+    ]
+   }
+  }
  }
 ]
