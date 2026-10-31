@@ -19,7 +19,7 @@ on:
       opgave:
         description: 'Hvad skal robotten gøre?'
         type: choice
-        options: [soegeord, noegletjek, proeveartikel, proeveomskriv, faq-ekstra]
+        options: [soegeord, noegletjek, proeveartikel, proeveomskriv, test-foraeldet, faq-ekstra]
         default: soegeord
       omskriv:
         description: 'proeveomskriv: artiklens adresse, fx /2026/04/mdm-activate-your-mac-with-this-essential-guide'
@@ -86,6 +86,9 @@ jobs:
             proeveomskriv)
               # 31/10-2026: prøv en omskrivning (også --igen af en artikel fra en ældre opskrift) på en gren
               node robot/artikel.mjs --omskriv "$OMSKRIV" --maade fuld --igen ;;
+            test-foraeldet)
+              # 31/10-2026: forældet-vagten på 4 kendte tilfælde (få øre), robot/test-foraeldet.mjs
+              node robot/test-foraeldet.mjs ;;
             faq-ekstra)
               # 32 minutter, så der er tid til at gemme grenen inden jobbets loft på 40
               node robot/faq-ekstra.mjs --minutter 32 ;;

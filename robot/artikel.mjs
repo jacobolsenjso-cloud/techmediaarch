@@ -24,6 +24,7 @@ import { execFileSync } from 'node:child_process';
 import { somSporgsmaal } from '../src/lib/sporgsmaal.mjs';
 import { EKSTRA_ETIKETTER } from '../src/lib/adresse.mjs';
 import { planHylde } from '../src/lib/hyldeplan.mjs';
+import { tjekForaeldet } from './lib/foraeldet.mjs';
 import { skriv, json, gemPrisVedExit, brugTekstmodel, ARTIKELMODEL } from './lib/gemini.mjs';
 brugTekstmodel(ARTIKELMODEL);   // den stærkere model til artiklerne (Jacob 31/10-2026), robot/lib/gemini.mjs
 gemPrisVedExit('artikel');   // pristælleren (trin 7): robot/ud/pris-artikel.json, også når artiklen afvises
@@ -532,12 +533,9 @@ ${alle.map((s, i) => `${i + 1}. ${tekst(s)}`).join('\n')}`, { soeg: true, temper
       const bekraeftet = [];
       for (const x of fund.slice(0, 5)) {
         try {
-          const s = await skriv(`Today is ${idag}. Use Google Search to check whether "${x.what}" has been discontinued, deprecated, retired, removed or replaced.
-The sentence in our article says: "${tekst(x.s)}"
-Return ONLY JSON {"outdated": true or false, "status": "<what happened and when, or 'still current'>"}`, { soeg: true, temperatur: 0 });
-          const v = JSON.parse((s.tekst.match(/\{[\s\S]*\}/) || ['{}'])[0]);
-          if (v.outdated === true && s.kilder.length) bekraeftet.push({ ...x, status: String(v.status || x.status) });
-          else log(`- Forældet-vagt: "${x.what}" ikke bekræftet (${v.outdated === true ? 'ingen søgekilder' : String(v.status || 'stadig aktuel').slice(0, 60)})`);
+          const v = await tjekForaeldet(x.what, tekst(x.s), idag);   // robot/lib/foraeldet.mjs
+          if (v.forældet === true && v.kilder) bekraeftet.push({ ...x, status: v.status || x.status });
+          else log(`- Forældet-vagt: "${x.what}" ikke bekræftet (${v.forældet === true ? 'ingen søgekilder' : v.forældet === false ? 'stadig aktuel' : 'intet svar'}${v.kilder ? `, ${v.kilder} kilder` : ''})`);
         } catch (e) { log(`- Forældet-vagt: tjek af "${x.what}" fejlede (${e.message.slice(0, 60)})`); }
       }
       fund = bekraeftet;

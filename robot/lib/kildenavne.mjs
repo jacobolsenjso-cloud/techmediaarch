@@ -130,7 +130,8 @@ const MOENSTRE = [
 ];
 // Ord, der kan stå med stort uden at være en kilde. Målt 29/10 på 46 robotartikler: 278 navne, heraf ca. 12
 // falske (Security, Compliance, Insights, Managing, Anything, Fintech, CO …) — de står her.
-const IKKE_KILDE = /^(This|That|These|Those|It|They|He|She|We|You|The|A|An|Each|Every|Most|Many|Some|Furthermore|Additionally|However|Moreover|Meanwhile|In|For|When|While|If|Both|Research|Data|Studies|Experts?|Analysts?|Researchers?|Developers?|Users?|Companies|Organizations|Businesses|Teams|Security|Compliance|Insights|Managing|Anything|Fintech|CO-?)$/;
+// "As"/"According"/"Per" (31/10-2026, prøve #41): "As noted by Microsoft …" gav navnet "As".
+const IKKE_KILDE = /^(As|According|Per|Like|This|That|These|Those|It|They|He|She|We|You|The|A|An|Each|Every|Most|Many|Some|Furthermore|Additionally|However|Moreover|Meanwhile|In|For|When|While|If|Both|Research|Data|Studies|Experts?|Analysts?|Researchers?|Developers?|Users?|Companies|Organizations|Businesses|Teams|Security|Compliance|Insights|Managing|Anything|Fintech|CO-?)$/;
 const synlig = (s) => String(s).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
 
 export function kildeHenvisninger(saetning) {
