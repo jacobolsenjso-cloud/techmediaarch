@@ -36,25 +36,29 @@ export async function braendInd(buf) {
 // Små kopier til miniaturer (1/11-2026, Jacobs ja): kortene viste billeder på op til 2560 px i felter på 112–235 px,
 // så en artikelside hentede 21 billeder = 2.041 KB. Den lille kopi laves af kopien MED mærker (dist/images/s/),
 // og siderne tilbyder den via srcset (src/lib/temakoder.mjs miniSrcset) — browseren vælger selv efter plads og skærm.
-export const LILLE_MAPPE = 's';
-export const LILLE_BREDDE = 480;
-async function lilleKopi(buf, ud) {
+// 1/11-2026 (PageSpeed: "Optimer billedlevering", 335 KB): to størrelser mere. Mobilens store kort (ca. 400 px gange
+// skærmens tæthed 1,75 = 700 px) fik før originalen på 1.366 px (131 KB), og de små rækker (133 px ≈ 233 px) fik
+// 480 px-kopien. Nu: 240 px (xs), 480 px (s) og 800 px (md). Navnene skal matche miniSrcset i src/lib/temakoder.mjs.
+export const KOPIER = [{ mappe: 'xs', bredde: 240 }, { mappe: 's', bredde: 480 }, { mappe: 'md', bredde: 800 }];
+async function lilleKopi(buf, ud, bredde) {
   try {
     const b = sharp(buf, { failOn: 'none' });
     const { width, format } = await b.metadata();
-    if (!width || width <= LILLE_BREDDE || !['jpeg', 'png', 'webp'].includes(format)) { fs.writeFileSync(ud, buf); return; }
-    const r = b.resize({ width: LILLE_BREDDE });
+    if (!width || width <= bredde || !['jpeg', 'png', 'webp'].includes(format)) { fs.writeFileSync(ud, buf); return; }
+    const r = b.resize({ width: bredde });
     const res = format === 'png' ? await r.png({ compressionLevel: 9 }).toBuffer()
       : format === 'webp' ? await r.webp({ quality: 78 }).toBuffer()
       : await r.jpeg({ quality: 78, mozjpeg: true }).toBuffer();
     fs.writeFileSync(ud, res);
   } catch { fs.writeFileSync(ud, buf); }
 }
+const alleKopier = async (buf, rod, f) => { for (const k of KOPIER) await lilleKopi(buf, path.join(rod, k.mappe, f), k.bredde); };
 
 // Laver alle kopierne. fra = public/images, til = dist/images/m
-export async function vandmaerkAlle(fra, til, lille = path.join(path.dirname(til), LILLE_MAPPE)) {
+export async function vandmaerkAlle(fra, til) {
   fs.mkdirSync(til, { recursive: true });
-  fs.mkdirSync(lille, { recursive: true });
+  const rod = path.dirname(til);
+  for (const k of KOPIER) fs.mkdirSync(path.join(rod, k.mappe), { recursive: true });
   const filer = fs.readdirSync(fra).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
   let lavet = 0, sprunget = 0; const fejl = [];
   const koe = [...filer];
@@ -62,10 +66,10 @@ export async function vandmaerkAlle(fra, til, lille = path.join(path.dirname(til
     for (let f; (f = koe.shift());) {
       const org = fs.readFileSync(path.join(fra, f));
       const res = await braendInd(org).catch(() => undefined);
-      if (res) { fs.writeFileSync(path.join(til, f), res); lavet++; await lilleKopi(res, path.join(lille, f)); }
+      if (res) { fs.writeFileSync(path.join(til, f), res); lavet++; await alleKopier(res, rod, f); }
       else if (res === undefined) {
         // Fejl i billedfilen: siden peger alligevel på kopien (src/lib/temakoder.mjs), så originalen lægges der
-        fs.writeFileSync(path.join(til, f), org); fejl.push(f); await lilleKopi(org, path.join(lille, f));
+        fs.writeFileSync(path.join(til, f), org); fejl.push(f); await alleKopier(org, rod, f);
       } else sprunget++;
     }
   }));

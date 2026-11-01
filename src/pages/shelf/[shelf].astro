@@ -91,7 +91,7 @@ const schema = {
             <div class="hylde-liste">
               {svar.map((p, i) => (
                 <a href={p.href} class="hylde-raekke">
-                  {p.image ? <img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="140px" alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" /> : <span class="hylde-raekke-tom" aria-hidden="true"></span>}
+                  {p.image ? <img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="112px" alt="" loading={i < 4 ? 'eager' : 'lazy'} decoding="async" /> : <span class="hylde-raekke-tom" aria-hidden="true"></span>}
                   <span class="hylde-raekke-tekst">
                     <span class="hylde-raekke-titel">{p.title}</span>
                     <span class="hylde-raekke-meta">{datoTekst(p.published)} · {p.minutter} min read</span>
@@ -108,7 +108,7 @@ const schema = {
             <div class="hylde-liste">
               {arkiv.map((p) => (
                 <a href={p.href} class="hylde-raekke">
-                  {p.image ? <img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="140px" alt="" loading="lazy" decoding="async" /> : <span class="hylde-raekke-tom" aria-hidden="true"></span>}
+                  {p.image ? <img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="112px" alt="" loading="lazy" decoding="async" /> : <span class="hylde-raekke-tom" aria-hidden="true"></span>}
                   <span class="hylde-raekke-tekst">
                     <span class="hylde-raekke-titel">{p.title}</span>
                     <span class="hylde-raekke-meta">{datoTekst(p.published)} · {p.minutter} min read</span>

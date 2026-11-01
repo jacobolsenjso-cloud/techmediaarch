@@ -205,7 +205,7 @@ const VEJE = [
         <div class="lead-secondary">
           {sideHistorier.map((p) => (
             <a href={p.href} class="lead-mini" style={maerke(p) ? `--tag-accent: ${maerke(p)!.farve}` : undefined}>
-              {p.image ? <div class="card-thumb"><img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="(max-width: 700px) 40vw, 140px" alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
+              {p.image ? <div class="card-thumb"><img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="(max-width: 520px) 110px, 132px" alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
               <div>
                 {/* Mærke over titlen (Jacob 5/10-2026), som på hovedhistorien — fra 28/10 hylden i stedet for emnet */}
                 {maerke(p) && <span class="lead-eyebrow lead-mini-eyebrow">{maerke(p)!.navn}</span>}

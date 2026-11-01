@@ -83,7 +83,7 @@ const naeste = (serieNr && serieNr < serie.length ? serie[serieNr] : null)
   ?? gamleForslag[0];
 const forslag = naeste ? [naeste] : [];
 const forslagHtml = naeste ? `<aside class="las-naeste" data-ekstra="1" aria-label="Read next" style="--hylde: ${hylde?.farve ?? 'var(--teal)'}"><a href="${esc(naeste.href)}" class="las-naeste-link">${
-  naeste.image ? `<span class="las-naeste-thumb"><img src="${esc(naeste.image)}"${miniSrcset(naeste.image) ? ` srcset="${esc(miniSrcset(naeste.image))}" sizes="140px"` : ''} alt="" loading="lazy" decoding="async"></span>` : ''
+  naeste.image ? `<span class="las-naeste-thumb"><img src="${esc(naeste.image)}"${miniSrcset(naeste.image) ? ` srcset="${esc(miniSrcset(naeste.image))}" sizes="112px"` : ''} alt="" loading="lazy" decoding="async"></span>` : ''
 }<span class="las-naeste-tekst"><span class="las-naeste-label">${hylde ? 'Read next on this shelf' : 'Read next'}</span><span class="las-naeste-titel">${esc(naeste.title)}</span><span class="las-naeste-meta">${esc(datoTekst(naeste.published))} · ${naeste.minutter} min read</span></span></a></aside>` : '';
 // Sidebaren lover "More in <hylde/emne>" — så den må kun vise den. Trin 6, forslag 5: hylden først (ikke det gamle
 // emnenavn, fx "Infosec"). Har hylden/emnet for få artikler, hedder den "Latest articles" og viser de nyeste i stedet.
@@ -495,7 +495,7 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
           <div class="side-list">
             {sidebarListe.map((r) => (
               <a href={r.href} class="side-item">
-                {r.image ? <div class="card-thumb"><img src={r.image} srcset={miniSrcset(r.image) || undefined} sizes="140px" alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
+                {r.image ? <div class="card-thumb"><img src={r.image} srcset={miniSrcset(r.image) || undefined} sizes="130px" alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
                 {/* Trin 6, forslag 5: dato og læsetid under titlen */}
                 <span class="side-item-tekst"><h3 class="side-item-title">{r.title}</h3><span class="side-item-meta">{datoTekst(r.published)} · {r.minutter} min read</span></span>
               </a>

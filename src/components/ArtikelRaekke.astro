@@ -13,7 +13,7 @@ const maerke = h ? { navn: h.navn, farve: h.farve } : p.emner[0] ? { navn: p.emn
 ---
 <a href={p.href} class:list={['raekke', { lille }]}>
   {p.image
-    ? <img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes={lille ? '140px' : '(max-width: 700px) 40vw, 260px'} alt="" loading={ivrig ? 'eager' : 'lazy'} decoding="async" />
+    ? <img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes={lille ? '120px' : '(max-width: 760px) 110px, 200px'} alt="" loading={ivrig ? 'eager' : 'lazy'} decoding="async" />
     : <span class="raekke-tom" style={maerke ? `--h: ${maerke.farve}` : undefined}></span>}
   <span class="raekke-tekst">
     {hylde && maerke && <span class="raekke-maerke" style={`--h: ${maerke.farve}`}>{maerke.navn}</span>}

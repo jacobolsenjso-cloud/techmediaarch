@@ -190,7 +190,13 @@ export function vandmaerke(html) {
       // pladsen (bredde x forhold) er kendt, før billedet er hentet. Samme udseende som før.
       const maal = billedMaal(src);
       const stil = maal && maal.h ? ` style="--b:${maal.b}px"` : '';
-      return `<span class="tma-wm"${stil}>${medMaal(img, src).replace(/(\ssrc=["'])[^"']+/i, `$1${m}`)}</span>`;
+      // srcset (1/11-2026): artiklens billeder hentede altid den fulde kopi (1.366 px) — også på en mobil, der viser
+      // dem 380 px brede. Nu vælger browseren 480/800 px-kopien, når den er skarp nok. sizes = spaltens bredde
+      // (målt: 787 px på computer, skærmen minus 24 px på mobil), dog aldrig bredere end billedet selv.
+      const ss = /\ssrcset=/i.test(img) ? '' : miniSrcset(m);
+      const plads = maal ? `(max-width: 900px) min(${maal.b}px, calc(100vw - 24px)), min(${maal.b}px, 790px)` : '(max-width: 900px) calc(100vw - 24px), 790px';
+      const ekstra = ss ? ` srcset="${ss}" sizes="${plads}"` : '';
+      return `<span class="tma-wm"${stil}>${medMaal(img, src).replace(/(\ssrc=["'])[^"']+(["'])/i, `$1${m}$2${ekstra}`)}</span>`;
     }
     return `<span class="tma-wm">${img}<span class="tma-wm-tekst">${VANDMAERKE_TEKST}</span></span>`;
   });
@@ -207,12 +213,15 @@ export function maerketBillede(src) {
   return b !== null && b >= 150 ? `/images/m/${m[1]}` : src;
 }
 
-// srcset til miniaturer (1/11-2026): den lille kopi (480 px, med mærker, dist/images/s/ — scripts/vandmaerk-billeder.mjs)
+// srcset til miniaturer: kopierne MED mærker i 240 (xs), 480 (s) og 800 px (md) — scripts/vandmaerk-billeder.mjs KOPIER —
 // + den store mærkekopi. Browseren henter den mindste, der er skarp nok til pladsen (sizes) og skærmen.
-// Kun for /images/m/-billeder bredere end 480 px; ellers '' (så bruges src alene).
+// Kun for /images/m/-billeder bredere end 480 px; ellers '' (så bruges src alene). En kopi står kun med, når
+// originalen er bredere end den (ellers er "kopien" bare originalen igen).
+const KOPI_BREDDER = [['xs', 240], ['s', 480], ['md', 800]];
 export function miniSrcset(src) {
   const m = String(src || '').match(/^\/images\/m\/([\w.-]+\.(?:jpe?g|png|webp))$/i);
   if (!m) return '';
   const b = billedBredde(`/images/${m[1]}`);
-  return b && b > 480 ? `/images/s/${m[1]} 480w, ${src} ${b}w` : '';
+  if (!b || b <= 480) return '';
+  return [...KOPI_BREDDER.filter(([, w]) => w < b).map(([mappe, w]) => `/images/${mappe}/${m[1]} ${w}w`), `${src} ${b}w`].join(', ');
 }

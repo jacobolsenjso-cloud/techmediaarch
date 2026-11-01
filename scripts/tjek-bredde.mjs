@@ -77,7 +77,8 @@ for (const [navn, viewport] of BREDDER) {
     return q.url().startsWith(BASE) && !['image', 'media'].includes(q.resourceType()) ? r.continue() : r.abort();
   });
   let i = 0;
-  await Promise.all(Array.from({ length: 6 }, async () => {
+  // Antal sider ad gangen: 6 som standard (GitHub); BREDDE_SAMTIDIG=3 på Jacobs pc, hvor 6 gav tilfældige timeouts (1/11-2026)
+  await Promise.all(Array.from({ length: Math.max(1, Number(process.env.BREDDE_SAMTIDIG) || 6) }, async () => {
     const side = await ctx.newPage();
     while (i < sider.length) {
       const s = sider[i++];
