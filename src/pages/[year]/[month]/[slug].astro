@@ -319,7 +319,9 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .nav-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
     /* Hele titlen på højst 2 linjer (1/11-2026; før én linje med "…") */
     .nav-title { font-size: 1rem; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .nav-card.disabled { opacity: 0.4; pointer-events: none; }
+    /* Ingen ældre/nyere på hylden: en tom plads i stedet for et dødt link (1/11-2026). Før stod
+       "No newer articles" som link til "#" i 40 % gennemsigtighed — for svag kontrast (Lighthouse 1,8:1). */
+    .nav-tom { flex: 1; }
     /* Related articles i en samlet boks (30/9, Jacob): uden overskrift-tag og uden <p>, så Googles Auto-annoncer
        ikke sætter annoncer ind mellem kortene — samme løsning som "People also ask" */
     .related-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px 20px 20px; margin-top: 10px; }
@@ -342,6 +344,7 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       .article-secondary { width: 100%; position: static; max-height: none; overflow: visible; padding-right: 0; }
       .article-title { font-size: 2.1rem; }
       .nav-row { flex-direction: column; gap: 12px; }
+      .nav-tom { display: none; }
       .share-cta { flex-direction: column; align-items: flex-start; }
       .share-cta-btn { width: 100%; justify-content: center; }
       .author-box { padding: 18px; gap: 12px; flex-direction: column; align-items: flex-start; }
@@ -459,14 +462,18 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       </div>
 
       <div class="nav-row">
-        <a href={aeldre ? aeldre.href : '#'} class={`nav-card ${aeldre ? '' : 'disabled'}`}>
-          <span class="nav-label">← Older{kaedeNavn}</span>
-          <span class="nav-title">{aeldre ? aeldre.title : 'No older articles'}</span>
-        </a>
-        <a href={nyere ? nyere.href : '#'} class={`nav-card right ${nyere ? '' : 'disabled'}`}>
-          <span class="nav-label">Newer{kaedeNavn} →</span>
-          <span class="nav-title">{nyere ? nyere.title : 'No newer articles'}</span>
-        </a>
+        {aeldre ? (
+          <a href={aeldre.href} class="nav-card">
+            <span class="nav-label">← Older{kaedeNavn}</span>
+            <span class="nav-title">{aeldre.title}</span>
+          </a>
+        ) : <span class="nav-tom" aria-hidden="true"></span>}
+        {nyere ? (
+          <a href={nyere.href} class="nav-card right">
+            <span class="nav-label">Newer{kaedeNavn} →</span>
+            <span class="nav-title">{nyere.title}</span>
+          </a>
+        ) : <span class="nav-tom" aria-hidden="true"></span>}
       </div>
 
       {relaterede.length > 0 && (
