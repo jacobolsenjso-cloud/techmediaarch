@@ -217,10 +217,6 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .action-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--card-bg); border-radius: var(--radius); height: 40px; padding: 0 16px; border: 1px solid var(--border-color); color: var(--text-color); font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
     .action-pill:hover { background: var(--hover-bg); }
     .action-icon { width: 18px; height: 18px; }
-    .tag-container { margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .tag-badge { display: inline-flex; align-items: center; gap: 6px; background-color: var(--card-bg); color: var(--ink-2); border: 1px solid var(--border-color); padding: 5px 12px; min-height: 32px; box-sizing: border-box; border-radius: var(--radius); font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; }
-    .tag-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
-    .tag-badge:hover { background-color: var(--hover-bg); color: var(--text-color); }
     /* Indholdsfortegnelsen står fra 1/10 INDE i brødteksten under første billede (lib/artikelbokse.mjs) — uden ul/li,
        så punkterne er <a> i en <span>. Reglerne er knyttet til .post-body, så de vinder over brødtekstens linkstil. */
     /* Synlig men rolig (Jacob 1/11-2026): et neutralt kort — farven er forbeholdt "Key takeaways" lige over, så de to
@@ -360,7 +356,8 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       .related-grid .article-card:first-child { border-top: 0; padding-top: 0; }
       .related-grid .article-card .card-thumb { grid-row: 1 / 3; border-radius: var(--radius); aspect-ratio: 16 / 10; }
       .related-grid .article-card .card-title { margin: 0 0 4px; padding: 0; font-size: 15px; }
-      .related-grid .article-card .card-meta { padding: 0; }
+      /* Kortets almindelige 16 px sidemargen gælder ikke i rækken (set live 1/11: meta stod rykket ind) */
+      .related-grid .article-card .card-meta { padding: 0; margin: 0; }
       .related-box { padding: 14px 12px 16px; }
     }
   </style>

@@ -1,5 +1,5 @@
 // /sitemap-pages.xml: forside, faste sider og hylder (Bloggers havde forside + faste sider). Emnesider findes ikke mere (1/11-2026).
-import { SIDER_UDEN_WATCH as SIDER } from '../lib/indhold';
+import { SIDER } from '../lib/indhold';
 import { HAR_BEDSTE } from '../lib/bedste';
 import { HYLDER, hyldeUrl } from '../lib/hylder';
 const SITE = 'https://www.techmediaarch.com';

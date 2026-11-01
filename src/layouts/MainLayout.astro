@@ -194,7 +194,7 @@ const nyeste = INDLAEG[0];
       /* Trin 3b (Jacob 28/10): bløde skygger på bokse.
          1/11-2026: IKKE på billeder i hvile — en skygge betyder "kan klikkes" og kommer først, når musen er over.
          Billederne får i stedet en tynd kant (1 px), så lyse billeder ikke flyder ud i den hvide side. */
-      :is(.home-hero-aside, .home-search, .toc-container, .ymal, .disclosure-box, .share-cta, .author-box, .nav-card, .related-box, .paa) { box-shadow: var(--shadow); }
+      :is(.home-search, .toc-container, .disclosure-box, .share-cta, .author-box, .nav-card, .related-box, .paa) { box-shadow: var(--shadow); }
       .card-thumb { box-shadow: 0 0 0 1px var(--rule-light); }
 
       /* --- Topbar --- */
@@ -236,7 +236,7 @@ const nyeste = INDLAEG[0];
         .search-input-wrapper { margin: 0 auto; }
         .search-overlay .icon-btn { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); margin-left: 0; }
       }
-      /* Logo: flisen med A'et + navnet (30/10). .logo-sub bruges ikke i markup lige nu. */
+      /* Logo: flisen med A'et + navnet (30/10) */
       .logo { text-decoration: none; color: inherit; display: flex; flex-direction: row; align-items: center; gap: 10px; min-height: 44px; min-width: 0; }
       /* Logoet (Jacob 30/10: én tegning alle steder, public/logo.svg = favicon.svg, laves af scripts/lav-logo.mjs) */
       .logo-mark { flex: none; display: block; width: 32px; height: 32px; border-radius: 9px; }
@@ -244,8 +244,6 @@ const nyeste = INDLAEG[0];
          så navnet læses som et ordmærke og ikke som en overskrift */
       .logo-name { font-size: 19px; line-height: 1.05; font-weight: 700; font-stretch: 94%; letter-spacing: -0.02em; white-space: nowrap; }
       .logo-arch { color: var(--teal-text); font-weight: 600; }
-      .logo-sub { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-      .logo-sub-kort { display: none; }
       /* Menu-knappen er kun et ikon (udkast 3); ordet "Menu" står til skærmlæsere i aria-label */
       .menu-label { display: none; }
 
@@ -311,9 +309,7 @@ const nyeste = INDLAEG[0];
       .nav-item:hover, .nav-item.active { background: var(--hover-bg); color: var(--teal-text); }
       .nav-icon { width: 19px; height: 19px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; }
       .nav-item.active .nav-icon, .nav-item:hover .nav-icon { opacity: 1; }
-      .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tag-accent); flex-shrink: 0; margin: 0 5px 0 5px; }
       .nav-heading { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 6px 15px 2px; }
-      /* Topics som fold-ud (30/9) */
       .nav-sep { width: 100%; border: 0; border-top: 1px solid var(--border-color); margin: 10px 0; }
       .content-main { flex: 1; min-width: 0; min-height: calc(100vh - 60px); background: var(--bg-color); position: relative; display: flex; flex-direction: column; overflow-x: clip; }
       /* Ingen ind-toning af hele siden: den forsinkede første visning (LCP) på mobil */
@@ -356,15 +352,11 @@ const nyeste = INDLAEG[0];
       @media (max-width: 768px) {
         .top-navbar { padding: 0 12px; gap: 10px; }
         .logo-name { font-size: 17.5px; }
-        .logo-sub { font-size: 10px; }
-        .logo-sub-lang { display: none; }
-        .logo-sub-kort { display: inline; }
         .nav-right { gap: 6px; }
         .menu-label { display: none; }
         .menu-btn { width: 44px; padding: 0; }
         .footer-inner { padding: 30px 16px calc(30px + env(safe-area-inset-bottom)); }
       }
-      @media (max-width: 360px) { .logo-sub { display: none; } }
 
 
       /* ===== Brødtekst fra Blogger (artikler og faste sider) =====
@@ -374,7 +366,7 @@ const nyeste = INDLAEG[0];
       /* Trin 3: brødteksten sættes med serif (Source Serif 4, 18 px) — overskrifter, bokse og knapper inde i teksten
          beholder Archivo (reglen længere nede), så kun selve læseteksten skifter skrift */
       .post-body { line-height: 1.7; font-size: 1.125rem; font-family: var(--font-serif); margin-bottom: 30px; overflow-wrap: break-word; }
-      .post-body :is(h2, h3, h4, summary, table, .tr-caption, .tma-knap, .paa, .faq-box summary, .toc-container, .ymal, .tma-wm-tekst) { font-family: var(--font-display); }
+      .post-body :is(h2, h3, h4, summary, table, .tr-caption, .tma-knap, .paa, .faq-box summary, .toc-container, .tma-wm-tekst) { font-family: var(--font-display); }
       /* Læsebredde (Jacob 5/10-2026, forslag 5): før 787 px ≈ 90 tegn pr. linje og linjeafstand 1,8. Nu højst
          680 px ≈ 75 tegn og 1,65. Billeder, tabeller, video og sitets bokse bruger stadig hele bredden. */
       .post-body :is(p, ul, ol, h2, h3, h4, blockquote) { max-width: 680px; }
@@ -500,10 +492,6 @@ const nyeste = INDLAEG[0];
       .chip-bar { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 0; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); }
       .chip { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 7px 16px; border-radius: var(--radius); font-size: 0.85rem; font-weight: 600; text-decoration: none; line-height: 1.5; display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; }
       .chip.active { background: var(--teal); color: var(--bg-color); border-color: var(--teal); }
-      .chip-accent { border-color: var(--border-color); }
-      .chip-accent::before { content: none; }
-      .chip-accent.active { background: var(--teal); color: var(--bg-color); border-color: var(--teal); }
-      .chip-accent:not(.active):hover { background: var(--hover-bg); }
       .chip-count { font-weight: 500; opacity: 0.6; margin-left: 6px; font-size: 0.8rem; }
       /* Hylde-knapperne (trin 4): rolig farveprik foran navnet */
       .chip-prik { width: 8px; height: 8px; border-radius: 50%; background: var(--h-farve); margin-right: 8px; flex-shrink: 0; }
@@ -567,7 +555,7 @@ const nyeste = INDLAEG[0];
       .top-navbar.rullet { box-shadow: 0 4px 18px rgba(31, 35, 40, 0.08); border-bottom-color: transparent; }
       body.dark-mode .top-navbar.rullet { box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45); }
       /* Store flader får den store runding */
-      :is(.lead-card .card-thumb, .author-box, .share-cta, .related-box, .post-body .paa, .post-body .toc-container, .post-body .ymal) { border-radius: var(--radius-lg); }
+      :is(.lead-card .card-thumb, .author-box, .share-cta, .related-box, .post-body .paa, .post-body .toc-container) { border-radius: var(--radius-lg); }
       @media (prefers-reduced-motion: reduce) {
         .top-links a::after, .post-body :is(p, li) a, .icon-btn, .card-thumb, :is(.lead-card, .lead-mini, .side-item, .home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"]) { transition: none !important; }
         :is(.lead-card, .lead-mini, .side-item, .home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"], .nav-card, .article-card):hover { transform: none !important; }

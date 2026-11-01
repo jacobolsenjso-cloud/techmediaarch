@@ -1,14 +1,12 @@
-// Emnerne er de samme som i Blogger-menuen (LinkList200), så besøgende genkender
-// inddelingen. Bloggers 130 løse labels er for mange og for tilfældige til at
-// navigere efter (fx "AI-Video" på 105 indlæg) — de bliver stående i
-// indlæggenes data, men kun disse emner får en side og en plads i menuen.
-// "Founders" er udeladt: den havde 0 indlæg og gav en tom side.
+// De gamle emner fra Blogger-menuen (LinkList200). Fra 1/11-2026 har de ingen egen side og vises ikke på kortene:
+// de bruges kun til at finde en artikels hylde (hylder.ts / adresse.mjs), til relaterede artikler og til robottens
+// rotation (robot/lib/arkiv.mjs læser denne fil). Bloggers 130 løse labels bliver stående i indlæggenes data.
 //
 // Farverne bruges som accent (prik, kant) — aldrig som tekst eller som baggrund
 // under hvid tekst, samme regel som på techfeedwatch.
 // etiket: Blogger-etiketten i indlæggenes data, når den er stavet anderledes end det viste navn
 import { EMNESIDE_TIL_HYLDE } from './adresse.mjs';
-export interface Emne { navn: string; slug: string; farve: string; egenMenu?: boolean; etiket?: string; }
+export interface Emne { navn: string; slug: string; farve: string; etiket?: string; }
 
 export const EMNER: Emne[] = [
   { navn: 'AI', slug: 'ai', farve: '#06b6d4' },
@@ -26,18 +24,12 @@ export const EMNER: Emne[] = [
   { navn: 'Web3', slug: 'web3', farve: '#059669' },
   { navn: 'Infosec', slug: 'infosec', farve: '#dc2626' },
   { navn: 'Vlog', slug: 'vlog', farve: '#d926c8' },
-  // "Resources" var sit eget menupunkt på Blogger (mega-menu med etiketten Resources),
-  // ikke en af kategorierne — derfor egenMenu: den får en emneside, men står ikke
-  // under "Topics" og ikke blandt emne-chipsene.
-  { navn: 'Resources', slug: 'resources', farve: '#0891b2', egenMenu: true },
+  // Resources var sit eget menupunkt på Blogger; emnesiden er 301 til Marketing & SEO (1/11-2026)
+  { navn: 'Resources', slug: 'resources', farve: '#0891b2' },
 ];
 
-// Emnerne under "Topics" og i emne-chipsene (Bloggers "Categories")
-export const KATEGORIER = EMNER.filter((e) => !e.egenMenu);
-
+// Etiketten i indlæggenes data (IT hedder "It" der)
 export const emneEtiket = (e: Emne) => e.etiket ?? e.navn;
-export const emneFraNavn = (navn: string) => EMNER.find((e) => e.navn === navn || emneEtiket(e) === navn);
-export const emneFraSlug = (slug: string) => EMNER.find((e) => e.slug === slug);
 // Fra 1/11-2026 har intet emne en egen side: alle emner linker til en hylde, og /topic/<emne> sendes med 301
 // til hylden (EMNESIDE_TIL_HYLDE i adresse.mjs + worker/index.js). Fallback /latest, hvis et nyt emne mangler i tabellen.
 export const emneUrl = (e: Emne) => (EMNESIDE_TIL_HYLDE[e.slug] ? `/shelf/${EMNESIDE_TIL_HYLDE[e.slug]}` : '/latest');

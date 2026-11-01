@@ -65,7 +65,6 @@ async function kontroller(buf) {
   }
 }
 
-export const kontrollerTest = kontroller; // kun til afprøvning af kontrollen alene
 
 // Dæmper lyspletterne: øverst til venstre meget, til højre lidt (det godkendte MFA-billede 31/10)
 async function daemp(buf) {

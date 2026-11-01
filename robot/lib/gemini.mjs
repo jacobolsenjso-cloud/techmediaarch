@@ -27,7 +27,6 @@ export const PRISER = {
   'gemini-3.5-flash': { ind: 1.50, ud: 9.00 },  // 31/10: manglede, så prisen stod som "UKENDT" (Googles prisliste via pricepertoken.com m.fl.)
 };
 export const BILLEDPRIS = 0.034;             // USD pr. billede (nano-banana-2.1, som techfeedwatch måler)
-export const SOEG_GRATIS_PR_MD = 5000;       // Google-søgning: 5.000 gratis pr. måned (Gemini 3+), derefter $14 pr. 1.000
 export const KURS = 6.87;                    // DKK pr. USD (Wise, midtkurs 29/10-2026)
 export const forbrug = { modeller: {}, billeder: 0, soegninger: 0 };
 

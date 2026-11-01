@@ -67,6 +67,7 @@ function maal() {
 
 const BREDDER = [['computer', { width: 1366, height: 900 }], ['mobil', { width: 390, height: 844 }]];
 const fund = [];
+let genforsoeg = 0; // sider, der fik et nyt forsøg efter timeout (vises, så en langsom maskine kan ses)
 for (const [navn, viewport] of BREDDER) {
   const ctx = await browser.newContext({ viewport });
   // Kun sitets egne filer; billeder og video hentes ikke (de har faste mål fra byggeriet, så pladsen er den
@@ -83,7 +84,11 @@ for (const [navn, viewport] of BREDDER) {
       const t0 = Date.now();
       try {
         // "load" = HTML, CSS og skrifter er indlæst (billeder er blokeret ovenfor, så det går hurtigt)
-        const svar = await side.goto(BASE + s, { waitUntil: 'load', timeout: 30000 });
+        // Ét nyt forsøg med længere tid, hvis siden ikke nåede at indlæse (1/11-2026: på Jacobs pc gav en travl maskine
+        // 2-9 tilfældige "Timeout 30000ms" — forskellige sider hver gang, og samme sider bestod ved næste kørsel)
+        let svar;
+        try { svar = await side.goto(BASE + s, { waitUntil: 'load', timeout: 30000 }); }
+        catch (e) { if (!/Timeout/i.test(e.message)) throw e; genforsoeg++; svar = await side.goto(BASE + s, { waitUntil: 'load', timeout: 60000 }); }
         if (!svar || svar.status() !== 200) { fund.push(`${navn} ${decodeURIComponent(s)}: svarede ${svar ? svar.status() : 'intet'}`); continue; }
         await side.evaluate(() => document.fonts.ready);
         for (const f of await side.evaluate(maal)) fund.push(`${navn} ${decodeURIComponent(s)}: ${f}`);
@@ -97,7 +102,7 @@ for (const [navn, viewport] of BREDDER) {
 await browser.close();
 server.close();
 
-console.log(`breddetjek: ${sider.length} sider x ${BREDDER.length} bredder, ${Math.round((Date.now() - START) / 1000)} s, problemer: ${fund.length}`);
+console.log(`breddetjek: ${sider.length} sider x ${BREDDER.length} bredder, ${Math.round((Date.now() - START) / 1000)} s, problemer: ${fund.length}${genforsoeg ? `, nye forsøg efter timeout: ${genforsoeg}` : ""}`);
 if (fund.length) {
   fund.slice(0, 25).forEach((f) => console.log('  ' + f));
   if (fund.length > 25) console.log(`  … og ${fund.length - 25} flere`);

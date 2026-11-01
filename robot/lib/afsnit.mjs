@@ -67,7 +67,6 @@ function grupper(dele) {
 // Skal afsnittet deles? (bruges også af målinger)
 // For langt = over 3 sætninger, eller 3 sætninger over 40 ord, eller 2 sætninger over 55 ord. Én sætning kan ikke deles.
 const forLangtTal = (n, w) => n > MAKS_SAETNINGER || (n === MAKS_SAETNINGER && w > MAKS_ORD) || (n === 2 && w > MAKS_ORD_TO);
-export function forLangt(indre) { const s = saetninger(indre); const n = s ? s.length : 1; return forLangtTal(n, ord(indre)); }
 
 // Deler alle for lange <p> i html. FAQ-afsnit (fra en overskrift med "FAQ"/"Frequently Asked" til næste <h2>)
 // røres ikke, fordi FAQ-boksen og FAQ-dataene bygger på svaret som ét afsnit.
