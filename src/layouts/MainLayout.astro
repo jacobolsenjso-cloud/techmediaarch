@@ -100,6 +100,18 @@ const nyeste = INDLAEG[0];
       gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'granted', security_storage: 'granted', wait_for_update: 500,
         region: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH'] });
       gtag('consent', 'default', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted', analytics_storage: 'granted', functionality_storage: 'granted', security_storage: 'granted' });
+      // Intern trafik (Jacobs ja 1/11-2026): besøg siden én gang med ?intern=1, så husker browseren det,
+      // og alle hans egne besøg sendes med traffic_type=internal. Analytics' filter "Internal Traffic"
+      // sorterer dem fra. IP-filter virker ikke, fordi Jacobs Chrome kører gennem Cloudflare WARP
+      // (delt, skiftende IP). ?intern=0 fjerner markeringen igen.
+      // Værdien lægges i datalaget; GTM-variablen "DLV traffic_type" sender den med Google-tagget
+      // (målt: gtag('set') ignoreres af Google-tagget, når det hentes via GTM).
+      try {
+        var tmaIntern = new URLSearchParams(location.search).get('intern');
+        if (tmaIntern === '1') localStorage.setItem('tma-intern', '1');
+        if (tmaIntern === '0') localStorage.removeItem('tma-intern');
+        if (localStorage.getItem('tma-intern') === '1') dataLayer.push({ traffic_type: 'internal' });
+      } catch (e) {}
     </script>
     {/* Google Analytics 4 (G-TJTC0HR0JK) — samme måling, som før kom via Cloudflare Zaraz
         (Zaraz slukket 25/9). Fra 1/11-2026 via GTM-containeren nedenfor (ikke en egen gtag.js).
