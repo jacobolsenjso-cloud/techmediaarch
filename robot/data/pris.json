@@ -283,5 +283,37 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-01T00:10:00.000Z",
+  "artikel": "/2026/04/mdm-activate-your-mac-with-this-essential-guide",
+  "omskrevet": true,
+  "usd": 0.5012,
+  "note": "udkast-43 (manuel, opskrift 2), lagt på main 1/11",
+  "kr": 3.44
+ },
+ {
+  "dato": "2026-11-01T00:10:00.000Z",
+  "artikel": "/2026/05/is-your-website-online-right-now-how-to",
+  "omskrevet": true,
+  "usd": 0.4898,
+  "note": "udkast-44 (manuel, opskrift 2), lagt på main 1/11",
+  "kr": 3.36
+ },
+ {
+  "dato": "2026-11-01T00:10:00.000Z",
+  "artikel": "/2026/04/create-hollywood-style-films-with-this-free-ai-workflow",
+  "omskrevet": true,
+  "usd": 0.4983,
+  "note": "udkast-45 (manuel, opskrift 2), lagt på main 1/11",
+  "kr": 3.42
+ },
+ {
+  "dato": "2026-11-01T00:10:00.000Z",
+  "artikel": "/2026/05/exploring-claude-just-changed-making",
+  "omskrevet": true,
+  "usd": 0.658,
+  "note": "udkast-46 (manuel, opskrift 2), lagt på main 1/11",
+  "kr": 4.52
  }
 ]
