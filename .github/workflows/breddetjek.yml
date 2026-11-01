@@ -11,6 +11,10 @@ on:
     paths: ['src/**', 'public/**', 'scripts/**', 'astro.config.*', 'package.json']
   workflow_dispatch:
 
+# Tjekket skal kun læse koden (CodeQL #25: uden denne linje fik det GitHubs bredere standardrettigheder)
+permissions:
+  contents: read
+
 jobs:
   bredde:
     runs-on: ubuntu-24.04
