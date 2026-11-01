@@ -33,9 +33,28 @@ export async function braendInd(buf) {
   return ud.jpeg({ quality: 82, mozjpeg: true }).toBuffer();
 }
 
+// Små kopier til miniaturer (1/11-2026, Jacobs ja): kortene viste billeder på op til 2560 px i felter på 112–235 px,
+// så en artikelside hentede 21 billeder = 2.041 KB. Den lille kopi laves af kopien MED mærker (dist/images/s/),
+// og siderne tilbyder den via srcset (src/lib/temakoder.mjs miniSrcset) — browseren vælger selv efter plads og skærm.
+export const LILLE_MAPPE = 's';
+export const LILLE_BREDDE = 480;
+async function lilleKopi(buf, ud) {
+  try {
+    const b = sharp(buf, { failOn: 'none' });
+    const { width, format } = await b.metadata();
+    if (!width || width <= LILLE_BREDDE || !['jpeg', 'png', 'webp'].includes(format)) { fs.writeFileSync(ud, buf); return; }
+    const r = b.resize({ width: LILLE_BREDDE });
+    const res = format === 'png' ? await r.png({ compressionLevel: 9 }).toBuffer()
+      : format === 'webp' ? await r.webp({ quality: 78 }).toBuffer()
+      : await r.jpeg({ quality: 78, mozjpeg: true }).toBuffer();
+    fs.writeFileSync(ud, res);
+  } catch { fs.writeFileSync(ud, buf); }
+}
+
 // Laver alle kopierne. fra = public/images, til = dist/images/m
-export async function vandmaerkAlle(fra, til) {
+export async function vandmaerkAlle(fra, til, lille = path.join(path.dirname(til), LILLE_MAPPE)) {
   fs.mkdirSync(til, { recursive: true });
+  fs.mkdirSync(lille, { recursive: true });
   const filer = fs.readdirSync(fra).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
   let lavet = 0, sprunget = 0; const fejl = [];
   const koe = [...filer];
@@ -43,10 +62,10 @@ export async function vandmaerkAlle(fra, til) {
     for (let f; (f = koe.shift());) {
       const org = fs.readFileSync(path.join(fra, f));
       const res = await braendInd(org).catch(() => undefined);
-      if (res) { fs.writeFileSync(path.join(til, f), res); lavet++; }
+      if (res) { fs.writeFileSync(path.join(til, f), res); lavet++; await lilleKopi(res, path.join(lille, f)); }
       else if (res === undefined) {
         // Fejl i billedfilen: siden peger alligevel på kopien (src/lib/temakoder.mjs), så originalen lægges der
-        fs.writeFileSync(path.join(til, f), org); fejl.push(f);
+        fs.writeFileSync(path.join(til, f), org); fejl.push(f); await lilleKopi(org, path.join(lille, f));
       } else sprunget++;
     }
   }));

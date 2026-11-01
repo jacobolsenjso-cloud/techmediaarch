@@ -24,7 +24,7 @@
     "yaml": "^2.9.1"
   },
   "devDependencies": {
-    "wrangler": "^4.138.0"
+    "wrangler": "^4.156.0"
   },
   "overrides": {
     "sharp": "^0.35.5"

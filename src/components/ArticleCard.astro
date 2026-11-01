@@ -4,6 +4,7 @@
 import type { Indlaeg } from '../lib/indhold';
 import { datoTekst, udsnit } from '../lib/indhold';
 import Maerke from './Maerke.astro';
+import { miniSrcset } from '../lib/temakoder.mjs';
 // niveau: kortets overskrift er h2 direkte under sidens h1 (oversigter), h3 under en h2 (forsiden).
 // Udseendet styres af .card-title, så niveauet ændrer intet visuelt (27/9-2026).
 // badge: lille mærke øverst til venstre på billedet (fx "#1" på Trending); udenUdsnit: kun titel og meta
@@ -17,7 +18,7 @@ const emne = p.emner[0];
 ---
 <a href={p.href} class="article-card" style={emne ? `--tag-accent: ${emne.farve}` : undefined}>
   {p.image ? (
-    <div class="card-thumb"><img src={p.image} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" />{badge && <span class="card-badge">{badge}</span>}</div>
+    <div class="card-thumb"><img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="(max-width: 700px) 92vw, 370px" alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" />{badge && <span class="card-badge">{badge}</span>}</div>
   ) : (
     <div class="card-thumb card-thumb-empty" aria-hidden={badge ? undefined : 'true'}>
       <Maerke id={`c${p.aar}${p.maaned}`} />{badge && <span class="card-badge">{badge}</span>}

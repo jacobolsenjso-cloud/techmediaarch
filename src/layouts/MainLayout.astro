@@ -14,7 +14,7 @@ import { HAR_BEDSTE } from '../lib/bedste';
 import { udenHtml } from '../lib/adresse.mjs';
 import { HYLDER, hyldeUrl, iHylde } from '../lib/hylder';
 import { INDLAEG } from '../lib/indhold';
-import { maerketBillede } from '../lib/temakoder.mjs';
+import { maerketBillede, miniSrcset } from '../lib/temakoder.mjs';
 
 interface Props {
   title?: string;
@@ -573,7 +573,7 @@ const nyeste = INDLAEG[0];
           <div class="mega-col">
             {nyeste && (
               <a href={nyeste.href} class="mega-nyeste">
-                {nyeste.image && <img src={nyeste.image} alt="" loading="lazy" decoding="async" />}
+                {nyeste.image && <img src={nyeste.image} srcset={miniSrcset(nyeste.image) || undefined} sizes="320px" alt="" loading="lazy" decoding="async" />}
                 <span class="mega-nyeste-tekst"><span class="mega-badge">Newest answer</span><span class="mega-nyeste-titel">{nyeste.title}</span></span>
               </a>
             )}

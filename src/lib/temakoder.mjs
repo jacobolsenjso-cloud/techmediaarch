@@ -175,3 +175,13 @@ export function maerketBillede(src) {
   const b = billedBredde(src);
   return b !== null && b >= 150 ? `/images/m/${m[1]}` : src;
 }
+
+// srcset til miniaturer (1/11-2026): den lille kopi (480 px, med mærker, dist/images/s/ — scripts/vandmaerk-billeder.mjs)
+// + den store mærkekopi. Browseren henter den mindste, der er skarp nok til pladsen (sizes) og skærmen.
+// Kun for /images/m/-billeder bredere end 480 px; ellers '' (så bruges src alene).
+export function miniSrcset(src) {
+  const m = String(src || '').match(/^\/images\/m\/([\w.-]+\.(?:jpe?g|png|webp))$/i);
+  if (!m) return '';
+  const b = billedBredde(`/images/${m[1]}`);
+  return b && b > 480 ? `/images/s/${m[1]} 480w, ${src} ${b}w` : '';
+}

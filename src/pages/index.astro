@@ -8,6 +8,7 @@ import { INDLAEG, datoTekst, udsnit } from '../lib/indhold';
 import { somSporgsmaal, tegnFarve } from '../lib/sporgsmaal.mjs';
 import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret } from '../lib/hylder';
 import { FORSIDE_NYESTE, listeSider } from '../lib/liste';
+import { miniSrcset } from '../lib/temakoder.mjs';
 
 // Forsiden (Jacob 28/10, forslag 2): de 5 nyeste øverst, derefter ét afsnit pr. hylde (1 stor + 3 rækker + "See all").
 // Gitteret med 19 kort er væk; "All articles" fortsætter på /page/2 lige efter de 5 nyeste (lib/liste.ts).
@@ -173,7 +174,7 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
         <div class="lead-secondary">
           {sideHistorier.map((p) => (
             <a href={p.href} class="lead-mini" style={maerke(p) ? `--tag-accent: ${maerke(p)!.farve}` : undefined}>
-              {p.image ? <div class="card-thumb"><img src={p.image} alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
+              {p.image ? <div class="card-thumb"><img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="(max-width: 700px) 40vw, 140px" alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
               <div>
                 {/* Mærke over titlen (Jacob 5/10-2026), som på hovedhistorien — fra 28/10 hylden i stedet for emnet */}
                 {maerke(p) && <span class="lead-eyebrow lead-mini-eyebrow">{maerke(p)!.navn}</span>}
