@@ -111,7 +111,10 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
           <input id="homeQ" name="q" type="search" placeholder="Ask a question" autocomplete="off" />
           <button type="submit">Search</button>
         </form>
-        <p class="top-d-hvordan">{INDLAEG.length} articles on five shelves. Short answer first, sources named. <a href="/p/editorial-guidelines">How we work</a></p>
+        {/* <div>, ikke <p> (1/11-2026): Googles auto-annoncer satte HVER gang (6 af 6 målte besøg) en annonce ind
+            lige foran dette afsnit, midt i det blå bånd på mobil, så hylderne hoppede ned (CLS 0,23). Stedet kan ikke
+            udelukkes i AdSense. Auto-annoncer ankrer typisk til tekstafsnit; en div ser ens ud, men er ikke et afsnit. */}
+        <div class="top-d-hvordan">{INDLAEG.length} articles on five shelves. Short answer first, sources named. <a href="/p/editorial-guidelines">How we work</a></div>
       </div>
       <nav class="top-d-reol" aria-label="Shelves">
         {HYLDER.map((h, i) => { const liste = hyldeSorteret(h); return (
