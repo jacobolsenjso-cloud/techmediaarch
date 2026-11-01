@@ -7,7 +7,7 @@ import MainLayout from '../../../layouts/MainLayout.astro';
 import ArticleCard from '../../../components/ArticleCard.astro';
 import { INDLAEG, datoTekst, synligeEtiketter } from '../../../lib/indhold';
 import { emneUrl } from '../../../lib/emner';
-import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret, startListe } from '../../../lib/hylder';
+import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret, startListe, iHylde } from '../../../lib/hylder';
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
 import { maerketBillede, miniSrcset } from '../../../lib/temakoder.mjs';
@@ -55,9 +55,6 @@ const forspalte = fa && fa[2].replace(/<[^>]+>/g, '').trim().length >= 60 ? fa[2
 const krop = foersteBilledeHurtigt(udenAnnonceHuller(forspalte ? (fa![1] ?? '') + p.html.slice(fa![0].length) : p.html));
 const faqStart = krop.indexOf('<section class="faq-box"');
 
-const i = INDLAEG.indexOf(p);
-const nyere = INDLAEG[i - 1];
-const aeldre = INDLAEG[i + 1];
 
 // Relaterede: samme emne først, derefter de nyeste; aldrig artiklen selv
 const somEmne = emne ? INDLAEG.filter((x) => x !== p && x.emner.some((e) => e.slug === emne.slug)) : [];
@@ -88,7 +85,6 @@ const forslag = naeste ? [naeste] : [];
 const forslagHtml = naeste ? `<aside class="las-naeste" data-ekstra="1" aria-label="Read next" style="--hylde: ${hylde?.farve ?? 'var(--teal)'}"><a href="${esc(naeste.href)}" class="las-naeste-link">${
   naeste.image ? `<span class="las-naeste-thumb"><img src="${esc(naeste.image)}"${miniSrcset(naeste.image) ? ` srcset="${esc(miniSrcset(naeste.image))}" sizes="140px"` : ''} alt="" loading="lazy" decoding="async"></span>` : ''
 }<span class="las-naeste-tekst"><span class="las-naeste-label">${hylde ? 'Read next on this shelf' : 'Read next'}</span><span class="las-naeste-titel">${esc(naeste.title)}</span><span class="las-naeste-meta">${esc(datoTekst(naeste.published))} · ${naeste.minutter} min read</span></span></a></aside>` : '';
-const relaterede = [...somEmne, ...INDLAEG.filter((x) => x !== p && !somEmne.includes(x))].filter((x) => !forslag.includes(x)).slice(0, 8);
 // Sidebaren lover "More in <hylde/emne>" — så den må kun vise den. Trin 6, forslag 5: hylden først (ikke det gamle
 // emnenavn, fx "Infosec"). Har hylden/emnet for få artikler, hedder den "Latest articles" og viser de nyeste i stedet.
 const somHylde = hylde ? hyldeSorteret(hylde).filter((x) => x !== p) : [];
@@ -96,6 +92,19 @@ const nokIHylde = somHylde.length >= 3;
 const nokIEmne = somEmne.length >= 3;
 const sidebarTitel = nokIHylde ? `More in ${hylde!.navn}` : nokIEmne ? `More in ${emne!.navn}` : 'Latest articles';
 const sidebarListe = (nokIHylde ? somHylde : nokIEmne ? somEmne : INDLAEG.filter((x) => x !== p)).slice(0, 8);
+
+// Forrige/næste (1/11-2026): inden for artiklens HYLDE, nyeste først — før gik de på tværs af hele sitet
+// (fra en MFA-artikel til krypto-wallets). Uden hylde: hele sitet som før.
+const kaede = hylde ? iHylde(hylde) : INDLAEG;
+const i = kaede.indexOf(p);
+const nyere = i > 0 ? kaede[i - 1] : undefined;
+const aeldre = i >= 0 ? kaede[i + 1] : undefined;
+const kaedeNavn = hylde && i >= 0 ? ` in ${hylde.navn}` : '';
+
+// Related (1/11-2026): 3 kort, som IKKE står i sidekolonnen, i "Read next", i "People also ask" eller som forrige/næste
+// (målt før: 4 af 8 var de samme som sidekolonnen). Samme hylde først, derefter samme emne, derefter de nyeste.
+const vist = new Set([p, ...sidebarListe, ...forslag, nyere, aeldre].filter(Boolean));
+const relaterede = [...new Set([...somHylde, ...somEmne, ...INDLAEG])].filter((x) => !vist.has(x) && !paaHref.has(x.href)).slice(0, 3);
 
 // Trin 6, forslag 6: Verification record. Kun det, der er sandt i dag (Jacob 28/10): udgivet/opdateret, de navngivne kilder
 // (artiklens egen "Sources"-liste) og — for robotartikler — at teksten er skrevet med AI ud fra kilderne.
@@ -175,11 +184,11 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .post-body .paa-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
     .post-body .paa-list li { margin: 0; }
     .post-body a.paa-link { display: flex; align-items: center; gap: 12px; padding: 9px 10px; min-height: 44px; box-sizing: border-box; border-radius: var(--radius); text-decoration: none; color: var(--text-color); font-weight: 400; border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
-    .post-body a.paa-link:hover { background: var(--card-bg); border-color: var(--border-color); transform: translateX(3px); }
+    .post-body a.paa-link:hover { background: var(--card-bg); border-color: var(--border-color); }
     .post-body .paa-mark { flex: none; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; background: var(--tag-accent); }
     .post-body .paa-text { font-weight: 600; font-size: 0.95rem; line-height: 1.35; }
     .post-body .paa-arrow { margin-left: auto; color: #9ca3af; transition: transform 0.15s, color 0.2s; }
-    .post-body a.paa-link:hover .paa-arrow { transform: translateX(3px); color: var(--teal-text); }
+    .post-body a.paa-link:hover .paa-arrow { transform: translateX(2px); color: var(--teal-text); }
     @media (prefers-reduced-motion: reduce) { .post-body a.paa-link:hover, .post-body a.paa-link:hover .paa-arrow { transform: none; } }
     @media (max-width: 900px) { .post-body .paa { padding: 16px 14px; } }
     .post-body .faq-box { background: transparent; border: 0; border-top: 1px solid var(--border-color); border-radius: 0; padding: 4px 0 10px; margin: 36px 0; }
@@ -250,8 +259,12 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .serie-trin.her { background: var(--teal); border-color: var(--teal); color: var(--bg-color); }
     .serie-trin.her .serie-nr { background: var(--bg-color); color: var(--teal-text); }
     .serie-her { font-weight: 400; opacity: 0.85; }
+    /* Mobil (1/11-2026): kun én linje ("Start here · hylde · part 4 of 4" + forrige/næste). Hele listen fyldte 330 px
+       mellem byline og første billede. Trinene står stadig på computer og på hyldesiden. */
     @media (max-width: 700px) {
-      .serie-liste { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .serie { padding: 12px 14px; margin-bottom: 18px; box-shadow: none; }
+      .serie-top { margin-bottom: 0; }
+      .serie-liste { display: none; }
       .serie-trin { flex-direction: row; align-items: center; gap: 10px; background: transparent; border: 0; border-top: 1px solid var(--rule-light); border-radius: 0; padding: 9px 0; font-size: 0.9rem; }
       .serie-trin:first-child { border-top: 0; }
       .serie-trin.her { background: transparent; color: var(--text-color); font-weight: 700; border-color: var(--rule-light); }
@@ -270,7 +283,7 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .post-body .las-naeste-label { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-text); }
     .post-body .las-naeste-titel { font-family: var(--font-display); font-size: 1.05rem; font-weight: 650; line-height: 1.3; }
     .post-body a.las-naeste-link:hover .las-naeste-titel { color: var(--teal-text); }
-    .post-body .las-naeste-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-transform: uppercase; }
+    .post-body .las-naeste-meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
     @media (max-width: 600px) { .post-body a.las-naeste-link { grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 12px; } .post-body .las-naeste-titel { font-size: 0.98rem; } }
     @media (prefers-reduced-motion: reduce) { .post-body a.las-naeste-link:hover { transform: none; } }
     /* 6: Verification record i sidekolonnen (på mobil står sidekolonnen under teksten) */
@@ -283,7 +296,7 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .verif-link:hover { text-decoration: underline; }
     /* 5: dato og læsetid på sidelistens artikler */
     .side-item-tekst { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-    .side-item-meta { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); text-transform: uppercase; }
+    .side-item-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
     .disclosure-box { font-size: 0.85rem; line-height: 1.6; color: var(--muted); background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 18px; margin: 0 0 30px 0; }
     .disclosure-box strong { color: var(--text-color); }
     .disclosure-box a { color: var(--teal-text); font-weight: 600; }
@@ -308,17 +321,19 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .nav-card:hover { transform: translateY(-3px); border-color: var(--teal-text); box-shadow: 0 6px 24px rgba(0,0,0,0.06); }
     .nav-card.right { text-align: right; }
     .nav-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
-    .nav-title { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Hele titlen på højst 2 linjer (1/11-2026; før én linje med "…") */
+    .nav-title { font-size: 1rem; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .nav-card.disabled { opacity: 0.4; pointer-events: none; }
     /* Related articles i en samlet boks (30/9, Jacob): uden overskrift-tag og uden <p>, så Googles Auto-annoncer
        ikke sætter annoncer ind mellem kortene — samme løsning som "People also ask" */
     .related-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px 20px 20px; margin-top: 10px; }
     .related-articles-title { display: block; font-size: 1.4rem; font-weight: 700; margin: 0 0 18px 0; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); }
-    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+    /* 3 kort på én række (1/11-2026; før 8 kort i 3 kolonner med en halv række til sidst) */
+    .related-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
     .related-grid .card-excerpt { display: none; }
     /* Titlen er et <span> (ikke h3), så fed skrift sættes her. Læsetiden skjules i de smalle kort: den brød ud på en
        ny linje med en løs "·" for enden (målt 30/9, desktop og mobil) */
-    .related-grid .card-title { font-weight: 700; }
+    .related-grid .card-title { font-weight: 700; -webkit-line-clamp: 3; }
     .related-grid .card-meta > :nth-last-child(-n+2) { display: none; }
     .side-title { font-size: 1.1rem; margin: 0 0 15px 0; }
     .side-list { display: flex; flex-direction: column; gap: 14px; }
@@ -339,7 +354,13 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       .author-box-title { font-size: 0.85rem; margin: 3px 0 12px 0; }
       .author-box-bio { font-size: 0.92rem; line-height: 1.6; margin-bottom: 12px; }
       .author-box-ai-note { font-size: 0.78rem; padding-top: 12px; }
-      .related-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      /* Mobil: 3 rækker med lille billede til venstre i stedet for høje kort */
+      .related-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .related-grid .article-card { display: grid; grid-template-columns: 112px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 12px; align-items: start; padding: 12px 0; border: 0; border-top: 1px solid var(--rule-light); border-radius: 0; box-shadow: none; background: transparent; }
+      .related-grid .article-card:first-child { border-top: 0; padding-top: 0; }
+      .related-grid .article-card .card-thumb { grid-row: 1 / 3; border-radius: var(--radius); aspect-ratio: 16 / 10; }
+      .related-grid .article-card .card-title { margin: 0 0 4px; padding: 0; font-size: 15px; }
+      .related-grid .article-card .card-meta { padding: 0; }
       .related-box { padding: 14px 12px 16px; }
     }
   </style>
@@ -442,11 +463,11 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
 
       <div class="nav-row">
         <a href={aeldre ? aeldre.href : '#'} class={`nav-card ${aeldre ? '' : 'disabled'}`}>
-          <span class="nav-label">← Previous article</span>
+          <span class="nav-label">← Older{kaedeNavn}</span>
           <span class="nav-title">{aeldre ? aeldre.title : 'No older articles'}</span>
         </a>
         <a href={nyere ? nyere.href : '#'} class={`nav-card right ${nyere ? '' : 'disabled'}`}>
-          <span class="nav-label">Next article →</span>
+          <span class="nav-label">Newer{kaedeNavn} →</span>
           <span class="nav-title">{nyere ? nyere.title : 'No newer articles'}</span>
         </a>
       </div>

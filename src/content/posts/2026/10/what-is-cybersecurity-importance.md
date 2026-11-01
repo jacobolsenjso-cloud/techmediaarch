@@ -56,20 +56,20 @@ robot: true
 </ul>
 
 <h2>FAQ</h2>
-<h3>What is cybersecurity and why is it important</h3>
+<h3>What is cybersecurity and why is it important?</h3>
 <p>Cybersecurity is the practice of defending digital assets from unauthorized access, playing a vital role in safeguarding national security and protecting the economy. Without these measures, organizations face expensive data breaches, operational downtime, and severe regulatory fines.</p>
 
-<h3>Why cybersecurity is important</h3>
+<h3>Why cybersecurity is important?</h3>
 <p>Cybersecurity is crucial to overall risk management strategies, specifically cyber risk management, to protect people, systems, and data from cyberattacks. It prevents global cybercrime from inflicting devastating financial and structural damage on critical infrastructure.</p>
 
-<h3>Why cybersecurity is important in today's world</h3>
+<h3>Why cybersecurity is important in today's world?</h3>
 <p>In today's world, organizations face a massive surge in cyber threats amid geopolitical unrest and sophisticated AI-driven attacks. Cybersecurity ensures the reliable operation of critical infrastructure like power grids, healthcare facilities, and financial systems.</p>
 
-<h3>Why cybersecurity testing is important</h3>
+<h3>Why cybersecurity testing is important?</h3>
 <p>Cyber security testing plays a crucial role by simulating real-world attacks to reveal security weaknesses before malicious actors can find and exploit them. It helps software companies avoid regulatory fines, unhappy customers, and reputational damage by evaluating IT infrastructure.</p>
 
-<h3>How does cybersecurity work</h3>
+<h3>How does cybersecurity work?</h3>
 <p>Cybersecurity works by implementing security policies, maintaining security hygiene, performing patch management, and running regular security awareness training. It functions through a holistic, layered defense spanning endpoints, networks, cloud environments, applications, data, and identity management.</p>
 
-<h3>Is cybersecurity hard</h3>
+<h3>Is cybersecurity hard?</h3>
 <p>Cybersecurity can feel challenging because learners must understand how computers communicate, how networks are set up, and how systems fail. However, it relies on logical problem-solving rather than advanced coding or sophisticated math skills.</p><h2>Sources</h2><ul><li><a href="https://ischool.syracuse.edu/what-is-cybersecurity/" rel="noopener" target="_blank">What Is Cybersecurity and Why It Matters</a></li><li><a href="https://www.snhu.edu/about-us/newsroom/stem/what-is-cyber-security" rel="noopener" target="_blank">What is Cybersecurity and Why is It Important? | SNHU</a></li><li><a href="https://www.ibm.com/think/topics/cybersecurity" rel="noopener" target="_blank">What Is Cybersecurity? | IBM</a></li><li><a href="https://www.unicaf.org/why-cybersecurity-is-more-important-than-ever/" rel="noopener" target="_blank">Why Cybersecurity Is More Important Than Ever</a></li></ul>

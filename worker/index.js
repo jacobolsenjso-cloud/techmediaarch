@@ -25,13 +25,14 @@ const EMNER = {
   crypto: 'crypto', web3: 'web3', infosec: 'infosec', vlog: 'vlog', resources: 'resources',
 };
 
-// Svar-arkivets hylder (trin 4, 28/10-2026): emner med hylde har ingen egen side mere.
-// Skal matche HYLDE_FOR_EMNE i src/lib/adresse.mjs.
+// Svar-arkivets hylder: fra 1/11-2026 har INTET emne en egen side mere — alle /topic/<emne> sendes med 301 til en hylde.
+// Skal matche EMNESIDE_TIL_HYLDE i src/lib/adresse.mjs (de 10 emner fra trin 4 + fintech, crypto, web3, vlog, resources).
 const HYLDE_FOR_EMNE = {
   ai: 'ai', infosec: 'cybersecurity',
   dev: 'software', devops: 'software', product: 'software', data: 'software',
   marketing: 'marketing', design: 'marketing',
   tech: 'everyday-tech', it: 'everyday-tech',
+  fintech: 'everyday-tech', crypto: 'everyday-tech', web3: 'ai', vlog: 'ai', resources: 'marketing',
 };
 const nyEmneAdresse = (slug) => (HYLDE_FOR_EMNE[slug] ? `/shelf/${HYLDE_FOR_EMNE[slug]}` : `/topic/${slug}`);
 
@@ -104,7 +105,7 @@ async function haandter(request, env) {
     return new Response(robots(host), { headers: { 'content-type': 'text/plain; charset=utf-8' } });
   }
 
-  // Emnesider for emner med hylde (trin 4): /topic/ai og /topic/ai.html -> /shelf/ai (301, ét hop)
+  // Emnesider (alle fra 1/11-2026): /topic/ai og /topic/ai.html -> /shelf/ai (301, ét hop)
   const emneSide = sti.match(/^\/topic\/([A-Za-z0-9-]+?)(?:\.html)?\/?$/);
   if (emneSide && HYLDE_FOR_EMNE[emneSide[1].toLowerCase()]) return flyt(url, nyEmneAdresse(emneSide[1].toLowerCase()));
 
@@ -131,7 +132,7 @@ async function haandter(request, env) {
   }
 
   // --- Bloggers gamle adresser ---
-  // Etiketsider: /search/label/AI -> hylden eller emnesiden (kun menuens emner har en side); direkte, uden mellemhop
+  // Etiketsider: /search/label/AI -> hylden (kun menuens emner; andre etiketter -> forsiden); direkte, uden mellemhop
   const label = sti.match(/^\/search\/label\/([^/?]+)/);
   if (label) {
     const slug = EMNER[label[1].toLowerCase()];

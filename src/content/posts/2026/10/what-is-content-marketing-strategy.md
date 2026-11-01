@@ -68,20 +68,20 @@ robot: true
 
 <h2>FAQ</h2>
 
-<h3>what is content marketing strategy</h3>
+<h3>What is content marketing strategy?</h3>
 <p>A content marketing strategy acts as a formal guide for creating, distributing, and managing content across multiple channels to achieve specific business goals. It defines target audiences, objectives, and structures to ensure that published assets stand out from competitors. Ultimately, it directs the production of valuable material designed to pull in customers rather than relying on traditional interruption advertising.</p>
 
-<h3>difference between content marketing and content strategy</h3>
+<h3>Difference between content marketing and content strategy?</h3>
 <p>Content strategy defines the overarching framework, governance, and the overall who, what, where, and why of content output across an entire organization. Content marketing is the tactical execution and promotion that utilizes those guidelines to produce assets like articles and videos. While strategy dictates the high-level business goals and ecosystem management, content marketing handles the direct distribution and lead generation assets.</p>
 
-<h3>is content marketing dead</h3>
+<h3>Is content marketing dead?</h3>
 <p>Content marketing is far from dead, but the digital landscape has shifted to demand high impact, sophisticated workflows, and direct links to business outcomes. Low-effort or generic material no longer works because consumers demand genuine connection and inspiration. Modern campaigns require deep storytelling, structural relevance, and sophisticated execution to capture user attention.</p>
 
-<h3>how much does content marketing cost</h3>
+<h3>How much does content marketing cost?</h3>
 <p>Content marketing costs vary widely depending on whether a business handles production internally or hires an outside agency. B2B programs range from $4,000 to $10,000 per month for small businesses and up to $60,000 for enterprises. Agency retainers frequently span from $1,000 to $20,000 monthly to cover ongoing copywriting, execution, and performance analytics.</p>
 
-<h3>difference between content marketing and social media marketing</h3>
+<h3>Difference between content marketing and social media marketing?</h3>
 <p>Content marketing centres on producing and owning core information assets like comprehensive guides, blogs, and videos. Social media marketing utilizes specific networking platforms like Facebook, Instagram, and LinkedIn to promote those assets and converse directly with prospects. Social media acts as a functional channel for distribution and community interaction, whereas content marketing provides the underlying valuable information.</p>
 
-<h3>how to use content marketing to grow your business</h3>
+<h3>How to use content marketing to grow your business?</h3>
 <p>Businesses can drive growth by developing an authentic brand voice and establishing a reliable repository of industry knowledge that guides prospects smoothly down the sales funnel. Consistent publishing builds organic search visibility, establishes industry authority, and captures high-quality leads. Companies also scale reach by mapping distinct content formats to buyer stages and utilizing co-marketing partnerships.</p><h2>Sources</h2><ul><li><a href="https://www.ama.org/marketing-news/what-is-content-marketing/" rel="noopener" target="_blank">What is Content Marketing? A Beginners Guide</a></li><li><a href="https://contentmarketinginstitute.com/what-is-content-marketing" rel="noopener" target="_blank">What Is Content Marketing?</a></li><li><a href="https://www.corporatecomm.com/blog/what-is-a-content-marketing-strategy" rel="noopener" target="_blank">What is a Content Marketing Strategy? | Corporate Communications Inc.</a></li><li><a href="https://blog.marketmuse.com/content-strategy-vs-content-marketing/" rel="noopener" target="_blank">What’s the Difference Between Content Strategy vs Content Marketing</a></li></ul>

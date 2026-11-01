@@ -71,7 +71,8 @@ for (const s of ['/', '/images/15d326138cfb576f.png', '/rss.xml', '/findes-ikke-
 const forventet = [
   // Fra trin 4 (28/10-2026): emner med en hylde har ingen emneside — de sendes direkte til hylden
   ['/search/label/AI', 301, '/shelf/ai'],
-  ['/search/label/Resources', 301, '/topic/resources'],
+  ['/search/label/Resources', 301, '/shelf/marketing'],
+  ['/search/label/Vlog', 301, '/shelf/ai'],
   ['/search/label/Findes-ikke', 301, '/'],
   // /search er nu selve søgesiden (29/9-2026); andre /search/… fra Blogger -> /latest (30/9; før /trending)
   ['/search?q=claude', 200, null],
@@ -86,7 +87,7 @@ const forventet = [
   ['/trending.html', 301, '/trending'],
   ['/search.html?q=claude', 301, '/search?q=claude'],
   ['/topic/ai.html', 301, '/shelf/ai'],
-  ['/topic/resources.html', 301, '/topic/resources'],
+  ['/topic/resources.html', 301, '/shelf/marketing'],
   ['/shelf/ai.html', 301, '/shelf/ai'],
   ['/page/2.html', 301, '/page/2'],
   // (29/10-2026: /2024/09/faq er slettet og sender til /p/faq — derfor en anden artikel her)
@@ -94,11 +95,15 @@ const forventet = [
   ['/trending', 200, null],
   ['/topic/ai', 301, '/shelf/ai'],
   ['/topic/ai/', 301, '/shelf/ai'],
-  ['/topic/resources', 200, null],
+  // 1/11-2026: de sidste 5 emnesider er 301 til hylden
+  ['/topic/resources', 301, '/shelf/marketing'],
+  ['/topic/crypto', 301, '/shelf/everyday-tech'],
+  ['/topic/fintech', 301, '/shelf/everyday-tech'],
+  ['/topic/web3', 301, '/shelf/ai'],
+  ['/topic/vlog', 301, '/shelf/ai'],
   ['/shelf/ai', 200, null],
   ['/page/2', 200, null],
   // "/" til sidst: Cloudflare selv sender videre til adressen uden (307)
-  ['/topic/resources/', 307, '/topic/resources'],
   ['/shelf/ai/', 307, '/shelf/ai'],
   // Nedlagte faste sider (worker/nedlagte.js) -> 301, med og uden .html
   ...Object.entries(NEDLAGTE).flatMap(([s, til]) => [[s, 301, til], [s + '.html', 301, til]]),

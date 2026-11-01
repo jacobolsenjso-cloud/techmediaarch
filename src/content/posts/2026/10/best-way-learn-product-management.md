@@ -74,7 +74,7 @@ robot: true
 <h3>How long does it take to learn product management?</h3>
 <p>Some individuals learn core execution in as little as 45 days, though most working professionals require under six months with a focused plan. Fully transitioning into the profession typically takes three to five years of combined experience and targeted training.</p>
 
-<h3>Why should i learn product management?</h3>
+<h3>Why should I learn product management?</h3>
 <p>Learning these skills provides sharper, data-driven decision-making regarding feature prioritization and enhanced adaptability to industry disruptions. It also places practitioners at the center of cross-functional collaboration alongside engineering and design teams.</p>
 
 <h3>What is the best way to get into product management?</h3>

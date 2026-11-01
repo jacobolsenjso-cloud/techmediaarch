@@ -24,10 +24,18 @@ export const HYLDE_FOR_EMNE = {
 // Ekstra Blogger-etiketter, der også sætter en artikel på en hylde, selv om de ikke er et af emnerne.
 // Målt 28/10: 19 artikler har "Cyber Security"/"Cyber-Security", men ikke "Infosec". Flyttet hertil fra
 // hylder.ts 29/10, så sitet og robotten (robot/lib/arkiv.mjs) tæller hylderne ens.
-export const EKSTRA_ETIKETTER = { 'Cyber Security': 'cybersecurity', 'Cyber-Security': 'cybersecurity' };
+// 1/11-2026 (Jacob: emnesiderne sendes videre til hylderne): 6 robotsvar havde kun "Fintech"/"Crypto" og stod på
+// ingen hylde. De står nu på Everyday Tech (hylden for tech i hverdagen; ingen anden hylde passer bedre).
+// Emnerne Fintech og Crypto kommer IKKE i robottens rotation (den læser kun HYLDE_FOR_EMNE).
+export const EKSTRA_ETIKETTER = { 'Cyber Security': 'cybersecurity', 'Cyber-Security': 'cybersecurity', Fintech: 'everyday-tech', Crypto: 'everyday-tech' };
+// De sidste 5 emnesider (1/11-2026, Jacobs beslutning) har ingen egen side mere: /topic/<emne> sendes med 301 til den
+// hylde, hvor flest af emnets artikler står (målt 1/11: vlog 19 af 33 på AI, web3 4 af 7 på AI, resources 2 af 2 på
+// Marketing; fintech og crypto til Everyday Tech, se ovenfor). Kun til adresser og links — ikke til hvilken hylde en
+// artikel står på, og ikke til robottens rotation. Skal matche worker/index.js.
+export const EMNESIDE_TIL_HYLDE = { ...HYLDE_FOR_EMNE, fintech: 'everyday-tech', crypto: 'everyday-tech', web3: 'ai', vlog: 'ai', resources: 'marketing' };
 const EMNE_LINK = /(\shref=(["'])(?:https?:\/\/(?:www\.)?techmediaarch\.com)?)\/topic\/([A-Za-z0-9-]+)(?=[#?"'])/g;
 const tilHylde = (html) => html.replace(EMNE_LINK, (m, start, anf, slug) => {
-  const h = HYLDE_FOR_EMNE[slug.toLowerCase()];
+  const h = EMNESIDE_TIL_HYLDE[slug.toLowerCase()];
   return h ? `${start}/shelf/${h}` : m;
 });
 

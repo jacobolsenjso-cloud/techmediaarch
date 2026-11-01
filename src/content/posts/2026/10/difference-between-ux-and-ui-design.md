@@ -64,17 +64,17 @@ robot: true
 <p>Once prototypes pass usability evaluations, interface specialists apply color theory, typography, and iconography. This final visual layer brings the underlying skeletal structure to life for everyday users.</p>
 
 <h2>FAQ</h2>
-<h3>What is the best way to learn ui ux design?</h3>
+<h3>What is the best way to learn UI UX design?</h3>
 <p>A structured beginner entry route involves taking comprehensive online programs like the Google UX/UI Design certificate course. Many successful designers also start by consuming articles and YouTube videos before taking short foundational courses.</p>
 
-<h3>What happens in ui ux design?</h3>
+<h3>What happens in UI UX design?</h3>
 <p>The workflow brings together multiple operational stages, including discovery, user research, wireframing, prototyping, and post-launch refinement. Teams move from empathizing with users to defining requirements, ideating solutions, designing interfaces, testing prototypes, and handing off to developers.</p>
 
-<h3>How long does it take to learn ui ux design?</h3>
+<h3>How long does it take to learn UI UX design?</h3>
 <p>Bootcamp graduates typically achieve job readiness in approximately six months through intensive training programs. Independent self-taught learning paths usually take up to a full year, while complete proficiency requires about three years of full-time work.</p>
 
-<h3>Should i learn ui ux design?</h3>
+<h3>Should I learn UI UX design?</h3>
 <p>Developing user-centered thinking skills provides professionals with a distinct competitive advantage, and Forbes ranked UX design as a top job for work-life balance. Deciding to enter the field depends on your interest in human psychology, problem solving, and digital aesthetics.</p>
 
-<h3>What are the core ui ux design rules?</h3>
+<h3>What are the core UI UX design rules?</h3>
 <p>Product teams rely on evidence-based UX rules rooted in cognitive psychology and human-computer interaction research. Jakob Nielsen’s 10 foundational interaction heuristics and established laws of UX provide broad rules of thumb for interface creators.</p><h2>Sources</h2><ul><li><a href="https://www.coursera.org/articles/ui-vs-ux-design" rel="noopener" target="_blank">UI vs. UX Design: What’s the Difference? | Coursera</a></li><li><a href="https://www.phoenix.edu/articles/it/the-differences-in-ui-vs-ux-design.html" rel="noopener" target="_blank">The Differences in UI vs UX Design | University of Phoenix</a></li><li><a href="https://www.wix.com/blog/understanding-difference-ui-ux-design" rel="noopener" target="_blank">Understanding the difference between UI and UX design</a></li><li><a href="https://www.geeksforgeeks.org/blogs/how-to-become-a-ui-ux-designer-a-complete-roadmap/" rel="noopener" target="_blank">How to Become a UI/UX Designer: A Complete Roadmap - GeeksforGeeks</a></li></ul>

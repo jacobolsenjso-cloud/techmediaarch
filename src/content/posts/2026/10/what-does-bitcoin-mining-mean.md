@@ -61,17 +61,17 @@ robot: true
 <p>Decentralization ensures that no single government, corporation, or mining cooperative can unilaterally alter the rules or freeze user funds. This robust security architecture underpins the trust that participants place in the immutable public ledger.</p>
 
 <h2>FAQ</h2>
-<h3>What is bitcoin mining?</h3>
+<h3>What is Bitcoin mining?</h3>
 <p>Ledger defines Bitcoin mining as the underlying process by which new bitcoins are created and the network is secured. It uses a decentralized consensus mechanism to verify transactions without a central authority.</p>
 
-<h3>How does bitcoin mining make money?</h3>
+<h3>How does Bitcoin mining make money?</h3>
 <p>CoinShares states that Bitcoin mining revenue consists of newly issued block rewards and user-paid transaction fees. Miners earn these payouts when they successfully solve cryptographic puzzles and add new blocks to the blockchain.</p>
 
-<h3>Is bitcoin mining profitable today?</h3>
+<h3>Is Bitcoin mining profitable today?</h3>
 <p>Profitability depends heavily on electricity costs, hardware efficiency, and current block rewards. Because difficulty has risen significantly over a 15-year period as noted by Coinbase, solo hobbyists struggle to compete with commercial operations.</p>
 
-<h3>Is bitcoin mining legal?</h3>
+<h3>Is Bitcoin mining legal?</h3>
 <p>The legality of mining varies by jurisdiction, with some countries fully embracing it and others placing total bans on cryptocurrency operations. Miners must check local regulations regarding energy consumption, financial reporting, and digital asset laws.</p>
 
-<h3>How does bitcoin work?</h3>
+<h3>How does Bitcoin work?</h3>
 <p>Fidelity Investments explains that miners verify transactions and ensure they are legitimate within minutes by solving encrypted mathematical puzzles. This trial-and-error process secures the immutable chain of information blocks known as the blockchain.</p><h2>Sources</h2><ul><li><a href="https://coinshares.com/insights/beginners-guide/bitcoin-mining-explained-process-benefits-and-challenges/" rel="noopener" target="_blank">Bitcoin mining explained – process, benefits, and challenges</a></li><li><a href="https://www.ledger.com/academy/topics/crypto/bitcoin-mining-at-home-a-practical-guide" rel="noopener" target="_blank">What Is Bitcoin Mining? A Practical Guide to Mining at Home</a></li><li><a href="https://www.fidelity.com/learning-center/trading-investing/crypto/what-is-mining" rel="noopener" target="_blank">What is bitcoin mining? | Fidelity Investments</a></li><li><a href="https://www.kiplinger.com/investing/bitcoin-mining-how-does-it-work-and-is-it-worth-it" rel="noopener" target="_blank">Bitcoin Mining: How Does it Work and Is It Worth It? | Kiplinger</a></li></ul>

@@ -20,18 +20,32 @@ const sideHistorier = side1.slice(1, FORSIDE_NYESTE);
 const maerke = (p: (typeof INDLAEG)[number]) => { const h = hyldeFor(p); return h ? { navn: h.navn, farve: h.farve } : p.emner[0] ? { navn: p.emner[0].navn, farve: p.emner[0].farve } : null; };
 // Hyldeafsnittene: den nyeste med billede som stor, de 3 næste som rækker — svarene først (skridt 3, 29/10-2026),
 // så forsiden ikke viser en AI-nyhed fra 2024 som hyldens ansigt
+// 1/11-2026: en artikel står kun ÉN gang på forsiden. Før stod fx Microsoft 365 både som hovedhistorie og som
+// Everyday Techs store artikel. Hyldeafsnittene springer derfor de 5 nyeste over og alt, der allerede er vist.
+const vist = new Set(side1);
 const hyldeAfsnit = HYLDER.map((h) => {
   const liste = hyldeSorteret(h);
-  const stor = liste.find((p) => p.image) ?? liste[0];
-  return { h, antal: liste.length, stor, smaa: liste.filter((p) => p !== stor).slice(0, 3) };
+  const ledige = liste.filter((p) => !vist.has(p));
+  const stor = ledige.find((p) => p.image) ?? ledige[0];
+  const smaa = ledige.filter((p) => p !== stor).slice(0, 3);
+  for (const p of [stor, ...smaa]) if (p) vist.add(p);
+  return { h, antal: liste.length, stor, smaa };
 }).filter((x) => x.stor);
 
 // "Questions people are asking" (29/9, Jacobs ønske): de nyeste robotartiklers Google-søgespørgsmål som genveje.
 // Undertitlen lover "this week" — den står kun, når ALLE viste spørgsmål er højst 7 dage gamle (ellers "recently").
 const UGE = 7 * 24 * 3600 * 1000;
 const sporgsmaal = INDLAEG.filter((p) => p.robot && p.keyword).slice(0, 8)
-  .map((p) => { const farve = p.emner[0]?.farve || '#1e40af'; return { href: p.href, tekst: somSporgsmaal(p.keyword), farve, tegn: tegnFarve(farve), dato: new Date(p.published).getTime() }; });
+  // Prikkens farve = hyldens farve (1/11-2026), så farve betyder det samme overalt på sitet
+  .map((p) => { const farve = hyldeFor(p)?.farve || p.emner[0]?.farve || '#1e40af'; return { href: p.href, tekst: somSporgsmaal(p.keyword), farve, tegn: tegnFarve(farve), dato: new Date(p.published).getTime() }; });
 const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q.dato <= UGE);
+// "Find your way around" (1/11-2026): de fire måder at finde rundt på, som også står i menuen
+const VEJE = [
+  { navn: 'Start here', besk: 'The basics of each shelf, in reading order', href: '/p/start-here', ikon: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M15.5 8.5l-2 5l-5 2l2-5z' },
+  { navn: 'Newest', besk: 'The latest answers, by day', href: '/latest', ikon: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18' },
+  { navn: 'Most read', besk: 'What readers open most this week', href: '/trending', ikon: 'M3 17l6-6l4 4l8-8M15 7h6v6' },
+  { navn: 'A–Z index', besk: `All ${INDLAEG.length} articles from A to Z`, href: '/a-z', ikon: 'M4 6h16M4 12h16M4 18h10' },
+];
 ---
 <MainLayout description="Clear answers to the tech questions people actually ask: AI tools, cybersecurity, building software, marketing and everyday tech, with the sources named.">
   <style is:global>
@@ -47,7 +61,7 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
     .lead-secondary { display: flex; flex-direction: column; gap: 20px; }
     .lead-card { text-decoration: none; color: inherit; display: block; }
     .lead-card .card-thumb { border-radius: var(--radius); margin-bottom: 14px; }
-    .lead-card:hover .card-thumb img { transform: scale(1.04); }
+    .lead-card:hover .card-thumb img { transform: scale(1.03); }
     .lead-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 9px; color: var(--teal-text); }
     .lead-eyebrow::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent, var(--teal)); }
     .lead-title { margin: 0 0 9px 0; font-size: 2rem; line-height: 1.12; font-weight: 700; font-stretch: 92%; letter-spacing: -0.015em; }
@@ -66,11 +80,11 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
     .home-questions { margin: 6px 0 36px; }
     .home-questions-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 22px; }
     .home-question { display: flex; align-items: center; gap: 12px; padding: 10px 12px; min-height: 44px; box-sizing: border-box; border-radius: var(--radius); text-decoration: none; color: var(--text-color); border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
-    .home-question:hover { background: var(--hover-bg); border-color: var(--border-color); transform: translateX(3px); }
+    .home-question:hover { background: var(--hover-bg); border-color: var(--border-color); }
     .home-question-mark { flex: none; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: #fff; background: var(--tag-accent); }
     .home-question-text { font-weight: 600; font-size: 0.95rem; line-height: 1.35; }
     .home-question-arrow { margin-left: auto; color: #9ca3af; transition: transform 0.15s, color 0.2s; }
-    .home-question:hover .home-question-arrow { transform: translateX(3px); color: var(--teal-text); }
+    .home-question:hover .home-question-arrow { transform: translateX(2px); color: var(--teal-text); }
     @media (max-width: 768px) { .home-questions-list { grid-template-columns: 1fr; } }
     @media (prefers-reduced-motion: reduce) { .home-question:hover, .home-question:hover .home-question-arrow { transform: none; } }
 
@@ -89,9 +103,24 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
     .hylde-stor-titel { font-size: 1.6rem; font-weight: 700; line-height: 1.2; font-stretch: 92%; letter-spacing: -0.015em; transition: color 0.15s; }
     .hylde-stor:hover .hylde-stor-titel { color: var(--teal-text); }
     .hylde-stor-besk { font-family: var(--font-serif); font-size: 1rem; line-height: 1.55; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .hylde-stor-meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-transform: uppercase; }
+    .hylde-stor-meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
     .hylde-smaa { display: flex; flex-direction: column; }
-    .alle-svar { margin-top: 8px; }
+    .veje { margin: 8px 0 20px; }
+    .veje-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .vej { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); text-decoration: none; transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; }
+    .vej:hover { border-color: var(--teal-text); box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+    .vej:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+    .vej-ikon { width: 42px; height: 42px; border-radius: 12px; background: var(--hero-bg-2); color: var(--teal-text); display: inline-flex; align-items: center; justify-content: center; }
+    .vej-tekst { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .vej-navn { font-weight: 700; font-size: 1rem; line-height: 1.2; }
+    .vej-besk { font-size: 0.84rem; line-height: 1.35; color: var(--muted); }
+    .vej-pil { color: var(--muted); transition: color 0.2s, transform 0.2s; }
+    .vej:hover .vej-pil { color: var(--teal-text); transform: translateX(2px); }
+    .veje-sider { display: flex; align-items: center; justify-content: center; gap: 4px 14px; flex-wrap: wrap; margin-top: 22px; color: var(--muted); font-size: 0.9rem; }
+    .veje-sider > span { white-space: nowrap; }
+    @media (max-width: 1000px) { .veje-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .veje-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
+    @media (prefers-reduced-motion: reduce) { .vej:hover, .vej:hover .vej-pil { transform: none; } }
     @media (max-width: 860px) {
       .hylde-afsnit-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
       .hylde-afsnit-top h2 { font-size: 1.3rem; }
@@ -143,7 +172,7 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
       background: rgb(255 255 255 / 7%); border: 1px solid rgb(255 255 255 / 14%);
       margin-left: calc(var(--i) * 14px); transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
     /* Ind-glidningen af hylderne er fjernet (1/11): den holdt toppen usynlig og forsinkede første visning på mobil */
-    .top-d-hylde:hover { transform: translateX(-6px); background: rgb(255 255 255 / 13%); border-color: color-mix(in srgb, var(--h) 70%, #fff); }
+    .top-d-hylde:hover { background: rgb(255 255 255 / 13%); border-color: color-mix(in srgb, var(--h) 70%, #fff); }
     .top-d-hylde:focus-visible { outline: 2px solid #f2b33d; outline-offset: 2px; }
     .top-d-ikon { width: 46px; height: 46px; border-radius: 12px; background: var(--h); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
     .top-d-navn { display: flex; flex-direction: column; gap: 3px; min-width: 0; font-weight: 700; font-size: 1.08rem; line-height: 1.2; }
@@ -228,7 +257,20 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
       </section>
     ))}
 
-    <div class="section-heading alle-svar"><h2>All answers</h2><span class="section-note">{INDLAEG.length} answers, newest first</span></div>
-    <Pagination side={1} antal={antalSider} />
+    {/* 1/11-2026: fire tydelige veje videre i stedet for en overskrift med kun sidetal under. Sidetallene står stadig
+        (de er Googles vej til de ældre artikler), men som en lille linje under vejene. */}
+    <section class="veje" aria-labelledby="veje-heading">
+      <div class="section-heading"><h2 id="veje-heading">Find your way around</h2><span class="section-note">{INDLAEG.length} articles</span></div>
+      <nav class="veje-grid" aria-label="Ways to browse">
+        {VEJE.map((v) => (
+          <a href={v.href} class="vej">
+            <span class="vej-ikon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d={v.ikon} /></svg></span>
+            <span class="vej-tekst"><span class="vej-navn">{v.navn}</span><span class="vej-besk">{v.besk}</span></span>
+            <span class="vej-pil" aria-hidden="true">→</span>
+          </a>
+        ))}
+      </nav>
+      <div class="veje-sider"><span>Or page through every article:</span><Pagination side={1} antal={antalSider} /></div>
+    </section>
   </div>
 </MainLayout>

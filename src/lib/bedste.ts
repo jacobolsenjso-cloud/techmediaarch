@@ -1,10 +1,10 @@
-// "Best of each topic": de mest læste artikler pr. emne de sidste 90 dage.
+// "Best of each topic" (/best-of-each-topic): de mest læste artikler pr. hylde de sidste 90 dage.
 // 30/9-2026: skiftet fra Search Console-klik til Google Analytics-læsninger (Jacobs valg; kun 7 Google-klik på 90 dage).
 // Tallene kommer fra robot/data/bedste.json, som robotten henter efter hver kørsel (robot/bedste.mjs).
 // Tom fil = ingen data endnu: siden står der, men er noindex og står ikke i menuen eller sitemap.
 import BEDSTE_RAA from '../../robot/data/bedste.json';
-import { iEmne, type Indlaeg } from './indhold';
-import { KATEGORIER, type Emne } from './emner';
+import type { Indlaeg } from './indhold';
+import { HYLDER, iHylde, type Hylde } from './hylder';
 
 interface Tal { visninger: number; brugere: number }
 interface Data { hentet?: string; fra?: string; til?: string; dage?: number; kilde?: string; sider?: Record<string, Tal> }
@@ -17,21 +17,21 @@ export const MIN_VISNINGER = 1;   // en artikel, ingen har læst, er ikke "bedst
 
 const tal = (p: Indlaeg): Tal => BEDSTE.sider?.[p.sti] ?? { visninger: 0, brugere: 0 };
 
-// Én sektion pr. emne; de store emner først (flest artikler i alt), men alle får højst PR_EMNE pladser.
+// Én sektion pr. HYLDE (1/11-2026; før de 13 gamle Blogger-emner som "Tech", "Vlog", "Data"), i hyldernes faste
+// rækkefølge som i menuen; hver hylde får højst PR_EMNE pladser.
 // Rangering: læsninger (sidevisninger), og ved lige mange: flest forskellige læsere.
-export const SEKTIONER: { emne: Emne; total: number; artikler: (Indlaeg & Tal)[] }[] = KATEGORIER
-  .map((emne) => {
-    const alle = iEmne(emne);
+export const SEKTIONER: { hylde: Hylde; total: number; artikler: (Indlaeg & Tal)[] }[] = HYLDER
+  .map((hylde) => {
+    const alle = iHylde(hylde);
     return {
-      emne, total: alle.length,
+      hylde, total: alle.length,
       artikler: alle.map((p) => ({ ...p, ...tal(p) }))
         .filter((p) => p.visninger >= MIN_VISNINGER)
         .sort((a, b) => b.visninger - a.visninger || b.brugere - a.brugere)
         .slice(0, PR_EMNE),
     };
   })
-  .filter((s) => s.artikler.length > 0)
-  .sort((a, b) => b.total - a.total);
+  .filter((s) => s.artikler.length > 0);
 
 export const HAR_BEDSTE = SEKTIONER.length > 0;
 

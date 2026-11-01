@@ -72,17 +72,17 @@ robot: true
 </ul>
 
 <h2>FAQ</h2>
-<h3>What does cybersecurity analyst do</h3>
+<h3>What does cybersecurity analyst do?</h3>
 <p>An information security analyst plans, implements, upgrades, and monitors security measures for the protection of computer networks and information. They assess system vulnerabilities for security risks, propose risk mitigation strategies, and ensure appropriate security controls are in place to safeguard digital files and vital electronic resources.</p>
 
-<h3>How much does cybersecurity analyst make</h3>
+<h3>How much does cybersecurity analyst make?</h3>
 <p>The median annual wage for information security analysts was $129,180 in May 2025 according to the U.S. Bureau of Labor Statistics. Individual pay varies based on geographic location, professional experience, technical knowledge, and organizational level.</p>
 
-<h3>What is cybersecurity engineering</h3>
+<h3>What is cybersecurity engineering?</h3>
 <p>Cybersecurity engineering involves working within engineering departments to design and create systems, processes, and procedures that maintain the safety, reliability, and security of industrial systems against cyber events. Engineers build the underlying security architecture and update systems to ensure compliance with government regulations.</p>
 
-<h3>What is the difference between cybersecurity analyst and soc analyst</h3>
+<h3>What is the difference between cybersecurity analyst and SOC analyst?</h3>
 <p>A cybersecurity analyst works primarily on the risk, compliance, and preventative side, handling vulnerability management and policy development during standard business hours. A SOC analyst operates inside a Security Operations Center monitoring SIEM alerts in shifts to triage, investigate, and respond to real-time security incidents.</p>
 
-<h3>What is the difference between cybersecurity and software engineering</h3>
+<h3>What is the difference between cybersecurity and software engineering?</h3>
 <p>Software engineering is the process of coding, designing, and maintaining software applications and systems through the software development life cycle. Cybersecurity involves protecting those computer systems, networks, and data from theft, unauthorized access, and damage using specialized security tools and protocols.</p><h2>Sources</h2><ul><li><a href="https://www.comptia.org/en-us/blog/cybersecurity-engineer-vs-analyst/" rel="noopener" target="_blank">Cybersecurity Engineer vs. Analyst: Key Differences and Similarities | CompTIA Blog</a></li><li><a href="https://www.discoverdatascience.org/articles/cybersecurity-analyst-vs-engineer/" rel="noopener" target="_blank">Cyber Security Analyst vs Cyber Security Engineer | Salary</a></li><li><a href="https://www.bls.gov/oes/2023/may/oes151212.htm" rel="noopener" target="_blank">Information Security Analysts</a></li><li><a href="https://socmasters.in/soc-analyst-vs-cybersecurity-analyst/" rel="noopener" target="_blank">SOC Analyst vs Cybersecurity Analyst: Which Is Better?</a></li></ul>

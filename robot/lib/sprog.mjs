@@ -116,13 +116,19 @@ export const STORE = Object.fromEntries(['AI', 'SEO', 'SEM', 'MDM', 'API', 'APIs
   'VPN', 'MFA', 'SSO', 'CRM', 'SaaS', 'B2B', 'LLM', 'LLMs', 'GPT', 'NIST', 'PDF', 'HTML', 'CSS', 'SQL', 'CEO', 'GDPR', 'Linux', 'Docker',
   'Kubernetes', 'DevOps', 'Copilot', 'Intune', 'Figma', 'Canva', 'TikTok', 'Instagram', 'Facebook', 'LinkedIn', 'WordPress',
   'Shopify', 'PayPal', 'Bitcoin', 'Ethereum', 'NFT', 'VR', 'GPU', 'CPU', 'RAM', 'SSD', 'USB', 'IoT', 'URL', 'DNS', 'HTTP',
-  'HTTPS', 'PPC', 'CTR', 'ROI', 'KPI', 'AEO']
+  'HTTPS', 'PPC', 'CTR', 'ROI', 'KPI', 'AEO', 'SOC', 'BBA', 'BCom']
   .map((n) => [n.toLowerCase(), n]));
 // "i", navne og forkortelser får de rigtige store bogstaver, og første bogstav bliver stort. Bruges på FAQ-spørgsmålene,
 // som Gemini bygger af søgeord med små bogstaver ("Should i learn generative ai?" → "Should I learn generative AI?").
 export function storeBogstaver(tekst) {
   const t = String(tekst).replace(/[A-Za-z][\w-]*/g, (w) => (w === 'i' ? 'I' : STORE[w] && w === w.toLowerCase() ? STORE[w] : w));
   return t.charAt(0).toUpperCase() + t.slice(1);
+}
+// Et FAQ-spørgsmål som en rigtig sætning (1/11-2026, Jacob: "alle de fine detaljer"): store bogstaver som ovenfor og et
+// spørgsmålstegn til sidst, hvis det mangler ("what is phishing resistant mfa" → "What is phishing resistant MFA?").
+export function somSpoergsmaal(tekst) {
+  const t = storeBogstaver(String(tekst).trim());
+  return /[?.!:]$/.test(t) || /<\/?[a-z]/i.test(t.slice(-6)) ? t : t + '?';
 }
 
 // Gentager en liste sig selv? Intro (<p>) og punkter (<li>) sammenlignes parvis på indholdsord; deler to dele

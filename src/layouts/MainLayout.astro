@@ -9,7 +9,6 @@ import '@fontsource-variable/source-serif-4/wght.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import archivoLatinWoff2 from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
-import { ANDRE_EMNER, emneUrl } from '../lib/emner';
 import { HAR_BEDSTE } from '../lib/bedste';
 import { udenHtml } from '../lib/adresse.mjs';
 import { HYLDER, hyldeUrl, iHylde } from '../lib/hylder';
@@ -192,8 +191,11 @@ const nyeste = INDLAEG[0];
       @keyframes tmaReveal { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
       @media (prefers-reduced-motion: reduce) { .tma-reveal { opacity: 1 !important; } .tma-reveal.is-visible { animation: none !important; } }
 
-      /* Trin 3b (Jacob 28/10): bløde skygger på kort, billeder og bokse */
-      :is(.card-thumb, .home-hero-aside, .home-search, .toc-container, .ymal, .disclosure-box, .share-cta, .author-box, .nav-card, .related-box, .paa, .lead-card .card-thumb) { box-shadow: var(--shadow); }
+      /* Trin 3b (Jacob 28/10): bløde skygger på bokse.
+         1/11-2026: IKKE på billeder i hvile — en skygge betyder "kan klikkes" og kommer først, når musen er over.
+         Billederne får i stedet en tynd kant (1 px), så lyse billeder ikke flyder ud i den hvide side. */
+      :is(.home-hero-aside, .home-search, .toc-container, .ymal, .disclosure-box, .share-cta, .author-box, .nav-card, .related-box, .paa) { box-shadow: var(--shadow); }
+      .card-thumb { box-shadow: 0 0 0 1px var(--rule-light); }
 
       /* --- Topbar --- */
       /* Højden er stadig 60 px: sidemenu, hop-til-overskrift og artiklens side-kolonne regner med den */
@@ -237,8 +239,11 @@ const nyeste = INDLAEG[0];
       /* Logo: flisen med A'et + navnet (30/10). .logo-sub bruges ikke i markup lige nu. */
       .logo { text-decoration: none; color: inherit; display: flex; flex-direction: row; align-items: center; gap: 10px; min-height: 44px; min-width: 0; }
       /* Logoet (Jacob 30/10: én tegning alle steder, public/logo.svg = favicon.svg, laves af scripts/lav-logo.mjs) */
-      .logo-mark { flex: none; display: block; width: 34px; height: 34px; border-radius: 9px; }
-      .logo-name { font-size: 22px; line-height: 1.05; font-weight: 800; font-stretch: 92%; letter-spacing: -0.01em; white-space: nowrap; }
+      .logo-mark { flex: none; display: block; width: 32px; height: 32px; border-radius: 9px; }
+      /* Navnet (1/11-2026, Jacob: "virker lidt stort"): 22 → 19 px og 800 → 700 i vægt; "Arch" i blåt med lettere vægt,
+         så navnet læses som et ordmærke og ikke som en overskrift */
+      .logo-name { font-size: 19px; line-height: 1.05; font-weight: 700; font-stretch: 94%; letter-spacing: -0.02em; white-space: nowrap; }
+      .logo-arch { color: var(--teal-text); font-weight: 600; }
       .logo-sub { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
       .logo-sub-kort { display: none; }
       /* Menu-knappen er kun et ikon (udkast 3); ordet "Menu" står til skærmlæsere i aria-label */
@@ -304,19 +309,11 @@ const nyeste = INDLAEG[0];
       .sidebar.open { transform: translateX(0); visibility: visible; transition: transform 0.25s ease, visibility 0s; }
       .nav-item { padding: 10px 15px; min-height: 44px; box-sizing: border-box; text-decoration: none; color: var(--text-color); border-radius: var(--radius); font-weight: 500; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease; }
       .nav-item:hover, .nav-item.active { background: var(--hover-bg); color: var(--teal-text); }
-      .nav-item:hover { transform: translateX(3px); }
       .nav-icon { width: 19px; height: 19px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; }
       .nav-item.active .nav-icon, .nav-item:hover .nav-icon { opacity: 1; }
       .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tag-accent); flex-shrink: 0; margin: 0 5px 0 5px; }
       .nav-heading { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 6px 15px 2px; }
       /* Topics som fold-ud (30/9) */
-      .nav-topics { display: flex; flex-direction: column; gap: 5px; }
-      .nav-topics > summary { list-style: none; cursor: pointer; }
-      .nav-topics > summary::-webkit-details-marker { display: none; }
-      .nav-topics-pil { width: 16px; height: 16px; margin-left: auto; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.6; transition: transform 0.2s ease; }
-      .nav-topics[open] .nav-topics-pil { transform: rotate(90deg); }
-      .nav-topics > .nav-item:not(summary) { padding-left: 22px; }
-      @media (prefers-reduced-motion: reduce) { .nav-topics-pil { transition: none; } }
       .nav-sep { width: 100%; border: 0; border-top: 1px solid var(--border-color); margin: 10px 0; }
       .content-main { flex: 1; min-width: 0; min-height: calc(100vh - 60px); background: var(--bg-color); position: relative; display: flex; flex-direction: column; overflow-x: clip; }
       /* Ingen ind-toning af hele siden: den forsinkede første visning (LCP) på mobil */
@@ -324,15 +321,28 @@ const nyeste = INDLAEG[0];
 
       /* --- Footer (trin 3): hvid bjælke, navn + én linje + alle de juridiske links (AdSense kræver dem) --- */
       .site-footer { background: var(--hero-bg); border-top: 1px solid var(--border-color); font-size: 14px; color: var(--muted); margin-top: auto; }
-      .footer-inner { max-width: 1200px; margin: 0 auto; padding: 40px 20px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
+      .footer-inner { max-width: 1200px; margin: 0 auto; padding: 44px 20px 30px; box-sizing: border-box; display: flex; flex-direction: column; gap: 26px; }
+      .footer-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.6fr); gap: 40px; }
+      .footer-brand { display: flex; flex-direction: column; gap: 10px; }
       .footer-name { font-weight: 700; color: var(--text-color); font-size: 18px; }
-      .footer-about { margin: 0; max-width: 640px; line-height: 1.5; }
-      .footer-copy { margin: 0; font-family: var(--font-mono); font-size: 12px; }
-      .footer-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); column-gap: 24px; margin: 8px 0 4px; }
-      .footer-link { color: var(--ink-2); text-decoration: none; padding: 4px 0; min-height: 44px; box-sizing: border-box; display: inline-flex; align-items: center; }
+      .footer-about { margin: 0; max-width: 340px; line-height: 1.55; }
+      .footer-copy { margin: 0; padding-top: 18px; border-top: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 12px; }
+      .footer-links { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+      .footer-col { display: flex; flex-direction: column; align-items: flex-start; }
+      .footer-col-titel { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-color); font-weight: 500; margin-bottom: 6px; }
+      /* Tryk-mål på mindst 24 px (WCAG 2.2 AA) uden at kolonnerne bliver luftige */
+      .footer-link { color: var(--ink-2); text-decoration: none; padding: 5px 0; min-height: 30px; box-sizing: border-box; display: inline-flex; align-items: center; line-height: 1.35; transition: color 0.15s; }
       .footer-link:hover { color: var(--teal-text); }
-      /* Skillestregerne bliver stående i HTML'en (cookie-scriptet bruger #cookieSettingsSep), men vises ikke */
+      /* display: inline-flex overtrumfede hidden-attributten: "Privacy and cookie settings" stod der, også når Googles
+         samtykkedialog ikke var indlæst (set 1/11-2026 med annoncer blokeret) */
+      .footer-link[hidden] { display: none; }
+      .footer-link:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 4px; }
+      .footer-hylde { gap: 8px; }
+      .footer-hylde::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--h); flex: none; }
+      /* Skillestregen bliver stående i HTML'en (cookie-scriptet bruger #cookieSettingsSep), men vises ikke */
       .footer-sep { display: none !important; }
+      @media (max-width: 1000px) { .footer-top { grid-template-columns: minmax(0, 1fr); gap: 26px; } }
+      @media (max-width: 640px) { .footer-links { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; } .footer-link { min-height: 36px; } }
       .scroll-top-btn { display: none; position: fixed; bottom: 20px; right: 20px; width: 44px; height: 44px; border-radius: var(--radius); background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); align-items: center; justify-content: center; cursor: pointer; z-index: 500; font-size: 1.3rem; line-height: 1; padding: 0; }
       .scroll-top-btn.visible { display: flex; }
       .scroll-top-btn:hover { border-color: var(--teal-text); color: var(--teal-text); }
@@ -340,20 +350,19 @@ const nyeste = INDLAEG[0];
       /* Under 780 px er der ikke plads til de tre links i topbjælken (målt 28/10): hylderne m.m. står i menuen i stedet */
       @media (max-width: 780px) { .top-links { display: none; } .mega, .mega-dim { display: none !important; } }
       /* De smalleste telefoner (ca. 320 px): navnet en anelse mindre, så det ikke skæres af ved knapperne */
-      @media (max-width: 380px) { .logo-name { font-size: 17px !important; } .logo { gap: 8px; } .logo-mark { width: 30px; height: 30px; } }
+      @media (max-width: 380px) { .logo-name { font-size: 16px !important; } .logo { gap: 8px; } .logo-mark { width: 28px; height: 28px; } }
       /* Under 360 px er der ikke plads til flisen OG navnet før knapperne (målt 30/10: 320 px gav 25 px overlap) — kun navnet */
       @media (max-width: 359px) { .logo-mark { display: none; } }
       @media (max-width: 768px) {
         .top-navbar { padding: 0 12px; gap: 10px; }
-        .logo-name { font-size: 19px; }
+        .logo-name { font-size: 17.5px; }
         .logo-sub { font-size: 10px; }
         .logo-sub-lang { display: none; }
         .logo-sub-kort { display: inline; }
         .nav-right { gap: 6px; }
         .menu-label { display: none; }
         .menu-btn { width: 44px; padding: 0; }
-        .footer-inner { padding: 24px 16px calc(30px + env(safe-area-inset-bottom)); }
-        .footer-links { flex-direction: column; align-items: flex-start; }
+        .footer-inner { padding: 30px 16px calc(30px + env(safe-area-inset-bottom)); }
       }
       @media (max-width: 360px) { .logo-sub { display: none; } }
 
@@ -433,7 +442,7 @@ const nyeste = INDLAEG[0];
       .post-body table p { margin: 0; }
       .post-body iframe { max-width: 100%; border: 0; border-radius: 12px; }
       /* YouTube som billede + afspilknap; selve afspilleren hentes ved klik (se temakoder.mjs) */
-      .post-body .yt-lazy { position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 1.5em 0; border-radius: 12px; overflow: hidden; background: #000 center / cover no-repeat; box-shadow: 0 8px 28px rgba(0,0,0,0.10); cursor: pointer; }
+      .post-body .yt-lazy { position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 1.5em 0; border-radius: 12px; overflow: hidden; background: #000 center / cover no-repeat; box-shadow: 0 0 0 1px var(--rule-light); cursor: pointer; }
       .post-body .yt-play-btn { position: absolute; top: 50%; left: 50%; width: 68px; height: 48px; transform: translate(-50%, -50%); border: 0; border-radius: 14px; background: rgba(33,33,33,0.8); cursor: pointer; transition: background 0.2s; }
       .post-body .yt-play-btn::before { content: ""; position: absolute; top: 50%; left: 54%; transform: translate(-50%, -50%); border-style: solid; border-width: 11px 0 11px 19px; border-color: transparent transparent transparent #fff; }
       .post-body .yt-lazy:hover .yt-play-btn, .post-body .yt-play-btn:focus-visible { background: #f00; }
@@ -441,8 +450,8 @@ const nyeste = INDLAEG[0];
          ellers fik afspilleren 1.5em margin, blev skubbet ned, og en stribe af miniaturen stod over den */
       .post-body .yt-lazy iframe, .post-body .yt-lazy iframe[src*="youtube"] { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 0; margin: 0; box-shadow: none; }
       /* Video uploadet til Blogger, nu afspillet fra vores egen kopi (lodret 9:16, se temakoder.mjs) */
-      .post-body .tma-video { display: block; width: 100%; max-width: 360px; height: auto; aspect-ratio: 9 / 16; margin: 1.5em auto; border-radius: 12px; background: #000; box-shadow: 0 8px 28px rgba(0,0,0,0.10); }
-      .post-body iframe[src*="youtube"] { width: 100%; height: auto; aspect-ratio: 16 / 9; display: block; margin: 1.5em 0; box-shadow: 0 8px 28px rgba(0,0,0,0.10); background: #000; }
+      .post-body .tma-video { display: block; width: 100%; max-width: 360px; height: auto; aspect-ratio: 9 / 16; margin: 1.5em auto; border-radius: 12px; background: #000; box-shadow: 0 0 0 1px var(--rule-light); }
+      .post-body iframe[src*="youtube"] { width: 100%; height: auto; aspect-ratio: 16 / 9; display: block; margin: 1.5em 0; box-shadow: 0 0 0 1px var(--rule-light); background: #000; }
       .post-body pre { background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 10px; overflow-x: auto; font-size: 0.88rem; line-height: 1.6; }
       .post-body code { font-size: 0.9em; font-family: var(--font-mono); }
       .post-body :not(pre) > code { background: var(--hover-bg); padding: 2px 6px; border-radius: 4px; }
@@ -467,11 +476,11 @@ const nyeste = INDLAEG[0];
       :is(.lead-section, .hylde-afsnit-grid, .card-grid) { grid-auto-flow: row dense; }
       .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px; }
       .article-card { text-decoration: none; color: inherit; display: block; transition: transform 0.2s; }
-      .article-card:hover { transform: translateY(-3px); }
+      .article-card:hover { transform: translateY(-2px); }
       .card-thumb { aspect-ratio: 16/9; border-radius: var(--radius); position: relative; margin-bottom: 10px; overflow: hidden; background-color: var(--placeholder); }
       /* Rolig ensfarvet pladsholder; den gamle glimt-animation kostede regnekraft på mobil */
       .card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
-      .article-card:hover .card-thumb img { transform: scale(1.06); }
+      .article-card:hover .card-thumb img { transform: scale(1.03); }
       .article-card:hover .card-thumb { box-shadow: 0 6px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05); }
       /* Artikler uden billede får et roligt felt i emnets farve i stedet for et hul */
       .card-thumb-empty { animation: none; background: linear-gradient(135deg, color-mix(in srgb, var(--tag-accent, #0891b2) 22%, var(--card-bg)), var(--hover-bg)); display: flex; align-items: center; justify-content: center; }
@@ -481,7 +490,7 @@ const nyeste = INDLAEG[0];
       .card-excerpt { margin: 4px 0 6px 0; font-family: var(--font-serif); font-size: 15px; line-height: 1.5; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
       /* Datoer og læsetid i mono, som "VERIFIED"-linjerne i designet */
       .card-meta { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin: 0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-      .card-topic { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+      .card-topic { display: flex; flex-basis: 100%; align-items: center; gap: 5px; font-weight: 600; margin-bottom: 1px; }
       .card-topic::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--tag-accent); }
       /* Mærke på kortets billede (ArticleCard badge: "42 clicks", "#1"). Blæk-farve med hvid tekst: over 15:1 */
       .card-badge { position: absolute; top: 8px; left: 8px; background: var(--text-color); color: var(--bg-color); padding: 3px 9px; border-radius: var(--radius); font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 1; }
@@ -536,12 +545,15 @@ const nyeste = INDLAEG[0];
         .top-links a:hover::after { transform: scaleX(1); transform-origin: left center; }
         .post-body :is(p, li) a:not(.paa-link):not(.tma-knap):not(:has(> img)):hover { background-size: 100% 2px; border-bottom-color: transparent; }
         .icon-btn:hover { color: var(--teal-text); border-color: var(--teal); background: var(--card-bg); }
-        :is(.lead-card, .lead-mini, .side-item):hover { transform: translateY(-2px); }
         :is(.article-card, .lead-card, .lead-mini, .side-item):hover .card-thumb { box-shadow: var(--shadow-hover); }
         :is(.lead-mini, .side-item):hover :is(.lead-mini-title, .side-item-title) { color: var(--teal-text); }
         :is(.home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"]):hover { transform: translateY(-1px); filter: brightness(0.92); box-shadow: var(--shadow); }
         .nav-card:hover { box-shadow: var(--shadow-hover); }
+        :is(.hylde-stor, .raekke):hover img { box-shadow: var(--shadow-hover); }
       }
+      /* 1/11-2026, ét bevægelsessprog: kort med ramme løfter sig 2 px; billeder zoomer højst 3 %; lister og menuer
+         flytter sig ikke, de skifter kun farve (en pil må skubbe 2 px). Titlen bliver blå alle steder. */
+      :is(.hylde-stor, .raekke) img { box-shadow: 0 0 0 1px var(--rule-light); transition: box-shadow 0.22s ease; }
       /* ===== Trin 3d: "mere lækker og imødekommende" (Jacob 28/10 aften) ===== */
       /* Artikelkort: hvid flade, billede øverst, tekst indeni, stor runding og blød skygge */
       .article-card { background: var(--card-bg); border: 1px solid var(--rule-light); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.22s ease; }
@@ -571,8 +583,8 @@ const nyeste = INDLAEG[0];
     <header class="top-navbar" id="mainHeader">
       <div class="nav-left">
         <a href="/" class="logo" aria-label="Tech Media Arch home">
-          <img class="logo-mark" src="/logo.svg" alt="" width="34" height="34" decoding="async" />
-          <span class="logo-name">Tech Media Arch</span>
+          <img class="logo-mark" src="/logo.svg" alt="" width="32" height="32" decoding="async" />
+          <span class="logo-name">Tech Media <span class="logo-arch">Arch</span></span>
         </a>
       </div>
       {/* 28/10 aften (Jacob): fuld bredde, kun navnet, Shelves (megamenu), Start here og A–Z index.
@@ -672,29 +684,9 @@ const nyeste = INDLAEG[0];
         {HAR_BEDSTE && (
           <a href="/best-of-each-topic" class={`nav-item ${aktiv('/best-of-each-topic') ? 'active' : ''}`}>
             <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></svg>
-            Best by topic
+            Best of each shelf
           </a>
         )}
-        <a href="/topic/resources" class={`nav-item ${aktiv('/topic/resources') ? 'active' : ''}`}>
-          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M8 7h7"/></svg>
-          Resources
-        </a>
-        <hr class="nav-sep" />
-        {/* Topics foldet sammen (30/9, Jacobs valg C): emne-knapperne står øverst på forsiden, emnesiderne og Trending,
-            men i artikler og på mobil er menuen eneste vej til emnerne — derfor foldet, ikke slettet. Åben på en emneside. */}
-        <details class="nav-topics" open={ANDRE_EMNER.some((e) => aktiv(emneUrl(e)))}>
-          <summary class="nav-item nav-topics-knap">
-            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
-            Other topics
-            <svg class="nav-topics-pil" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
-          </summary>
-          {ANDRE_EMNER.map((e) => (
-            <a href={emneUrl(e)} class={`nav-item ${aktiv(emneUrl(e)) ? 'active' : ''}`} style={`--tag-accent: ${e.farve}`}>
-              <span class="nav-dot" aria-hidden="true"></span>
-              {e.navn}
-            </a>
-          ))}
-        </details>
         <hr class="nav-sep" />
         <a href="/p/sitemap" class={`nav-item ${aktiv('/p/sitemap') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
@@ -720,28 +712,49 @@ const nyeste = INDLAEG[0];
 
         <footer class="site-footer">
           <div class="footer-inner">
-            <span class="footer-name">Tech Media Arch</span>
-            {/* Lover kun det, der er sandt i dag: kilderne nævnes. "Checked/verified" kommer først med trin 6-7 */}
-            <p class="footer-about">Clear answers to the tech questions people actually ask, with the sources named. Run by <span style="white-space: nowrap">Jacob S. Olsen</span>.</p>
-            <div class="footer-links">
-              {/* Samme links og rækkefølge som Bloggers footer (LinkList204, sorteret alfabetisk).
-                  "Report Abuse" er udeladt: det var Bloggers egen side. */}
-              <a href="/p/about-us" class="footer-link">About Us</a><span class="footer-sep">|</span>
-              <a href="/p/accessibility-information" class="footer-link">Accessibility Information</a><span class="footer-sep">|</span>
-              {/* Contact Us (29/9, Jacob): ny side, ikke fra Blogger — alfabetisk plads */}
-              <a href="/p/contact-us" class="footer-link">Contact Us</a><span class="footer-sep">|</span>
-              <a href="/p/copyright-trademark-and-patent" class="footer-link">Copyright &amp; Trademark</a><span class="footer-sep">|</span>
-              <a href="/p/disclosure" class="footer-link">Disclosure</a><span class="footer-sep">|</span>
-              {/* Editorial Guidelines (5/10, Jacob): ny side, alfabetisk plads */}
-              <a href="/p/editorial-guidelines" class="footer-link">Editorial Guidelines</a><span class="footer-sep">|</span>
-              <a href="/p/faq" class="footer-link">F.A.Q.</a><span class="footer-sep">|</span>
-              <a href="/p/privacy-policy" class="footer-link">Privacy Policy</a><span class="footer-sep">|</span>
-              <a href="/rss.xml" class="footer-link">RSS</a><span class="footer-sep">|</span>
-              <a href="/p/sitemap" class="footer-link">Sitemap</a><span class="footer-sep">|</span>
-              <a href="/p/start-here" class="footer-link">Start Here</a><span class="footer-sep">|</span>
-              <a href="/p/terms-conditions" class="footer-link">Terms &amp; Conditions</a><span class="footer-sep">|</span>
-              <a href="/p/we-not-sell-your-personal-information" class="footer-link">Do Not Sell My Personal Information</a>
-              <span class="footer-sep" id="cookieSettingsSep" hidden>|</span><a href="#" id="cookieSettingsLink" class="footer-link" hidden>Privacy and cookie settings</a>
+            {/* Sidefoden (1/11-2026): navn + én linje til venstre, og links i fire kolonner — de 5 hylder, veje rundt,
+                om sitet og de juridiske sider (AdSense kræver dem; alle Bloggers links er med). Før var der kun de
+                juridiske links, så sidefoden ikke hjalp læseren (eller Google) videre til hylderne. */}
+            <div class="footer-top">
+              <div class="footer-brand">
+                <span class="footer-name">Tech Media <span class="logo-arch">Arch</span></span>
+                {/* Lover kun det, der er sandt i dag: kilderne nævnes. "Checked/verified" kommer først med trin 6-7 */}
+                <p class="footer-about">Clear answers to the tech questions people actually ask, with the sources named. Run by <span style="white-space: nowrap">Jacob S. Olsen</span>.</p>
+              </div>
+              <nav class="footer-links" aria-label="Footer">
+                <div class="footer-col">
+                  <span class="footer-col-titel">Shelves</span>
+                  {HYLDER.map((h) => <a href={hyldeUrl(h)} class="footer-link footer-hylde" style={`--h: ${h.farve}`}>{h.navn}</a>)}
+                </div>
+                <div class="footer-col">
+                  <span class="footer-col-titel">Explore</span>
+                  <a href="/p/start-here" class="footer-link">Start Here</a>
+                  <a href="/latest" class="footer-link">Newest</a>
+                  <a href="/trending" class="footer-link">Most read</a>
+                  {HAR_BEDSTE && <a href="/best-of-each-topic" class="footer-link">Best of each shelf</a>}
+                  <a href="/a-z" class="footer-link">A–Z index</a>
+                  <a href="/p/sitemap" class="footer-link">Sitemap</a>
+                  <a href="/rss.xml" class="footer-link">RSS</a>
+                </div>
+                <div class="footer-col">
+                  <span class="footer-col-titel">About</span>
+                  <a href="/p/about-us" class="footer-link">About Us</a>
+                  <a href="/p/editorial-guidelines" class="footer-link">Editorial Guidelines</a>
+                  <a href="/p/contact-us" class="footer-link">Contact Us</a>
+                  <a href="/p/faq" class="footer-link">F.A.Q.</a>
+                  <a href="/p/disclosure" class="footer-link">Disclosure</a>
+                </div>
+                <div class="footer-col">
+                  <span class="footer-col-titel">Legal</span>
+                  <a href="/p/privacy-policy" class="footer-link">Privacy Policy</a>
+                  <a href="/p/terms-conditions" class="footer-link">Terms &amp; Conditions</a>
+                  <a href="/p/copyright-trademark-and-patent" class="footer-link">Copyright &amp; Trademark</a>
+                  <a href="/p/accessibility-information" class="footer-link">Accessibility Information</a>
+                  <a href="/p/we-not-sell-your-personal-information" class="footer-link">Do Not Sell My Personal Information</a>
+                  {/* Vises kun, når Googles samtykkedialog er indlæst (scriptet nedenfor bruger begge id'er) */}
+                  <span class="footer-sep" id="cookieSettingsSep" hidden>|</span><a href="#" id="cookieSettingsLink" class="footer-link" hidden>Privacy and cookie settings</a>
+                </div>
+              </nav>
             </div>
             <p class="footer-copy">&copy; {new Date().getFullYear()} Tech Media Arch. All rights reserved.</p>
           </div>
@@ -765,7 +778,8 @@ const nyeste = INDLAEG[0];
         var tries = 0;
         var t = setInterval(function () {
           if (window.googlefc && typeof window.googlefc.showRevocationMessage === 'function') { clearInterval(t); enable(); }
-          else if (++tries > 40) clearInterval(t);
+          // 30 s (1/11-2026): Googles scripts hentes først efter indlæsning + ledig tid, så 10 s kunne være for kort
+          else if (++tries > 120) clearInterval(t);
         }, 250);
       })();
     </script>

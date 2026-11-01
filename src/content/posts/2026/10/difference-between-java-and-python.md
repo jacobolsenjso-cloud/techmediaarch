@@ -69,17 +69,17 @@ robot: true
 
 <h2>FAQ</h2>
 
-<h3>What is the difference between python and java programming language?</h3>
+<h3>What is the difference between Python and Java programming language?</h3>
 <p>Java is a statically typed, compiled language that runs on a virtual machine for high performance, whereas Python is a dynamically typed, interpreted language focused on readability and rapid development. Java enforces verbose syntax with strict error checking, while Python relies on concise syntax for quick deployments.</p>
 
-<h3>What does python programming look like?</h3>
+<h3>What does Python programming look like?</h3>
 <p>Python code uses clean, concise syntax with whitespace indentation rather than curly braces to define code blocks. Documentation and code examples frequently incorporate humorous references inspired by Monty Python such as spam and eggs.</p>
 
-<h3>Should python programming language be capitalized?</h3>
+<h3>Should Python programming language be capitalized?</h3>
 <p>Stylistic naming conventions require programming language names to use an initial capital letter as proper nouns. Formal documentation always spells Python with a capital P, though it appears in lowercase inside code environments.</p>
 
-<h3>How did python programming get its name?</h3>
+<h3>How did Python programming get its name?</h3>
 <p>The language was created by Guido van Rossum and named after the classic BBC comedy television series Monty Python's Flying Circus. Daily.dev notes that the name was chosen as a rebellion against pretentious naming conventions.</p>
 
-<h3>Can I do python programming online?</h3>
+<h3>Can I do Python programming online?</h3>
 <p>Users can build, run, and share code online for free using web-based integrated development environments. Platforms like Project Jupyter and browser playgrounds powered by WebAssembly let developers execute real environments with zero local setup.</p><h2>Related reading</h2><ul><li><a href="/2026/09/what-is-python-used-for">What is Python Programming Used For in Modern Tech</a></li><li><a href="/2026/10/how-long-learn-python">How Long Does It Take to Learn Python Programming?</a></li></ul><h2>Sources</h2><ul><li><a href="https://www.snowflake.com/en/fundamentals/python-vs-java/" rel="noopener" target="_blank">Python vs. Java: Key Differences &amp; Use Cases</a></li><li><a href="https://www.geeksforgeeks.org/python/difference-between-python-and-java/" rel="noopener" target="_blank">Difference between Python and Java - GeeksforGeeks</a></li><li><a href="https://www.coursera.org/articles/python-vs-java" rel="noopener" target="_blank">Python vs. Java: Which Should I Learn? | Coursera</a></li><li><a href="https://www.onlc.com/blog/python-vs-java-key-differences-use-cases-learning-curve/" rel="noopener" target="_blank">Python vs Java: Key Differences Explained - ONLC</a></li></ul>

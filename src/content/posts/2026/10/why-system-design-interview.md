@@ -54,20 +54,20 @@ robot: true
 </ul>
 
 <h2>FAQ</h2>
-<h3>why system design interview</h3>
+<h3>Why system design interview?</h3>
 <p>Companies use this format because traditional coding tests make it difficult to infer a candidate's real-world engineering experience. These evaluations assess how engineers handle ambiguity, systemic complexity, scalability, and technical trade-offs.</p>
 
-<h3>what happens in system design interview</h3>
+<h3>What happens in system design interview?</h3>
 <p>The session typically lasts 30 to 60 minutes and moves from requirement clarification to high-level proposals and deep dives. Interviewers introduce new constraints or failures to test how candidates adapt their architecture under pressure.</p>
 
-<h3>do system design interviews require coding</h3>
+<h3>Do system design interviews require coding?</h3>
 <p>Most of these interviews do not require writing syntax-perfect code since the focus is on abstract system scaling and component architecture. However, lightweight implementation details or small API contracts may occasionally appear in specific loops.</p>
 
-<h3>how long does it take to learn system design for interview</h3>
+<h3>How long does it take to learn system design for interview?</h3>
 <p>Preparation timelines typically span four to 10 weeks for beginners committing two to three hours daily. Total duration ranges from three to 16 weeks depending on the starting technical background and prior backend experience.</p>
 
-<h3>what is the best way to prepare for system design interview</h3>
+<h3>What is the best way to prepare for system design interview?</h3>
 <p>The most effective approach relies on a repeatable problem-solving framework rather than memorizing fixed architecture diagrams. Candidates should combine foundational study of caching and load balancing with active practice on real-world systems.</p>
 
-<h3>how should i prepare for system design interview</h3>
+<h3>How should I prepare for system design interview?</h3>
 <p>A structured preparation plan involves studying core design patterns, practicing live explanation fluency, and moving beyond passive reading. Learners can follow step-by-step methodologies like RESHADED to manage open-ended prompts under tight time constraints.</p><h2>Sources</h2><ul><li><a href="https://algocademy.com/blog/what-is-a-system-design-interview-and-why-its-important/" rel="noopener" target="_blank">What Is a System Design Interview, and Why It’s Important – AlgoCademy Blog</a></li><li><a href="https://bytebytego.com/courses/system-design-interview/a-framework-for-system-design-interviews" rel="noopener" target="_blank">ByteByteGo | Technical Interview Prep</a></li><li><a href="https://algomaster.io/learn/system-design-interviews/introduction" rel="noopener" target="_blank">What are System Design Interviews? | System Design Interview | AlgoMaster.io</a></li><li><a href="https://dev.to/imsushant12/how-to-approach-system-design-interviews-a-step-by-step-guide-2oi5" rel="noopener" target="_blank">How to Approach System Design Interviews: A Step-by-Step Guide - DEV Community</a></li></ul>

@@ -59,17 +59,17 @@ robot: true
 
 <h2>FAQ</h2>
 
-<h3>can i do product management after 12th</h3>
+<h3>Can I do product management after 12th?</h3>
 <p>Students can enter the product ecosystem after completing high school by enrolling in undergraduate programs or specialized courses tailored to product strategy and technology. However, becoming a product manager directly out of high school is rare because the discipline is generally considered a senior role requiring transferable skills or domain experience.</p>
 
-<h3>can i do product management after bba</h3>
+<h3>Can I do product management after BBA?</h3>
 <p>Graduates with a business administration degree can build strong product management profiles by focusing on specializations like entrepreneurship, digital marketing, or finance. Final-year students lacking a technical background can still break into the field by first targeting entry-level roles like program management, business analysis, or project management.</p>
 
-<h3>can i do product management after bcom</h3>
+<h3>Can I do product management after BCom?</h3>
 <p>Graduates holding a commerce degree can successfully enter the product management field because many related roles prioritize business acumen and user understanding over deep coding expertise. Building foundational organizational and market research skills through a relevant bachelor's degree helps prepare commerce graduates for strategic tech careers.</p>
 
-<h3>difference between product management and project management</h3>
+<h3>Difference between product management and project management?</h3>
 <p>Product managers focus on defining the what and why behind building products and oversee overall success across an entire lifecycle, whereas project managers concentrate on the how and when of execution by shepherding specific tasks to completion. Product management software helps organize long-term strategy, while project management software tracks task execution and short-term initiatives.</p>
 
-<h3>should product management be capitalized</h3>
+<h3>Should product management be capitalized?</h3>
 <p>Professional style guides dictate that general functional terms like product management should be written in lowercase letters. Job titles and functional disciplines act as common nouns and require lowercase formatting when used generally within the body of a sentence.</p><h2>Sources</h2><ul><li><a href="https://www.hiddengemcareercoaching.com/blog/alternative-careers-for-product-managers" rel="noopener" target="_blank">40 Alternative Careers for Product Managers Feeling Burnt Out</a></li><li><a href="https://leverageedu.com/learn/product-management-courses-after-12th/" rel="noopener" target="_blank">Product Management Courses after 12th: Top Colleges, Courses - Leverage Edu Learn</a></li><li><a href="https://www.coursera.org/articles/product-manager-degree" rel="noopener" target="_blank">Product Manager Degree: Educational Paths and How to Get Started | Coursera</a></li><li><a href="https://woxsen.edu.in/blog/is-product-management-after-b-school-the-new-power-career-for-you/" rel="noopener" target="_blank">Is Product Management after B-School the New Power Career for You? - Woxsen Blog</a></li></ul>

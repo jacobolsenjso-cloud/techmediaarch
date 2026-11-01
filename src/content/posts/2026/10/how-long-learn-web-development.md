@@ -72,20 +72,20 @@ robot: true
 
 <h2>FAQ</h2>
 
-<h3>how long does it take to learn web development</h3>
+<h3>How long does it take to learn web development?</h3>
 <p>Most beginners need anywhere from 3 to 12 months to learn core coding concepts, according to Stack Overflow and JetBrains data cited by Scrimba. Mastering essential professional skills and securing employment typically extends that timeline to between six months and two years.</p>
 
-<h3>should i learn web development in 2025</h3>
+<h3>Should I learn web development in 2025?</h3>
 <p>Noble Desktop Blog reports that the industry is experiencing tremendous growth with an urgent need for new recruits. Bureau of Labor Statistics figures show developer roles growing 10 percent from 2025 to 2035 with a median annual salary of $135,980, though Reddit communities note the junior market remains competitive.</p>
 
-<h3>is web development hard to learn</h3>
+<h3>Is web development hard to learn?</h3>
 <p>Noble Desktop Blog states that web development is not nearly as difficult as it appears to non-programmers, allowing beginners to learn fundamentals in months. Reddit discussions describe the field as a complex and constantly changing discipline requiring simultaneous mastery of multiple integrated components.</p>
 
-<h3>how long does it take to learn web development and get a job</h3>
+<h3>How long does it take to learn web development and get a job?</h3>
 <p>Standard timelines to learn sufficient skills and secure an employment position span between six months and two years, depending on background and study methods. Career Karma data shows that intensive bootcamps take 4 to 5 months, followed by 2 to 4 months to land a role.</p>
 
-<h3>how long does it take to learn web development from scratch</h3>
+<h3>How long does it take to learn web development from scratch?</h3>
 <p>Moving from zero knowledge to a full-stack developer typically takes six to eight months, according to Skillcrush. Frontend development offers a faster entry path taking 4 to 8 months with dedicated weekly study hours.</p>
 
-<h3>how long does it take to learn basic web development</h3>
+<h3>How long does it take to learn basic web development?</h3>
 <p>Noble Desktop Blog highlights that most beginners can learn the basics within three months. Scrimba data indicates that understanding basic coding concepts specifically requires 1 to 2 months of study with a commitment of 5 to 10 hours per week.</p><h2>Sources</h2><ul><li><a href="https://blog.nobledesktop.com/learn/web-development/how-long-does-it-take-to-learn-web-development" rel="noopener" target="_blank">Web Development: How Long Does it Take to Learn?</a></li><li><a href="https://scrimba.com/articles/how-long-does-it-take-to-learn-to-code-a-realistic-timeline/" rel="noopener" target="_blank">How Long Does It Take to Learn to Code? [2026 Guide]</a></li><li><a href="https://stemlink.online/blogs/learning-web-development-in-2025" rel="noopener" target="_blank">How Long Does It Take to Learn Web Development in 2025?</a></li><li><a href="https://skillcrush.com/blog/how-long-does-it-take-to-become-a-web-developer/" rel="noopener" target="_blank">How Long Does it Take to Become a Web Developer? - Skillcrush</a></li></ul>

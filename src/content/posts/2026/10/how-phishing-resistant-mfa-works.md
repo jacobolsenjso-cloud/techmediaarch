@@ -16,7 +16,7 @@ relatedKeywords:
   - "can phishing be identified by bad grammar"
 robot: true
 ---
-<p><a href="https://www.ibm.com/think/topics/phishing-resistant-mfa" rel="noopener" target="_blank">Phishing resistant mfa</a> works by using cryptographic keys bound specifically to legitimate websites to verify identity. This makes the security mechanism resistant to interception, replays, and social engineering.</p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Cryptographic key securing a website shield" height="768" src="/images/03d7ca69afbe4654-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Cryptographic key securing a website shield</td></tr></tbody></table>
+<p><a href="https://www.ibm.com/think/topics/phishing-resistant-mfa" rel="noopener" target="_blank">Phishing resistant MFA</a> works by using cryptographic keys bound specifically to legitimate websites to verify identity. This makes the security mechanism resistant to interception, replays, and social engineering.</p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Cryptographic key securing a website shield" height="768" src="/images/03d7ca69afbe4654-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Cryptographic key securing a website shield</td></tr></tbody></table>
 
 <h2>Understanding the Mechanics of Fraudulent Messaging</h2>
 
@@ -52,7 +52,7 @@ robot: true
 
 <table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Phishing hook failing to capture secure credentials" height="768" src="/images/21d94d8a61f6a58f-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Phishing hook failing to capture secure credentials</td></tr></tbody></table><h2>Cryptographic Defenses and Domain Binding</h2>
 
-<p>CISA defines <a href="https://www.logintc.com/blog/what-is-phishing-resistant-mfa-a-plain-language-guide/" rel="noopener" target="_blank">phishing-resistant mfa</a> as a secure multifactor authentication method utilizing cryptographic keys bound specifically to legitimate websites to verify identity. IBM explains that the system works by verifying both who the user is and the specific website domain they are authenticating to.</p><p>This renders credentials cryptographically impossible to relay to a different domain.</p>
+<p>CISA defines <a href="https://www.logintc.com/blog/what-is-phishing-resistant-mfa-a-plain-language-guide/" rel="noopener" target="_blank">phishing-resistant MFA</a> as a secure multifactor authentication method utilizing cryptographic keys bound specifically to legitimate websites to verify identity. IBM explains that the system works by verifying both who the user is and the specific website domain they are authenticating to.</p><p>This renders credentials cryptographically impossible to relay to a different domain.</p>
 
 <p>IBM notes that commercially available FIDO authenticators paired with the W3C Web Authentication API and hardware-bound passkeys are primary examples of these tools. For a deeper look into baseline attack execution, review <a href="/2026/10/what-are-phishing-attacks">What Are Phishing Attacks and How Do They Work</a> to see how standard credentials fail against domain relay.</p>
 
@@ -75,17 +75,17 @@ robot: true
 
 <h2>FAQ</h2>
 
-<h3>what is phishing resistant mfa</h3>
+<h3>What is phishing resistant MFA?</h3>
 <p>CISA defines phishing-resistant mfa as a secure multifactor authentication method utilizing cryptographic keys bound specifically to legitimate websites to verify identity. This makes the system completely resistant to interception, replays, and social engineering.</p>
 
-<h3>how does phishing work</h3>
+<h3>How does phishing work?</h3>
 <p>IBM explains that phishing works by using fraudulent emails, text messages, phone calls, or websites to trick individuals into sharing sensitive data or downloading malware. CISA notes these attacks operate by using electronic communication to solicit personal information while posing as a trustworthy organization or individual.</p>
 
-<h3>why phishing and not fishing</h3>
+<h3>Why phishing and not fishing?</h3>
 <p>SlashGear states that the term phishing originated because scammers are fishing around for a user's private information in digital streams. SlashGear adds that the unconventional ph spelling is historically attributed as a throwback to phreaking.</p>
 
-<h3>is phishing a form of social engineering</h3>
+<h3>Is phishing a form of social engineering?</h3>
 <p>CISA formally classifies phishing as a form of social engineering because it exploits human error and psychological manipulation rather than breaking direct technological vulnerabilities. IBM notes that these attacks successfully bypass technical safeguards by leveraging pressure tactics, fake stories, authority figures, and human trust.</p>
 
-<h3>can phishing be identified by bad grammar</h3>
+<h3>Can phishing be identified by bad grammar?</h3>
 <p>CISA notes that traditional indicators of phishing used to include obvious spelling mistakes and bad grammar, but these signs are no longer reliable on their own. Adaptive reports that relying on grammar-based detection fails because modern threat actors use generative AI to remove awkward syntax and typos.</p><h2>Sources</h2><ul><li><a href="https://www.ibm.com/think/topics/phishing-resistant-mfa" rel="noopener" target="_blank">What is Phishing Resistant MFA and How Does It Work? | IBM</a></li><li><a href="https://www.logintc.com/blog/what-is-phishing-resistant-mfa-a-plain-language-guide/" rel="noopener" target="_blank">What is Phishing-Resistant MFA? A Plain-Language Guide</a></li><li><a href="https://www.nist.gov/blogs/cybersecurity-insights/phishing-resistance-protecting-keys-your-kingdom" rel="noopener" target="_blank">Phishing Resistance – Protecting the Keys to Your Kingdom | NIST</a></li><li><a href="https://www.cisa.gov/news-events/news/avoiding-social-engineering-and-phishing-attacks" rel="noopener" target="_blank">Avoiding Social Engineering and Phishing Attacks | CISA</a></li></ul>

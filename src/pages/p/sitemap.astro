@@ -27,7 +27,7 @@ const SIDEGRUPPER: { navn: string; links: { title: string; href: string }[] }[] 
   { navn: 'Explore', links: [
     { title: 'Latest articles', href: '/latest' },
     { title: 'Trending', href: '/trending' },
-    ...(HAR_BEDSTE ? [{ title: 'Best of each topic', href: '/best-of-each-topic' }] : []),
+    ...(HAR_BEDSTE ? [{ title: 'Best of each shelf', href: '/best-of-each-topic' }] : []),
     { title: 'A–Z index', href: '/a-z' },
     ...(['start-here', 'video-schema-generator-free-seo-tool'].map(sideAf).filter(Boolean).map((s) => ({ title: s!.title, href: s!.href }))),
     { title: 'RSS feed', href: '/rss.xml' },

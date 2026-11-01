@@ -36,7 +36,7 @@ import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
 import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
-import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord, storeBogstaver, gentagerSig } from './lib/sprog.mjs';
+import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord, storeBogstaver, somSpoergsmaal, gentagerSig } from './lib/sprog.mjs';
 import { laesHjerne, stemmeBlok, stemmePrompt, tjekStemme, fletInd, senesteStemmeAfsnit } from './lib/hjerne.mjs';
 import { kildeHenvisninger, kendtNavn, domaenerTilNavne } from './lib/kildenavne.mjs';
 import { parse as yamlParse, stringify as yamlStringify } from 'yaml';
@@ -687,11 +687,11 @@ log(`- Eksterne links inde i teksten: ${eksterneITekst}`);
 
 html += kildeliste(kildeLinks);
 
-// FAQ-spørgsmålene med rigtige store bogstaver (31/10-2026: "Should i learn generative ai?"), robot/lib/sprog.mjs
+// FAQ-spørgsmålene med rigtige store bogstaver (31/10-2026: "Should i learn generative ai?") og spørgsmålstegn (1/11), robot/lib/sprog.mjs
 {
   let rettet = 0;
   html = html.replace(/(<h2[^>]*>\s*(?:FAQ|Frequently Asked Questions)\s*<\/h2>)([\s\S]*?)(?=<h2\b|$)/i, (m, h, krop) => h + krop.replace(/(<h3\b[^>]*>)([\s\S]*?)(<\/h3>)/gi, (x, a, t, b) => {
-    const ny = storeBogstaver(t); if (ny !== t) rettet++; return a + ny + b;
+    const ny = somSpoergsmaal(t); if (ny !== t) rettet++; return a + ny + b;
   }));
   log(`- FAQ-spørgsmål med rettede store bogstaver: ${rettet}`);
 }
