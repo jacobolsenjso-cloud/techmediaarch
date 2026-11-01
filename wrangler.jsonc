@@ -18,7 +18,10 @@
     "not_found_handling": "none",
     // Videoer går gennem workeren, som kan sende dem i stykker (206) — Safari kræver
     // det. De statiske filer alene svarer altid med hele filen. Se video() i worker/index.js.
-    "run_worker_first": ["/video/*", "/*.html"]
+    // 1/11-2026: også forsiden, artiklerne (/20…), de faste sider (/p/…) og *.md, så workeren kan
+    // svare AI-agenter med Markdown og sætte Link-headers (se "AI-agenter" i worker/index.js).
+    // Billeder, CSS, skrifter og hylder går stadig direkte til de statiske filer.
+    "run_worker_first": ["/video/*", "/*.html", "/*.md", "/", "/20*", "/p/*"]
   },
   // Test-adressen techmediaarch.<konto>.workers.dev er slået til (trin 4).
   // Forhåndsvisnings-adresser pr. version slås fra: de ville ikke være dækket af

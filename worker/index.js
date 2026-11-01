@@ -40,6 +40,9 @@ function robots(host) {
   if (host !== PROD) return 'User-agent: *\nDisallow: /\n';
   return [
     'User-agent: *',
+    // Content Signals (1/11-2026, Jacobs valg): må vises i søgning og citeres i AI-svar, men må ikke
+    // bruges til at træne AI-modeller. Se contentsignals.org. Cloudflare Agent Readiness tjekker linjen.
+    'Content-Signal: search=yes, ai-input=yes, ai-train=no',
     'Disallow: /search',
     'Allow: /',
     '',
@@ -58,6 +61,53 @@ function medRobotsHeader(res, host) {
 }
 
 const flyt = (url, sti) => Response.redirect(new URL(sti, url).toString(), 301);
+
+// ---- AI-agenter (1/11-2026, Jacobs ja; Cloudflare Agent Readiness) ----
+// 1. Markdown: beder en AI om en side med "Accept: text/markdown", får den artiklen som ren tekst
+//    (/…/navn.md, bygget af src/pages/…/[slug].md.ts) og forsiden som /llms.txt. Browsere og Google
+//    sender ikke det ønske og får HTML som altid. Markdown-svarene er noindex og peger på HTML-siden
+//    som den rigtige (canonical), så Google ikke ser dem som dubletter.
+// 2. Link-headers (RFC 8288) på HTML-siderne: fortæller robotter, hvor llms.txt, sitemap, RSS og
+//    sidens Markdown-udgave ligger, uden at de skal læse HTML'en først.
+// Derfor går forsiden, artiklerne (/20…), de faste sider (/p/…) og *.md gennem workeren først
+// (run_worker_first i wrangler.jsonc). Billeder, CSS og skrifter går stadig direkte.
+const vilMarkdown = (request) => /\btext\/markdown\b/i.test(request.headers.get('Accept') || '');
+const erArtikel = (sti) => /^\/\d{4}\/\d{2}\/[^/]+$/.test(sti);
+const erFastSide = (sti) => /^\/p\/[^/]+$/.test(sti);
+// Hvilken Markdown-fil hører til en HTML-adresse (null = ingen)
+function markdownFor(sti) {
+  const s = sti.length > 1 ? sti.replace(/\/$/, '') : sti;
+  if (s === '/') return '/llms.txt';
+  if (erArtikel(s) || (erFastSide(s) && s !== '/p/sitemap')) return s + '.md';
+  return null;
+}
+async function markdownSvar(url, mdSti, htmlSti, env, head) {
+  const r = await env.ASSETS.fetch(new Request(new URL(mdSti, url), { method: 'GET' }));
+  if (r.status !== 200) { await r.body?.cancel(); return null; }
+  const headers = new Headers();
+  headers.set('content-type', 'text/markdown; charset=utf-8');
+  headers.set('vary', 'Accept');
+  headers.set('x-robots-tag', 'noindex');
+  headers.set('link', `<https://${PROD}${htmlSti}>; rel="canonical"; type="text/html"`);
+  headers.set('cache-control', 'public, max-age=3600');
+  return new Response(head ? null : r.body, { status: 200, headers });
+}
+function linkHeader(sti) {
+  const md = markdownFor(sti);
+  return [
+    md ? `<${md}>; rel="alternate"; type="text/markdown"` : null,
+    '</llms.txt>; rel="describedby"; type="text/markdown"',
+    '</sitemap.xml>; rel="sitemap"; type="application/xml"',
+    '</rss.xml>; rel="alternate"; type="application/rss+xml"',
+  ].filter(Boolean).join(', ');
+}
+function medLinks(res, sti) {
+  if (!(res.headers.get('content-type') || '').includes('text/html')) return res;
+  const ny = new Response(res.body, res);
+  ny.headers.set('link', linkHeader(sti));
+  ny.headers.append('vary', 'Accept');
+  return ny;
+}
 
 // Videoer (/video/*): Cloudflares statiske filer svarer altid med HELE filen (200), også
 // når browseren kun beder om et stykke ("Range: bytes=0-1"). Safari på iPhone/Mac
@@ -105,6 +155,17 @@ async function haandter(request, env) {
     return new Response(robots(host), { headers: { 'content-type': 'text/plain; charset=utf-8' } });
   }
 
+  // AI-agenter: Markdown-udgaven, når den bedes om (se øverst), og selve .md-filerne
+  const head = request.method === 'HEAD';
+  if (sti.endsWith('.md')) {
+    const m = await markdownSvar(url, sti, sti.slice(0, -3), env, head);
+    if (m) return m;
+  } else if (vilMarkdown(request) && !sti.endsWith('.html')) {
+    const mdSti = markdownFor(sti);
+    const m = mdSti && await markdownSvar(url, mdSti, sti.length > 1 ? sti.replace(/\/$/, '') : '/', env, head);
+    if (m) return m;
+  }
+
   // Emnesider (alle fra 1/11-2026): /topic/ai og /topic/ai.html -> /shelf/ai (301, ét hop)
   const emneSide = sti.match(/^\/topic\/([A-Za-z0-9-]+?)(?:\.html)?\/?$/);
   if (emneSide && HYLDE_FOR_EMNE[emneSide[1].toLowerCase()]) return flyt(url, nyEmneAdresse(emneSide[1].toLowerCase()));
@@ -128,7 +189,7 @@ async function haandter(request, env) {
   } else {
     // Sikkerhedsnet: når en adresse uden .html alligevel workeren først, serveres filen
     const fil = await env.ASSETS.fetch(request);
-    if (fil.status !== 404) return fil;
+    if (fil.status !== 404) return fil.status === 200 ? medLinks(fil, sti) : fil;
   }
 
   // --- Bloggers gamle adresser ---
