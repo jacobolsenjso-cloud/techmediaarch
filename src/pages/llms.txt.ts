@@ -1,11 +1,14 @@
 // /llms.txt — en kort oversigt i ren tekst til AI-tjenester (ChatGPT, Claude,
-// Perplexity m.fl.), efter forslaget på llmstxt.org: hvad sitet er, emnerne og
+// Perplexity m.fl.), efter forslaget på llmstxt.org: hvad sitet er, hylderne og
 // alle artikler med én linje hver. Bygges af de samme data som sitemappet, så
 // nye robotartikler kommer med af sig selv (Jacobs ønske om LLM-optimering 27/9-2026).
+// 1/11-2026: ordnet efter sitets 5 hylder (som /p/sitemap og menuen) i stedet for de
+// gamle Blogger-etiketter, hvor fire navne pegede på samme hylde. Svar først, så arkivet.
 import { INDLAEG, SIDER } from '../lib/indhold';
-import { KATEGORIER, emneUrl } from '../lib/emner';
+import { HYLDER, hyldeUrl, svarIHylde, arkivIHylde, hyldeFor } from '../lib/hylder';
 const SITE = 'https://www.techmediaarch.com';
 const linje = (t: string) => String(t || '').replace(/\s+/g, ' ').trim();
+const punkt = (p: { title: string; href: string; description?: string }) => `- [${linje(p.title)}](${SITE}${p.href}): ${linje(p.description || '')}`;
 export function GET() {
   const nyeste = [...INDLAEG].sort((a, b) => +new Date(b.published) - +new Date(a.published));
   const ud: string[] = [
@@ -16,19 +19,18 @@ export function GET() {
     `Articles: ${INDLAEG.length}. Every article has a publication date and, where relevant, a list of sources. Full list of addresses: ${SITE}/sitemap.xml`,
     '',
     '## About',
-    ...SIDER.filter((s) => ['about-us', 'start-here', 'faq', 'disclosure', 'contact-us'].includes(s.navn)).map((s) => `- [${linje(s.title)}](${SITE}${s.href}): ${linje(s.description)}`),
+    ...SIDER.filter((s) => ['about-us', 'editorial-guidelines', 'faq', 'disclosure', 'contact-us'].includes(s.navn)).map(punkt),
     '',
-    '## Topics',
-    ...KATEGORIER.map((e) => `- [${e.navn}](${SITE}${emneUrl(e)})`),
+    '## Shelves',
+    ...HYLDER.map((h) => `- [${h.navn}](${SITE}${hyldeUrl(h)}): ${linje(h.besk)}`),
   ];
-  const brugt = new Set<string>();
-  for (const e of KATEGORIER) {
-    const liste = nyeste.filter((p) => !brugt.has(p.href) && p.emner.some((x) => x.slug === e.slug));
-    if (!liste.length) continue;
-    ud.push('', `## ${e.navn}`);
-    for (const p of liste) { brugt.add(p.href); ud.push(`- [${linje(p.title)}](${SITE}${p.href}): ${linje(p.description)}`); }
+  for (const h of HYLDER) {
+    const svar = svarIHylde(h), arkiv = arkivIHylde(h);
+    if (!svar.length && !arkiv.length) continue;
+    ud.push('', `## ${h.navn}`, ...svar.map(punkt));
+    if (arkiv.length) ud.push('', `### ${h.navn}: from the archive`, ...arkiv.map(punkt));
   }
-  const rest = nyeste.filter((p) => !brugt.has(p.href));
-  if (rest.length) { ud.push('', '## Optional', ...rest.map((p) => `- [${linje(p.title)}](${SITE}${p.href}): ${linje(p.description)}`)); }
+  const rest = nyeste.filter((p) => !hyldeFor(p));
+  if (rest.length) ud.push('', '## Optional', ...rest.map(punkt));
   return new Response(ud.join('\n') + '\n', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 }

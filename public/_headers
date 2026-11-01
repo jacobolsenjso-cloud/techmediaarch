@@ -9,3 +9,21 @@ https://techmediaarch.:konto.workers.dev/*
 
 /video/*
   Cache-Control: public, max-age=31536000, immutable
+
+# 1/11-2026: skrifter, CSS og scripts fra byggeriet har et fingeraftryk i navnet (fx
+# archivo-latin-wdth-normal.DY7AcnAa.woff2) og ændrer sig aldrig — før blev de tjekket
+# mod serveren ved HVER sidevisning (max-age=0), hvilket forsinkede teksten på mobil.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Faste småfiler uden fingeraftryk: gemmes en dag (kan ændres, så ikke "immutable")
+/logo.svg
+  Cache-Control: public, max-age=86400
+/jacob-olsen-96.jpg
+  Cache-Control: public, max-age=86400
+/manifest.webmanifest
+  Cache-Control: public, max-age=86400
+/favicon.svg
+  Cache-Control: public, max-age=86400
+/favicon.ico
+  Cache-Control: public, max-age=86400

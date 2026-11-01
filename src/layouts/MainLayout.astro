@@ -451,6 +451,15 @@ const nyeste = INDLAEG[0];
       .section-heading { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 18px 0; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
       .section-heading h2, .section-heading h1 { margin: 0; font-size: 1.6rem; font-weight: 700; font-stretch: 92%; letter-spacing: -0.01em; }
       .section-heading .section-note { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+      /* AdSense auto-annoncer (1/11-2026, målt live): (1) en tom annonceplads ("unfilled") efterlod et stort tomt
+         hul, fx 432 px i det blå bånd på mobil — Googles egen anbefalede CSS skjuler den
+         (support.google.com/adsense/answer/10762946). (2) En auto-annonce, der lander inde i et gitter, tog en
+         kolonne fra indholdet (forsidens hovedhistorie og hyldernes "stor + små"), så de små historier røg ned
+         under — nu fylder annoncen hele rækken, og gitteret flytter det næste indhold op i hullet (dense). */
+      ins.adsbygoogle[data-ad-status="unfilled"] { display: none !important; }
+      .google-auto-placed:has(> ins.adsbygoogle[data-ad-status="unfilled"]) { display: none !important; }
+      .google-auto-placed { grid-column: 1 / -1; flex-basis: 100%; }
+      :is(.lead-section, .hylde-afsnit-grid, .card-grid) { grid-auto-flow: row dense; }
       .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px; }
       .article-card { text-decoration: none; color: inherit; display: block; transition: transform 0.2s; }
       .article-card:hover { transform: translateY(-3px); }
