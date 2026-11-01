@@ -1,0 +1,168 @@
+---
+// Sitemap-siden /p/sitemap (Jacob 1/11-2026: "overskuelig professionelt"). Afløser Bloggers HTML-side, der hentede
+// artiklerne med JavaScript fra /feeds/ og grupperede efter de gamle emneetiketter. Nu: almindelig HTML (alle links
+// kan læses af Google uden script), ordnet efter sitets 5 hylder som resten af sitet. Hver hylde: svarene synlige,
+// de ældre artikler foldet sammen under "From the archive". Til sidst sitets faste sider i tre grupper.
+// Søgefeltet filtrerer kun det, der allerede står på siden (lille script nederst; uden script virker siden stadig).
+// src/content/pages/sitemap.md bevares (titel/beskrivelse til feeds og sitemap-pages.xml), men bygges ikke af p/[slug].astro.
+import MainLayout from '../../layouts/MainLayout.astro';
+import { INDLAEG, SIDER, datoTekst } from '../../lib/indhold';
+import { HYLDER, hyldeUrl, svarIHylde, arkivIHylde, hyldeFor } from '../../lib/hylder';
+import { emneUrl } from '../../lib/emner';
+import { HAR_BEDSTE } from '../../lib/bedste';
+
+const side = SIDER.find((s) => s.navn === 'sitemap')!;
+const hylder = HYLDER.map((h) => ({ h, svar: svarIHylde(h), arkiv: arkivIHylde(h) }));
+// Artikler uden hylde, grupperet efter emne
+const udenHylde = INDLAEG.filter((p) => !hyldeFor(p));
+const emneGrupper = new Map<string, { navn: string; href: string; farve: string; liste: typeof INDLAEG }>();
+for (const p of udenHylde) {
+  const e = p.emner[0];
+  const k = e ? e.slug : 'andet';
+  if (!emneGrupper.has(k)) emneGrupper.set(k, { navn: e ? e.navn : 'Other', href: e ? emneUrl(e) : '/latest', farve: e ? e.farve : 'var(--muted)', liste: [] });
+  emneGrupper.get(k)!.liste.push(p);
+}
+const sideAf = (navn: string) => SIDER.find((s) => s.navn === navn);
+const SIDEGRUPPER: { navn: string; links: { title: string; href: string }[] }[] = [
+  { navn: 'Explore', links: [
+    { title: 'Latest articles', href: '/latest' },
+    { title: 'Trending', href: '/trending' },
+    ...(HAR_BEDSTE ? [{ title: 'Best of each topic', href: '/best-of-each-topic' }] : []),
+    { title: 'A–Z index', href: '/a-z' },
+    ...(['start-here', 'video-schema-generator-free-seo-tool'].map(sideAf).filter(Boolean).map((s) => ({ title: s!.title, href: s!.href }))),
+    { title: 'RSS feed', href: '/rss.xml' },
+  ] },
+  { navn: 'About', links: ['about-us', 'editorial-guidelines', 'faq', 'contact-us', 'disclosure'].map(sideAf).filter(Boolean).map((s) => ({ title: s!.title, href: s!.href })) },
+  { navn: 'Legal', links: ['privacy-policy', 'cookie-policy', 'terms-conditions', 'we-not-sell-your-personal-information', 'copyright-trademark-and-patent', 'accessibility-information', 'securitytxt'].map(sideAf).filter(Boolean).map((s) => ({ title: s!.title, href: s!.href })) },
+];
+const antalSider = SIDEGRUPPER.reduce((n, g) => n + g.links.length, 0);
+---
+<MainLayout title="Sitemap" seoTitle="Sitemap – every article and page" description={side.description} breadcrumb={[{ navn: 'Sitemap', href: '/p/sitemap' }]}>
+  <style is:global>
+    /* min-width: 0: siden står i layoutets flex-kolonne — uden den skubbede knap-rækken siden bredere end en mobilskærm */
+    .sm { width: 100%; min-width: 0; max-width: 1100px; margin: 0 auto; padding: 28px 20px 40px; box-sizing: border-box; }
+    .sm-top h1 { margin: 0; font-size: clamp(2rem, 4vw, 2.8rem); line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+    .sm-top p { margin: 8px 0 0; font-family: var(--font-serif); font-size: 1.12rem; color: var(--ink-2); max-width: 680px; }
+    .sm-tal { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 16px 0 0; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+    .sm-tal b { color: var(--text-color); font-weight: 600; }
+    /* Hop-bjælken: hylderne + sider, klæber under topbjælken */
+    /* Én linje, der kan rulles vandret — to linjer dækkede overskrifterne, når bjælken klæbede (målt 1/11) */
+    .sm-hop { position: sticky; top: 60px; z-index: 5; display: flex; flex-wrap: nowrap; gap: 6px; align-items: center; margin: 10px 0 6px; padding: 10px 0; background: var(--bg-color); border-bottom: 1px solid var(--border-color); overflow-x: auto; scrollbar-width: none; }
+    .sm-hop::-webkit-scrollbar { display: none; }
+    .sm-hop { min-width: 0; max-width: 100%; }
+    .sm-hop a { flex: none; }
+    .sm-hop a { display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 11px; border-radius: 999px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); text-decoration: none; font-size: 0.84rem; font-weight: 650; }
+    .sm-hop a:hover { border-color: var(--teal); color: var(--teal-text); }
+    .sm-hop a i { width: 8px; height: 8px; border-radius: 50%; background: var(--f); }
+    .sm-hop a small { font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-weight: 500; }
+    .sm-soeg { display: flex; align-items: center; gap: 10px; height: 44px; margin: 22px 0 0; padding: 0 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg); max-width: 560px; }
+    .sm-soeg:focus-within { border-color: var(--teal); }
+    .sm-soeg svg { width: 15px; height: 15px; flex: none; color: var(--muted); }
+    .sm-soeg input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text-color); font: inherit; font-size: 0.9rem; }
+    .sm-ingen { display: none; margin: 18px 0; color: var(--muted); }
+    /* Afsnit */
+    .sm-afsnit { margin: 34px 0 0; scroll-margin-top: 120px; }
+    .sm-hoved { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 2px solid var(--text-color); }
+    .sm-ikon { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--f); color: #fff; }
+    .sm-ikon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .sm-hoved h2 { margin: 0; font-size: 1.45rem; font-weight: 800; letter-spacing: -0.01em; line-height: 1.2; }
+    .sm-hoved p { margin: 2px 0 0; font-size: 0.9rem; color: var(--muted); }
+    .sm-hoved .sm-aaben { margin-left: auto; flex: none; font-size: 0.86rem; font-weight: 650; color: var(--teal-text); text-decoration: none; white-space: nowrap; }
+    .sm-hoved .sm-aaben:hover { text-decoration: underline; }
+    .sm-under { margin: 18px 0 4px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .sm-liste { columns: 2; column-gap: 40px; }
+    .sm-liste a { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--border-color); color: var(--text-color); text-decoration: none; font-weight: 600; font-size: 0.97rem; line-height: 1.4; break-inside: avoid; }
+    .sm-liste a:hover { color: var(--teal-text); }
+    .sm-liste a time { flex: none; font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; color: var(--muted); }
+    .sm-arkiv { margin-top: 14px; border: 1px solid var(--border-color); border-radius: var(--radius); background: var(--card-bg); }
+    .sm-arkiv summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-weight: 650; font-size: 0.95rem; }
+    .sm-arkiv summary::-webkit-details-marker { display: none; }
+    .sm-arkiv summary::before { content: ''; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(-45deg); transition: transform 0.15s; }
+    .sm-arkiv[open] summary::before { transform: rotate(45deg); }
+    .sm-arkiv summary small { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); font-weight: 500; }
+    .sm-arkiv .sm-liste { padding: 0 16px 10px; }
+    .sm-sider { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 32px; margin-top: 12px; }
+    .sm-sider h3 { margin: 6px 0 4px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    .sm-sider a { display: block; padding: 8px 0; border-bottom: 1px solid var(--border-color); color: var(--text-color); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+    .sm-sider a:hover { color: var(--teal-text); }
+    .sm-skjult { display: none !important; }
+    @media (max-width: 760px) {
+      .sm { padding: 20px 15px 30px; }
+      .sm-liste { columns: 1; }
+      .sm-sider { grid-template-columns: 1fr; }
+      .sm-hoved .sm-aaben { display: none; }
+      .sm-hop { position: static; }
+    }
+  </style>
+
+  <div class="sm">
+    <header class="sm-top">
+      <h1>Sitemap</h1>
+      <p>Every article and page on Tech Media Arch, sorted by shelf. Newer answers come first on each shelf; older news and reviews are under “From the archive”.</p>
+      <div class="sm-tal"><span><b>{INDLAEG.length}</b> articles</span><span><b>{HYLDER.length}</b> shelves</span><span><b>{antalSider}</b> site pages</span></div>
+    </header>
+
+    <label class="sm-soeg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" placeholder="Filter all articles by title…" aria-label="Filter articles" data-sm-soeg /></label>
+    <nav class="sm-hop" aria-label="Jump to shelf">
+      {hylder.map(({ h, svar, arkiv }) => <a href={`#${h.slug}`} style={`--f: ${h.farve}`}><i></i>{h.navn} <small>{svar.length + arkiv.length}</small></a>)}
+      {emneGrupper.size > 0 && <a href="#other" style="--f: var(--muted)"><i></i>Other <small>{udenHylde.length}</small></a>}
+      <a href="#pages" style="--f: var(--text-color)"><i></i>Site pages <small>{antalSider}</small></a>
+    </nav>
+    <p class="sm-ingen" data-sm-ingen>No articles match that filter.</p>
+
+    {hylder.map(({ h, svar, arkiv }) => (
+      <section class="sm-afsnit" id={h.slug} style={`--f: ${h.farve}`} aria-labelledby={`sm-${h.slug}`} data-sm-afsnit>
+        <div class="sm-hoved">
+          <span class="sm-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d={h.ikon} /></svg></span>
+          <div><h2 id={`sm-${h.slug}`}>{h.navn}</h2><p>{h.besk}</p></div>
+          <a class="sm-aaben" href={hyldeUrl(h)}>Open shelf →</a>
+        </div>
+        {svar.length > 0 && <>
+          <div class="sm-under">Answers · {svar.length}</div>
+          <div class="sm-liste">{svar.map((p) => <a href={p.href} data-sm-punkt><span>{p.title}</span><time datetime={p.published}>{datoTekst(p.published)}</time></a>)}</div>
+        </>}
+        {arkiv.length > 0 && (
+          <details class="sm-arkiv" data-sm-arkiv>
+            <summary>From the archive <small>{arkiv.length} older news stories and reviews</small></summary>
+            <div class="sm-liste">{arkiv.map((p) => <a href={p.href} data-sm-punkt><span>{p.title}</span><time datetime={p.published}>{datoTekst(p.published)}</time></a>)}</div>
+          </details>
+        )}
+      </section>
+    ))}
+
+    {emneGrupper.size > 0 && (
+      <section class="sm-afsnit" id="other" aria-labelledby="sm-other" data-sm-afsnit>
+        <div class="sm-hoved"><div><h2 id="sm-other">Other topics</h2><p>Articles outside the five shelves.</p></div></div>
+        {[...emneGrupper.values()].map((g) => <>
+          <div class="sm-under">{g.navn} · {g.liste.length}</div>
+          <div class="sm-liste">{g.liste.map((p) => <a href={p.href} data-sm-punkt><span>{p.title}</span><time datetime={p.published}>{datoTekst(p.published)}</time></a>)}</div>
+        </>)}
+      </section>
+    )}
+
+    <section class="sm-afsnit" id="pages" aria-labelledby="sm-pages">
+      <div class="sm-hoved"><div><h2 id="sm-pages">Site pages</h2><p>Browse, about the site, and the legal pages.</p></div></div>
+      <div class="sm-sider">
+        {SIDEGRUPPER.map((g) => <div><h3>{g.navn}</h3>{g.links.map((l) => <a href={l.href}>{l.title}</a>)}</div>)}
+      </div>
+    </section>
+  </div>
+
+  <script is:inline>
+    // Filter: skjuler artikler, der ikke passer; åbner arkivet og skjuler tomme afsnit, mens der søges
+    (() => {
+      const felt = document.querySelector('[data-sm-soeg]'); if (!felt) return;
+      const punkter = [...document.querySelectorAll('[data-sm-punkt]')];
+      const afsnit = [...document.querySelectorAll('[data-sm-afsnit]')];
+      const ingen = document.querySelector('[data-sm-ingen]');
+      felt.addEventListener('input', () => {
+        const q = felt.value.trim().toLowerCase();
+        for (const a of punkter) a.classList.toggle('sm-skjult', q !== '' && !a.textContent.toLowerCase().includes(q));
+        for (const d of document.querySelectorAll('[data-sm-arkiv]')) { if (q) d.open = true; }
+        let synlige = 0;
+        for (const s of afsnit) { const n = s.querySelectorAll('[data-sm-punkt]:not(.sm-skjult)').length; synlige += n; s.classList.toggle('sm-skjult', q !== '' && n === 0); }
+        ingen.style.display = q && synlige === 0 ? 'block' : 'none';
+      });
+    })();
+  </script>
+</MainLayout>

@@ -10,7 +10,8 @@ export function getStaticPaths() {
   // (skal stå inde i funktionen: Astro kører getStaticPaths isoleret)
   // Watch-siden bygges ikke (trin 5): skabelonen hedder nu p/_watch.astro (Astro springer filer med _ over),
   // og workeren sender /p/watch til forsiden med 301.
-  const UDELAD = new Set(['watch']);
+  // Sitemap-siden har fra 1/11-2026 sin egen skabelon (p/sitemap.astro) — bygget fra hylderne, ikke Blogger-HTML
+  const UDELAD = new Set(['watch', 'sitemap']);
   return SIDER.filter((s) => !UDELAD.has(s.navn)).map((s) => ({ params: { slug: s.navn }, props: { s } }));
 }
 const { s } = Astro.props;
