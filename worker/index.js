@@ -40,9 +40,12 @@ function robots(host) {
   if (host !== PROD) return 'User-agent: *\nDisallow: /\n';
   return [
     'User-agent: *',
-    // Content Signals (1/11-2026, Jacobs valg): må vises i søgning og citeres i AI-svar, men må ikke
-    // bruges til at træne AI-modeller. Se contentsignals.org. Cloudflare Agent Readiness tjekker linjen.
-    'Content-Signal: search=yes, ai-input=yes, ai-train=no',
+    // Content Signals (Jacobs valg 1/11-2026 kl. 22:11): må vises i søgning, citeres i AI-svar OG bruges
+    // til træning. Grunden: Google bruger samme regel (Google-Extended) til træning og til at Gemini-appen
+    // henter tekst til sine svar — at blokere træning ville koste citater i Gemini. Skal stemme med
+    // Cloudflare → Security → Settings → "AI Crawler and Agent access policies" (Training = Allow).
+    // Se contentsignals.org. Cloudflare Agent Readiness tjekker linjen.
+    'Content-Signal: search=yes, ai-input=yes, ai-train=yes',
     'Disallow: /search',
     'Allow: /',
     '',
