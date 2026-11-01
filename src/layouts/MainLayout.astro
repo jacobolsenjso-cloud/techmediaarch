@@ -87,13 +87,19 @@ const nyeste = INDLAEG[0];
     <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
     <title>{fuldTitel}</title>
 
-    {/* Google Consent Mode v2 — SKAL stå før alle Google-tags. Alt afvises som
-        udgangspunkt; Googles egen samtykkedialog (Funding Choices, sat op i
-        AdSense for techmediaarch.com) opdaterer valget. Byg ikke eget banner. */}
+    {/* Google Consent Mode v2 — SKAL stå før alle Google-tags. Googles egen samtykkedialog (Funding Choices,
+        sat op i AdSense for techmediaarch.com) opdaterer valget. Byg ikke eget banner.
+        Regionsopdelt (1/11-2026, Jacobs ja): dialogen vises kun i EØS, Storbritannien og Schweiz, så kun DÉR er
+        "nej" udgangspunktet, indtil læseren svarer. Før var "nej" udgangspunktet i hele verden, og uden for Europa
+        kom der aldrig et svar (målt med en besøgende fra USA: intet banner, samtykket forblev "nej") — de blev ikke
+        talt i Analytics og fik kun ikke-personlige annoncer. Den regionsopdelte linje gælder altid frem for den
+        generelle, uanset rækkefølge (Googles regel). USA's delstatsregler klares af dialogens egne signaler (GPP). */}
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'granted', security_storage: 'granted', wait_for_update: 500 });
+      gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied', functionality_storage: 'granted', security_storage: 'granted', wait_for_update: 500,
+        region: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH'] });
+      gtag('consent', 'default', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted', analytics_storage: 'granted', functionality_storage: 'granted', security_storage: 'granted' });
     </script>
     {/* Google Analytics 4 (G-TJTC0HR0JK) — samme måling, som før kom via Cloudflare Zaraz
         (Zaraz slukket 25/9). Fra 1/11-2026 via GTM-containeren nedenfor (ikke en egen gtag.js).
