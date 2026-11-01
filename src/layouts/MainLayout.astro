@@ -100,18 +100,41 @@ const nyeste = INDLAEG[0];
         (Zaraz slukket 25/9). Står EFTER samtykke-standarden ovenfor: GA sætter ingen
         cookies, før læseren har sagt ja i Googles samtykkedialog. Kun på det rigtige
         domæne, så test-adressen (workers.dev) ikke tæller med i statistikken. */}
+    {/* Hastighed (1/11): Analytics og AdSense (ca. 1 MB JavaScript) hentes først, når
+        siden er tegnet færdig (load + ledig tid, højst 3 s ekstra). Før konkurrerede de
+        med tekst og skrifter på mobil, så overskriften kom sent (LCP 11 s i PageSpeed).
+        Samtykke-standarden ovenfor står stadig først, så intet sættes før et ja. */}
+    <meta name="google-adsense-account" content="ca-pub-9695260339642032" />
     <script is:inline>
-      if (location.hostname === 'www.techmediaarch.com') {
-        var gaScript = document.createElement('script');
-        gaScript.async = true;
-        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-TJTC0HR0JK';
-        document.head.appendChild(gaScript);
-        gtag('js', new Date());
-        gtag('config', 'G-TJTC0HR0JK');
-      }
+      (function () {
+        var hentet = false;
+        function hentGoogle() {
+          if (hentet) return; hentet = true;
+          if (location.hostname === 'www.techmediaarch.com') {
+            var ga = document.createElement('script');
+            ga.async = true;
+            ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-TJTC0HR0JK';
+            document.head.appendChild(ga);
+            gtag('js', new Date());
+            gtag('config', 'G-TJTC0HR0JK');
+          }
+          // AdSense: samme konto som før (pub-9695260339642032), auto-annoncer
+          var ad = document.createElement('script');
+          ad.async = true;
+          ad.crossOrigin = 'anonymous';
+          ad.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9695260339642032';
+          document.head.appendChild(ad);
+        }
+        function naarLedig() {
+          if ('requestIdleCallback' in window) requestIdleCallback(hentGoogle, { timeout: 3000 });
+          else setTimeout(hentGoogle, 1500);
+        }
+        if (document.readyState === 'complete') naarLedig();
+        else window.addEventListener('load', naarLedig, { once: true });
+        // Læseren rører siden: hent med det samme, så annoncer ikke kommer for sent
+        ['scroll', 'pointerdown', 'keydown'].forEach(function (h) { window.addEventListener(h, hentGoogle, { once: true, passive: true }); });
+      })();
     </script>
-    {/* AdSense: samme konto som i dag (pub-9695260339642032), auto-annoncer. */}
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9695260339642032" crossorigin="anonymous"></script>
 
     <meta name="description" content={desc} />
     {!nocanonical && <link rel="canonical" href={canonicalURL} />}
@@ -286,9 +309,8 @@ const nyeste = INDLAEG[0];
       @media (prefers-reduced-motion: reduce) { .nav-topics-pil { transition: none; } }
       .nav-sep { width: 100%; border: 0; border-top: 1px solid var(--border-color); margin: 10px 0; }
       .content-main { flex: 1; min-width: 0; min-height: calc(100vh - 60px); background: var(--bg-color); position: relative; display: flex; flex-direction: column; overflow-x: clip; }
-      @keyframes tmaFadeIn { from { opacity: 0; } to { opacity: 1; } }
-      .content-main { animation: tmaFadeIn 0.4s ease backwards; }
-      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .content-main { animation: none; } .nav-item:hover { transform: none; } .sidebar, .sidebar.open { transition: none; } }
+      /* Ingen ind-toning af hele siden: den forsinkede første visning (LCP) på mobil */
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .nav-item:hover { transform: none; } .sidebar, .sidebar.open { transition: none; } }
 
       /* --- Footer (trin 3): hvid bjælke, navn + én linje + alle de juridiske links (AdSense kræver dem) --- */
       .site-footer { background: var(--hero-bg); border-top: 1px solid var(--border-color); font-size: 14px; color: var(--muted); margin-top: auto; }
@@ -415,16 +437,14 @@ const nyeste = INDLAEG[0];
       .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px; }
       .article-card { text-decoration: none; color: inherit; display: block; transition: transform 0.2s; }
       .article-card:hover { transform: translateY(-3px); }
-      .card-thumb { aspect-ratio: 16/9; border-radius: var(--radius); position: relative; margin-bottom: 10px; overflow: hidden; background-color: var(--placeholder); background-image: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 80%); background-size: 200% 100%; background-repeat: no-repeat; animation: tmaShimmer 1.5s ease-in-out infinite; }
-      body.dark-mode .card-thumb { background-color: var(--placeholder); background-image: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0) 80%); }
-      .card-thumb.is-loaded { animation: none; background-image: none; }
+      .card-thumb { aspect-ratio: 16/9; border-radius: var(--radius); position: relative; margin-bottom: 10px; overflow: hidden; background-color: var(--placeholder); }
+      /* Rolig ensfarvet pladsholder; den gamle glimt-animation kostede regnekraft på mobil */
       .card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
       .article-card:hover .card-thumb img { transform: scale(1.06); }
       .article-card:hover .card-thumb { box-shadow: 0 6px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05); }
       /* Artikler uden billede får et roligt felt i emnets farve i stedet for et hul */
       .card-thumb-empty { animation: none; background: linear-gradient(135deg, color-mix(in srgb, var(--tag-accent, #0891b2) 22%, var(--card-bg)), var(--hover-bg)); display: flex; align-items: center; justify-content: center; }
       .card-thumb-empty img.maerke { width: 22%; height: auto; border-radius: 9px; box-shadow: 0 6px 16px -8px rgba(42, 18, 96, 0.5); }
-      @keyframes tmaShimmer { 0% { background-position: 150% 0; } 100% { background-position: -150% 0; } }
       .card-title { margin: 0 0 5px 0; font-size: 17px; font-weight: 650; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
       .article-card:hover .card-title { color: var(--teal-text); }
       .card-excerpt { margin: 4px 0 6px 0; font-family: var(--font-serif); font-size: 15px; line-height: 1.5; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }

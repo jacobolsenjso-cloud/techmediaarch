@@ -138,9 +138,8 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
     .top-d-reol { display: flex; flex-direction: column; gap: 8px; }
     .top-d-hylde { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 13px 18px 13px 13px; border-radius: var(--radius-lg); text-decoration: none; color: #fff;
       background: rgb(255 255 255 / 7%); border: 1px solid rgb(255 255 255 / 14%);
-      margin-left: calc(var(--i) * 14px); transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-      animation: top-d-ind 0.5s cubic-bezier(.2,.7,.2,1) backwards; animation-delay: calc(var(--i) * 70ms); }
-    @keyframes top-d-ind { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+      margin-left: calc(var(--i) * 14px); transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+    /* Ind-glidningen af hylderne er fjernet (1/11): den holdt toppen usynlig og forsinkede første visning på mobil */
     .top-d-hylde:hover { transform: translateX(-6px); background: rgb(255 255 255 / 13%); border-color: color-mix(in srgb, var(--h) 70%, #fff); }
     .top-d-hylde:focus-visible { outline: 2px solid #f2b33d; outline-offset: 2px; }
     .top-d-ikon { width: 46px; height: 46px; border-radius: 12px; background: var(--h); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
@@ -157,7 +156,7 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
       .top-d-hylde { margin-left: 0; grid-template-columns: 40px minmax(0, 1fr) auto; padding: 10px 14px 10px 10px; }
       .top-d-ikon { width: 40px; height: 40px; }
     }
-    @media (prefers-reduced-motion: reduce) { .top-d-hylde { animation: none; } .top-d-hylde:hover { transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .top-d-hylde:hover { transform: none; } }
   </style>
 
   <div class="page-wrapper">
@@ -165,7 +164,7 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
     {hoved && (
       <section class="lead-section" aria-label="Latest">
         <a href={hoved.href} class="lead-card" style={maerke(hoved) ? `--tag-accent: ${maerke(hoved)!.farve}` : undefined}>
-          {hoved.image ? <div class="card-thumb"><img src={hoved.image} alt="" loading="eager" fetchpriority="high" /></div> : null}
+          {hoved.image ? <div class="card-thumb"><img src={hoved.image} srcset={miniSrcset(hoved.image) || undefined} sizes="(max-width: 700px) 92vw, 700px" alt="" loading="eager" /></div> : null}
           {maerke(hoved) && <span class="lead-eyebrow">{maerke(hoved)!.navn}</span>}
           <h2 class="lead-title">{hoved.title}</h2>
           <p class="lead-excerpt">{udsnit(hoved.description, 230)}</p>
@@ -216,7 +215,7 @@ const denneUge = sporgsmaal.length > 0 && sporgsmaal.every((q) => Date.now() - q
         </div>
         <div class="hylde-afsnit-grid">
           <a href={stor.href} class="hylde-stor">
-            {stor.image && <img src={stor.image} alt="" loading="lazy" decoding="async" />}
+            {stor.image && <img src={stor.image} srcset={miniSrcset(stor.image) || undefined} sizes="(max-width: 860px) 92vw, 620px" alt="" loading="lazy" decoding="async" />}
             <span class="hylde-stor-titel">{stor.title}</span>
             {stor.description && <span class="hylde-stor-besk">{stor.description}</span>}
             <span class="hylde-stor-meta">{datoTekst(stor.published)} · {stor.minutter} min read</span>
