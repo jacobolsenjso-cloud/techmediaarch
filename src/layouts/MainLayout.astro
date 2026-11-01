@@ -118,6 +118,16 @@ const nyeste = INDLAEG[0];
             gtag('js', new Date());
             gtag('config', 'G-TJTC0HR0JK');
           }
+          // Google Tag Manager-container GTM-PBPZ3RWL (Google Ads-remarketing). Blev før sat ind af
+          // Cloudflares "Google tag gateway" ØVERST i siden — før samtykke-standarden og før alt andet
+          // (207 KB). Fra 1/11-2026 hentes den her: efter samtykke og efter indlæsning. Gateway slået fra.
+          if (location.hostname === 'www.techmediaarch.com') {
+            dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+            var gtm = document.createElement('script');
+            gtm.async = true;
+            gtm.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-PBPZ3RWL';
+            document.head.appendChild(gtm);
+          }
           // AdSense: samme konto som før (pub-9695260339642032), auto-annoncer
           var ad = document.createElement('script');
           ad.async = true;
@@ -383,6 +393,13 @@ const nyeste = INDLAEG[0];
          !important som på Blogger, så billedernes egne gamle Blogger-stile (margin, ramme) ikke vinder. */
       .post-body .tma-wm { position: relative !important; display: block !important; width: fit-content !important; max-width: 100% !important; margin: 2.5rem auto !important; border-radius: var(--radius) !important; overflow: hidden !important; line-height: 0 !important; font-size: 0 !important; }
       .post-body .tma-wm > img { display: block !important; max-width: 100% !important; width: auto; height: auto !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; box-sizing: border-box !important; border-radius: var(--radius) !important; }
+      /* 1/11-2026: kendte mål (--b fra byggeriet): rammen får billedets bredde (højst 100 %), billedet fylder
+         den, og højden følger width/height-forholdet — pladsen er fri, før billedet er hentet (ingen hop/CLS) */
+      .post-body .tma-wm[style*="--b"] { width: var(--b) !important; }
+      .post-body .tma-wm[style*="--b"] > img { width: 100% !important; }
+      /* 12 gamle Blogger-artikler har billedet i et link med float:left; så lagde indholdsfortegnelsen sig
+         i en smal stribe ved siden af. Billedrammen er en centreret blok, så det, der holder den, svæver ikke. */
+      .post-body :is(a, span, div):has(> .tma-wm) { float: none !important; }
       .post-body .tma-wm-tekst { position: absolute !important; bottom: 15px !important; right: 15px !important; color: rgba(255, 255, 255, 0.9) !important; font-size: 14px !important; font-weight: bold !important; font-family: sans-serif, Arial !important; text-shadow: 1px 1px 3px #000, -1px -1px 3px #000 !important; z-index: 2 !important; pointer-events: none !important; line-height: 1 !important; user-select: none; }
       .post-body a[data-tma-uden-link] { pointer-events: none !important; border-bottom: 0 !important; }
       /* Knapper fra Blogger-temaets {getButton}-kode (se src/lib/temakoder.mjs) */

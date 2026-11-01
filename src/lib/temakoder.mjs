@@ -106,34 +106,59 @@ export function bloggerVideo(html) {
 //     til det rå billede uden vandmærke)
 // Her sker det, når siden bygges: bredden læses direkte i billedfilen i public/images.
 
-const breddeCache = new Map();
-function billedBredde(src) {
+// Bredde OG højde (1/11-2026): højden bruges til width/height på artikelbillederne, så browseren
+// kan holde pladsen fri, før billedet er hentet (ellers hopper teksten = layoutskift/CLS).
+const maalCache = new Map();
+function billedMaal(src) {
   const m = src.match(/^\/images\/([\w.-]+)$/);
   if (!m) return null;
-  if (breddeCache.has(m[1])) return breddeCache.get(m[1]);
-  let b = null;
+  if (maalCache.has(m[1])) return maalCache.get(m[1]);
+  let b = null, h = null;
   try {
     const buf = fs.readFileSync(path.join(process.cwd(), 'public', 'images', m[1]));
-    if (buf[0] === 0x89 && buf.toString('ascii', 1, 4) === 'PNG') b = buf.readUInt32BE(16);
-    else if (buf.toString('ascii', 0, 3) === 'GIF') b = buf.readUInt16LE(6);
+    if (buf[0] === 0x89 && buf.toString('ascii', 1, 4) === 'PNG') { b = buf.readUInt32BE(16); h = buf.readUInt32BE(20); }
+    else if (buf.toString('ascii', 0, 3) === 'GIF') { b = buf.readUInt16LE(6); h = buf.readUInt16LE(8); }
     else if (buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
       const t = buf.toString('ascii', 12, 16);
-      if (t === 'VP8 ') b = buf.readUInt16LE(26) & 0x3fff;
-      else if (t === 'VP8L') b = 1 + (((buf[22] & 0x3f) << 8) | buf[21]);
-      else if (t === 'VP8X') b = 1 + buf.readUIntLE(24, 3);
+      if (t === 'VP8 ') { b = buf.readUInt16LE(26) & 0x3fff; h = buf.readUInt16LE(28) & 0x3fff; }
+      else if (t === 'VP8L') { b = 1 + (((buf[22] & 0x3f) << 8) | buf[21]); h = 1 + (((buf[24] & 0x0f) << 10) | (buf[23] << 2) | ((buf[22] & 0xc0) >> 6)); }
+      else if (t === 'VP8X') { b = 1 + buf.readUIntLE(24, 3); h = 1 + buf.readUIntLE(27, 3); }
     } else if (buf[0] === 0xff && buf[1] === 0xd8) {
-      // JPEG: find første SOF-markør (C0-CF undtagen C4, C8, CC)
+      // JPEG: find første SOF-markør (C0-CF undtagen C4, C8, CC); højde før bredde
       let i = 2;
       while (i < buf.length - 9) {
         if (buf[i] !== 0xff) { i++; continue; }
         const mk = buf[i + 1];
-        if (mk >= 0xc0 && mk <= 0xcf && mk !== 0xc4 && mk !== 0xc8 && mk !== 0xcc) { b = buf.readUInt16BE(i + 7); break; }
+        if (mk >= 0xc0 && mk <= 0xcf && mk !== 0xc4 && mk !== 0xc8 && mk !== 0xcc) { h = buf.readUInt16BE(i + 5); b = buf.readUInt16BE(i + 7); break; }
         i += 2 + buf.readUInt16BE(i + 2);
       }
     }
-  } catch { b = null; }
-  breddeCache.set(m[1], b);
-  return b;
+  } catch { b = null; h = null; }
+  const ud = b ? { b, h: h || null } : null;
+  maalCache.set(m[1], ud);
+  return ud;
+}
+function billedBredde(src) {
+  const m = billedMaal(src);
+  return m ? m.b : null;
+}
+
+// Sætter width/height på et <img>, hvis de mangler og målene kendes (originalen i /images har samme
+// mål som mærkekopien i /images/m/). Gamle Blogger-billeder har ofte visningsmål (fx 640x320); dem
+// beholdes, men passer forholdet ikke til filen (12 billeder havde fx 640x200 for 1024x512), regnes
+// højden om ud fra bredden — ellers holder browseren en forkert plads fri, og teksten hopper.
+function medMaal(img, originalSrc) {
+  const m = billedMaal(originalSrc);
+  if (!m || !m.h) return img;
+  const w = img.match(/\swidth=["']?(\d+)["']?/i), h = img.match(/\sheight=["']?(\d+)["']?/i);
+  if (!w && !h) return img.replace(/^<img\b/i, `<img width="${m.b}" height="${m.h}"`);
+  if (w && h) {
+    const rigtig = Math.round((+w[1] * m.h) / m.b);
+    if (Math.abs(rigtig - +h[1]) / rigtig <= 0.02) return img;
+    return img.replace(h[0], ` height="${rigtig}"`);
+  }
+  // Kun den ene af dem: lad være (sjældent; browseren regner selv med auto)
+  return img;
 }
 
 // Et billede får vandmærke, hvis det er 150 px eller bredere (ukendt bredde = ja, som på Blogger)
@@ -160,7 +185,13 @@ export function vandmaerke(html) {
     if (!faarMaerke(img)) return img;
     const src = (img.match(/\ssrc=["']([^"']+)["']/i) || [])[1] || '';
     const m = maerketBillede(src);
-    if (m !== src) return `<span class="tma-wm">${img.replace(/(\ssrc=["'])[^"']+/i, `$1${m}`)}</span>`;
+    if (m !== src) {
+      // --b = billedets egen bredde: CSS gør rammen så bred (højst 100 %), og billedet fylder den, så
+      // pladsen (bredde x forhold) er kendt, før billedet er hentet. Samme udseende som før.
+      const maal = billedMaal(src);
+      const stil = maal && maal.h ? ` style="--b:${maal.b}px"` : '';
+      return `<span class="tma-wm"${stil}>${medMaal(img, src).replace(/(\ssrc=["'])[^"']+/i, `$1${m}`)}</span>`;
+    }
     return `<span class="tma-wm">${img}<span class="tma-wm-tekst">${VANDMAERKE_TEKST}</span></span>`;
   });
   return ud;
