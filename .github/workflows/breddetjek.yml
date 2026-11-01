@@ -1,0 +1,28 @@
+# Breddetjek (Jacob 1/11-2026): bygger sitet og åbner alle artikler i GitHubs installerede Chrome i computer-
+# (1366 px) og mobilbredde (390 px). Fejler, hvis noget i artikelteksten går ud over spalten, eller hvis en side
+# kan rulles sidelæns (scripts/tjek-bredde.mjs). Kører ved hvert push til main, der ændrer sitets kode eller
+# indhold, og kan startes i hånden. Det stopper ikke Cloudflares udgivelse — det er et alarmsignal (rødt kryds på
+# GitHub). Robottens egne udgivelser stoppes FØR main af samme tjek i robot-tidsplan.yml.
+name: Breddetjek
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'public/**', 'scripts/**', 'astro.config.*', 'package.json']
+  workflow_dispatch:
+
+jobs:
+  bredde:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Byg sitet
+        run: npm run build > /dev/null
+      - name: Tjek at intet er for bredt (computer + mobil)
+        run: npm run tjek:bredde

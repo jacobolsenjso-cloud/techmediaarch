@@ -90,9 +90,17 @@ jobs:
         id: bygget
         if: always() && (steps.plan.outputs.koer == 'ja' || steps.plan.outputs.omskriv == 'ja')
         run: npm run build > /dev/null
+      # Breddetjek (Jacob 1/11-2026): alle artikler åbnes i GitHubs installerede Chrome i computer- og mobilbredde;
+      # går noget ud over tekstspalten, eller kan en side rulles sidelæns, udgives der IKKE (fejlen står i loggen).
+      # Baggrund: 1/11 stak billederne ud til højre i 139 af 197 artikler, uden at noget tjek opdagede det.
+      - name: Tjek at intet er for bredt (computer + mobil)
+        id: bredde
+        if: always() && steps.bygget.outcome == 'success'
+        timeout-minutes: 10
+        run: npm run tjek:bredde
       - name: Udgiv på main
         id: udgiv
-        if: always() && steps.bygget.outcome == 'success'
+        if: always() && steps.bygget.outcome == 'success' && steps.bredde.outcome == 'success'
         run: |
           git config user.name "techmediaarch-robot"
           git config user.email "robot@techmediaarch.com"
