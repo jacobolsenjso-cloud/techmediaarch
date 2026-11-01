@@ -397,6 +397,11 @@ const nyeste = INDLAEG[0];
          den, og højden følger width/height-forholdet — pladsen er fri, før billedet er hentet (ingen hop/CLS) */
       .post-body .tma-wm[style*="--b"] { width: var(--b) !important; }
       .post-body .tma-wm[style*="--b"] > img { width: 100% !important; }
+      /* FEJL rettet 1/11-2026 kl. 13 (Jacob så det): robotartiklernes billeder ligger i en billedtekst-tabel, og en
+         tabel vokser med indholdet — med fast bredde på rammen (--b) blev tabellen 1366 px og billedet stak 579 px
+         ud til højre på computer (139 af 197 artikler). Tabellen er nu altid spaltens bredde med fast opbygning
+         (samme regel, som allerede gjaldt på mobil), så "højst 100 %" betyder spalten. */
+      .post-body table.tr-caption-container:has(.tma-wm[style*="--b"]) { width: 100% !important; max-width: 100%; table-layout: fixed; }
       /* 12 gamle Blogger-artikler har billedet i et link med float:left; så lagde indholdsfortegnelsen sig
          i en smal stribe ved siden af. Billedrammen er en centreret blok, så det, der holder den, svæver ikke. */
       .post-body :is(a, span, div):has(> .tma-wm) { float: none !important; }
