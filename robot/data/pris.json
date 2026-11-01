@@ -315,5 +315,21 @@
   "usd": 0.658,
   "note": "udkast-46 (manuel, opskrift 2), lagt på main 1/11",
   "kr": 4.52
+ },
+ {
+  "dato": "2026-11-01T00:10:00.000Z",
+  "artikel": "/2026/10/how-generative-ai-creates-images",
+  "omskrevet": true,
+  "usd": 0.5265,
+  "note": "udkast-47 (manuel, opskrift 2), lagt på main 1/11",
+  "kr": 3.62
+ },
+ {
+  "dato": "2026-11-01T00:10:00.000Z",
+  "artikel": "/2026/10/what-are-intelligent-agents-ai",
+  "omskrevet": true,
+  "usd": 0.4991,
+  "note": "udkast-48 (manuel, opskrift 2), lagt på main 1/11",
+  "kr": 3.43
  }
 ]
