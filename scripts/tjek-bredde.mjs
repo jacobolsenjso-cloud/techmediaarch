@@ -14,6 +14,13 @@ import { chromium } from 'playwright-core';
 
 const START = Date.now();
 const DIST = path.resolve(process.argv[2] || 'dist');
+// Sikring (2/11-2026, sket 2 gange samme dag): efter et fejlet byg startede tjekket på en tom/halv dist og hang
+// i baggrunden i timevis. Nu: intet byg = stop med det samme, og tjekket stopper altid selv efter 15 minutter.
+if (!fs.existsSync(path.join(DIST, 'index.html'))) {
+  console.error(`breddetjek: intet færdigt byg i ${DIST} (index.html mangler) — byg først`);
+  process.exit(1);
+}
+setTimeout(() => { console.error('breddetjek: stoppet efter 15 minutter (hang) — kør igen'); process.exit(1); }, 15 * 60 * 1000).unref();
 const TYPER = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.woff2': 'font/woff2', '.json': 'application/json', '.xml': 'application/xml', '.ico': 'image/x-icon' };
 
 // Samme adresseregel som Cloudflare (html_handling "drop-trailing-slash"): /a/b -> a/b.html, / -> index.html
