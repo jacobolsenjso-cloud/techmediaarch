@@ -4,7 +4,7 @@
 import type { Indlaeg } from '../lib/indhold';
 import { datoTekst, udsnit } from '../lib/indhold';
 import Maerke from './Maerke.astro';
-import { miniSrcset, avifSrcset } from '../lib/temakoder.mjs';
+import { miniSrcset, webpSrcset } from '../lib/temakoder.mjs';
 import { hyldeFor } from '../lib/hylder';
 // niveau: kortets overskrift er h2 direkte under sidens h1 (oversigter), h3 under en h2 (forsiden).
 // Udseendet styres af .card-title, så niveauet ændrer intet visuelt (27/9-2026).
@@ -22,7 +22,7 @@ const emne = hylde ? { navn: hylde.navn, farve: hylde.farve } : p.emner[0];
 ---
 <a href={p.href} class="article-card" style={emne ? `--tag-accent: ${emne.farve}` : undefined}>
   {p.image ? (
-    <div class="card-thumb"><picture class="tma-pic">{avifSrcset(p.image) && <source type="image/avif" srcset={avifSrcset(p.image)} sizes="(max-width: 700px) 92vw, 370px" />}<img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="(max-width: 700px) 92vw, 370px" alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" /></picture>{badge && <span class="card-badge">{badge}</span>}</div>
+    <div class="card-thumb"><picture class="tma-pic">{webpSrcset(p.image) && <source type="image/webp" srcset={webpSrcset(p.image)} sizes="(max-width: 700px) 92vw, 370px" />}<img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="(max-width: 700px) 92vw, 370px" alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" /></picture>{badge && <span class="card-badge">{badge}</span>}</div>
   ) : (
     <div class="card-thumb card-thumb-empty" aria-hidden={badge ? undefined : 'true'}>
       <Maerke id={`c${p.aar}${p.maaned}`} />{badge && <span class="card-badge">{badge}</span>}

@@ -54,28 +54,29 @@ async function lilleKopi(buf, ud, bredde) {
 }
 const alleKopier = async (buf, rod, f) => { for (const k of KOPIER) await lilleKopi(buf, path.join(rod, k.mappe, f), k.bredde); };
 
-// AVIF (2/11-2026, Jacobs ja): hver kopi (m, xs, s, md) får en AVIF-udgave ved siden af: <fil>.avif
-// (fx 9c7c…-gm.jpg.avif). Målt på 80 kopier: 54 % mindre end JPEG. effort 2 = den hurtige indstilling
-// (effort 4 sparede kun 4 procentpoint mere, men tog 3 gange så lang tid). Siderne tilbyder filen via
-// <picture> (src/lib/temakoder.mjs avifSrcset), og scripts/tjek-site.mjs fejler, hvis en af dem mangler.
+// WebP (2/11-2026, Jacobs valg): hver kopi (m, xs, s, md) får en WebP-udgave ved siden af: <fil>.webp
+// (fx 9c7c…-gm.jpg.webp). Målt på forsidens billeder: 35 % mindre end JPEG. (AVIF var prøvet først:
+// 54 % mindre, men byggeriet tog 3,5 min længere hos Cloudflare, og Jacob valgte WebP som det sikreste.)
+// Siderne tilbyder filen via <picture> (src/lib/temakoder.mjs webpSrcset), og scripts/tjek-site.mjs
+// fejler, hvis en af dem mangler.
 // Nødudgang: kan en fil ikke laves om (fx en GIF med .jpg-navn, der skal blive ved med at bevæge sig),
-// lægges de originale bytes under .avif-navnet. Browseren ser selv efter, hvad filen indeholder, så
+// lægges de originale bytes under .webp-navnet. Browseren ser selv efter, hvad filen indeholder, så
 // billedet vises stadig — en henvisning til en manglende fil ville derimod give et tomt billede.
-export const AVIF = { quality: 50, effort: 2 };
-async function avifAf(fil) {
+export const WEBP = { quality: 75 };
+async function webpAf(fil) {
   if (!fs.existsSync(fil)) return true;
-  const ud = `${fil}.avif`;
+  const ud = `${fil}.webp`;
   try {
     const b = sharp(fil, { failOn: 'none' });
     const { format } = await b.metadata();
     if (!['jpeg', 'png', 'webp'].includes(format)) { fs.copyFileSync(fil, ud); return false; }
-    fs.writeFileSync(ud, await b.avif(AVIF).toBuffer());
+    fs.writeFileSync(ud, await b.webp(WEBP).toBuffer());
     return true;
   } catch { fs.copyFileSync(fil, ud); return false; }
 }
-const alleAvif = async (rod, f) => {
+const alleWebp = async (rod, f) => {
   let ok = true;
-  for (const mappe of [MAPPE, ...KOPIER.map((k) => k.mappe)]) ok = (await avifAf(path.join(rod, mappe, f))) && ok;
+  for (const mappe of [MAPPE, ...KOPIER.map((k) => k.mappe)]) ok = (await webpAf(path.join(rod, mappe, f))) && ok;
   return ok;
 };
 
@@ -85,7 +86,7 @@ export async function vandmaerkAlle(fra, til) {
   const rod = path.dirname(til);
   for (const k of KOPIER) fs.mkdirSync(path.join(rod, k.mappe), { recursive: true });
   const filer = fs.readdirSync(fra).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
-  let lavet = 0, sprunget = 0; const fejl = [], avifNoed = [];
+  let lavet = 0, sprunget = 0; const fejl = [], webpNoed = [];
   const koe = [...filer];
   await Promise.all(Array.from({ length: 4 }, async () => {
     for (let f; (f = koe.shift());) {
@@ -96,10 +97,10 @@ export async function vandmaerkAlle(fra, til) {
         // Fejl i billedfilen: siden peger alligevel på kopien (src/lib/temakoder.mjs), så originalen lægges der
         fs.writeFileSync(path.join(til, f), org); fejl.push(f); await alleKopier(org, rod, f);
       } else { sprunget++; continue; }
-      if (!(await alleAvif(rod, f))) avifNoed.push(f);
+      if (!(await alleWebp(rod, f))) webpNoed.push(f);
     }
   }));
-  return { lavet, sprunget, fejl, avifNoed };
+  return { lavet, sprunget, fejl, webpNoed };
 }
 
 // Astro-integration: kører efter byggeriet og lægger kopierne i dist/images/m/
@@ -110,10 +111,10 @@ export function vandmaerkeIntegration() {
       'astro:build:done': async ({ dir, logger }) => {
         const start = Date.now();
         const rod = fileURLToPath(dir);
-        const { lavet, sprunget, fejl, avifNoed } = await vandmaerkAlle(path.join(rod, 'images'), path.join(rod, 'images', MAPPE));
-        logger.info(`vandmærke: ${lavet} billeder lavet, ${sprunget} sprunget over (under ${MIN_BREDDE} px), ${fejl.length} kunne ikke læses, AVIF med nødudgang: ${avifNoed.length} (${((Date.now() - start) / 1000).toFixed(1)} s)`);
+        const { lavet, sprunget, fejl, webpNoed } = await vandmaerkAlle(path.join(rod, 'images'), path.join(rod, 'images', MAPPE));
+        logger.info(`vandmærke: ${lavet} billeder lavet, ${sprunget} sprunget over (under ${MIN_BREDDE} px), ${fejl.length} kunne ikke læses, WebP med nødudgang: ${webpNoed.length} (${((Date.now() - start) / 1000).toFixed(1)} s)`);
         if (fejl.length) logger.warn(`vandmærke: uden mærke: ${fejl.join(', ')}`);
-        if (avifNoed.length) logger.warn(`avif: originalen lagt under .avif-navnet for: ${avifNoed.join(', ')}`);
+        if (webpNoed.length) logger.warn(`webp: originalen lagt under .webp-navnet for: ${webpNoed.join(', ')}`);
       },
     },
   };

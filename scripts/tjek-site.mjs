@@ -193,8 +193,8 @@ for (const f of html) {
     if (u.startsWith('/share-widget') && KENDTE.has('/share-widget?w=poi')) { kendteFundet.add('/share-widget?w=poi'); continue; }
     fejl.push(`MANGLER fil i ${f}: ${u}`);
   }
-  // srcset (2/11-2026, AVIF): hver fil i et srcset — både <img> og <source type="image/avif"> — skal findes.
-  // Browseren falder IKKE tilbage til JPEG, hvis en AVIF-fil mangler: så bliver billedet bare tomt.
+  // srcset (2/11-2026, WebP): hver fil i et srcset — både <img> og <source type="image/webp"> — skal findes.
+  // Browseren falder IKKE tilbage til JPEG, hvis en WebP-fil mangler: så bliver billedet bare tomt.
   for (const [, ss] of s.matchAll(/\ssrcset="([^"]*)"/g)) {
     for (const del of ss.split(',')) {
       const u = del.trim().split(/\s+/)[0];

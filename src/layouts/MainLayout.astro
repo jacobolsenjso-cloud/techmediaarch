@@ -6,18 +6,16 @@
 //   Source Serif 4 (brødtekst). Datoer, læsetid og koder bruger enhedens egen skrift med fast
 //   tegnbredde (2/11-2026, Jacobs ja): IBM Plex Mono (2 filer, 30 KB) blev hentet før siden var færdig,
 //   selv om den kun stod længere nede på forsiden (målt i en browser på mobil).
-// Archivo og Source Serif hentes tidligt (preload), fordi begge står på første skærm; før kom
-// Source Serif sent, så undertekst og "Latest"-linjer skiftede skrift undervejs (PageSpeed 2/11).
+// Kun Archivo hentes tidligt (preload) — se kommentaren ved <link rel="preload"> om Source Serif.
 import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource-variable/source-serif-4/wght.css';
 import archivoLatinWoff2 from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
-import serifLatinWoff2 from '@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2?url';
 import { HAR_BEDSTE } from '../lib/bedste';
 import { udenHtml } from '../lib/adresse.mjs';
 import { HYLDER, hyldeUrl, iHylde } from '../lib/hylder';
 import { organisation, person, ORG_ID } from '../lib/entitet.mjs';
 import { INDLAEG } from '../lib/indhold';
-import { maerketBillede, miniSrcset, avifSrcset } from '../lib/temakoder.mjs';
+import { maerketBillede, miniSrcset, webpSrcset } from '../lib/temakoder.mjs';
 
 interface Props {
   title?: string;
@@ -89,7 +87,9 @@ const nyeste = INDLAEG[0];
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#15171c" media="(prefers-color-scheme: dark)" />
     <link rel="preload" href={archivoLatinWoff2} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={serifLatinWoff2} as="font" type="font/woff2" crossorigin />
+    {/* Source Serif forudindlæses IKKE (2/11-2026 kl. 21): med to forudindlæste skrifter målte PageSpeed et hop
+        (CLS 0,232) i hylde-listen på forsiden, 2 af 2 målinger — formodentlig fordi Archivo (overskriften) så
+        kom senere og overskriften blev tegnet om. Med kun Archivo forudindlæst var CLS 0 i alle målinger. */}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -412,7 +412,7 @@ const nyeste = INDLAEG[0];
       /* Links i teksten er understreget (tynd linje): med serif og grøn alene var de svære at se som links */
       .post-body a { color: var(--teal-text); text-decoration: none; font-weight: 600; border-bottom: 1px solid color-mix(in srgb, var(--teal-text) 45%, transparent); transition: border-color 0.2s; }
       .post-body a:hover { border-bottom-color: var(--teal-text); }
-      /* AVIF (2/11-2026): billederne står i <picture class="tma-pic"> med AVIF først (temakoder.mjs avifSrcset/medAvif).
+      /* WebP (2/11-2026): billederne står i <picture class="tma-pic"> med WebP først (temakoder.mjs webpSrcset/medWebp).
          display: contents = <picture> tæller ikke i layoutet; billedet opfører sig, som om det stod direkte i sin boks.
          Regler med "> img" skal derfor også nævne "> .tma-pic > img". */
       .tma-pic { display: contents; }
@@ -652,7 +652,7 @@ const nyeste = INDLAEG[0];
           <div class="mega-col">
             {nyeste && (
               <a href={nyeste.href} class="mega-nyeste">
-                {nyeste.image && <picture class="tma-pic">{avifSrcset(nyeste.image) && <source type="image/avif" srcset={avifSrcset(nyeste.image)} sizes="320px" />}<img src={nyeste.image} srcset={miniSrcset(nyeste.image) || undefined} sizes="320px" alt="" loading="lazy" decoding="async" /></picture>}
+                {nyeste.image && <picture class="tma-pic">{webpSrcset(nyeste.image) && <source type="image/webp" srcset={webpSrcset(nyeste.image)} sizes="320px" />}<img src={nyeste.image} srcset={miniSrcset(nyeste.image) || undefined} sizes="320px" alt="" loading="lazy" decoding="async" /></picture>}
                 <span class="mega-nyeste-tekst"><span class="mega-badge">Newest answer</span><span class="mega-nyeste-titel">{nyeste.title}</span></span>
               </a>
             )}
