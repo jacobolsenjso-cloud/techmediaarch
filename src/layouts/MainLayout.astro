@@ -12,6 +12,7 @@ import archivoLatinWoff2 from '@fontsource-variable/archivo/files/archivo-latin-
 import { HAR_BEDSTE } from '../lib/bedste';
 import { udenHtml } from '../lib/adresse.mjs';
 import { HYLDER, hyldeUrl, iHylde } from '../lib/hylder';
+import { organisation, person, ORG_ID } from '../lib/entitet.mjs';
 import { INDLAEG } from '../lib/indhold';
 import { maerketBillede, miniSrcset } from '../lib/temakoder.mjs';
 
@@ -50,12 +51,18 @@ const breadcrumbSchema = {
     '@type': 'ListItem', position: i + 1, name: b.navn ?? (b as any).name, item: SITE + b.href,
   })),
 };
-const siteSchema = [
-  { '@context': 'https://schema.org', '@type': 'WebSite', name: BRAND, alternateName: 'techmediaarch.com', description: defaultDesc, url: SITE + '/',
-    potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${SITE}/search?q={search_term_string}` }, 'query-input': 'required name=search_term_string' } },
-  { '@context': 'https://schema.org', '@type': 'Organization', '@id': `${SITE}/#organization`, name: BRAND, url: SITE + '/',
-    logo: `${SITE}/icon-512.png` },
-];
+// Organisationen og personen (src/lib/entitet.mjs) står på ALLE sider (2/11-2026), så artiklernes
+// author/publisher peger på et @id, der findes på selve siden. WebSite (søgefeltet) kun på forsiden.
+const emner = HYLDER.map((h) => h.navn);
+const entitetSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    organisation(emner), person(emner),
+    ...(currentPath === '/' ? [{ '@type': 'WebSite', '@id': `${SITE}/#website`, name: BRAND, alternateName: 'techmediaarch.com', description: defaultDesc, url: SITE + '/',
+      publisher: { '@id': ORG_ID }, inLanguage: 'en',
+      potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${SITE}/search?q={search_term_string}` }, 'query-input': 'required name=search_term_string' } }] : []),
+  ],
+};
 const schemaListe = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
 const aktiv = (p: string) => currentPath === p || currentPath === encodeURI(p);
 // Megamenuen viser den nyeste artikel (INDLAEG er sorteret nyeste først)
@@ -175,7 +182,7 @@ const nyeste = INDLAEG[0];
     {/* "<" skrives som \u003c, så HTML i data (fx FAQ-svar) aldrig kan lukke script-tagget */}
     {schemaListe.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s).replace(/</g, '\\u003c')} />)}
     {currentPath !== '/' && <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />}
-    {currentPath === '/' && <script type="application/ld+json" set:html={JSON.stringify(siteSchema)} />}
+    <script type="application/ld+json" set:html={JSON.stringify(entitetSchema).replace(/</g, '\\u003c')} />
 
     <style is:global>
       /* Svar-arkivets farver (trin 3, 28/10-2026; designet Jacob godkendte). Variabelnavnene er de gamle,

@@ -14,7 +14,7 @@ export function GET() {
   const ud: string[] = [
     '# Tech Media Arch',
     '',
-    '> Tech Media Arch (techmediaarch.com) is an English-language archive of clear answers to the tech questions people actually ask: AI tools and agents, cybersecurity, building software, marketing and SEO, and everyday tech. Each answer names its sources. Founder, editor and author: Jacob S. Olsen.',
+    '> Tech Media Arch (techmediaarch.com) is an English-language archive of clear answers to the tech questions people actually ask: AI tools and agents, cybersecurity, building software, marketing and SEO, and everyday tech. Each answer names its sources. Started in July 2024 in Denmark. Founder & Editor: Jacob S. Olsen.',
     '',
     `Articles: ${INDLAEG.length}. Every article has a publication date and, where relevant, a list of sources. Full list of addresses: ${SITE}/sitemap.xml`,
     '',

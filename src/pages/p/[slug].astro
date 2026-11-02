@@ -5,6 +5,7 @@
 import MainLayout from '../../layouts/MainLayout.astro';
 import { SIDER } from '../../lib/indhold';
 import { faqSchema } from '../../lib/faqschema.mjs';
+import { SITE, ORG_ID, BESKRIVELSE } from '../../lib/entitet.mjs';
 
 export function getStaticPaths() {
   // (skal stå inde i funktionen: Astro kører getStaticPaths isoleret)
@@ -18,8 +19,18 @@ const { s } = Astro.props;
 const egenH1 = /<h1[\s>]/i.test(s.html);
 // FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs)
 const faq = faqSchema(s.faqHtml);
+// About-siden er sitets "entity home" (2/11-2026): siden, der samler fakta om Tech Media Arch.
+// AboutPage peger på organisationen (src/lib/entitet.mjs). Vagt: schemaets beskrivelse SKAL stå
+// ordret på siden (Google vil have, at schema svarer til det synlige) — ellers stopper byggeriet.
+const erAbout = s.navn === 'about-us';
+if (erAbout && !s.html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').includes(BESKRIVELSE)) {
+  throw new Error('about-us: første afsnit og BESKRIVELSE i src/lib/entitet.mjs står ikke ens — ret dem, så de er ens');
+}
+const aboutSchema = erAbout ? { '@context': 'https://schema.org', '@type': 'AboutPage', '@id': `${SITE}/p/about-us#page`, url: `${SITE}/p/about-us`,
+  name: s.title, inLanguage: 'en', about: { '@id': ORG_ID }, mainEntity: { '@id': ORG_ID } } : null;
+const sideSchema = [faq, aboutSchema].filter(Boolean);
 ---
-<MainLayout title={s.title} description={s.description} schema={faq} noindex={s.navn === 'techmediaarchcomp404html'} breadcrumb={[{ navn: s.title, href: s.href }]}>
+<MainLayout title={s.title} description={s.description} schema={sideSchema.length ? sideSchema : null} noindex={s.navn === 'techmediaarchcomp404html'} breadcrumb={[{ navn: s.title, href: s.href }]}>
   <style is:global>
     .static-page { max-width: 860px; margin: 0 auto; padding: 30px 20px 10px; box-sizing: border-box; width: 100%; }
     .static-page h1.page-title { font-size: 2rem; line-height: 1.2; margin: 0 0 20px; }

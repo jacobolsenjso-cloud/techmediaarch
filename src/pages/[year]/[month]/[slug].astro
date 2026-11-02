@@ -10,6 +10,7 @@ import { emneUrl } from '../../../lib/emner';
 import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret, startListe, iHylde } from '../../../lib/hylder';
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
+import { udgiverRef, PERSON_ID, PERSON_NAVN } from '../../../lib/entitet.mjs';
 import { maerketBillede, miniSrcset } from '../../../lib/temakoder.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
 import { tegnFarve } from '../../../lib/sporgsmaal.mjs';
@@ -139,10 +140,16 @@ const schema = {
   mainEntityOfPage: SITE + p.href,
   ...(p.image ? { image: SITE + maerketBillede(p.image) } : {}),
   // Forfatter = en navngiven person (Jacobs valg 27/9-2026): Google og AI-tjenester vægter,
-  // at der står et menneske bag. Navn og titel som på om-siden ("Jacob S. Olsen Founder & CEO").
-  author: { '@type': 'Person', name: 'Jacob S. Olsen', jobTitle: 'Founder & CEO', url: SITE + '/p/about-us', worksFor: { '@id': `${SITE}/#organization` } },
-  publisher: { '@type': 'Organization', name: 'Tech Media Arch', url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/icon-512.png' } },
-  ...(synligeEtiketter(p).length ? { keywords: synligeEtiketter(p).join(', ') } : {}),
+  // at der står et menneske bag. Fra 2/11-2026 peger forfatter og udgiver på de faste id-numre (@id)
+  // (src/lib/entitet.mjs), som MainLayout beskriver fuldt på hver side — så Google ser, at det er
+  // samme person og samme site i alle artikler.
+  // ADVARSEL (målt 2/11-2026): Astros oversætter (@astrojs/compiler-rs 0.5.0) fejler med "Unexpected token"
+  // ved getStaticPaths, hvis tekstskabelonen i worksFor nedenfor fjernes — også selvom koden er gyldig.
+  // Lad linjen stå i denne form; test med scripts/tjek-compile.mjs, hvis den skal ændres.
+  author: { '@type': 'Person', '@id': PERSON_ID, name: PERSON_NAVN, url: SITE + '/p/about-us', worksFor: { '@id': `${SITE}/#organization` } },
+  publisher: udgiverRef(),
+  // Emneord = hylden (2/11-2026); før de gamle Blogger-etiketter ("Infosec", "Product", "AI-Video" …)
+  ...(hylde ? { keywords: hylde.navn } : synligeEtiketter(p).length ? { keywords: synligeEtiketter(p).join(', ') } : {}),
 };
 // FAQ-data som Blogger-temaet lavede dem (se lib/faqschema.mjs) + de ekstra spørgsmål fra frontmatter,
 // så Google får præcis de spørgsmål, læseren ser i FAQ-boksen
@@ -428,7 +435,7 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       <article class="post-body" set:html={broedtekst} style={`--hylde: ${hylde?.farve ?? 'var(--teal)'}`} />
 
       {/* Stod før som fodnote i hvert indlæg (Blogger-feedets fodnote). Resources-artikler har den øverst i stedet. */}
-      {!erResources && <p class="disclosure-box"><strong>Affiliate disclosure:</strong> Please note that some links on TechMediaArch.com are affiliate links. We may receive a commission, at no extra cost to you, if you click through our links and make a purchase from one of our partners.</p>}
+      {!erResources && <p class="disclosure-box"><strong>Affiliate disclosure:</strong> Please note that some links on Tech Media Arch are affiliate links. We may receive a commission, at no extra cost to you, if you click through our links and make a purchase from one of our partners.</p>}
 
       <div class="share-cta">
         <div>
