@@ -111,17 +111,17 @@ const nyeste = INDLAEG[0];
       // og alle hans egne besøg sendes med traffic_type=internal. Analytics' filter "Internal Traffic"
       // sorterer dem fra. IP-filter virker ikke, fordi Jacobs Chrome kører gennem Cloudflare WARP
       // (delt, skiftende IP). ?intern=0 fjerner markeringen igen.
-      // Værdien lægges i datalaget; GTM-variablen "DLV traffic_type" sender den med Google-tagget
-      // (målt: gtag('set') ignoreres af Google-tagget, når det hentes via GTM).
+      // Markeringen sendes med gtag('config', …, { traffic_type: 'internal' }) længere nede, når Google-tagget hentes
+      // (Googles dokumenterede måde for gtag.js; Tag Manager og dens "DLV traffic_type" er fjernet 2/11-2026).
       try {
-        var tmaIntern = new URLSearchParams(location.search).get('intern');
-        if (tmaIntern === '1') localStorage.setItem('tma-intern', '1');
-        if (tmaIntern === '0') localStorage.removeItem('tma-intern');
-        if (localStorage.getItem('tma-intern') === '1') dataLayer.push({ traffic_type: 'internal' });
+        var tmaParam = new URLSearchParams(location.search).get('intern');
+        if (tmaParam === '1') localStorage.setItem('tma-intern', '1');
+        if (tmaParam === '0') localStorage.removeItem('tma-intern');
+        window.tmaIntern = localStorage.getItem('tma-intern') === '1';
       } catch (e) {}
     </script>
     {/* Google Analytics 4 (G-TJTC0HR0JK) — samme måling, som før kom via Cloudflare Zaraz
-        (Zaraz slukket 25/9). Fra 1/11-2026 via GTM-containeren nedenfor (ikke en egen gtag.js).
+        (Zaraz slukket 25/9). 1/11-2026 via Tag Manager; fra 2/11-2026 direkte med gtag.js nedenfor.
         Står EFTER samtykke-standarden ovenfor: GA sætter ingen cookies, før læseren har sagt ja
         i Googles samtykkedialog. Kun på det rigtige domæne, så test-adressen (workers.dev) ikke
         tæller med i statistikken. */}
@@ -135,17 +135,17 @@ const nyeste = INDLAEG[0];
         var hentet = false;
         function hentGoogle() {
           if (hentet) return; hentet = true;
-          // Google Tag Manager-container GTM-PBPZ3RWL: Google Ads-remarketing OG Analytics (G-TJTC0HR0JK — containeren har
-          // sit eget Google-tag for det id, affyret på alle sider). Sitet hentede før også gtag.js for G-TJTC0HR0JK selv;
-          // så blev Analytics nogle gange hentet to gange (målt i PageSpeed 1/11-2026: ca. 200 KB ekstra). Fra 1/11-2026
-          // (Jacobs ja) står containeren alene. Samtykke-standarden ovenfor gælder stadig, fordi den ligger i dataLayer først.
-          // Containeren blev før sat ind af Cloudflares "Google tag gateway" ØVERST i siden (slået fra 1/11-2026).
+          // Google-tagget G-TJTC0HR0JK hentes direkte (2/11-2026, Jacobs ja) — ikke længere via Tag Manager.
+          // Målt 2/11: containeren indeholdt KUN dette Google-tag (+ en scroll-lytter uden tag) og kostede ca. 120 KB
+          // og 195 ms CPU på mobil. Google Ads (AW-16667923080) er koblet på selve Google-tagget hos Google og følger
+          // med i gtag.js, så remarketing virker som før. Samtykke-standarden ovenfor gælder stadig: den står først i dataLayer.
           if (location.hostname === 'www.techmediaarch.com') {
-            dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-            var gtm = document.createElement('script');
-            gtm.async = true;
-            gtm.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-PBPZ3RWL';
-            document.head.appendChild(gtm);
+            var ga = document.createElement('script');
+            ga.async = true;
+            ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-TJTC0HR0JK';
+            document.head.appendChild(ga);
+            gtag('js', new Date());
+            gtag('config', 'G-TJTC0HR0JK', window.tmaIntern ? { traffic_type: 'internal' } : {});
           }
           // AdSense: samme konto som før (pub-9695260339642032), auto-annoncer
           var ad = document.createElement('script');
@@ -908,15 +908,28 @@ const nyeste = INDLAEG[0];
         var bar = document.getElementById('tmaProgress');
         var hdr = document.getElementById('mainHeader');
         var rod = document.scrollingElement || document.documentElement;
-        var onScroll = function () {
-          var st = window.scrollY || rod.scrollTop, hoejde = window.innerHeight, max = rod.scrollHeight - hoejde;
+        // Målingen venter til næste skærmopdatering (requestAnimationFrame), højst én gang pr. billede, og køres
+        // første gang efter 'load'. Før kørte den med det samme, mens siden blev bygget: sidens højde tvang
+        // browseren til at regne layoutet ud før tid (PageSpeed 2/11-2026: "forced reflow" 69 ms på mobil).
+        // Højden måles kun, når der er rullet — ved toppen er bjælken alligevel 0 og knappen skjult.
+        var venter = false;
+        var maal = function () {
+          venter = false;
+          var st = window.scrollY, hoejde = window.innerHeight;
+          var max = st > 0 ? rod.scrollHeight - hoejde : 0;
           if (bar) bar.style.width = (max > 0 ? (st / max) * 100 : 0) + '%';
           if (hdr) hdr.classList.toggle('rullet', st > 8);
-          if (topBtn) topBtn.classList.toggle('visible', st > 400 && st + hoejde < rod.scrollHeight - 120);
+          if (topBtn) topBtn.classList.toggle('visible', st > 400 && st < max - 120);
+        };
+        var onScroll = function () {
+          if (venter) return;
+          venter = true;
+          requestAnimationFrame(maal);
         };
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onScroll);
-        onScroll();
+        if (document.readyState === 'complete') onScroll();
+        else window.addEventListener('load', onScroll, { once: true });
         if (topBtn) topBtn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
         // Kort fader blidt ind, når de rulles i syne
