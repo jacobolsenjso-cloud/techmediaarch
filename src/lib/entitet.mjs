@@ -14,6 +14,10 @@ export const PERSON_TITEL = 'Founder & Editor';
 // Startet juli 2024 (Jacob 2/11-2026; den ældste artikel i arkivet er fra juli 2024)
 export const STARTET = '2024-07';
 export const STARTET_TEKST = 'July 2024';
+// Biografien (Jacob 2/11-2026 valgte udkast "B"; fakta fra ham: tre sites, AI-robotterne sat op selv,
+// krypto-wallets siden 2011). Vises i forfatterboksen, på about-siden og som Person.description.
+// Kun det, Jacob har sagt er sandt — intet tilføjes uden ham.
+export const PERSON_BIO = 'Jacob builds and runs three websites himself, including Tech Media Arch, and set up the AI robots that research and draft their articles. Over the years he has done affiliate marketing, SEO, image and video editing and YouTube channel setup, and he has used Bitcoin and crypto wallets since 2011, so security questions are personal to him. He lives in Denmark.';
 // Sitets egne profiler (YouTube, Pinterest, X, Facebook …). TOM indtil Jacob har oprettet dem,
 // og de linker tilbage til sitet. Én linje pr. profil, fx 'https://www.pinterest.com/techmediaarch/'.
 export const PROFILER = [];
@@ -34,7 +38,7 @@ export function organisation(emner) {
 }
 export function person(emner) {
   return {
-    '@type': 'Person', '@id': PERSON_ID, name: PERSON_NAVN, jobTitle: PERSON_TITEL,
+    '@type': 'Person', '@id': PERSON_ID, name: PERSON_NAVN, jobTitle: PERSON_TITEL, description: PERSON_BIO,
     url: `${SITE}/p/about-us`, image: `${SITE}/jacob-olsen.png`,
     worksFor: { '@id': ORG_ID }, knowsAbout: emner,
   };

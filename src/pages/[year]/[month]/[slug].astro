@@ -10,7 +10,7 @@ import { emneUrl } from '../../../lib/emner';
 import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret, startListe, iHylde } from '../../../lib/hylder';
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
-import { udgiverRef, PERSON_ID, PERSON_NAVN } from '../../../lib/entitet.mjs';
+import { udgiverRef, PERSON_ID, PERSON_NAVN, PERSON_TITEL, PERSON_BIO, BRAND } from '../../../lib/entitet.mjs';
 import { efterRang } from '../../../lib/kilderang.mjs';
 import { maerketBillede, miniSrcset } from '../../../lib/temakoder.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
@@ -458,7 +458,9 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
         <img src="/jacob-olsen.png" alt="Jacob S. Olsen" class="author-box-photo" width="80" height="80" loading="lazy" />
         <div>
           <p class="author-box-name">Jacob S. Olsen</p>
-          <p class="author-box-title">Runs Tech Media Arch, from Denmark</p>
+          {/* Titel og biografi fra src/lib/entitet.mjs (2/11-2026), så de er ens med about-siden og schemaet */}
+          <p class="author-box-title">{PERSON_TITEL}, {BRAND}</p>
+          <p class="author-box-bio">{PERSON_BIO}</p>
           {p.robot ? (
             <>
               <p class="author-box-bio">How this answer was made: it starts from a question people search for on Google. A language model researches it on the web and writes the short answer first, then the details; it is only published if at least two sources check out. It publishes automatically — I do not read every answer before it goes live.</p>

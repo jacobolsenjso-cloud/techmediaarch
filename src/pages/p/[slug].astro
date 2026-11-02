@@ -5,7 +5,7 @@
 import MainLayout from '../../layouts/MainLayout.astro';
 import { SIDER } from '../../lib/indhold';
 import { faqSchema } from '../../lib/faqschema.mjs';
-import { SITE, ORG_ID, BESKRIVELSE, BRAND, PERSON_NAVN, PERSON_TITEL, STARTET_TEKST } from '../../lib/entitet.mjs';
+import { SITE, ORG_ID, BESKRIVELSE, BRAND, PERSON_NAVN, PERSON_TITEL, PERSON_BIO, STARTET_TEKST } from '../../lib/entitet.mjs';
 
 export function getStaticPaths() {
   // (skal stå inde i funktionen: Astro kører getStaticPaths isoleret)
@@ -49,6 +49,7 @@ const sideSchema = [faq, aboutSchema].filter(Boolean);
     .about-kort .about-kort-navn { font-size: 1.25rem; font-weight: 700; margin: 2px 0 4px; color: var(--text-color); }
     .about-kort .about-kort-linje { font-size: 0.95rem; color: var(--ink-2); line-height: 1.5; }
     .about-kort a { color: var(--teal-text); }
+    .about-kort .about-kort-bio { font-family: var(--font-serif); font-size: 0.98rem; line-height: 1.6; color: var(--ink-2); margin-top: 10px; }
     @media (max-width: 480px) { .about-kort { flex-direction: column; text-align: center; } .about-maerke-navn { font-size: 1.7rem; } .about-prik { display: none; } .about-siden { display: block; } }
     /* Sitemap-siden: Bloggers beholder var 100vw bred og trukket ud til begge kanter.
        Med sidemenuen her stak den 22 px ud under rullebjælken (målt 28/9) — holdes i kolonnen, som Watch */
@@ -75,6 +76,7 @@ const sideSchema = [faq, aboutSchema].filter(Boolean);
           <p class="about-kort-navn">{PERSON_NAVN}</p>
           <p class="about-kort-linje">{PERSON_TITEL}, {BRAND}</p>
           <p class="about-kort-linje">Denmark · <a href="mailto:info@techmediaarch.com">info@techmediaarch.com</a></p>
+          <p class="about-kort-bio">{PERSON_BIO}</p>
         </div>
       </div>
     )}
