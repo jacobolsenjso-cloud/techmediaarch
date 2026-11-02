@@ -230,12 +230,36 @@ for (const model of [undefined, undefined, 'gemini-3.5-flash', 'gemini-3.5-flash
 }
 if (kilder.length < 2) throw new Error(`Research gav kun ${kilder.length} kilder — artiklen afvist`);
 
+// Officielle kilder (Jacob 2/11-2026, E-E-A-T: "fra de officielle kanaler … lige meget hvilken artikel"). Målt 2/11:
+// kun 26 af 246 kilder i de 56 robotartikler var officielle, selv om research-opgaven beder om dem. Derfor én ekstra,
+// målrettet søgning, der KUN må bruge producentens egne sider, standardorganer og myndigheder. Dens kilder sættes
+// forrest, så de kontrolleres først (højst én side pr. domæne) og står øverst på listen (src/lib/kilderang.mjs).
+// Finder den ingen (bredt emne uden én producent), fortsætter robotten som før. Kildenumrene forskydes med 1000,
+// så Googles kobling mellem fakta og kilder (stoette) ikke blandes med den første søgnings numre.
+const officielOpgave = `Use Google Search to find OFFICIAL pages about the product, service, platform or standard these questions are about:
+- ${[valgt.hoved, ...valgt.beslaegtede].join('\n- ')}
+Only use pages published by the maker of the product or service (its own documentation, help, support or developer pages), the standards body behind it, or a government agency (e.g. learn.microsoft.com, support.apple.com, support.google.com, developer.mozilla.org, nist.gov, cisa.gov). Do not use news sites, blogs, encyclopedias, course sites or resellers.
+Return 6-12 short bullet points of concrete facts from those official pages, each starting with the organization's name (e.g. "Microsoft: ..."). Only facts that are true today (${new Date().toISOString().slice(0, 10)}).
+If the questions are not about a specific product, service or standard with an official source, return exactly: NONE`;
+try {
+  const r = await skriv(officielOpgave, { soeg: true, temperatur: 0.2 });
+  const punkter = (r.tekst.match(/^\s*(?:[-*•]|\d+\.)\s+/gm) || []).length;
+  if (/^\s*NONE\s*$/i.test(r.tekst) || !r.kilder.length || !punkter) log(`- Officielle kilder: ingen (emnet har ingen enkelt producent, eller søgningen fandt intet).`);
+  else {
+    fakta = `${r.tekst.trim()}\n${fakta}`;
+    kilder = [...r.kilder.map((k) => ({ ...k, i: k.i + 1000 })), ...kilder];
+    stoette = [...stoette, ...(r.stoette || []).map((s) => ({ ...s, kilder: s.kilder.map((i) => i + 1000) }))];
+    log(`- Officielle kilder: ${r.kilder.length} søgekilder, ${punkter} faktapunkter lagt forrest.`);
+  }
+} catch (e) { log(`- Officielle kilder: ${e.message.slice(0, 120)} — fortsætter uden.`); }
+
 // Kun kilder, der står under "Sources" (Jacob 29/10-2026). Før blev kilderne kontrolleret EFTER skrivningen, og kun
 // de første 4 kom på listen — prøve #31 nævnte ca. 15 kilder i teksten med 4 på listen. Nu: kontrollér op til 20,
 // skriv kun ud fra fakta fra de kontrollerede (Googles kobling, ellers navnet), og vis præcis de kilder, fakta
 // kommer fra. Se robot/lib/kildenavne.mjs. Prøve #32 blev afvist med 10 fakta via navnet alene — derfor koblingen.
 const MIN_FAKTA = 12;
-const { sat: kontrollerede, afvist: kildeAfvist } = await kontrollerKilder(kilder, 20);
+// 30 (før 20, 2/11-2026): de officielle søgekilder står nu forrest, så de almindelige ikke må skubbes ud
+const { sat: kontrollerede, afvist: kildeAfvist } = await kontrollerKilder(kilder, 30);
 const kf = kunKontrolleredeFakta(fakta, kontrollerede, stoette, { loft: KILDE_LOFT, minFakta: MIN_FAKTA, maksLoft: KILDE_LOFT_MAKS });
 const kildeLinks = kf.brugte;
 log(`- Kilder kontrolleret før skrivning: ${kontrollerede.length} bestod (${kildeAfvist.length} afvist: ${kildeAfvist.map((a) => `${a.kilde} – ${a.grund}`).join('; ') || 'ingen'})`);

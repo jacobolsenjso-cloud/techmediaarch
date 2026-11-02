@@ -117,10 +117,12 @@ export function kunKontrolleredeFakta(fakta, kilder, stoette = [], { loft = Infi
     if (!hvem.length) { const n = m ? norm(m[1].replace(/\(.*?\)/g, '')) : ''; hvem = n.length >= 2 ? kilder.filter((k) => daekker(k, n)) : []; via = hvem.length ? 'navn' : ''; }
     return { l, m, hvem, via };
   });
-  // 2. Loftet: kilderne med flest punkter først (ved lighed: den officielle kilde, src/lib/kilderang.mjs 2/11-2026,
-  //    derefter søgningens rækkefølge)
+  // 2. Loftet: officielle kilder (src/lib/kilderang.mjs) først, så de aldrig falder ud på grund af få punkter
+  //    (Jacob 2/11-2026: officielle kanaler i alle artikler); derefter flest punkter, så søgningens rækkefølge.
+  //    Dækker de valgte for få fakta, udvider løkken nedenfor loftet som før (op til maksLoft).
   const antal = new Map(); for (const v of vurderet) for (const k of v.hvem) antal.set(k, (antal.get(k) || 0) + 1);
-  const raekke = kilder.filter((k) => antal.get(k)).sort((a, b) => antal.get(b) - antal.get(a) || kildeRang(a.url) - kildeRang(b.url) || kilder.indexOf(a) - kilder.indexOf(b));
+  const officiel = (k) => (kildeRang(k.url) === 0 ? 0 : 1);
+  const raekke = kilder.filter((k) => antal.get(k)).sort((a, b) => officiel(a) - officiel(b) || antal.get(b) - antal.get(a) || kildeRang(a.url) - kildeRang(b.url) || kilder.indexOf(a) - kilder.indexOf(b));
   const daekket = (n) => { const s = new Set(raekke.slice(0, n)); return vurderet.filter((v) => v.hvem.some((k) => s.has(k))).length; };
   let n = Math.min(loft, raekke.length);
   while (n < Math.min(maksLoft, raekke.length) && daekket(n) < minFakta) n++;
