@@ -2,7 +2,7 @@
 // når siden svarer live. Afvisningslisterne er kopieret fra techfeedwatch
 // (src/lib/eksterne-links.mjs), hvor de er målt i drift: ingen forkortere,
 // ingen sociale medier/butikker, ingen affiliate-links, højst ét pr. domæne.
-import { efterRang } from '../../src/lib/kilderang.mjs';
+import { efterRang, kildeRang } from '../../src/lib/kilderang.mjs';
 const UA = 'techmediaarch-robot/1.0 (+https://www.techmediaarch.com)';
 export const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
 const FORKORTERE = /(^|\.)(bit\.ly|tinyurl\.com|t\.co|goo\.gl|ow\.ly|buff\.ly|rebrand\.ly|cutt\.ly|is\.gd|amzn\.to|geni\.us|linktr\.ee|lnk\.to|bitdefend\.me|shorturl\.at|tiny\.cc|rb\.gy|s\.id|bl\.ink|dub\.sh|shor\.by|smarturl\.it|hyperurl\.co|kit\.co|beacons\.ai|stan\.store|bio\.link)$/i;
@@ -28,7 +28,10 @@ async function hent(u, timeoutMs = 10000) {
     try { res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': UA, accept: 'text/html' } }); }
     catch (e) { if (ctrl.signal.aborted) throw e; res = await somBrowser(); }
     if (res.status === 403 || res.status === 429) res = await somBrowser();
-    if (res.status !== 200 || !/text\/html/i.test(res.headers.get('content-type') || '')) return null;
+    // Årsagen gemmes (2/11-2026): "svarer ikke med en side" alene kunne ikke forklare, hvorfor 17 microsoft.com-kilder
+    // faldt fra i prøve #49, mens de samme sider svarede 200 udefra. Nu står HTTP-koden/typen/værten i loggen.
+    if (res.status !== 200) return { fejl: `HTTP ${res.status} fra ${new URL(res.url).hostname}` };
+    if (!/text\/html/i.test(res.headers.get('content-type') || '')) return { fejl: `ikke HTML (${(res.headers.get('content-type') || '?').split(';')[0]}) fra ${new URL(res.url).hostname}` };
     const html = (await res.text()).slice(0, 300000);
     // Afkod HTML-tegn i titlen (ellers blev "What's" til "What&amp;#39;s" i kildelisten, målt 26/9).
     const afkod = (t) => t.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(n)).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)))
@@ -36,8 +39,8 @@ async function hent(u, timeoutMs = 10000) {
       .replace(/&(ndash|mdash|rsquo|lsquo|rdquo|ldquo|hellip|middot|bull|trade|reg|copy);/g, (_, n) => ({ ndash: '–', mdash: '—', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“', hellip: '…', middot: '·', bull: '•', trade: '™', reg: '®', copy: '©' })[n])
       .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
     const titel = afkod(afkod((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || '').replace(/\s+/g, ' '))).trim();
-    return titel ? { url: res.url, titel } : null;
-  } catch { return null; } finally { clearTimeout(t); }
+    return titel ? { url: res.url, titel } : { fejl: `ingen titel på ${new URL(res.url).hostname}` };
+  } catch (e) { return { fejl: ctrl.signal.aborted ? `tidsudløb (${timeoutMs / 1000} s)` : `forbindelse: ${e.cause?.code || e.name}` }; } finally { clearTimeout(t); }
 }
 
 // Kilder fra Gemini → højst `max` kontrollerede links. Returnerer { sat, afvist }.
@@ -46,17 +49,26 @@ export async function kontrollerKilder(kilder, max = 4) {
   for (const k of kilder) {
     if (sat.length >= max) break;
     const s = await hent(k.uri);
-    if (!s) { afvist.push({ kilde: k.titel, grund: 'svarer ikke med en side' }); continue; }
+    if (!s || s.fejl) { afvist.push({ kilde: k.titel, grund: `svarer ikke med en side${s?.fejl ? ` (${s.fejl})` : ''}` }); continue; }
     let url; try { url = ren(s.url); } catch { afvist.push({ kilde: k.titel, grund: 'ugyldig adresse' }); continue; }
     const host = new URL(url).hostname;
     if (erPlatform(host)) { afvist.push({ kilde: host, grund: 'forkorter/platform' }); continue; }
     if (AFFILIATE_URL.test(url)) { afvist.push({ kilde: host, grund: 'affiliate' }); continue; }
-    const dom = hovedNavn(host);
+    // Officielle kilder (src/lib/kilderang.mjs) tælles pr. underdomæne, højst 3 pr. firma: målt 2/11-2026 (prøve #49)
+    // gav "ét pr. domæne" kun 2 kilder, fordi learn.microsoft.com, support.microsoft.com og www.microsoft.com talte som én.
+    // Producentens dokumentation og hjælpesider er forskellige, gode kilder. Alle andre: stadig højst én pr. domæne.
+    const hoved = hovedNavn(host);
+    const officiel = kildeRang(url) === 0;
+    const dom = officiel ? host.toLowerCase().replace(/^www\./, '') : hoved;
+    const fraFirma = sat.filter((x) => x.hoved === hoved).length;
     // Samme domæne igen: ikke et nyt link, men søgekildens nummer huskes på det første (29/10-2026), så fakta fra
     // den anden side af samme domæne stadig tæller som kontrolleret (robot/lib/kildenavne.mjs).
-    if (domaener.has(dom)) { const tidl = sat.find((x) => x.dom === dom); if (tidl && k.i !== undefined) tidl.idx.push(k.i); afvist.push({ kilde: host, grund: 'domæne brugt' }); continue; }
+    if (domaener.has(dom) || (officiel && fraFirma >= 3) || (!officiel && fraFirma > 0)) {
+      const tidl = sat.find((x) => x.dom === dom) || sat.find((x) => x.hoved === hoved);
+      if (tidl && k.i !== undefined) tidl.idx.push(k.i); afvist.push({ kilde: host, grund: 'domæne brugt' }); continue;
+    }
     domaener.add(dom);
-    sat.push({ url, titel: s.titel.slice(0, 110), dom, idx: k.i !== undefined ? [k.i] : [] });
+    sat.push({ url, titel: s.titel.slice(0, 110), dom, hoved, idx: k.i !== undefined ? [k.i] : [] });
   }
   return { sat, afvist };
 }
