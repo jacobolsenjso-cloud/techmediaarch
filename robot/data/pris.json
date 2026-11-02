@@ -347,5 +347,61 @@
   "usd": 0.6074,
   "note": "udkast-50 (manuel prøve, officiel søgning, 8 kilder), lagt på main 2/11",
   "kr": 4.17
+ },
+ {
+  "dato": "2026-11-02T17:14:05.934Z",
+  "artikel": "/2026/11/how-does-generative-ai-learn",
+  "usd": 0.6035,
+  "kr": 4.15,
+  "dele": {
+   "artikel": {
+    "kr": 4.11,
+    "billeder": 4,
+    "soegninger": 3,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-02T17:20:18.747Z",
+  "artikel": "/2026/05/kling-ai-tutorial-create-stunning-ai",
+  "omskrevet": true,
+  "usd": 0.6236,
+  "kr": 4.28,
+  "dele": {
+   "artikel": {
+    "kr": 4.28,
+    "billeder": 4,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-02T17:26:09.384Z",
+  "artikel": "/2026/05/create-15-minute-videos-with-free-ai",
+  "omskrevet": true,
+  "usd": 0.6069,
+  "kr": 4.17,
+  "dele": {
+   "artikel": {
+    "kr": 4.17,
+    "billeder": 3,
+    "soegninger": 7,
+    "ukendtPris": []
+   }
+  }
  }
 ]

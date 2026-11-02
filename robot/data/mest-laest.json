@@ -1,26 +1,46 @@
 {
- "hentet": "2026-10-31T22:31:28.605Z",
- "fra": "2026-10-25",
- "til": "2026-10-31",
+ "hentet": "2026-11-02T17:14:05.927Z",
+ "fra": "2026-10-27",
+ "til": "2026-11-02",
  "dage": 7,
  "sider": {
   "/2026/10/what-are-intelligent-agents-ai": {
-   "visninger": 7,
-   "brugere": 3
+   "visninger": 15,
+   "brugere": 5
+  },
+  "/2026/10/what-is-included-in-microsoft-365": {
+   "visninger": 10,
+   "brugere": 2
+  },
+  "/2026/10/how-generative-ai-creates-images": {
+   "visninger": 6,
+   "brugere": 2
   },
   "/2026/09/what-are-phishing-emails": {
-   "visninger": 4,
-   "brugere": 1
+   "visninger": 5,
+   "brugere": 2
   },
   "/2026/10/how-phishing-resistant-mfa-works": {
-   "visninger": 4,
-   "brugere": 1
+   "visninger": 5,
+   "brugere": 2
+  },
+  "/2026/05/exploring-claude-just-changed-making": {
+   "visninger": 3,
+   "brugere": 2
   },
   "/2026/05/the-best-ai-detector-free-tools-to-spot": {
    "visninger": 3,
    "brugere": 2
   },
+  "/2026/03/guide-to-databricks-success": {
+   "visninger": 2,
+   "brugere": 1
+  },
   "/2026/05/exploring-possibilities-of-openfutureai": {
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/06/agentic-ai-vs-ai-agents-technical": {
    "visninger": 2,
    "brugere": 1
   },
@@ -28,15 +48,27 @@
    "visninger": 2,
    "brugere": 1
   },
+  "/2026/10/what-is-cybersecurity-importance": {
+   "visninger": 2,
+   "brugere": 2
+  },
   "/2024/08/a-comprehensive-review-of-cyber": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/06/agentic-ai-vs-ai-agents-technical": {
+  "/2024/09/Metas Posts using metas ai tools": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/10/how-generative-ai-creates-images": {
+  "/2026/05/the-real-arch-linux-myths-trade-offs": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/09/what-is-ransomware-cyber-security": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/how-long-learn-web-development": {
    "visninger": 1,
    "brugere": 1
   },
@@ -44,11 +76,19 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/10/what-is-cybersecurity-importance": {
+  "/2026/10/product-management-business-development": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/what-are-crypto-wallet-addresses": {
    "visninger": 1,
    "brugere": 1
   },
   "/2026/10/what-to-do-after-product-management": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/why-system-design-interview": {
    "visninger": 1,
    "brugere": 1
   }

@@ -1871,11 +1871,11 @@
   ]
  },
  "/2026/10/why-seo-is-important": {
-  "dato": "2026-10-03T12:39:47.873Z",
+  "dato": "2026-11-02T17:14:03.876Z",
   "valg": [
    {
-    "q": "What is the future of SEO with AI?",
-    "sti": "/2026/04/is-google-gemini-killing-the-seo-retaine"
+    "q": "What is the best way to learn SEO?",
+    "sti": "/2026/10/seo-best-practices-guide"
    },
    {
     "q": "How does content marketing help with SEO?",
@@ -2360,5 +2360,22 @@
  "/2026/10/what-is-included-in-microsoft-365": {
   "dato": "2026-10-31T22:31:07.170Z",
   "valg": []
+ },
+ "/2026/11/how-does-generative-ai-learn": {
+  "dato": "2026-11-02T17:14:03.118Z",
+  "valg": [
+   {
+    "q": "Difference between large language models and generative AI?",
+    "sti": "/2026/09/large-language-models-vs-generative-ai"
+   },
+   {
+    "q": "How does generative AI work?",
+    "sti": "/2024/08/the-future-of-ai-discover-3-most"
+   },
+   {
+    "q": "How long does it take to learn generative AI?",
+    "sti": "/2026/10/how-generative-ai-creates-images"
+   }
+  ]
  }
 }
