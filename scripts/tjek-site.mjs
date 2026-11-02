@@ -141,7 +141,7 @@ const WORKER = [/^\/$/, /^\/search\/label\//, /^\/search(\?|$)/, /^\/feeds\//, /
 // Links der allerede var døde på Blogger (scripts/kendte-doede-links.txt)
 const KENDTE = new Set(fs.readFileSync(path.resolve('scripts/kendte-doede-links.txt'), 'utf8').split(/\r?\n/).filter((l) => l && !l.startsWith('#')));
 const kendteFundet = new Set();
-let links = 0, billeder = 0, ldJson = 0;
+let links = 0, billeder = 0, ldJson = 0, srcsetFiler = 0;
 const faqSider = new Set();
 const findes = (url) => {
   const ren = url.split('#')[0].split('?')[0];
@@ -193,6 +193,16 @@ for (const f of html) {
     if (u.startsWith('/share-widget') && KENDTE.has('/share-widget?w=poi')) { kendteFundet.add('/share-widget?w=poi'); continue; }
     fejl.push(`MANGLER fil i ${f}: ${u}`);
   }
+  // srcset (2/11-2026, AVIF): hver fil i et srcset — både <img> og <source type="image/avif"> — skal findes.
+  // Browseren falder IKKE tilbage til JPEG, hvis en AVIF-fil mangler: så bliver billedet bare tomt.
+  for (const [, ss] of s.matchAll(/\ssrcset="([^"]*)"/g)) {
+    for (const del of ss.split(',')) {
+      const u = del.trim().split(/\s+/)[0];
+      if (!u.startsWith('/')) continue;
+      srcsetFiler++;
+      if (!findes(u)) fejl.push(`MANGLER fil (srcset) i ${f}: ${u}`);
+    }
+  }
 }
 // Adresser uden .html (29/9-2026) også i sitemap, RSS, llms.txt, søgeindeks og feed-data
 for (const f of [...filer].filter((x) => /\.(xml|txt|json)$/.test(x))) {
@@ -213,7 +223,7 @@ for (const f of [...filer].filter((x) => /\.(xml|txt|json)$/.test(x))) {
 const unik = [...new Set(fejl)];
 console.log(`sider: ${html.length} · Blogger-adresser: ${posts.length + pages.length} · tekst ens: ${tekstOk} af ${posts.length - omskrevne}${omskrevne ? ` (+ ${omskrevne} omskrevet)` : ''}`);
 console.log(`strukturerede data: ${ldJson} blokke · sider med FAQ-data: ${faqSider.size}`);
-console.log(`interne links: ${links} · interne src: ${billeder} · kendte døde links fra Blogger: ${kendteFundet.size} af ${KENDTE.size} · fejl: ${unik.length}`);
+console.log(`interne links: ${links} · interne src: ${billeder} · srcset-filer: ${srcsetFiler} · kendte døde links fra Blogger: ${kendteFundet.size} af ${KENDTE.size} · fejl: ${unik.length}`);
 const VIS = Number(process.env.VIS || 60);
 unik.slice(0, VIS).forEach((f) => console.log('  ' + f));
 if (unik.length > VIS) console.log(`  … og ${unik.length - VIS} til`);

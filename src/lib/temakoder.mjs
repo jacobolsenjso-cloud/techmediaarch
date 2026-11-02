@@ -196,7 +196,8 @@ export function vandmaerke(html) {
       const ss = /\ssrcset=/i.test(img) ? '' : miniSrcset(m);
       const plads = maal ? `(max-width: 900px) min(${maal.b}px, calc(100vw - 24px)), min(${maal.b}px, 790px)` : '(max-width: 900px) calc(100vw - 24px), 790px';
       const ekstra = ss ? ` srcset="${ss}" sizes="${plads}"` : '';
-      return `<span class="tma-wm"${stil}>${medMaal(img, src).replace(/(\ssrc=["'])[^"']+(["'])/i, `$1${m}$2${ekstra}`)}</span>`;
+      const nyImg = medMaal(img, src).replace(/(\ssrc=["'])[^"']+(["'])/i, `$1${m}$2${ekstra}`);
+      return `<span class="tma-wm"${stil}>${ss ? medAvif(nyImg, m, plads) : nyImg}</span>`;
     }
     return `<span class="tma-wm">${img}<span class="tma-wm-tekst">${VANDMAERKE_TEKST}</span></span>`;
   });
@@ -224,4 +225,22 @@ export function miniSrcset(src) {
   const b = billedBredde(`/images/${m[1]}`);
   if (!b || b <= 480) return '';
   return [...KOPI_BREDDER.filter(([, w]) => w < b).map(([mappe, w]) => `/images/${mappe}/${m[1]} ${w}w`), `${src} ${b}w`].join(', ');
+}
+
+// AVIF (2/11-2026, Jacobs ja): samme kopier i AVIF-format, ca. 54 % mindre end JPEG (målt på 80 kopier).
+// Filnavnet er det gamle + ".avif" (fx 9c7c…-gm.jpg.avif), så to billeder aldrig kan få samme navn.
+// scripts/vandmaerk-billeder.mjs laver filerne; scripts/tjek-site.mjs fejler, hvis en af dem mangler.
+// Browseren tager AVIF, hvis den kan, ellers JPEG fra <img> — gamle browsere ser altså det samme som før.
+export function avifSrcset(src) {
+  const ss = miniSrcset(src);
+  return ss ? ss.split(', ').map((d) => d.replace(/^(\S+)/, '$1.avif')).join(', ') : '';
+}
+
+// Pakker et <img>-mærke (som tekst) i <picture> med AVIF først. Bruges, hvor siden bygges som tekst
+// (artikelteksten og "Læs næste"). class="tma-pic" har display: contents (MainLayout), så <picture>
+// ikke ændrer layoutet: billedet opfører sig, som om det stod direkte i sin boks.
+export function medAvif(imgHtml, src, sizes) {
+  const av = avifSrcset(src);
+  if (!av) return imgHtml;
+  return `<picture class="tma-pic"><source type="image/avif" srcset="${av}" sizes="${sizes}" />${imgHtml}</picture>`;
 }

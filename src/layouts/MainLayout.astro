@@ -17,7 +17,7 @@ import { udenHtml } from '../lib/adresse.mjs';
 import { HYLDER, hyldeUrl, iHylde } from '../lib/hylder';
 import { organisation, person, ORG_ID } from '../lib/entitet.mjs';
 import { INDLAEG } from '../lib/indhold';
-import { maerketBillede, miniSrcset } from '../lib/temakoder.mjs';
+import { maerketBillede, miniSrcset, avifSrcset } from '../lib/temakoder.mjs';
 
 interface Props {
   title?: string;
@@ -412,16 +412,20 @@ const nyeste = INDLAEG[0];
       /* Links i teksten er understreget (tynd linje): med serif og grøn alene var de svære at se som links */
       .post-body a { color: var(--teal-text); text-decoration: none; font-weight: 600; border-bottom: 1px solid color-mix(in srgb, var(--teal-text) 45%, transparent); transition: border-color 0.2s; }
       .post-body a:hover { border-bottom-color: var(--teal-text); }
-      .post-body a:has(> img) { border-bottom: 0; }
+      /* AVIF (2/11-2026): billederne står i <picture class="tma-pic"> med AVIF først (temakoder.mjs avifSrcset/medAvif).
+         display: contents = <picture> tæller ikke i layoutet; billedet opfører sig, som om det stod direkte i sin boks.
+         Regler med "> img" skal derfor også nævne "> .tma-pic > img". */
+      .tma-pic { display: contents; }
+      .post-body a:has(> img, > .tma-pic) { border-bottom: 0; }
       .post-body img { max-width: 100%; height: auto; border-radius: var(--radius); }
       /* Vandmærket på billederne — samme udseende som Blogger-temaets script (se temakoder.mjs).
          !important som på Blogger, så billedernes egne gamle Blogger-stile (margin, ramme) ikke vinder. */
       .post-body .tma-wm { position: relative !important; display: block !important; width: fit-content !important; max-width: 100% !important; margin: 2.5rem auto !important; border-radius: var(--radius) !important; overflow: hidden !important; line-height: 0 !important; font-size: 0 !important; }
-      .post-body .tma-wm > img { display: block !important; max-width: 100% !important; width: auto; height: auto !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; box-sizing: border-box !important; border-radius: var(--radius) !important; }
+      .post-body .tma-wm > img, .post-body .tma-wm > .tma-pic > img { display: block !important; max-width: 100% !important; width: auto; height: auto !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; box-sizing: border-box !important; border-radius: var(--radius) !important; }
       /* 1/11-2026: kendte mål (--b fra byggeriet): rammen får billedets bredde (højst 100 %), billedet fylder
          den, og højden følger width/height-forholdet — pladsen er fri, før billedet er hentet (ingen hop/CLS) */
       .post-body .tma-wm[style*="--b"] { width: var(--b) !important; }
-      .post-body .tma-wm[style*="--b"] > img { width: 100% !important; }
+      .post-body .tma-wm[style*="--b"] > img, .post-body .tma-wm[style*="--b"] > .tma-pic > img { width: 100% !important; }
       /* FEJL rettet 1/11-2026 kl. 13 (Jacob så det): robotartiklernes billeder ligger i en billedtekst-tabel, og en
          tabel vokser med indholdet — med fast bredde på rammen (--b) blev tabellen 1366 px og billedet stak 579 px
          ud til højre på computer (139 af 197 artikler). Tabellen er nu altid spaltens bredde med fast opbygning
@@ -548,14 +552,14 @@ const nyeste = INDLAEG[0];
       .top-links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 8px; height: 2px; border-radius: 2px; background: var(--teal); transform: scaleX(0); transform-origin: right center; transition: transform 0.22s ease; }
       .top-links a.active::after, .top-links a:focus-visible::after { transform: scaleX(1); transform-origin: left center; }
       /* Links i brødteksten: en tydelig streg glider ind under ordet (billeder, knapper og bokse er undtaget) */
-      .post-body :is(p, li) a:not(.paa-link):not(.tma-knap):not(:has(> img)) { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 2px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 0.25s ease, border-color 0.2s ease; }
+      .post-body :is(p, li) a:not(.paa-link):not(.tma-knap):not(:has(> img, > .tma-pic)) { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 2px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 0.25s ease, border-color 0.2s ease; }
       /* Ikonknapper, kort, billeder og knapper: bløde overgange */
       .icon-btn { transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
       :is(.article-card, .lead-card, .lead-mini, .side-item) .card-thumb { transition: box-shadow 0.22s ease; }
       :is(.lead-card, .lead-mini, .side-item, .home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"]) { transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease, background 0.2s ease; }
       @media (hover: hover) {
         .top-links a:hover::after { transform: scaleX(1); transform-origin: left center; }
-        .post-body :is(p, li) a:not(.paa-link):not(.tma-knap):not(:has(> img)):hover { background-size: 100% 2px; border-bottom-color: transparent; }
+        .post-body :is(p, li) a:not(.paa-link):not(.tma-knap):not(:has(> img, > .tma-pic)):hover { background-size: 100% 2px; border-bottom-color: transparent; }
         .icon-btn:hover { color: var(--teal-text); border-color: var(--teal); background: var(--card-bg); }
         :is(.article-card, .lead-card, .lead-mini, .side-item):hover .card-thumb { box-shadow: var(--shadow-hover); }
         :is(.lead-mini, .side-item):hover :is(.lead-mini-title, .side-item-title) { color: var(--teal-text); }
@@ -648,7 +652,7 @@ const nyeste = INDLAEG[0];
           <div class="mega-col">
             {nyeste && (
               <a href={nyeste.href} class="mega-nyeste">
-                {nyeste.image && <img src={nyeste.image} srcset={miniSrcset(nyeste.image) || undefined} sizes="320px" alt="" loading="lazy" decoding="async" />}
+                {nyeste.image && <picture class="tma-pic">{avifSrcset(nyeste.image) && <source type="image/avif" srcset={avifSrcset(nyeste.image)} sizes="320px" />}<img src={nyeste.image} srcset={miniSrcset(nyeste.image) || undefined} sizes="320px" alt="" loading="lazy" decoding="async" /></picture>}
                 <span class="mega-nyeste-tekst"><span class="mega-badge">Newest answer</span><span class="mega-nyeste-titel">{nyeste.title}</span></span>
               </a>
             )}

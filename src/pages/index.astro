@@ -8,7 +8,7 @@ import { INDLAEG, datoTekst, udsnit } from '../lib/indhold';
 import { somSporgsmaal, tegnFarve } from '../lib/sporgsmaal.mjs';
 import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret } from '../lib/hylder';
 import { FORSIDE_NYESTE, listeSider } from '../lib/liste';
-import { miniSrcset } from '../lib/temakoder.mjs';
+import { miniSrcset, avifSrcset } from '../lib/temakoder.mjs';
 
 // Forsiden (Jacob 28/10, forslag 2): de 5 nyeste øverst, derefter ét afsnit pr. hylde (1 stor + 3 rækker + "See all").
 // Gitteret med 19 kort er væk; "All articles" fortsætter på /page/2 lige efter de 5 nyeste (lib/liste.ts).
@@ -196,7 +196,7 @@ const VEJE = [
     {hoved && (
       <section class="lead-section" aria-label="Latest">
         <a href={hoved.href} class="lead-card" style={maerke(hoved) ? `--tag-accent: ${maerke(hoved)!.farve}` : undefined}>
-          {hoved.image ? <div class="card-thumb"><img src={hoved.image} srcset={miniSrcset(hoved.image) || undefined} sizes="(max-width: 700px) 92vw, 700px" alt="" loading="eager" /></div> : null}
+          {hoved.image ? <div class="card-thumb"><picture class="tma-pic">{avifSrcset(hoved.image) && <source type="image/avif" srcset={avifSrcset(hoved.image)} sizes="(max-width: 700px) 92vw, 700px" />}<img src={hoved.image} srcset={miniSrcset(hoved.image) || undefined} sizes="(max-width: 700px) 92vw, 700px" alt="" loading="eager" /></picture></div> : null}
           {maerke(hoved) && <span class="lead-eyebrow">{maerke(hoved)!.navn}</span>}
           <h2 class="lead-title">{hoved.title}</h2>
           <p class="lead-excerpt">{udsnit(hoved.description, 230)}</p>
@@ -205,7 +205,7 @@ const VEJE = [
         <div class="lead-secondary">
           {sideHistorier.map((p) => (
             <a href={p.href} class="lead-mini" style={maerke(p) ? `--tag-accent: ${maerke(p)!.farve}` : undefined}>
-              {p.image ? <div class="card-thumb"><img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="(max-width: 520px) 110px, 132px" alt="" loading="lazy" /></div> : <div class="card-thumb card-thumb-empty"></div>}
+              {p.image ? <div class="card-thumb"><picture class="tma-pic">{avifSrcset(p.image) && <source type="image/avif" srcset={avifSrcset(p.image)} sizes="(max-width: 520px) 110px, 132px" />}<img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes="(max-width: 520px) 110px, 132px" alt="" loading="lazy" /></picture></div> : <div class="card-thumb card-thumb-empty"></div>}
               <div>
                 {/* Mærke over titlen (Jacob 5/10-2026), som på hovedhistorien — fra 28/10 hylden i stedet for emnet */}
                 {maerke(p) && <span class="lead-eyebrow lead-mini-eyebrow">{maerke(p)!.navn}</span>}
@@ -247,7 +247,7 @@ const VEJE = [
         </div>
         <div class="hylde-afsnit-grid">
           <a href={stor.href} class="hylde-stor">
-            {stor.image && <img src={stor.image} srcset={miniSrcset(stor.image) || undefined} sizes="(max-width: 860px) 92vw, 620px" alt="" loading="lazy" decoding="async" />}
+            {stor.image && <picture class="tma-pic">{avifSrcset(stor.image) && <source type="image/avif" srcset={avifSrcset(stor.image)} sizes="(max-width: 860px) 92vw, 620px" />}<img src={stor.image} srcset={miniSrcset(stor.image) || undefined} sizes="(max-width: 860px) 92vw, 620px" alt="" loading="lazy" decoding="async" /></picture>}
             <span class="hylde-stor-titel">{stor.title}</span>
             {stor.description && <span class="hylde-stor-besk">{stor.description}</span>}
             <span class="hylde-stor-meta">{datoTekst(stor.published)} · {stor.minutter} min read</span>

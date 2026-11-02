@@ -5,7 +5,7 @@
 import type { Indlaeg } from '../lib/indhold';
 import { datoTekst } from '../lib/indhold';
 import { hyldeFor } from '../lib/hylder';
-import { miniSrcset } from '../lib/temakoder.mjs';
+import { miniSrcset, avifSrcset } from '../lib/temakoder.mjs';
 interface Props { p: Indlaeg; besk?: boolean; hylde?: boolean; lille?: boolean; ivrig?: boolean }
 const { p, besk = true, hylde = true, lille = false, ivrig = false } = Astro.props;
 const h = hyldeFor(p);
@@ -13,7 +13,7 @@ const maerke = h ? { navn: h.navn, farve: h.farve } : p.emner[0] ? { navn: p.emn
 ---
 <a href={p.href} class:list={['raekke', { lille }]}>
   {p.image
-    ? <img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes={lille ? '120px' : '(max-width: 760px) 110px, 200px'} alt="" loading={ivrig ? 'eager' : 'lazy'} decoding="async" />
+    ? <picture class="tma-pic">{avifSrcset(p.image) && <source type="image/avif" srcset={avifSrcset(p.image)} sizes={lille ? '120px' : '(max-width: 760px) 110px, 200px'} />}<img src={p.image} srcset={miniSrcset(p.image) || undefined} sizes={lille ? '120px' : '(max-width: 760px) 110px, 200px'} alt="" loading={ivrig ? 'eager' : 'lazy'} decoding="async" /></picture>
     : <span class="raekke-tom" style={maerke ? `--h: ${maerke.farve}` : undefined}></span>}
   <span class="raekke-tekst">
     {hylde && maerke && <span class="raekke-maerke" style={`--h: ${maerke.farve}`}>{maerke.navn}</span>}
