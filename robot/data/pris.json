@@ -331,5 +331,21 @@
   "usd": 0.4991,
   "note": "udkast-48 (manuel, opskrift 2), lagt på main 1/11",
   "kr": 3.43
+ },
+ {
+  "dato": "2026-11-02T11:36:38.000Z",
+  "artikel": "/2026/10/what-is-included-in-microsoft-365",
+  "omskrevet": true,
+  "usd": 0.5724,
+  "note": "udkast-49 (manuel prøve, officiel søgning) - IKKE lagt live, kun 2 kilder",
+  "kr": 3.93
+ },
+ {
+  "dato": "2026-11-02T11:56:00.000Z",
+  "artikel": "/2026/10/what-is-included-in-microsoft-365",
+  "omskrevet": true,
+  "usd": 0.6074,
+  "note": "udkast-50 (manuel prøve, officiel søgning, 8 kilder), lagt på main 2/11",
+  "kr": 4.17
  }
 ]
