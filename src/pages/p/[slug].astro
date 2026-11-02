@@ -11,7 +11,8 @@ export function getStaticPaths() {
   // (skal stå inde i funktionen: Astro kører getStaticPaths isoleret)
   // Watch-siden er slettet (1/11-2026; workeren sender /p/watch til forsiden med 301).
   // Sitemap-siden har fra 1/11-2026 sin egen skabelon (p/sitemap.astro) — bygget fra hylderne, ikke Blogger-HTML
-  const UDELAD = new Set(['sitemap']);
+  // Start Here har fra 2/11-2026 også sin egen skabelon (p/start-here.astro) — bygget fra de 5 hylder
+  const UDELAD = new Set(['sitemap', 'start-here']);
   return SIDER.filter((s) => !UDELAD.has(s.navn)).map((s) => ({ params: { slug: s.navn }, props: { s } }));
 }
 const { s } = Astro.props;

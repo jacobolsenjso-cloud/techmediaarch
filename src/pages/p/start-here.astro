@@ -1,0 +1,64 @@
+---
+// Start Here /p/start-here (2/11-2026, Jacob: "alle sider i footeren skal gennemgås"). Afløser Blogger-siden fra 14/9,
+// der beskrev det gamle videokoncept, de gamle emner (Vlog, Web3, Crypto …) og havde en liste, der hang på "Loading…".
+// Bygges nu af de 5 hylder (src/lib/hylder.ts): hyldens godkendte "Start here"-liste, ellers de nyeste svar.
+// Så kan siden ikke forælde, når hylderne ændrer sig. src/content/pages/start-here.md bevares (titel/beskrivelse
+// til feeds, sitemap-pages.xml og Markdown-udgaven), men bygges ikke af p/[slug].astro.
+import MainLayout from '../../layouts/MainLayout.astro';
+import { SIDER } from '../../lib/indhold';
+import { HYLDER, hyldeUrl, startListe, svarIHylde } from '../../lib/hylder';
+
+const side = SIDER.find((s) => s.navn === 'start-here')!;
+const hylder = HYLDER.map((h) => {
+  const start = startListe(h);
+  return { h, start: start.length > 0, liste: start.length ? start : svarIHylde(h).slice(0, 4) };
+});
+---
+<MainLayout title="Start Here" description={side.description} breadcrumb={[{ navn: 'Start Here', href: '/p/start-here' }]}>
+  <style is:global>
+    .sh { max-width: 860px; margin: 0 auto; padding: 30px 20px 30px; box-sizing: border-box; width: 100%; }
+    .sh h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 14px; }
+    .sh-lead { font-family: var(--font-serif); font-size: 1.125rem; line-height: 1.7; color: var(--ink-2); margin: 0 0 28px; }
+    .sh-hylde { border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px 22px; margin: 0 0 18px; background: var(--card-bg); }
+    .sh-hylde h2 { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; margin: 0 0 4px; }
+    .sh-prik { width: 10px; height: 10px; border-radius: 50%; background: var(--h); flex: none; }
+    .sh-besk { color: var(--muted); margin: 0 0 12px; font-size: 0.95rem; }
+    .sh-maerke { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 6px; }
+    .sh-hylde ol { margin: 0 0 12px; padding-left: 1.4em; font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.6; }
+    .sh-hylde li { margin: 4px 0; }
+    .sh-hylde a { color: var(--teal-text); }
+    .sh-alle { font-size: 0.95rem; font-weight: 600; text-decoration: none; }
+    .sh-andet { margin-top: 30px; }
+    .sh-andet h2 { font-size: 1.3rem; margin: 0 0 10px; }
+    .sh-andet ul { display: flex; flex-wrap: wrap; gap: 8px 18px; list-style: none; padding: 0; margin: 0; }
+    .sh-andet a { color: var(--teal-text); font-weight: 600; }
+    @media (max-width: 768px) { .sh { padding: 20px 15px 20px; } .sh h1 { font-size: 1.5rem; } .sh-hylde { padding: 16px; } }
+  </style>
+  <div class="sh">
+    <h1>Start Here</h1>
+    <p class="sh-lead">Tech Media Arch is an archive of short, sourced answers to the tech questions people actually ask. Pick a shelf below and start with the first answer, or browse everything from the links at the bottom.</p>
+    {hylder.map(({ h, start, liste }) => (
+      <section class="sh-hylde" style={`--h: ${h.farve}`}>
+        <h2><span class="sh-prik" aria-hidden="true"></span>{h.navn}</h2>
+        <p class="sh-besk">{h.besk}</p>
+        {liste.length > 0 && <>
+          <p class="sh-maerke">{start ? 'Read in this order' : 'Newest answers'}</p>
+          <ol>{liste.map((p) => <li><a href={p.href}>{p.title}</a></li>)}</ol>
+        </>}
+        <a class="sh-alle" href={hyldeUrl(h)}>All answers on {h.navn} →</a>
+      </section>
+    ))}
+    <nav class="sh-andet" aria-label="Other ways in">
+      <h2>Other ways in</h2>
+      <ul>
+        <li><a href="/latest">Newest</a></li>
+        <li><a href="/trending">Most read</a></li>
+        <li><a href="/a-z">A–Z index</a></li>
+        <li><a href="/p/sitemap">Sitemap</a></li>
+        <li><a href="/p/about-us">About Us</a></li>
+        <li><a href="/p/editorial-guidelines">How answers are made</a></li>
+        <li><a href="/p/faq">FAQ</a></li>
+      </ul>
+    </nav>
+  </div>
+</MainLayout>

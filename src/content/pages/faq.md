@@ -1,73 +1,27 @@
 ---
 title: F.A.Q
-description: "Frequently asked questions about Tech Media Arch: what the blog covers, how often new articles are published and how to find them."
+description: "Frequently asked questions about Tech Media Arch: what the archive is, who runs it, how the answers are written and checked, and how to report an error."
 published: 2025-10-03T19:25:00.000+02:00
-updated: 2026-10-05T10:26:08.710Z
+updated: 2026-11-02T12:00:00.000+01:00
 bloggerId: "7104141226660280480"
 ---
-<br /><span id="docs-internal-guid-fc89ccbd-7fff-d206-03a8-4794892702a1"><div style="text-align: center;"><div class="separator" style="clear: both; text-align: center;"><a href="/images/968c28856caa9abd.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img alt="Frequently asked questions - Tech Media Arch" border="0" data-original-height="1080" data-original-width="1920" height="225" src="/images/968c28856caa9abd.png" title="Frequently asked questions" width="400" /></a></div><br /></div><div style="text-align: center;"><a href="/p/about-us.html" style="font-family: Arial, sans-serif; font-size: 14pt; font-weight: 700; white-space-collapse: preserve;" target="">{getButton} $text={Read About Us Here} $icon={link} $color={#0d1eb9}</a></div><div style="text-align: center;"><br /></div></span><details><summary>What is Tech Media Arch about?</summary>
-  <div>
-    <p>Tech Media Arch is a blog that provides insights, reviews, and news about the latest technology trends, gadgets, software, and media developments.
-</p>
-  </div>
-</details>
-<details open="">
-  <summary>How often do you publish new content?</summary>
-  <div>
-    <p>New articles are published on most days, covering a variety of topics. How they are made is explained in our Editorial Guidelines.
-</p>
-  </div>
-</details>
-<details>
-  <summary>What types of technology topics do you cover?</summary>
-  <div>
-    <p>Our blog covers a wide range of technology topics, including product reviews, software tips, tech news, tutorials, and industry trends.</p>
-  </div>
-</details>
-<details>
-  <summary>Do you provide reviews for all types of gadgets?</summary>
-  <div>
-    <p>Yes, We review a variety of gadgets, not all of them, so that our readers can make informed buying decisions.
-</p>
-  </div>
-</details>
-<details>
-  <summary>Do you cover media-related topics as well?</summary>
-  <div>
-    <p>Yes, we explore various media topics including digital content creation tools, and industry news related to media technology.
-</p>
-  </div>
-</details>
-<details>
-  <summary>Can I contribute an article to Tech Media Arch?</summary>
-  <div>
-    <p>Tech Media Arch does not publish guest articles at the moment. Ideas and tips are welcome at info@techmediaarch.com. </p>
-  </div>
-</details>
-<details>
-  <summary>How can I provide feedback on your articles?&nbsp; &nbsp; &nbsp;&nbsp;</summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary>&nbsp;&nbsp;</summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><a href="/p/about-us.html" style="font-family: Arial, sans-serif; font-size: 14pt; font-weight: 700; text-align: center; white-space-collapse: preserve;" target="_blank">{getButton} $text={Read About Us Here} $icon={link} $color={#0d1eb9}</a></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary><summary><br /></summary>
-  <div>
-  <p>We appreciate feedback from our readers. Send it to info@techmediaarch.com, and include the link to the article if it is about an error. </p><p><br /></p><br />
-  </div>
-</details>
-<script type="application/ld+json">{
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {"@type":"Question","name":"What is Tech Media Arch about?","acceptedAnswer":{"@type":"Answer","text":"Tech Media Arch is a blog that provides insights, reviews, and news about the latest technology trends, gadgets, software, and media developments."}},
-      {"@type":"Question","name":"How often do you publish new content?","acceptedAnswer":{"@type":"Answer","text":"New articles are published on most days, covering a variety of topics. How they are made is explained in our Editorial Guidelines."}},
-      {"@type":"Question","name":"What types of technology topics do you cover?","acceptedAnswer":{"@type":"Answer","text":"Our blog covers a wide range of technology topics, including product reviews, software tips, tech news, tutorials, and industry trends."}},
-      {"@type":"Question","name":"Do you provide reviews for all types of gadgets?","acceptedAnswer":{"@type":"Answer","text":"Yes, We review a variety of gadgets, not all of them, so that our readers can make informed buying decisions."}},
-      {"@type":"Question","name":"Do you cover media-related topics as well?","acceptedAnswer":{"@type":"Answer","text":"Yes, we explore various media topics including digital content creation tools, and industry news related to media technology."}},
-      {"@type":"Question","name":"Can I contribute an article to Tech Media Arch?","acceptedAnswer":{"@type":"Answer","text":"Tech Media Arch does not publish guest articles at the moment. Ideas and tips are welcome at info@techmediaarch.com."}},
-      {"@type":"Question","name":"How can I provide feedback on your articles?","acceptedAnswer":{"@type":"Answer","text":"We appreciate feedback from our readers. Send it to info@techmediaarch.com, and include the link to the article if it is about an error."}}
-    ]
-  }</script>
-
-
-
-
-
-
-
-<br />
+<p>Short answers about how Tech Media Arch works. For the full picture, see <a href="/p/about-us">About Us</a> and our <a href="/p/editorial-guidelines">Editorial Guidelines</a>.</p>
+<h2>Frequently asked questions</h2>
+<h3>What is Tech Media Arch?</h3>
+<p>Tech Media Arch is an English-language archive of short, sourced answers to the tech questions people actually ask. The answers sit on five shelves: AI Tools &amp; Agents, Cybersecurity, Building Software, Marketing &amp; SEO and Everyday Tech.</p>
+<h3>Who runs Tech Media Arch?</h3>
+<p>Jacob S. Olsen from Denmark started the site in July 2024 and runs it independently. Read more <a href="/p/about-us">about us</a>.</p>
+<h3>Are the answers written by AI?</h3>
+<p>Most answers since late September 2026 are written by an AI language model that researches each question on the web first. The rules it follows are Jacob's, and every AI-written answer says so in its verification record. Jacob does not read every answer before it goes live.</p>
+<h3>How are the facts checked?</h3>
+<p>Every source is opened and checked before an answer is written, and the answer is written only from facts found in those sources. Official sources, such as the maker's own documentation or a government agency, are preferred and listed first. An answer with fewer than two working sources is not published.</p>
+<h3>How often are new answers published?</h3>
+<p>New answers are added several times a week, and older articles are rewritten with the same rules over time. An updated answer shows an "Updated" date next to the publication date.</p>
+<h3>How does Tech Media Arch make money?</h3>
+<p>From ads placed by Google and from affiliate links in some articles. Nobody can pay to be covered or to get a favorable answer. See our <a href="/p/disclosure">Disclosure</a>.</p>
+<h3>Can I write for Tech Media Arch or pay for an article?</h3>
+<p>No. Tech Media Arch does not publish guest articles or sponsored content. Ideas for questions to answer are welcome at info@techmediaarch.com.</p>
+<h3>I found an error. What should I do?</h3>
+<p>Write to info@techmediaarch.com with the link to the answer and what is wrong. Errors are checked and fixed.</p>
+<h3>Is this financial, legal or security advice?</h3>
+<p>No. The answers are general information. For decisions about your money, your legal situation or the security of your own systems, ask a qualified professional.</p>

@@ -1,8 +1,24 @@
 ---
 title: Accessibility Information
-description: "How Tech Media Arch works to make its website accessible to everyone, and how to tell us about accessibility problems."
+description: "How Tech Media Arch works to make the site usable for everyone, what has been checked, the known limits, and how to report an accessibility problem."
 published: 2025-03-03T17:05:00.000+01:00
-updated: 2025-03-03T17:05:33.720+01:00
+updated: 2026-11-02T12:00:00.000+01:00
 bloggerId: "3319326911589587240"
 ---
-<h3 style="text-align: left;"><b><span style="background-color: white; font-family: arial; font-size: small;"><span style="white-space-collapse: preserve;">Tech Media Arch</span></span></b></h3><span id="docs-internal-guid-f684bb1f-7fff-7549-e980-d21a4e34ad02"><p dir="ltr" style="line-height: 1.38; margin-bottom: 13pt; margin-top: 0pt;"><span face="&quot;Open Sans&quot;, sans-serif" style="background-color: white; color: #1a1a1a; font-family: arial; font-size: 11pt; font-variant-alternates: normal; font-variant-east-asian: normal; font-variant-numeric: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;">www.Techmediaarch.com has utilized guidelines issued by the Web Accessibility Initiative (WAI) of the World Wide Web Consortium (W3C) to implement functional improvements to techmediaarch.com.</span></p><p dir="ltr" style="line-height: 1.38; margin-bottom: 13pt; margin-top: 0pt;"><span face="&quot;Open Sans&quot;, sans-serif" style="background-color: white; color: #1a1a1a; font-family: arial; font-size: 11pt; font-variant-alternates: normal; font-variant-east-asian: normal; font-variant-numeric: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;">We are working to ensure that all content on the techmediaarch.com sites meets the Level AA Success Criteria outlined in WCAG 2.0. and in the future WCAG3. If you have any questions or comments, please contact our Digital Accessibility Coordinator at email: info@techmediaarch.com.</span></p><p dir="ltr" style="line-height: 1.38; margin-bottom: 13pt; margin-top: 0pt;"><span style="background-color: white; font-family: arial;"><span face="&quot;Open Sans&quot;, sans-serif" style="color: #1a1a1a; font-size: 11pt; font-variant-alternates: normal; font-variant-east-asian: normal; font-variant-numeric: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;">While we strive to make t</span><span face="&quot;Open Sans&quot;, sans-serif" style="color: #1a1a1a; font-size: 14.6667px; white-space-collapse: preserve;">echmediaarch.com</span><span face="&quot;Open Sans&quot;, sans-serif" style="color: #1a1a1a; font-size: 11pt; white-space-collapse: preserve;"> as accessible as possible and to meet the WCAG 2.0 guidelines, our pages may not always pass online validation tools. If you notice ways we can improve the usability and accessibility of our sites, please send your suggestions to our Digital Accessibility Coordinator at email: </span><span face="&quot;Open Sans&quot;, sans-serif" style="color: #1a1a1a; font-size: 14.6667px; white-space-collapse: preserve;">info@techmediaarch.com</span><span face="&quot;Open Sans&quot;, sans-serif" style="color: #1a1a1a; font-size: 11pt; white-space-collapse: preserve;">.</span></span></p><div><span face="&quot;Open Sans&quot;, sans-serif" style="background-color: white; color: #1a1a1a; font-family: arial; font-size: 11pt; font-variant-alternates: normal; font-variant-east-asian: normal; font-variant-numeric: normal; font-variant-position: normal; vertical-align: baseline; white-space-collapse: preserve;">If you still need to read our <a href="/p/terms-conditions.html" target="_blank">Terms &amp; Conditions</a>.</span></div></span>
+<p>Tech Media Arch should be easy to read and use for everyone, including people who use a screen reader, a keyboard or zoom. We aim to meet the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA.</p>
+<h2>What we do</h2>
+<ul>
+<li>Pages use real headings, lists and links, so screen readers and keyboards can move through them.</li>
+<li>Text and buttons are checked for color contrast.</li>
+<li>Images in new answers have a text description (alt text). Images are illustrations, so no information is given only as a picture.</li>
+<li>The site works when zoomed and on small screens, and there is a dark mode.</li>
+<li>Pages are checked with Google Lighthouse. In November 2026 the front page scored 100 for accessibility on mobile.</li>
+</ul>
+<h2>Known limits</h2>
+<ul>
+<li>Ads are placed by Google, and we cannot fully control how accessible they are.</li>
+<li>Some older articles have images without a useful text description. They are improved when the articles are rewritten.</li>
+<li>Embedded YouTube videos in older articles follow YouTube's own player.</li>
+</ul>
+<h2>Tell us about a problem</h2>
+<p>If something is hard to use, write to info@techmediaarch.com with the address of the page and what went wrong. We will try to fix it.</p>
