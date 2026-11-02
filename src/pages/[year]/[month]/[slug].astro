@@ -11,6 +11,7 @@ import { HYLDER, hyldeFor, hyldeUrl, hyldeSorteret, startListe, iHylde } from '.
 import Maerke from '../../../components/Maerke.astro';
 import { faqSchema } from '../../../lib/faqschema.mjs';
 import { udgiverRef, PERSON_ID, PERSON_NAVN } from '../../../lib/entitet.mjs';
+import { efterRang } from '../../../lib/kilderang.mjs';
 import { maerketBillede, miniSrcset } from '../../../lib/temakoder.mjs';
 import { ogsaaSpurgt } from '../../../lib/ogsaaspurgt.mjs';
 import { tegnFarve } from '../../../lib/sporgsmaal.mjs';
@@ -112,7 +113,11 @@ const relaterede = [...new Set([...somHylde, ...somEmne, ...INDLAEG])].filter((x
 // "Last verified" kommer først, når robotten faktisk tjekker artiklerne igen (trin 7).
 const kildeStart = krop.search(/<h2[^>]*>\s*Sources\s*<\/h2>/i);
 const kildeListe = kildeStart >= 0 ? (krop.slice(kildeStart).match(/<ul[\s\S]*?<\/ul>/) || [''])[0] : '';
-const kildeVaerter = [...new Set([...kildeListe.matchAll(/href="https?:\/\/(?:www\.)?([^/"]+)/g)].map((m) => m[1]))];
+// Officielle kilder først (src/lib/kilderang.mjs, 2/11-2026): både boksen (de 3 første værter) og selve listen
+// nederst ordnes ens, så også de ældre robotartikler følger reglen uden at deres tekst ændres.
+const kildeVaerter = [...new Set(efterRang([...kildeListe.matchAll(/href="(https?:\/\/(?:www\.)?([^/"]+)[^"]*)"/g)], (m) => m[1]).map((m) => m[2]))];
+const ordnetKilder = kildeListe.replace(/^(<ul[^>]*>)([\s\S]*)(<\/ul>)$/, (_, a, indre, b) => a + efterRang(indre.match(/<li[\s\S]*?<\/li>/g) || [], (li) => (li.match(/href="([^"]+)"/) || [])[1] || '').join('') + b);
+const medKildeOrden = (html) => (kildeListe && ordnetKilder !== kildeListe ? html.replace(kildeListe, () => ordnetKilder) : html);
 
 // Indholdsfortegnelse ved 3+ overskrifter. Bliver den lang (de ældre indlæg har
 // op til 40), vises kun hovedafsnittene (h2), så den ikke fylder en hel skærm.
@@ -123,11 +128,11 @@ const tocHtml = toc.length ? `<nav class="toc-container" data-ekstra="1" aria-la
   toc.map((h) => `<a class="toc-depth-${h.niveau}" href="#${esc(h.id)}">${esc(h.tekst)}</a>`).join('')
 }</span></nav>` : '';
 const slut = faqStart >= 0 ? faqStart : krop.length;
-const broedtekst = indsaet(krop, [
+const broedtekst = medKildeOrden(indsaet(krop, [
   { pos: efterFoersteBillede(krop, slut), html: tocHtml },
   { pos: foranMidterOverskrift(krop, slut), html: forslagHtml },
   { pos: slut, html: paaHtml },
-]);
+]));
 
 const schema = {
   '@context': 'https://schema.org',

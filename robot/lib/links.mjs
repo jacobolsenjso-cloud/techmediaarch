@@ -2,6 +2,7 @@
 // når siden svarer live. Afvisningslisterne er kopieret fra techfeedwatch
 // (src/lib/eksterne-links.mjs), hvor de er målt i drift: ingen forkortere,
 // ingen sociale medier/butikker, ingen affiliate-links, højst ét pr. domæne.
+import { efterRang } from '../../src/lib/kilderang.mjs';
 const UA = 'techmediaarch-robot/1.0 (+https://www.techmediaarch.com)';
 export const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
 const FORKORTERE = /(^|\.)(bit\.ly|tinyurl\.com|t\.co|goo\.gl|ow\.ly|buff\.ly|rebrand\.ly|cutt\.ly|is\.gd|amzn\.to|geni\.us|linktr\.ee|lnk\.to|bitdefend\.me|shorturl\.at|tiny\.cc|rb\.gy|s\.id|bl\.ink|dub\.sh|shor\.by|smarturl\.it|hyperurl\.co|kit\.co|beacons\.ai|stan\.store|bio\.link)$/i;
@@ -60,7 +61,8 @@ export async function kontrollerKilder(kilder, max = 4) {
   return { sat, afvist };
 }
 
+// Officielle kilder først (src/lib/kilderang.mjs, 2/11-2026) — samme regel som artikelsiden bruger
 export function kildeliste(sat) {
   if (!sat.length) return '';
-  return `<h2>Sources</h2><ul>${sat.map((k) => `<li><a href="${esc(k.url)}" rel="noopener" target="_blank">${esc(k.titel)}</a></li>`).join('')}</ul>`;
+  return `<h2>Sources</h2><ul>${efterRang(sat, (k) => k.url).map((k) => `<li><a href="${esc(k.url)}" rel="noopener" target="_blank">${esc(k.titel)}</a></li>`).join('')}</ul>`;
 }

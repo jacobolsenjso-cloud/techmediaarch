@@ -3,6 +3,7 @@
 // fordi research brugte ~19 kilder, og kontrollen bagefter kun satte de første 4, der virkede, på listen.
 // Her: (1) hvilke navne en kontrolleret kilde dækker, (2) fakta skæres ned til de kontrollerede kilder,
 // (3) sætninger i teksten, der henviser til en kilde uden for listen, findes, så de kan rettes eller fjernes.
+import { kildeRang } from '../../src/lib/kilderang.mjs';
 
 // Domænedele, der ikke siger noget om kilden
 const TOM = new Set(['www', 'com', 'org', 'net', 'gov', 'edu', 'io', 'co', 'ai', 'uk', 'us', 'de', 'blog', 'news', 'docs', 'learn', 'en', 'support', 'help', 'info', 'app']);
@@ -116,9 +117,10 @@ export function kunKontrolleredeFakta(fakta, kilder, stoette = [], { loft = Infi
     if (!hvem.length) { const n = m ? norm(m[1].replace(/\(.*?\)/g, '')) : ''; hvem = n.length >= 2 ? kilder.filter((k) => daekker(k, n)) : []; via = hvem.length ? 'navn' : ''; }
     return { l, m, hvem, via };
   });
-  // 2. Loftet: kilderne med flest punkter først (ved lighed: søgningens rækkefølge)
+  // 2. Loftet: kilderne med flest punkter først (ved lighed: den officielle kilde, src/lib/kilderang.mjs 2/11-2026,
+  //    derefter søgningens rækkefølge)
   const antal = new Map(); for (const v of vurderet) for (const k of v.hvem) antal.set(k, (antal.get(k) || 0) + 1);
-  const raekke = kilder.filter((k) => antal.get(k)).sort((a, b) => antal.get(b) - antal.get(a) || kilder.indexOf(a) - kilder.indexOf(b));
+  const raekke = kilder.filter((k) => antal.get(k)).sort((a, b) => antal.get(b) - antal.get(a) || kildeRang(a.url) - kildeRang(b.url) || kilder.indexOf(a) - kilder.indexOf(b));
   const daekket = (n) => { const s = new Set(raekke.slice(0, n)); return vurderet.filter((v) => v.hvem.some((k) => s.has(k))).length; };
   let n = Math.min(loft, raekke.length);
   while (n < Math.min(maksLoft, raekke.length) && daekket(n) < minFakta) n++;
