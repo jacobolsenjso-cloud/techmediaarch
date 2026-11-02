@@ -13,6 +13,7 @@ export const PERSON_NAVN = 'Jacob S. Olsen';
 export const PERSON_TITEL = 'Founder & Editor';
 // Startet juli 2024 (Jacob 2/11-2026; den ældste artikel i arkivet er fra juli 2024)
 export const STARTET = '2024-07';
+export const STARTET_TEKST = 'July 2024';
 // Sitets egne profiler (YouTube, Pinterest, X, Facebook …). TOM indtil Jacob har oprettet dem,
 // og de linker tilbage til sitet. Én linje pr. profil, fx 'https://www.pinterest.com/techmediaarch/'.
 export const PROFILER = [];

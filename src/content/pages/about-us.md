@@ -5,7 +5,6 @@ published: 2026-03-05T12:32:00.000+01:00
 updated: 2026-11-02T12:00:00.000+01:00
 bloggerId: "6268712934090928161"
 ---
-<div class="separator" style="clear: both; text-align: center;"><img alt="About Us Tech Media Arch" border="0" height="200" src="/images/fb780b2228feb52d.png" title="About Us" width="400" /></div>
 <p><strong>Tech Media Arch is the checked tech answer archive.</strong> It collects short, sourced answers to the tech questions people actually ask, and keeps them in one place you can come back to. It was started in July 2024 and is run independently by Jacob S. Olsen from Denmark.</p>
 <h2>How an answer works</h2>
 <ul>
@@ -27,4 +26,3 @@ bloggerId: "6268712934090928161"
 <p>Tech Media Arch earns money from ads placed by Google and from affiliate links in some articles. If you buy through an affiliate link, we may earn a commission at no extra cost to you. Nobody can pay to be covered. Read more in our <a href="/p/disclosure">Disclosure</a>.</p>
 <h2>Contact</h2>
 <p>Found an error or have a question? Write to <a href="mailto:info@techmediaarch.com">info@techmediaarch.com</a> or use the <a href="/p/contact-us">Contact Us</a> page. Common questions are answered in our <a href="/p/faq">FAQ</a>.</p>
-<div class="separator" style="clear: both; text-align: center;"><img alt="Tech Media Arch Denmark" border="0" src="/images/1e64dceb65a78518.jpg" title="Jacob S. Olsen, Tech Media Arch" /></div>

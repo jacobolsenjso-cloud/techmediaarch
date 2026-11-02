@@ -5,7 +5,7 @@
 import MainLayout from '../../layouts/MainLayout.astro';
 import { SIDER } from '../../lib/indhold';
 import { faqSchema } from '../../lib/faqschema.mjs';
-import { SITE, ORG_ID, BESKRIVELSE } from '../../lib/entitet.mjs';
+import { SITE, ORG_ID, BESKRIVELSE, BRAND, PERSON_NAVN, PERSON_TITEL, STARTET_TEKST } from '../../lib/entitet.mjs';
 
 export function getStaticPaths() {
   // (skal stå inde i funktionen: Astro kører getStaticPaths isoleret)
@@ -35,12 +35,48 @@ const sideSchema = [faq, aboutSchema].filter(Boolean);
     .static-page { max-width: 860px; margin: 0 auto; padding: 30px 20px 10px; box-sizing: border-box; width: 100%; }
     .static-page h1.page-title { font-size: 2rem; line-height: 1.2; margin: 0 0 20px; }
     @media (max-width: 768px) { .static-page { padding: 20px 15px 10px; } .static-page h1.page-title { font-size: 1.5rem; } }
+    /* About-siden: logo-kort øverst og afsenderkort nederst (2/11-2026). Kun sitets egne farvevariabler, så mørk tilstand følger med */
+    .about-maerke { text-align: center; background: var(--hero-bg); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 20px 26px; margin: 0 0 28px; }
+    .about-maerke-logo { display: block; margin: 0 auto 12px; width: 72px; height: 72px; border-radius: 18px; }
+    .about-maerke p { margin: 0; }
+    .about-maerke-navn { font-family: var(--font-display); font-size: 2.1rem; font-weight: 700; font-stretch: 94%; letter-spacing: -0.02em; line-height: 1.1; color: var(--text-color); }
+    .about-maerke-navn .logo-arch { font-weight: 600; }
+    .about-maerke .about-maerke-linje { font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+    .about-kort { display: flex; gap: 20px; align-items: center; background: var(--hero-bg); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 22px 24px; margin: 10px 0 30px; }
+    .about-kort-foto { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; flex: none; }
+    .about-kort p { margin: 0; font-family: var(--font-display); }
+    .about-kort .about-kort-hilsen { font-size: 0.85rem; color: var(--muted); }
+    .about-kort .about-kort-navn { font-size: 1.25rem; font-weight: 700; margin: 2px 0 4px; color: var(--text-color); }
+    .about-kort .about-kort-linje { font-size: 0.95rem; color: var(--ink-2); line-height: 1.5; }
+    .about-kort a { color: var(--teal-text); }
+    @media (max-width: 480px) { .about-kort { flex-direction: column; text-align: center; } .about-maerke-navn { font-size: 1.7rem; } .about-prik { display: none; } .about-siden { display: block; } }
     /* Sitemap-siden: Bloggers beholder var 100vw bred og trukket ud til begge kanter.
        Med sidemenuen her stak den 22 px ud under rullebjælken (målt 28/9) — holdes i kolonnen, som Watch */
     body .static-page .tma-sitemap-container { width: 100% !important; max-width: 100% !important; left: auto !important; transform: none !important; margin-top: 0 !important; }
   </style>
   <div class="static-page">
     {!egenH1 && <h1 class="page-title">{s.title}</h1>}
+    {/* About-siden (2/11-2026, Jacobs ja): logo og afsenderkort laves HER, ikke som billeder i teksten.
+        De gamle billeder havde "Tech Media Archive", "Jacob Olsen" og "Founder & CEO" brændt ind, og billeder
+        uden for /images får byggeriets vandmærke-tekst ovenpå. Navn og titel kommer fra src/lib/entitet.mjs. */}
+    {erAbout && (
+      <div class="about-maerke">
+        <img class="about-maerke-logo" src="/logo.svg" alt="" width="72" height="72" decoding="async" />
+        <p class="about-maerke-navn">Tech Media <span class="logo-arch">Arch</span></p>
+        <p class="about-maerke-linje">The checked tech answer archive<span class="about-prik"> · </span><span class="about-siden">since {STARTET_TEKST}</span></p>
+      </div>
+    )}
     <div class="post-body" set:html={s.html} />
+    {erAbout && (
+      <div class="about-kort">
+        <img class="about-kort-foto" src="/jacob-olsen-96.jpg" srcset="/jacob-olsen-96.jpg 96w, /jacob-olsen.png 1024w" sizes="96px" alt={PERSON_NAVN} width="96" height="96" loading="lazy" decoding="async" />
+        <div>
+          <p class="about-kort-hilsen">Sincerely</p>
+          <p class="about-kort-navn">{PERSON_NAVN}</p>
+          <p class="about-kort-linje">{PERSON_TITEL}, {BRAND}</p>
+          <p class="about-kort-linje">Denmark · <a href="mailto:info@techmediaarch.com">info@techmediaarch.com</a></p>
+        </div>
+      </div>
+    )}
   </div>
 </MainLayout>
