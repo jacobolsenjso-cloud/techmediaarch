@@ -403,5 +403,50 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-03T15:09:01.257Z",
+  "artikel": null,
+  "omskrevet": true,
+  "usd": 0.1979,
+  "kr": 1.36,
+  "dele": {
+   "artikel": {
+    "kr": 1.36,
+    "billeder": 0,
+    "soegninger": 2,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-03T15:13:42.405Z",
+  "artikel": "/2024/08/an-in-depth-review-of-builderallcom",
+  "omskrevet": true,
+  "usd": 0.4897,
+  "kr": 3.36,
+  "dele": {
+   "artikel": {
+    "kr": 3.36,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-03T15:19:48.516Z",
+  "artikel": "/2026/05/made-viral-podcast-clips-with-ai-in-30",
+  "omskrevet": true,
+  "usd": 0.6341,
+  "kr": 4.36,
+  "dele": {
+   "artikel": {
+    "kr": 4.36,
+    "billeder": 4,
+    "soegninger": 4,
+    "ukendtPris": []
+   }
+  }
  }
 ]

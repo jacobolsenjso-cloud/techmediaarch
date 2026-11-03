@@ -40,7 +40,7 @@ opskrift: 2
 
 <h2>Establishing a Conceptual Framework for AI Production</h2>
 <p>According to Invideo, an AI filmmaking workflow follows <a href="https://invideo.io/blog/ai-filmmaking/" rel="noopener" target="_blank">three production phases</a>: pre-production, production, and post-production. Pre-production establishes story ideas and reference sets, production generates footage, and post-production covers editing, sound design, color balancing, and review.</p>
-<p>Behind the visual rendering, <a href="/2026/10/how-generative-ai-creates-images">diffusion models</a> drive the clip generation process. PixVerse notes that these diffusion models start with visual noise and repeatedly denoise frames across temporal steps to turn text prompts or reference images into continuous moving sequences.</p>
+<p>Behind the visual rendering, <a href="/2026/10/how-generative-ai-creates-images">diffusion models</a> drive the <a href="/2026/05/made-viral-podcast-clips-with-ai-in-30">clip generation process</a>. PixVerse notes that these diffusion models start with visual noise and repeatedly denoise frames across temporal steps to turn text prompts or reference images into continuous moving sequences.</p>
 
 <h2>The Evolution of Browser-Based AI Production</h2>
 <p>Modern movie generation has shifted away from expensive hardware studios toward accessible web platforms. As filmaris explains, solo creators can construct browser-based AI movies at low cost by connecting third-party API keys to handle pay-as-you-go rendering while managing screenplays and shot planning inside a browser interface.</p>
