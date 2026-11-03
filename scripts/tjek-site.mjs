@@ -127,7 +127,9 @@ for (const p of [...posts, ...pages]) {
     .replace(/<aside class="ymal" data-ekstra="1"[\s\S]*?<\/aside>/g, ' ')
     // Trin 6 (28/10): "Read next"-boksen afløste "You might also like"
     .replace(/<aside class="las-naeste" data-ekstra="1"[\s\S]*?<\/aside>/g, ' ')
-    .replace(/<details class="faq-item" data-ekstra="1">[\s\S]*?<\/details>/g, ' '));
+    .replace(/<details class="faq-item" data-ekstra="1">[\s\S]*?<\/details>/g, ' ')
+    // 3/11-2026: den faste annonceplads under "Key takeaways"
+    .replace(/<aside class="tma-annonce" data-ekstra="1"[\s\S]*?<\/aside>/g, ' '));
   if (kilde === ny) tekstOk++;
   else {
     let i = 0; while (i < kilde.length && kilde[i] === ny[i]) i++;

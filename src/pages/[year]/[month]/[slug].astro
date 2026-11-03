@@ -127,9 +127,18 @@ const toc = p.overskrifter.length < 3 ? [] : p.overskrifter.length > 14 ? p.over
 const tocHtml = toc.length ? `<nav class="toc-container" data-ekstra="1" aria-label="Table of contents"><span class="toc-title">Table of Contents</span><span class="toc-list">${
   toc.map((h) => `<a class="toc-depth-${h.niveau}" href="#${esc(h.id)}">${esc(h.tekst)}</a>`).join('')
 }</span></nav>` : '';
+// Fast annonceplads (3/11-2026, Jacob: "der skal være en fast plads"): én AdSense-enhed ("TMA Artikel - efter takeaways",
+// slot 1043274802) lige under "Key takeaways" og før indholdsfortegnelsen. Grunden: Auto ads satte den første annonce ca.
+// 3 skærme nede (målt i Jacobs Chrome), fordi toppen af artiklerne er udelukket i AdSense (1/11, mod hop). Titel, indledning
+// og billede står stadig først (AdSense-regel: der skal være indhold at læse før annoncer).
+// Pladsen har fast højde (CSS nedenfor), så teksten ikke hopper, når annoncen kommer. Auto ads kører videre længere nede.
+const annonceHtml = `<aside class="tma-annonce" data-ekstra="1" aria-label="Advertisement"><span class="tma-annonce-label">Advertisement</span><ins class="adsbygoogle" data-ad-client="ca-pub-9695260339642032" data-ad-slot="1043274802"></ins></aside>`;
 const slut = faqStart >= 0 ? faqStart : krop.length;
+// Kun hvis der er et billede/resumé før pladsen (målt 3/11: 168 af 198 artikler). Ellers ville annoncen stå allerførst
+// i brødteksten (30 ældre video-artikler) — der klarer Auto ads det som før.
+const efterBillede = efterFoersteBillede(krop, slut);
 const broedtekst = medKildeOrden(indsaet(krop, [
-  { pos: efterFoersteBillede(krop, slut), html: tocHtml },
+  { pos: efterBillede, html: (efterBillede > 0 ? annonceHtml : '') + tocHtml },
   { pos: foranMidterOverskrift(krop, slut), html: forslagHtml },
   { pos: slut, html: paaHtml },
 ]));
@@ -183,6 +192,14 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .post-body .tma-overblik-punkt { display: block; position: relative; margin: 0; padding: 0 0 0 30px; font-size: 1.02rem; font-weight: 600; line-height: 1.5; color: var(--text-color); }
     .post-body .tma-overblik-punkt::before { content: ''; position: absolute; left: 7px; top: 0.5em; width: 10px; height: 10px; border-radius: 3px; background: var(--hylde); transform: rotate(45deg); }
     @media (max-width: 600px) { .post-body .tma-overblik { padding: 18px 18px 18px 20px; border-left-width: 6px; } .post-body .tma-overblik-punkt { font-size: 0.98rem; } }
+    /* Fast annonceplads (3/11-2026): fast højde = intet hop, når annoncen kommer. AdSense' responsive enhed vælger en
+       annonce, der passer i boksen (Googles vejledning: sæt bredde/højde med CSS og udelad data-ad-format).
+       Mærket "Advertisement" skiller annoncen tydeligt fra artiklen (AdSense-regel). Pladsen holdes, OGSÅ hvis Google ikke
+       har en annonce ("unfilled"): i mange ældre artikler står den på første skærm, og lukkede den, ville teksten hoppe op.
+       Derfor overstyres MainLayouts regel, der skjuler tomme annoncer. */
+    .post-body .tma-annonce { display: block; margin: 0 0 30px; text-align: center; }
+    .post-body .tma-annonce-label { display: block; margin: 0 0 6px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .post-body .tma-annonce ins.adsbygoogle, .post-body .tma-annonce ins.adsbygoogle[data-ad-status="unfilled"] { display: block !important; width: 100%; height: 280px; border-radius: var(--radius); background: var(--hover-bg); }
     /* FAQ-boksen (lib/faqboks.mjs): spørgsmålene kan foldes ud; svaret står i HTML'en, så Google og AI læser det */
     /* People also ask (29/9) — samme udseende som på Jacobs andet site; nulstiller brødtekstens link- og listestil */
     /* 30/9 (Jacobs valg A): boksen flød ind i teksten. Nu tyk turkis kant i venstre side og en let turkis tone,
@@ -438,6 +455,8 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       )}
 
       <article class="post-body" set:html={broedtekst} style={`--hylde: ${hylde?.farve ?? 'var(--teal)'}`} />
+      {/* Beder AdSense fylde den faste plads. Køen behandles, når annoncekoden er hentet (MainLayout, hentGoogle). */}
+      <script is:inline>document.querySelectorAll('.tma-annonce ins.adsbygoogle').forEach(function () { (window.adsbygoogle = window.adsbygoogle || []).push({}); });</script>
 
       {/* Stod før som fodnote i hvert indlæg (Blogger-feedets fodnote). Resources-artikler har den øverst i stedet. */}
       {!erResources && <p class="disclosure-box"><strong>Affiliate disclosure:</strong> Please note that some links on Tech Media Arch are affiliate links. We may receive a commission, at no extra cost to you, if you click through our links and make a purchase from one of our partners.</p>}
