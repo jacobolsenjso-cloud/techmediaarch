@@ -3,12 +3,14 @@
 // (28/10-2026) har den sit eget udseende: "Tech Media Arch – the checked tech answer archive".
 // Skrifter selvhostet (ingen Google Fonts: hurtigere og ingen persondata til Google):
 //   Archivo (overskrifter og knapper, med bredde-akse til de smalle overskrifter),
-//   Source Serif 4 (brødtekst). Datoer, læsetid og koder bruger enhedens egen skrift med fast
-//   tegnbredde (2/11-2026, Jacobs ja): IBM Plex Mono (2 filer, 30 KB) blev hentet før siden var færdig,
-//   selv om den kun stod længere nede på forsiden (målt i en browser på mobil).
+//   Source Serif 4 (brødtekst), IBM Plex Mono (koder, datoer og læsetid).
+//   IBM Plex Mono er TILBAGE (3/11-2026, Jacob): 2/11 brugte datoerne enhedens egen skrift med fast tegnbredde
+//   for at spare 30 KB, men på Windows blev det Consolas, og datoerne så forkerte ud. Udseendet vejer tungere.
 // Kun Archivo hentes tidligt (preload) — se kommentaren ved <link rel="preload"> om Source Serif.
 import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource-variable/source-serif-4/wght.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
 import archivoLatinWoff2 from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
 import { HAR_BEDSTE } from '../lib/bedste';
 import { udenHtml } from '../lib/adresse.mjs';
@@ -197,7 +199,7 @@ const nyeste = INDLAEG[0];
          28/10 kl. 21.52 (Jacob valgte "H"): hvid bund i stedet for papir, forsidens topkasse får tre bløde farveskyer
          (--sky-1 blå, --sky-2 lilla, --sky-3 fersken på --sky-bund), og bunden af siden (--hero-bg) er lys lavendel. */
       :root { --bg-color: #ffffff; --text-color: #1f2328; --card-bg: #fff; --border-color: #e3e0d8; --sidebar-bg: #fff; --hover-bg: #f2f3f8; --teal: #1e40af; --teal-text: #1e40af; --muted: #5e6168; --ink-2: #3d4148; --rule-light: #ece9e1; --placeholder: #ece9e1; --hero-bg: #f3f1fa; --hero-bg-2: #e9eefa; --sky-1: #c9d8ff; --sky-2: #e3d4ff; --sky-3: #ffd9c2; --sky-bund: #f7f8fc; --verified: #15803d; --radius-lg: 16px; --radius: 10px; --shadow: 0 1px 2px rgba(22, 32, 43, 0.05), 0 6px 18px rgba(22, 32, 43, 0.07);
-        --font-display: "Archivo Variable", "Helvetica Neue", Arial, sans-serif; --font-serif: "Source Serif 4 Variable", Georgia, "Times New Roman", serif; --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Roboto Mono", "Liberation Mono", monospace; }
+        --font-display: "Archivo Variable", "Helvetica Neue", Arial, sans-serif; --font-serif: "Source Serif 4 Variable", Georgia, "Times New Roman", serif; --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace; }
       /* Mørk tilstand: samme opbygning — dyb neutral grå bund, varm lys tekst, lys blå (ca. 8:1) og lys grøn til "Verified" */
       body.dark-mode { --bg-color: #15171c; --text-color: #eceae4; --card-bg: #1d2026; --border-color: #2e323a; --sidebar-bg: #1a1c21; --hover-bg: #262a31; --teal: #8aa8ff; --teal-text: #8aa8ff; --muted: #a3a6ad; --ink-2: #c9c7c1; --rule-light: #24272e; --placeholder: #262a31; --hero-bg: #1b1e24; --hero-bg-2: #1a2232; --sky-1: #1f2d55; --sky-2: #2d2350; --sky-3: #3a2a24; --sky-bund: #1b1e24; --verified: #5bc08a; --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 22px rgba(0, 0, 0, 0.35); }
       body.dark-mode [style*="#1e3a8a"] { --tag-accent: #6d9eff; }
@@ -414,8 +416,12 @@ const nyeste = INDLAEG[0];
       .post-body a:hover { border-bottom-color: var(--teal-text); }
       /* WebP (2/11-2026): billederne står i <picture class="tma-pic"> med WebP først (temakoder.mjs webpSrcset/medWebp).
          display: contents = <picture> tæller ikke i layoutet; billedet opfører sig, som om det stod direkte i sin boks.
-         Regler med "> img" skal derfor også nævne "> .tma-pic > img". */
+         Regler med "> img" skal derfor også nævne "> .tma-pic > img".
+         FEJL 2/11 → rettet 3/11: med display: contents blev også <source> en boks i gitter-rækkerne (hylder, forsidens
+         hyldeafsnit, /page/N) og optog sin egen celle — billedet røg til højre, titlen klemt ned under. <source> skal
+         aldrig vises (browseren bruger den kun til at vælge fil), så den skjules her. */
       .tma-pic { display: contents; }
+      .tma-pic > source { display: none; }
       .post-body a:has(> img, > .tma-pic) { border-bottom: 0; }
       .post-body img { max-width: 100%; height: auto; border-radius: var(--radius); }
       /* Vandmærket på billederne — samme udseende som Blogger-temaets script (se temakoder.mjs).

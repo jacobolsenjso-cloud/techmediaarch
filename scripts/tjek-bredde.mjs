@@ -40,7 +40,9 @@ await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const BASE = `http://127.0.0.1:${server.address().port}`;
 
 // Sider: alle artikler (dist/ÅÅÅÅ/MM/*.html) + forside og hylder
-const sider = ['/', '/shelf/ai', '/shelf/cybersecurity', '/shelf/software', '/shelf/marketing', '/shelf/everyday-tech'];
+const sider = ['/', '/shelf/ai', '/shelf/cybersecurity', '/shelf/software', '/shelf/marketing', '/shelf/everyday-tech',
+  // 3/11-2026: alle sider med kort/rækker er med, så layoutvagten nedenfor ser dem
+  '/page/2', '/latest', '/trending', '/best-of-each-topic', '/a-z', '/p/start-here', '/p/sitemap', '/p/about-us'];
 for (const aar of fs.readdirSync(DIST).filter((d) => /^\d{4}$/.test(d)))
   for (const md of fs.readdirSync(path.join(DIST, aar)).filter((d) => /^\d{2}$/.test(d)))
     for (const f of fs.readdirSync(path.join(DIST, aar, md)).filter((f) => f.endsWith('.html')))
@@ -68,6 +70,18 @@ function maal() {
       const r = e.getBoundingClientRect();
       if (r.width && r.right > hoejre + 2) fejl.push(`${e.tagName.toLowerCase()}${e.className ? '.' + String(e.className).split(' ')[0] : ''} går ${Math.round(r.right - hoejre)} px ud over spalten`);
     }
+  }
+  // Layoutvagt (3/11-2026): 2/11 fik <source> i <picture> sin egen gitter-celle, så billedet røg til højre og
+  // titlen blev klemt ned under — på alle hylder og forsidens hyldeafsnit, uden at noget tjek opdagede det.
+  // (1) <source> må aldrig fylde plads. (2) I en række skal billedet stå til venstre for teksten, på samme højde.
+  for (const s of document.querySelectorAll('picture > source')) {
+    if (s.getClientRects().length) { fejl.push('<source> i <picture> fylder plads i layoutet (skal være display: none)'); break; }
+  }
+  for (const r of document.querySelectorAll('.raekke, .hylde-raekke, .lead-mini')) {
+    const img = r.querySelector('img'), tekst = r.querySelector('.raekke-tekst, .hylde-raekke-tekst, :scope > div:not(.card-thumb)');
+    if (!img || !tekst) continue;
+    const a = img.getBoundingClientRect(), b = tekst.getBoundingClientRect();
+    if (a.right > b.left + 1 || b.top > a.bottom) { fejl.push(`række ${r.className.split(' ')[0]}: billedet står ikke til venstre for teksten`); break; }
   }
   return [...new Set(fejl)].slice(0, 3);
 }
