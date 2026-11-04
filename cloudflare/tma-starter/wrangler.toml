@@ -1,0 +1,23 @@
+# tma-starter (4/11-2026, Jacobs ja): starter techmediaarch-robotten til tiden. Egen lille Worker, holdt adskilt
+# fra techfeedwatch (Jacob: "holde det adskilt"). Udgives KUN med udgiv.cmd i denne mappe
+# (= npx wrangler deploy -c wrangler.toml). ADVARSEL (målt 4/11): "npx wrangler deploy" UDEN -c valgte sitets
+# egen opsætning (wrangler.jsonc i repoets rod, 4.662 filer) — det ville have sendt sitet op under forkert navn.
+name = "tma-starter"
+main = "worker.mjs"
+compatibility_date = "2026-11-01"
+# Ingen offentlig adresse: Workeren skal kun køre på tidsplanen.
+workers_dev = false
+preview_urls = false
+
+# Tider i UTC: 07:43 og 15:43 mandag-lørdag = 08:43 og 16:43 dansk vintertid (09:43 og 17:43 sommertid).
+# Minut 43 (Jacob 4/11): skævt, og aldrig samtidig med tfw-starter (minut 17 og 37). Robottens egen GitHub-tidsplan
+# (robot-tidsplan.yml) er reserve. Bruger 1 af kontoens 5 gratis tidsplaner (målt 4/11: kun tfw-starter havde en).
+[triggers]
+crons = ["43 7,15 * * 1-6"]
+
+[observability]
+enabled = true
+
+# Nøglen sættes af Jacob i Cloudflare (Workers -> tma-starter -> Indstillinger -> Variabler og hemmeligheder,
+# type "Secret", navn GITHUB_TOKEN) — aldrig i denne fil, i git eller i en chat.
+# Nøglen: GitHub "fine-grained" token, KUN repoet techmediaarch, KUN "Actions: Read and write".
