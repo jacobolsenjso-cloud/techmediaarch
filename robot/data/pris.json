@@ -448,5 +448,40 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-04T11:22:15.877Z",
+  "artikel": null,
+  "usd": 0.0011,
+  "kr": 0.01,
+  "dele": {
+   "artikel": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0.01,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-04T11:22:17.393Z",
+  "artikel": null,
+  "omskrevet": true,
+  "usd": 0,
+  "kr": 0,
+  "dele": {
+   "artikel": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
  }
 ]

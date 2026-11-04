@@ -1888,7 +1888,7 @@
   ]
  },
  "/2026/10/what-are-saas-product-companies": {
-  "dato": "2026-10-03T18:46:21.203Z",
+  "dato": "2026-11-04T11:22:12.407Z",
   "valg": [
    {
     "q": "What is SaaS MVP development?",
@@ -1897,16 +1897,20 @@
   ]
  },
  "/2026/10/what-are-phishing-attacks": {
-  "dato": "2026-10-04T13:17:46.424Z",
+  "dato": "2026-11-04T11:22:12.993Z",
   "valg": [
    {
     "q": "What are some signs of phishing emails?",
     "sti": "/2024/10/the fake gmail com inbox that fooled the world"
+   },
+   {
+    "q": "Is phishing a form of social engineering?",
+    "sti": "/2026/10/how-phishing-resistant-mfa-works"
    }
   ]
  },
  "/2026/10/seo-best-practices-guide": {
-  "dato": "2026-10-04T18:43:40.553Z",
+  "dato": "2026-11-04T11:22:13.597Z",
   "valg": [
    {
     "q": "How does content marketing help with SEO?",
@@ -1915,19 +1919,19 @@
    {
     "q": "Why SEO is important for business?",
     "sti": "/2026/10/why-seo-is-important"
-   },
-   {
-    "q": "What is the future of SEO with AI?",
-    "sti": "/2026/04/is-google-gemini-killing-the-seo-retaine"
    }
   ]
  },
  "/2026/10/how-long-learn-python": {
-  "dato": "2026-10-05T10:53:52.110Z",
+  "dato": "2026-11-04T11:22:14.278Z",
   "valg": [
    {
     "q": "Is Python programming hard to learn?",
     "sti": "/2026/09/what-is-python-used-for"
+   },
+   {
+    "q": "Difference between java and Python programming?",
+    "sti": "/2026/10/difference-between-java-and-python"
    }
   ]
  },

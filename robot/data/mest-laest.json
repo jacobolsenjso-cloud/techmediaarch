@@ -1,11 +1,11 @@
 {
- "hentet": "2026-11-02T17:14:05.927Z",
- "fra": "2026-10-27",
- "til": "2026-11-02",
+ "hentet": "2026-11-04T11:22:15.819Z",
+ "fra": "2026-10-29",
+ "til": "2026-11-04",
  "dage": 7,
  "sider": {
   "/2026/10/what-are-intelligent-agents-ai": {
-   "visninger": 15,
+   "visninger": 17,
    "brugere": 5
   },
   "/2026/10/what-is-included-in-microsoft-365": {
@@ -16,10 +16,6 @@
    "visninger": 6,
    "brugere": 2
   },
-  "/2026/09/what-are-phishing-emails": {
-   "visninger": 5,
-   "brugere": 2
-  },
   "/2026/10/how-phishing-resistant-mfa-works": {
    "visninger": 5,
    "brugere": 2
@@ -28,15 +24,7 @@
    "visninger": 3,
    "brugere": 2
   },
-  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
-   "visninger": 3,
-   "brugere": 2
-  },
   "/2026/03/guide-to-databricks-success": {
-   "visninger": 2,
-   "brugere": 1
-  },
-  "/2026/05/exploring-possibilities-of-openfutureai": {
    "visninger": 2,
    "brugere": 1
   },
@@ -44,13 +32,17 @@
    "visninger": 2,
    "brugere": 1
   },
-  "/2026/09/what-is-mvp-software-development": {
+  "/2026/10/product-management-business-development": {
    "visninger": 2,
-   "brugere": 1
+   "brugere": 2
   },
   "/2026/10/what-is-cybersecurity-importance": {
    "visninger": 2,
    "brugere": 2
+  },
+  "/2026/11/how-does-generative-ai-learn": {
+   "visninger": 2,
+   "brugere": 1
   },
   "/2024/08/a-comprehensive-review-of-cyber": {
    "visninger": 1,
@@ -60,7 +52,15 @@
    "visninger": 1,
    "brugere": 1
   },
+  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
+   "visninger": 1,
+   "brugere": 1
+  },
   "/2026/05/the-real-arch-linux-myths-trade-offs": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/09/what-are-phishing-emails": {
    "visninger": 1,
    "brugere": 1
   },
@@ -73,10 +73,6 @@
    "brugere": 1
   },
   "/2026/10/how-payment-processors-work": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/10/product-management-business-development": {
    "visninger": 1,
    "brugere": 1
   },
