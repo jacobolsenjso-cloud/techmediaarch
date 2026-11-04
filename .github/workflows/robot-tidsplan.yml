@@ -4,7 +4,10 @@
 #   Kørslerne sker mandag-lørdag (cron 1-6), fordi omskrivningen kører 6 dage om ugen (Jacob 30/10-2026);
 #   plan.mjs --tjek siger, om dagen har ny artikel (koer) og/eller omskrivning (omskriv).
 #   HUSK: cron-teksten står to steder (schedule og jobbets "if"), og de skal være ens, ellers kører jobbet aldrig.
-# Tider er UTC: 07:17 og 15:17 = kl. 9:17 og 17:17 dansk sommertid (8:17 og 16:17 vintertid).
+# Tider er UTC: 09:17 og 17:17 = kl. 10:17 og 18:17 dansk vintertid (11:17 og 19:17 sommertid).
+# RESERVE (Jacob 4/11-2026): robotten startes til tiden af tma-starter (Cloudflare, cloudflare/tma-starter) kl. 7:43 og
+#   15:43 UTC. GitHubs egen tidsplan ligger 1½ time senere, så de to aldrig står i kø bag hinanden, og robot/plan.mjs
+#   (halvdagsreglen) lader kun reserven skrive, hvis tma-starters kørsel ikke nåede det.
 # Minuttallet er skævt med vilje: GitHub er mest bagud på hele og halve timer.
 # robot/plan.mjs tjekker loft og fridage igen, fordi GitHub kan være timer
 # forsinket, og fordi knappen kan trykkes i hånden.
@@ -18,7 +21,7 @@ name: Robot (tidsplan)
 
 on:
   schedule:
-    - cron: '17 7,15 * * 1-6'
+    - cron: '17 9,17 * * 1-6'
   workflow_dispatch:
     inputs:
       opgave:
@@ -37,7 +40,7 @@ concurrency:
 
 jobs:
   artikel:
-    if: github.event.schedule == '17 7,15 * * 1-6' || inputs.opgave == 'artikel' || inputs.opgave == 'omskriv'
+    if: github.event.schedule == '17 9,17 * * 1-6' || inputs.opgave == 'artikel' || inputs.opgave == 'omskriv'
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:

@@ -29,6 +29,8 @@ const SITE = 'https://www.techmediaarch.com';
 
 const dkDato = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Copenhagen' }).format(d);            // 2026-09-26
 const dkDag = (d) => new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Copenhagen', weekday: 'short' }).format(d); // Sat
+// 'f' = før kl. 12 dansk tid, 'e' = efter (halvdagsreglen i maaUdgive)
+const halvdag = (d) => (Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Copenhagen', hour: '2-digit', hourCycle: 'h23' }).format(d)) < 12 ? 'f' : 'e');
 const laes = (f, tom) => { try { return JSON.parse(fs.readFileSync(sti(f), 'utf8')); } catch { return tom; } };
 const skrivJson = (f, d) => fs.writeFileSync(sti(f), JSON.stringify(d, null, 1) + '\n');
 const summary = (t) => { console.log(t); if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, t + '\n'); };
@@ -54,6 +56,13 @@ export function maaUdgive(nu = new Date(), liste = robotArtikler()) {
   const iDag = liste.filter((a) => dkDato(a.udgivet) === dkDato(nu)).length;
   const loft = loftFor(nu);
   if (iDag >= loft) return { ok: false, grund: `loftet er nået: ${iDag} af ${loft} i dag` };
+  // Halvdagsregel (Jacob 4/11-2026): tma-starter starter kl. 8:43 og 16:43, GitHubs egen tidsplan 1½ time senere som
+  // RESERVE. Højst halvdelen af dagens loft pr. halvdag (før/efter kl. 12 dansk tid), så reserven kun skriver, når
+  // tma-starters kørsel ikke nåede det — ellers kom begge dagens artikler om morgenen og ingen om eftermiddagen.
+  const halv = (d) => halvdag(d) + dkDato(d);
+  const iHalvdag = liste.filter((a) => halv(a.udgivet) === halv(nu)).length;
+  const halvLoft = Math.ceil(loft / 2);
+  if (iHalvdag >= halvLoft) return { ok: false, grund: `halvdagen har sin artikel: ${iHalvdag} af ${halvLoft} ${halvdag(nu) === 'f' ? 'før' : 'efter'} kl. 12 (${iDag} af ${loft} i dag)` };
   // Månedsloft (31/10-2026): Googles beløbsloft er 400 kr. Nye artikler stopper ved MAANED_LOFT_KR, så robotten aldrig
   // løber ind i Googles loft midt i en artikel (med den stærkere model koster en artikel målt ca. 5,8 kr).
   const krMd = laes(PRIS, []).filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === dkDato(nu).slice(0, 7)).reduce((s, p) => s + (p.kr || 0), 0);
