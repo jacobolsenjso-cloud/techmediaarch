@@ -145,6 +145,11 @@ log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.ho
 // Målt 31/10: "How does generative AI create images" fik "should i learn generative ai" og "how long does it take to
 // learn generative ai" med, og halvdelen af artiklen kom til at handle om jobs og læring. Nu vurderer Gemini, hvilke
 // beslægtede søgeord artiklen naturligt svarer på; resten droppes (også fra research, FAQ og frontmatter).
+// Omskrivning: emnerne fra den gamle version (kun overskrifterne — dens tekst og tal er ikke kontrolleret).
+// 4/11-2026: prøven af "How Does Generative AI Learn?" fik ALLIGEVEL afsnittet "Learning Pathways: How to Learn
+// Generative AI" og FAQ'en "Should I learn ...", fordi de gamle overskrifter (også de gamle FAQ-spørgsmål) blev givet
+// videre uden vurdering. Nu vurderes de i SAMME kald som søgeordene og med samme regel; kun de beholdte gives videre.
+let gamleEmner = gammel ? [...gammel.krop.matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h[23]>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim()).filter((h) => h && !/^(FAQ|Frequently Asked|Key Takeaways|Conclusion|Wrapping Up|Sources)/i.test(h)).slice(0, 15) : [];
 {
   try {
     // 4/11-2026: "How Does Generative AI Learn?" (2/11) fik ALLIGEVEL "should i learn generative ai" og "how long does it
@@ -155,8 +160,14 @@ For each related search phrase, answer whether it asks about the SAME subject wi
 Watch out for words with two meanings. Example: "how does generative ai learn" is about how the MACHINE is trained; "should i learn generative ai" and "how long does it take to learn generative ai" are about a PERSON studying — a different subject, so answer no.
 Say no to side topics: careers, whether/how long to learn it, courses, salaries, prices of unrelated products, other products or brands, news.
 Return JSON {"samme": [numbers of the phrases on the same subject]}
-${valgt.beslaegtede.map((k, i) => `${i + 1}. ${k}`).join('\n')}`);
+${[...valgt.beslaegtede, ...gamleEmner].map((k, i) => `${i + 1}. ${k}`).join('\n')}`);
     const ok = new Set((Array.isArray(r.samme) ? r.samme : []).map((n) => parseInt(n, 10)));
+    if (gamleEmner.length) {
+      const nb = valgt.beslaegtede.length;
+      const gDroppet = gamleEmner.filter((_, i) => !ok.has(nb + i + 1));
+      gamleEmner = gamleEmner.filter((_, i) => ok.has(nb + i + 1));
+      log(`- Gamle overskrifter om selve emnet: ${gamleEmner.length} af ${gamleEmner.length + gDroppet.length}${gDroppet.length ? ` · droppet: ${gDroppet.join(' · ')}` : ''}`);
+    }
     const beholdt = valgt.beslaegtede.filter((_, i) => ok.has(i + 1));
     const droppet = valgt.beslaegtede.filter((_, i) => !ok.has(i + 1));
     valgt.beslaegtede = beholdt;
@@ -286,8 +297,7 @@ fakta = kf.tekst;
 const kildeNavn = kildeNavneTekst(kildeLinks);
 
 // --- 4. Skriv artiklen ud fra de fakta ---------------------------------------
-// Omskrivning: emnerne fra den gamle version (kun overskrifterne — dens tekst og tal er ikke kontrolleret)
-const gamleEmner = gammel ? [...gammel.krop.matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h[23]>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim()).filter((h) => h && !/^(FAQ|Frequently Asked|Key Takeaways|Conclusion|Wrapping Up)/i.test(h)).slice(0, 15) : [];
+// Omskrivning: gamleEmner (de gamle overskrifter, vurderet i 1b) gives videre her
 const opgave = `Write an in-depth, genuinely helpful English article for techmediaarch.com.
 Main keyword: "${valgt.hoved}"
 Related questions readers ask (answer each where it fits — they are topics, not phrases to copy): ${valgt.beslaegtede.map((k) => `"${k}"`).join(', ')}

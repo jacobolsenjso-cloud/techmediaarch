@@ -97,9 +97,18 @@ export function enhedFor(t, i, len) {
   return '';
 }
 const noegle = (v, e) => `${+Number(v).toPrecision(12)}|${e}`;
+// Tal skrevet med bogstaver (4/11-2026): "two to four weeks" og "six to twelve months" gik uden om talvagten, som
+// kun så cifre. Nu laves de om til cifre (i artiklen OG i kilderne), før reglerne ovenfor bruges — så "two weeks" i
+// artiklen også godkendes af "2 weeks" i kilden. Enkeltcifre tæller stadig kun med en måleenhed ("one of the" tæller ikke).
+const ORDTAL = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12,
+  thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40,
+  fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
+const TIERE = 'twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety';
+const ORDTAL_RE = new RegExp(`\\b(?:(${TIERE})[-\\s](one|two|three|four|five|six|seven|eight|nine)|(${Object.keys(ORDTAL).join('|')}))\\b`, 'gi');
+export const ordTilTal = (tekst) => String(tekst).replace(ORDTAL_RE, (m, tier, en, enkelt) => String(tier ? ORDTAL[tier.toLowerCase()] + ORDTAL[en.toLowerCase()] : ORDTAL[enkelt.toLowerCase()]));
 // Nøglesæt for en tekst: "værdi|enhed" og "værdi|*" (hvert tal i teksten, også det rå tal ved "1.2 million")
 export function talNoegler(tekst) {
-  const t = String(tekst); const s = new Set();
+  const t = ordTilTal(tekst); const s = new Set();
   for (const m of t.matchAll(TAL)) {
     const x = talI(m[0])[0]; if (!x) continue;
     const e = enhedFor(t, m.index, m[0].length);
@@ -119,7 +128,7 @@ export function tilskrevne(saetningHtml, indeks, navne = [], kendtNavn = () => f
 export function talUdenKildeV2(saetningerMedHtml, indeks, faktaNoegler, navneFor = () => [], kendtNavn = () => false) {
   const ud = [];
   for (const s of saetningerMedHtml) {
-    const synlig = synligTekst(s);
+    const synlig = ordTilTal(synligTekst(s));
     const egne = tilskrevne(s, indeks, navneFor(s), kendtNavn);
     const kandidater = egne.length ? egne : indeks;
     const mangler = [];

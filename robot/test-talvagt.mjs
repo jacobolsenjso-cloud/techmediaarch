@@ -1,6 +1,6 @@
 // Selvtest af talvagt 2 (robot/lib/talvagt.mjs). Kør: node robot/test-talvagt.mjs — intet net.
 // Eksemplerne er de målte fejl fra 4/11-2026 ("How Does Generative AI Learn?" m.fl.).
-import { enhedFor, talNoegler, kildeIndeks, talUdenKildeV2 } from './lib/talvagt.mjs';
+import { enhedFor, talNoegler, kildeIndeks, talUdenKildeV2, ordTilTal } from './lib/talvagt.mjs';
 import { kildeHenvisninger, kendtNavn } from './lib/kildenavne.mjs';
 let fejl = 0;
 const t = (navn, ok) => { console.log(`${ok ? 'OK  ' : 'FEJL'} ${navn}`); if (!ok) fejl++; };
@@ -32,6 +32,14 @@ t('IGNORERER: billedformat "9:16"', tjek('It reframes footage into 9:16 vertical
 t('FANGER: enkeltciffer med enhed ("over 1 to 2 months"), som ingen kilde har', tjek('Most learners finish over 1 to 2 months.').length === 1);
 t('IGNORERER: enkeltciffer uden måleenhed ("3 types", "step 2")', tjek('There are 3 types of models, and step 2 is training.').length === 0);
 t('GODKENDER: "2 hours" fra Coursera ("Week 1, 2 hours to complete")', tjek('According to Coursera, each week takes 2 hours to complete.').length === 0);
+// Tal skrevet med bogstaver (4/11-2026, prøven af "How Does Generative AI Learn?": "two to four weeks", "six to twelve months")
+t('FANGER: "two to four weeks" (ingen kilde har det)', tjek('Non-programmers can gain proficiency within two to four weeks of daily practice.').length === 1);
+t('FANGER: "six to twelve months"', tjek('Mastering fine-tuning typically requires six to twelve months of study.').length === 1);
+t('GODKENDER: "six hours" når Coursera skriver "6 hours"', tjek('According to Coursera, the course takes six hours to complete.').length === 0);
+t('IGNORERER: "one of the" og "two types" (ingen måleenhed)', tjek('One of the two types of models is the transformer.').length === 0);
+t('ordTilTal: "twenty-five minutes" → "25 minutes"', ordTilTal('about twenty-five minutes') === 'about 25 minutes');
+const idx3 = kildeIndeks([kilder[3]], [lang('Most learners finish in three weeks.')]);
+t('GODKENDER: "3 weeks" når kilden skriver "three weeks"', talUdenKildeV2(['Coursera says most learners finish in 3 weeks.'], idx3, talNoegler(''), kildeHenvisninger, kendtNavn).length === 0);
 // Fakta-noter gælder kun, når den nævnte kilde ikke kunne læses
 const idx2 = kildeIndeks([kilder[0]], ['']);
 t('Fakta godkender tal, når kilden ikke kunne læses', talUdenKildeV2(['IBM says it takes 40 hours.'], idx2, talNoegler('IBM: takes 40 hours'), kildeHenvisninger, kendtNavn).length === 0);
