@@ -2381,5 +2381,22 @@
     "sti": "/2026/10/how-generative-ai-creates-images"
    }
   ]
+ },
+ "/2026/11/generative-ai-vs-traditional-ai": {
+  "dato": "2026-11-04T15:42:37.790Z",
+  "valg": [
+   {
+    "q": "How does generative AI create images?",
+    "sti": "/2026/10/how-generative-ai-creates-images"
+   },
+   {
+    "q": "How does generative AI learn?",
+    "sti": "/2026/11/how-does-generative-ai-learn"
+   },
+   {
+    "q": "Difference between large language models and generative AI?",
+    "sti": "/2026/09/large-language-models-vs-generative-ai"
+   }
+  ]
  }
 }

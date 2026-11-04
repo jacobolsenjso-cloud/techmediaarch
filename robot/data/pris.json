@@ -483,5 +483,61 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-04T15:42:39.461Z",
+  "artikel": "/2026/11/generative-ai-vs-traditional-ai",
+  "usd": 0.6935,
+  "kr": 4.76,
+  "dele": {
+   "artikel": {
+    "kr": 4.73,
+    "billeder": 5,
+    "soegninger": 3,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-04T15:49:45.350Z",
+  "artikel": "/2026/05/stop-losing-rankings-how-to-find-and",
+  "omskrevet": true,
+  "usd": 0.5064,
+  "kr": 3.48,
+  "dele": {
+   "artikel": {
+    "kr": 3.48,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-04T15:55:41.980Z",
+  "artikel": "/2026/05/exploring-how-i-make-1000-ai-podcast",
+  "omskrevet": true,
+  "usd": 0.6479,
+  "kr": 4.45,
+  "dele": {
+   "artikel": {
+    "kr": 4.45,
+    "billeder": 4,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
  }
 ]
