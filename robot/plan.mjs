@@ -19,6 +19,10 @@ import { KURS } from './lib/gemini.mjs';
 const PRIS = 'robot/data/pris.json';   // pristælleren (trin 7): én række pr. kørsel
 
 export const MAKS_PR_DAG = 2;
+// Undtagelser for enkelte dage (dansk dato → loft). Gælder KUN den dag; dagen efter er loftet MAKS_PR_DAG igen af sig selv.
+// 4/11-2026 (Jacob 12:01): 3 artikler i dag, mens tma-starter (Cloudflare) testes.
+export const EKSTRA_LOFT = { '2026-11-04': 3 };
+const loftFor = (d) => EKSTRA_LOFT[dkDato(d)] ?? MAKS_PR_DAG;
 export const FRIDAGE = ['Tue', 'Fri', 'Sun']; // tirsdag, fredag og søndag (Jacob 29/10-2026: udgiver man, ons, tor, lør)
 export const TOMGANG_TIMER = 60;            // længste normale pause: fx lørdag eftermiddag → mandag morgen (~40 t) + GitHubs forsinkelse
 const SITE = 'https://www.techmediaarch.com';
@@ -48,12 +52,13 @@ export function robotArtikler() {
 export function maaUdgive(nu = new Date(), liste = robotArtikler()) {
   if (FRIDAGE.includes(dkDag(nu))) return { ok: false, grund: `fridag (${dkDag(nu)}, dansk tid)` };
   const iDag = liste.filter((a) => dkDato(a.udgivet) === dkDato(nu)).length;
-  if (iDag >= MAKS_PR_DAG) return { ok: false, grund: `loftet er nået: ${iDag} af ${MAKS_PR_DAG} i dag` };
+  const loft = loftFor(nu);
+  if (iDag >= loft) return { ok: false, grund: `loftet er nået: ${iDag} af ${loft} i dag` };
   // Månedsloft (31/10-2026): Googles beløbsloft er 400 kr. Nye artikler stopper ved MAANED_LOFT_KR, så robotten aldrig
   // løber ind i Googles loft midt i en artikel (med den stærkere model koster en artikel målt ca. 5,8 kr).
   const krMd = laes(PRIS, []).filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === dkDato(nu).slice(0, 7)).reduce((s, p) => s + (p.kr || 0), 0);
   if (krMd >= MAANED_LOFT_KR) return { ok: false, grund: `månedsloftet er nået: ${krMd.toFixed(2)} af ${MAANED_LOFT_KR} kr` };
-  return { ok: true, grund: `${iDag} af ${MAKS_PR_DAG} i dag` };
+  return { ok: true, grund: `${iDag} af ${loft} i dag` };
 }
 
 const OMSKRIV_KOE = 'robot/data/omskriv-koe.json';         // [{ sti, maade: 'fuld' | 'titel' }] i Jacobs rækkefølge
