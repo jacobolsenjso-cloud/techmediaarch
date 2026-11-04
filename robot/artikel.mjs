@@ -40,7 +40,7 @@ import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, 
 import { laesHjerne, stemmeBlok, stemmePrompt, tjekStemme, fletInd, senesteStemmeAfsnit } from './lib/hjerne.mjs';
 import { kildeHenvisninger, kendtNavn, domaenerTilNavne } from './lib/kildenavne.mjs';
 import { parse as yamlParse, stringify as yamlStringify } from 'yaml';
-import { hentKildeTekster, vaerdier, talUdenKilde, synligTekst } from './lib/talvagt.mjs';
+import { hentKildeTekster, synligTekst, kildeIndeks, talNoegler, talUdenKildeV2 } from './lib/talvagt.mjs';
 
 const arg = (navn) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? (process.argv[i + 1] || '') : ''; };
 const EMNE = arg('emne');
@@ -147,17 +147,30 @@ log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.ho
 // beslægtede søgeord artiklen naturligt svarer på; resten droppes (også fra research, FAQ og frontmatter).
 {
   try {
+    // 4/11-2026: "How Does Generative AI Learn?" (2/11) fik ALLIGEVEL "should i learn generative ai" og "how long does it
+    // take to learn generative ai" med — ordet "learn" har to betydninger (maskinen trænes / et menneske studerer), og
+    // vurderingen så kun på ordene. Nu skal betydningen være den samme, med et eksempel på netop den fælde.
     const r = await json(`Main topic of an explainer article: "${valgt.hoved}".
-For each related search phrase, answer whether it asks about the SAME subject, so an article on the main topic would naturally answer it.
-Say no to side topics: careers, whether/how long to learn it, salaries, prices of unrelated products, other products or brands, news.
+For each related search phrase, answer whether it asks about the SAME subject with the SAME meaning, so an article on the main topic would naturally answer it.
+Watch out for words with two meanings. Example: "how does generative ai learn" is about how the MACHINE is trained; "should i learn generative ai" and "how long does it take to learn generative ai" are about a PERSON studying — a different subject, so answer no.
+Say no to side topics: careers, whether/how long to learn it, courses, salaries, prices of unrelated products, other products or brands, news.
 Return JSON {"samme": [numbers of the phrases on the same subject]}
 ${valgt.beslaegtede.map((k, i) => `${i + 1}. ${k}`).join('\n')}`);
     const ok = new Set((Array.isArray(r.samme) ? r.samme : []).map((n) => parseInt(n, 10)));
     const beholdt = valgt.beslaegtede.filter((_, i) => ok.has(i + 1));
     const droppet = valgt.beslaegtede.filter((_, i) => !ok.has(i + 1));
-    if (beholdt.length) valgt.beslaegtede = beholdt;
-    log(`- Beslægtede søgeord om selve emnet: ${beholdt.length} af ${beholdt.length + droppet.length}${droppet.length && beholdt.length ? ` · droppet: ${droppet.join(' · ')}` : ''}${beholdt.length ? '' : ' (ingen vurderet relevante — alle beholdt)'}`);
-  } catch (e) { log(`- Beslægtede søgeord: vurdering fejlede (${e.message.slice(0, 80)}) — alle beholdt`); }
+    valgt.beslaegtede = beholdt;
+    // For få tilbage (under 3): før blev ALLE beholdt, også de forkerte. Nu suppleres med spørgsmål om selve emnet.
+    if (beholdt.length < 3) {
+      const t = await json(`Main topic of an explainer article: "${valgt.hoved}".
+Give ${3 - beholdt.length} short questions people search for that ask about this exact subject with the same meaning (how it works, what it is, examples, differences) — lowercase search phrases, no careers, courses or how long to learn it. Do not repeat these: ${[valgt.hoved, ...beholdt].map((k) => `"${k}"`).join(', ')}.
+Return JSON {"phrases": ["..."]}`);
+      const nye = (Array.isArray(t.phrases) ? t.phrases : []).map((x) => String(x).trim().toLowerCase()).filter((x) => x && !valgt.beslaegtede.includes(x) && x !== valgt.hoved);
+      valgt.beslaegtede = [...beholdt, ...nye].slice(0, 5);
+    }
+    log(`- Beslægtede søgeord om selve emnet: ${beholdt.length} af ${beholdt.length + droppet.length}${droppet.length ? ` · droppet: ${droppet.join(' · ')}` : ''}${valgt.beslaegtede.length > beholdt.length ? ` · suppleret: ${valgt.beslaegtede.slice(beholdt.length).join(' · ')}` : ''}`);
+    if (!valgt.beslaegtede.length) throw new Error('Ingen beslægtede spørgsmål om selve emnet');
+  } catch (e) { if (/Ingen beslægtede/.test(e.message)) throw e; log(`- Beslægtede søgeord: vurdering fejlede (${e.message.slice(0, 80)}) — alle beholdt`); }
 }
 
 // --- 2. Interne link-kandidater ---------------------------------------------
@@ -502,14 +515,16 @@ ${kand.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
 // skal fjerne eller omskrive tallet; lykkes det ikke, fjernes sætningen. Står det i det korte svar, eller er der for
 // mange, afvises artiklen hellere.
 const TALVAGT_MAKS = 8;
-let kendteTal = new Set();
+// Talvagt 2 (4/11-2026): tal + enhed, i den kilde sætningen nævner (robot/lib/talvagt.mjs). tjekTal(sætninger) → [{ s, mangler }]
+let tjekTal = () => [];
 {
   const tekster = await hentKildeTekster(kildeLinks.map((k) => k.url));
-  kendteTal = vaerdier([fakta, ...tekster].join(' '));
-  const foerTal = talUdenKilde(saetninger(html), kendteTal);
+  const kildeIdx = kildeIndeks(kildeLinks, tekster); const faktaNoegler = talNoegler(fakta);
+  tjekTal = (liste) => talUdenKildeV2(liste, kildeIdx, faktaNoegler, kildeHenvisninger, kendtNavn);
+  const foerTal = tjekTal(saetninger(html));
   if (foerTal.length) {
     try {
-      const r = await json(`Each numbered sentence from an article about "${valgt.hoved}" contains a number that is NOT in the article's sources (the numbers are listed after the sentence).
+      const r = await json(`Each numbered sentence from an article about "${valgt.hoved}" contains a number the article's sources do NOT support: it is not in the source the sentence names, or not with that unit (e.g. a source says "60 minutes", the sentence says "60 hours"). The numbers are listed after the sentence.
 Rewrite each sentence so it no longer states those numbers: keep the point in words without the number, or use a number from the facts below if one says the same. Never invent a number.
 Keep every HTML tag (especially <a ...>...</a>) exactly as it is. Change nothing else. If the sentence means nothing without the number, return "".
 Facts with sources (the only numbers allowed):\n${fakta}
@@ -518,12 +533,12 @@ ${foerTal.map((x, i) => `${i + 1}. ${x.s}  [numbers: ${x.mangler.join(', ')}]`).
       let rettet = 0;
       for (const f of Array.isArray(r.fixes) ? r.fixes : []) {
         const x = foerTal[parseInt(f.n, 10) - 1]; const ny = rensMarkdown(String(f.new || '').trim());
-        if (!x || !ny || !html.includes(x.s) || hrefs(ny) !== hrefs(x.s) || talUdenKilde([ny], kendteTal).length || uklarKilde(ny) || ukendteKilder(ny, kildeLinks).length) continue;
+        if (!x || !ny || !html.includes(x.s) || hrefs(ny) !== hrefs(x.s) || tjekTal([ny]).length || uklarKilde(ny) || ukendteKilder(ny, kildeLinks).length) continue;
         html = html.replace(x.s, () => ny); rettet++;
       }
       log(`- Talvagt: ${foerTal.length} sætninger med tal uden kilde (${foerTal.flatMap((x) => x.mangler).slice(0, 12).join(', ')}), ${rettet} rettet af Gemini`);
     } catch (e) { log(`- Talvagt: retning fejlede (${e.message.slice(0, 80)})`); }
-    const rest = talUdenKilde(saetninger(html), kendteTal);
+    const rest = tjekTal(saetninger(html));
     if (rest.some((x) => foersteAfsnit(html).includes(x.s))) throw new Error(`Det korte svar har et tal, der ikke står i kilderne (${rest[0].mangler.join(', ')}) — artiklen afvist`);
     if (rest.length > TALVAGT_MAKS) throw new Error(`${rest.length} sætninger har tal, der ikke står i kilderne — artiklen afvist`);
     for (const x of rest) html = html.replace(x.s, '');
@@ -531,7 +546,7 @@ ${foerTal.map((x, i) => `${i + 1}. ${x.s}  [numbers: ${x.mangler.join(', ')}]`).
     if (rest.length) log(`- Talvagt: ${rest.length} sætninger fjernet (${rest.flatMap((x) => x.mangler).join(', ')})`);
     if (antalFaq(html) < 5) throw new Error(`FAQ har kun ${antalFaq(html)} spørgsmål efter talvagten — artiklen afvist`);
   }
-  log(`- Talvagt: ${tekster.filter(Boolean).length} af ${kildeLinks.length} kildesider læst · ${foerTal.length ? 'se ovenfor' : 'alle tal står i kilderne'} · tilbage uden kilde: ${talUdenKilde(saetninger(html), kendteTal).length}`);
+  log(`- Talvagt: ${tekster.filter(Boolean).length} af ${kildeLinks.length} kildesider læst · ${foerTal.length ? 'se ovenfor' : 'alle tal står i kilderne'} · tilbage uden kilde: ${tjekTal(saetninger(html)).length}`);
 }
 
 // --- 4c2. Forældet-vagten (Jacob 31/10-2026, prøve #37) ------------------------
@@ -587,7 +602,7 @@ let stemme = false;
   if (!p) log('- Stemme: ingen af Jacobs holdninger rammer emnet (kun stilen er brugt)');
   else {
     const ekstra = (t) => (kildeHenvisninger(t).length ? `nævner en kilde (${kildeHenvisninger(t).join(', ')})`
-      : talUdenKilde([t], kendteTal).length ? `tal, der ikke står i kilderne (${talUdenKilde([t], kendteTal)[0].mangler.join(', ')})` : '');
+      : tjekTal([t]).length ? `tal, der ikke står i kilderne (${tjekTal([t])[0].mangler.join(', ')})` : '');
     let mt = { ok: false, grund: '' };
     for (let forsoeg = 0; forsoeg < 3 && !mt.ok; forsoeg++) {
       try {
@@ -604,6 +619,32 @@ let stemme = false;
   }
 }
 
+// --- 4e. Naturligt sprog (Jacob 4/11-2026: "så naturligt som muligt … som når en normal person skriver") ---------
+// Målt 4/11 i "How Does Generative AI Learn?": "a ambiguous word", "Organization teams apply …", "This spatial processing"
+// (forkert fagord). En sidste korrekturlæsning retter KUN stive eller forkerte sætninger. Vagter: samme tal, samme links,
+// ingen nye kilder, ingen uklare kilder, ingen tal uden kilde, længden ±40 % — og Jacobs egne afsnit (første person)
+// røres ikke. En rettelse, der ikke består, kasseres; sætningen bliver som den var.
+{
+  try {
+    const tal = (t) => (synligTekst(t).match(/\d[\d.,]*/g) || []).sort().join('|');
+    const ord = (t) => synligTekst(t).split(/\s+/).filter(Boolean).length;
+    const liste = saetninger(html).filter((s) => ord(s) >= 6 && !/\b(I|I'm|I've|my|me)\b/.test(synligTekst(s))).slice(0, 150);
+    const r = await json(`You are the copy editor of a tech news site. Below are numbered sentences from one article about "${valgt.hoved}".
+Find the sentences that sound stiff, unnatural or machine-written, or that have a grammar or word-choice error (for example "a ambiguous", "Organization teams apply", a technical term used wrongly). Rewrite ONLY those, in plain, natural English that a careful human journalist would write for ordinary readers.
+Keep the meaning, every number, every name and every HTML tag (especially <a ...>...</a>) exactly as they are. Do not add facts or sources. If a sentence is fine, leave it out. At most 15 fixes.
+Return JSON {"fixes":[{"n": number, "new": "the corrected sentence with its HTML"}]}
+${liste.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
+    let rettet = 0, kasseret = 0;
+    for (const f of Array.isArray(r.fixes) ? r.fixes.slice(0, 15) : []) {
+      const x = liste[parseInt(f.n, 10) - 1]; const ny = rensMarkdown(String(f.new || '').trim());
+      const ok = x && ny && ny !== x && html.includes(x) && hrefs(ny) === hrefs(x) && tal(ny) === tal(x) && !uklarKilde(ny)
+        && !ukendteKilder(ny, kildeLinks).length && !tjekTal([ny]).length && ord(ny) >= ord(x) * 0.6 && ord(ny) <= ord(x) * 1.4;
+      if (ok) { html = html.replace(x, () => ny); rettet++; } else kasseret++;
+    }
+    log(`- Naturligt sprog: ${rettet} sætninger rettet${kasseret ? `, ${kasseret} forslag kasseret af vagterne` : ''} (af ${liste.length} læst)`);
+  } catch (e) { log(`- Naturligt sprog: fejlede (${String(e.message).slice(0, 80)}) — teksten er uændret`); }
+}
+
 // --- 5. Titel, beskrivelse, billedtekster -----------------------------------
 const meta = await json(`Article about "${valgt.hoved}". First 1500 characters:
 ${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500)}
@@ -618,7 +659,7 @@ Return JSON with:
 "alt3": short alt text for image 3,
 "alt1": short alt text for image 1, "alt2": short alt text for image 2`);
 // Talvagten gælder også beskrivelsen, som Google viser: har den et tal uden kilde, bruges det korte svar i stedet.
-if (talUdenKilde([String(meta.description || '')], kendteTal).length) {
+if (tjekTal([String(meta.description || '')]).length) {
   const svar = synligTekst(foersteAfsnit(html)).trim();
   const kort = svar.length <= 160 ? svar : `${svar.slice(0, 157).replace(/\s+\S*$/, '')}…`;
   log(`- Talvagt: beskrivelsen havde et tal uden kilde — bruger det korte svar i stedet`);
@@ -726,14 +767,22 @@ html += kildeliste(kildeLinks);
 {
   try {
     const tekstNu = synligTekst(html).replace(/\s+/g, ' ');
-    const r = await json(`Below is an article titled "${titel}". Write 3-4 key takeaways for a reader who only skims: each one short sentence (at most 22 words), concrete and specific, in correct natural English with proper capitals.
+    // 4/11-2026: målt i 13 artikler — i 4 delte et punkt mindst 70 % af ordene med det korte svar øverst (3 næsten ordret).
+    // Punkterne skal give læseren noget NYT; det korte svar står jo lige over boksen.
+    const intro = synligTekst(foersteAfsnit(html)).replace(/\s+/g, ' ').trim();
+    const r = await json(`Below is an article titled "${titel}". Write 4-5 key takeaways for a reader who only skims: each one short sentence (at most 22 words), concrete and specific, in plain, natural English a person would write, with proper capitals.
+The reader has ALREADY read the opening answer just above the box — do not repeat or rephrase it: "${intro}"
+Each takeaway must add a different point from the rest of the article.
 Use ONLY information stated in the article; never add numbers, names or claims that are not in it. No source names, no links, no markdown, no bold.
 Return JSON {"punkter": ["...", "..."]}
 
 ${tekstNu.slice(0, 9000)}`);
+    const introOrd = new Set(intro.toLowerCase().match(/[a-z0-9]{4,}/g) || []);
+    const ligner = (p) => { const o = new Set(p.toLowerCase().match(/[a-z0-9]{4,}/g) || []); let f = 0; for (const w of o) if (introOrd.has(w)) f++; return o.size ? f / o.size : 0; };
     const punkter = (Array.isArray(r.punkter) ? r.punkter : [])
       .map((p) => storeBogstaver(String(p).replace(/<[^>]+>/g, '').replace(/\*+/g, '').trim()))
       .filter((p) => p && p.split(/\s+/).length <= 30 && (p.match(/\d[\d.,]*\d|\d/g) || []).every((tal) => tekstNu.includes(tal)))
+      .filter((p) => ligner(p) < 0.6) // gentager det korte svar → ud
       .slice(0, 4);
     if (punkter.length >= 3 && html.includes(heroFigur)) {
       const boks = `<div class="tma-overblik"><p class="tma-overblik-titel">Key takeaways</p><ul>${punkter.map((p) => `<li>${esc(p)}</li>`).join('')}</ul></div>`;

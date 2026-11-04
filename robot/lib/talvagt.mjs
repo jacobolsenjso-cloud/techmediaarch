@@ -61,7 +61,89 @@ export async function hentKildeTekster(urls, timeoutMs = 15000) {
   }));
 }
 
+// ---------------------------------------------------------------------------------------------------------------
+// Talvagt 2 (4/11-2026, Jacob: "det skal vi så rette til … på den bedst mulige måde"). Målt på "How Does Generative AI
+// Learn?": "IBM reports … 30 to 60 hours over 1 to 2 months" blev godkendt, fordi "30" stod i en HELT anden kilde
+// ("30-minute course" hos TechTarget, en kode "30AS5" hos IBM) og "60" i "60 minutes" hos Google — ingen kilde siger
+// "30 to 60 hours", og IBM-siden nævner slet ingen timer. Derfor nu:
+//   1) ENHED: et tal tæller kun som fundet, hvis kilden har samme tal med samme enhed (timer, minutter, %, $, GB …).
+//   2) TILSKRIVNING: nævner sætningen en kilde ("IBM reports", "according to Coursera", et link), skal tallet stå i
+//      netop DEN kildes tekst — ikke i en vilkårlig anden.
+//   3) FAKTA-noterne fra søgningen (Googles AI-opsummering) godkender kun tal, når den nævnte kilde ikke kunne læses
+//      (siden bygges med JavaScript); før godkendte de alle tal — derfra kom "100 to 150 hours", som ingen side har.
+const ENHEDER = new Map(Object.entries({
+  second: 'second', seconds: 'second', sec: 'second', secs: 'second', minute: 'minute', minutes: 'minute', min: 'minute', mins: 'minute',
+  hour: 'hour', hours: 'hour', hr: 'hour', hrs: 'hour', day: 'day', days: 'day', week: 'week', weeks: 'week', month: 'month', months: 'month',
+  year: 'year', years: 'year', yr: 'year', yrs: 'year', percent: 'pct', percentage: 'pct', pct: 'pct',
+  kb: 'kb', mb: 'mb', gb: 'gb', tb: 'tb', pb: 'pb', kbps: 'kbps', mbps: 'mbps', gbps: 'gbps', ghz: 'ghz', mhz: 'mhz', mp: 'mp', megapixels: 'mp',
+  user: 'user', users: 'user', device: 'device', devices: 'device', people: 'person', persons: 'person', employees: 'employee', employee: 'employee',
+  customers: 'customer', customer: 'customer', languages: 'language', countries: 'country', words: 'word', tokens: 'token', token: 'token',
+  parameters: 'parameter', pages: 'page', videos: 'video', apps: 'app', courses: 'course', modules: 'module', lessons: 'lesson', steps: 'step',
+  times: 'times', x: 'times', dollars: 'usd', usd: 'usd', euros: 'eur', eur: 'eur', pounds: 'gbp', kr: 'dkk', dkk: 'dkk',
+}));
+const MAALEENHEDER = new Set(['second', 'minute', 'hour', 'day', 'week', 'month', 'year', 'pct', 'kb', 'mb', 'gb', 'tb', 'pb', 'kbps', 'mbps', 'gbps', 'ghz', 'mhz', 'mp', 'usd', 'eur', 'gbp', 'dkk', 'times']);
+const FYLD = new Set(['to', 'and', 'or', 'of', 'the', 'a', 'an', 'total', 'study', 'per', 'additional', 'more', 'extra', 'full', 'free', 'monthly', 'daily', 'weekly', 'active', 'dedicated', 'about', 'roughly', 'approximately', 'nearly', 'over', 'up']);
+// Enheden for tallet på plads i i teksten t (længde len): valuta foran; "%" lige efter; ellers første kendte enhed inden
+// for 4 ord — et interval ("30 to 60 hours", "1-2 months", "10–20 hours") springes over, så begge tal får enheden.
+export function enhedFor(t, i, len) {
+  const foer = t.slice(Math.max(0, i - 3), i);
+  if (/\$\s?$/.test(foer)) return 'usd'; if (/€\s?$/.test(foer)) return 'eur'; if (/£\s?$/.test(foer)) return 'gbp';
+  let efter = t.slice(i + len, i + len + 60);
+  if (/^\s?(%|percent\b|per cent\b)/i.test(efter)) return 'pct';
+  efter = efter.replace(/^\s?(?:to|-|–|—|and)\s?\$?\d[\d.,]*/i, ''); // spring intervallets andet tal over
+  if (/^\s?(%|percent\b)/i.test(efter)) return 'pct';
+  const ord = (efter.match(/^[\s-]*([A-Za-z]+)(?:[\s-]+([A-Za-z]+))?(?:[\s-]+([A-Za-z]+))?(?:[\s-]+([A-Za-z]+))?/) || []).slice(1).filter(Boolean).map((o) => o.toLowerCase());
+  for (const o of ord) { if (ENHEDER.has(o)) return ENHEDER.get(o); if (!FYLD.has(o)) break; }
+  return '';
+}
+const noegle = (v, e) => `${+Number(v).toPrecision(12)}|${e}`;
+// Nøglesæt for en tekst: "værdi|enhed" og "værdi|*" (hvert tal i teksten, også det rå tal ved "1.2 million")
+export function talNoegler(tekst) {
+  const t = String(tekst); const s = new Set();
+  for (const m of t.matchAll(TAL)) {
+    const x = talI(m[0])[0]; if (!x) continue;
+    const e = enhedFor(t, m.index, m[0].length);
+    for (const v of x.gange === 1 ? [x.raa] : [x.vaerdi, x.raa]) { s.add(noegle(v, '*')); if (e) s.add(noegle(v, e)); }
+  }
+  return s;
+}
+export const LAESBAR = 1000; // tegn synlig tekst; derunder kunne siden ikke læses (blokeret, tom, kun JavaScript)
+// Indeks over kilderne: [{ url, host, laesbar, noegler }] — bygges én gang pr. artikel
+export const kildeIndeks = (kilder, tekster) => kilder.map((k, i) => ({ url: k.url, k, host: new URL(k.url).hostname.replace(/^www\./, ''), laesbar: (tekster[i] || '').length >= LAESBAR, noegler: talNoegler(tekster[i] || '') }));
+// Hvilke kilder står sætningen på? Links til en kilde + navne, der dækker en kilde (navne = kildeHenvisninger(s)).
+export function tilskrevne(saetningHtml, indeks, navne = [], kendtNavn = () => false) {
+  const hosts = [...String(saetningHtml).matchAll(/href="(https?:\/\/[^"]+)"/g)].map((m) => { try { return new URL(m[1]).hostname.replace(/^www\./, ''); } catch { return ''; } });
+  return indeks.filter((c) => hosts.includes(c.host) || navne.some((n) => kendtNavn(n, [c.k])));
+}
+// Sætninger, hvis tal ikke er dækket. faktaNoegler = talNoegler(fakta). navneFor(s) = kildenavne i sætningen.
+export function talUdenKildeV2(saetningerMedHtml, indeks, faktaNoegler, navneFor = () => [], kendtNavn = () => false) {
+  const ud = [];
+  for (const s of saetningerMedHtml) {
+    const synlig = synligTekst(s);
+    const egne = tilskrevne(s, indeks, navneFor(s), kendtNavn);
+    const kandidater = egne.length ? egne : indeks;
+    const mangler = [];
+    for (const m of synlig.matchAll(TAL)) {
+      const foer = synlig.slice(Math.max(0, m.index - 30), m.index); const efter = synlig.slice(m.index + m[0].length, m.index + m[0].length + 2);
+      // Forhold og klokkeslæt ("9:16", "16:9", "10:30") er formater, ikke påstande (målt 4/11: "9:16 vertical video")
+      if (/\d:$/.test(foer) || /^:\d/.test(efter)) continue;
+      const x = talI(m[0])[0]; if (!x) continue;
+      const e = enhedFor(synlig, m.index, m[0].length);
+      // Enkeltcifre: før talte de aldrig ("3 types", "step 2"); men "6 hours", "1 to 2 months", "5 GB" er påstande
+      // (4/11-2026) — de tjekkes nu, når de har en MÅLEENHED (tid, %, datastørrelse, valuta, "x gange").
+      const enkelt = x.gange === 1 && Number.isInteger(x.raa) && x.raa < 10;
+      if (enkelt ? !(MAALEENHEDER.has(e) && !/[A-Za-z][-.]?$/.test(foer)) : !taeller({ ...x, foer, efter }, synlig)) continue;
+      const k = noegle(x.vaerdi, e || '*');
+      const ok = kandidater.some((c) => c.noegler.has(k)) || (kandidater.some((c) => !c.laesbar) && faktaNoegler.has(k));
+      if (!ok) mangler.push(x.tekst.trim());
+    }
+    if (mangler.length) ud.push({ s, mangler: [...new Set(mangler)], tilskrevet: egne.map((c) => c.host) });
+  }
+  return ud;
+}
+
 // Sætninger (med HTML) i artiklen, der har tal, som ikke findes i kilderne/fakta. saetninger = robot/lib/sprog.mjs saetninger
+// (Talvagt 1 — bruges ikke længere af robotten fra 4/11-2026; se talUdenKildeV2 ovenfor)
 export function talUdenKilde(saetningerMedHtml, kendte) {
   const ud = [];
   for (const s of saetningerMedHtml) {
