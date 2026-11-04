@@ -41,7 +41,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
+      # ref: main (4/11-2026): uden den henter GitHub main, som den så ud, da kørslen blev BESTILT. #60 ventede i kø bag
+      # #59 og startede derfor på en gammel main uden #59's data — loft og pris blev læst forkert, og udgivelsen fejlede.
       - uses: actions/checkout@v5
+        with:
+          ref: main
       # Jacobs hjerne (30/10-2026): stemme og holdninger fra det PRIVATE repo jacob-hjerne, hentet med læsenøglen
       # HJERNE_NOEGLE (en "deploy key" med kun læseadgang) til mappen _hjerne (står i .gitignore). Samme opskrift som
       # techfeedwatch. continue-on-error: mangler nøglen, stopper robot/artikel.mjs selv med en tydelig fejl — og
@@ -107,7 +111,26 @@ jobs:
           git add src/content public/images robot/data
           git diff --cached --quiet && { echo "Intet at udgive"; exit 0; }
           git commit -m "Robot article $(date -u +%F) (run ${{ github.run_number }})"
-          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && { echo "udgivet=ja" >> "$GITHUB_OUTPUT"; exit 0; }; sleep 10; done
+          # Konflikt (4/11-2026, #60): ændrede main robot/data under kørslen, vinder kørslens udgave (den startede fra
+          # nyeste main og har alt fra før). Konflikt i ALT andet (artikler, kode) stopper udgivelsen — intet skubbes.
+          # Afprøvet i en prøve-repo 4/11: datakonflikt → udgivet; konflikt i anden fil → stop uden push.
+          for i in 1 2 3; do
+            if git pull --rebase -q origin main; then
+              git push -q origin main && { echo "udgivet=ja" >> "$GITHUB_OUTPUT"; exit 0; }
+            else
+              konflikt=$(git diff --name-only --diff-filter=U)
+              if [ -z "$konflikt" ]; then git rebase --abort 2>/dev/null || true; sleep 10; continue; fi
+              if echo "$konflikt" | grep -qv '^robot/data/'; then
+                echo "::error::Konflikt uden for robot/data: $konflikt"; git rebase --abort; exit 1
+              fi
+              echo "::warning::main ændrede robot/data under kørslen; kørslens udgave bruges: $konflikt"
+              echo "$konflikt" | xargs git checkout --theirs --
+              for f in $konflikt; do node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$f" || { git rebase --abort; exit 1; }; done
+              echo "$konflikt" | xargs git add --
+              GIT_EDITOR=true git rebase --continue > /dev/null && git push -q origin main && { echo "udgivet=ja" >> "$GITHUB_OUTPUT"; exit 0; }
+            fi
+            sleep 10
+          done
           exit 1
       # IndexNow (Jacob 31/10-2026): de artikler, robottens commit ændrede, meldes til Bing, når Cloudflare viser dem
       # (robot/indexnow.mjs venter højst 12 min). Fejler det, går robotten ikke i stå.
