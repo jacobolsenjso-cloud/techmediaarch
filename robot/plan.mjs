@@ -155,7 +155,9 @@ if (arg === '--tjek') {
   const iDagDato = new Date().toISOString().slice(0, 10);
   const md = dkDato(new Date()).slice(0, 7);
   // Færdig = skrevet om — undtagen punkter med "igen": true, hvor artiklen er lavet med en ældre opskrift (31/10-2026)
-  const faerdig = (k) => { const f = fm(k.sti); return !!f.omskrevet && !(k.igen && (Number(f.opskrift) || 1) < OPSKRIFT); };
+  // "efter": "ÅÅÅÅ-MM-DD" (4/11-2026): artiklen skal skrives om IGEN, selv om den er omskrevet før — kun en omskrivning
+  // EFTER den dato tæller som færdig (bruges, når en kvalitetsfejl er fundet i en allerede omskrevet artikel).
+  const faerdig = (k) => { const f = fm(k.sti); if (k.efter && !(String(f.omskrevet || '') > k.efter)) return false; return !!f.omskrevet && !(k.igen && (Number(f.opskrift) || 1) < OPSKRIFT); };
   // Hvad der allerede er ændret FØR en omskrivning (dagens nye artikel og tidligere omskrivninger i samme kørsel).
   // Fejler en omskrivning, ryddes KUN det, den selv har lavet (30/10: én robot, én kørsel).
   const aendret = () => new Set(execFileSync('git', ['status', '--porcelain', '--untracked-files=all', '--', 'src', 'public'], { cwd: sti(), encoding: 'utf8' }).split('\n').filter(Boolean));

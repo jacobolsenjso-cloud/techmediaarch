@@ -1,5 +1,21 @@
 [
  {
+  "sti": "/2026/11/how-does-generative-ai-learn",
+  "maade": "fuld",
+  "efter": "2026-11-03"
+ },
+ {
+  "sti": "/2026/10/what-is-included-in-microsoft-365",
+  "maade": "fuld",
+  "efter": "2026-11-03"
+ },
+ {
+  "sti": "/2026/10/what-are-intelligent-agents-ai",
+  "maade": "fuld",
+  "robotFoerVagt": true,
+  "efter": "2026-11-03"
+ },
+ {
   "sti": "/2026/04/mdm-activate-your-mac-with-this-essential-guide",
   "maade": "fuld",
   "visninger": true,
@@ -29,11 +45,6 @@
  },
  {
   "sti": "/2026/10/how-generative-ai-creates-images",
-  "maade": "fuld",
-  "robotFoerVagt": true
- },
- {
-  "sti": "/2026/10/what-are-intelligent-agents-ai",
   "maade": "fuld",
   "robotFoerVagt": true
  },
