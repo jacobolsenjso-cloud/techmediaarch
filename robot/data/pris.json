@@ -595,5 +595,46 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-05T15:52:27.085Z",
+  "artikel": "/2026/11/microsoft-365-vs-office-differences",
+  "usd": 0.5021,
+  "kr": 3.45,
+  "dele": {
+   "artikel": {
+    "kr": 3.41,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-05T15:52:28.965Z",
+  "artikel": null,
+  "omskrevet": true,
+  "usd": 0,
+  "kr": 0,
+  "dele": {
+   "artikel": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
  }
 ]

@@ -24,7 +24,7 @@ gammelTitel: What Is Included in a Microsoft 365 Subscription?
 
 <p>Microsoft 365 functions as a unified software ecosystem designed for individuals, families, businesses, enterprise environments, and educational institutions. According to Microsoft 365, Microsoft officially <a href="https://www.microsoft.com/en-us/microsoft-365/basic" rel="noopener" target="_blank">rebranded its Office 365</a> suite as Microsoft 365 in 2020 to reflect its expanded focus on cloud services and integrated tools.</p>
 
-<p>A Microsoft 365 subscription provides continuous access to productivity apps, security updates, cloud storage, and technical support across connected devices. While free accounts offer web versions with 5 GB of storage, paid plans unlock desktop app installations and larger storage allocations.</p>
+<p>A <a href="/2026/11/microsoft-365-vs-office-differences">Microsoft 365 subscription</a> provides continuous access to productivity apps, security updates, cloud storage, and technical support across connected devices. While free accounts offer web versions with 5 GB of storage, paid plans unlock desktop app installations and larger storage allocations.</p>
 
 <p>Core productivity applications bundled across Microsoft 365 offerings include Microsoft Word, Excel, PowerPoint, Outlook, Teams, OneNote, and OneDrive. Licensing options range from consumer tiers like Basic and Personal to commercial plans such as Business Standard and enterprise editions.</p>
 
