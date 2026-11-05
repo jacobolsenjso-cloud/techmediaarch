@@ -1,7 +1,7 @@
 {
- "hentet": "2026-11-04T15:42:38.544Z",
- "fra": "2026-08-07",
- "til": "2026-11-04",
+ "hentet": "2026-11-05T07:51:45.963Z",
+ "fra": "2026-08-08",
+ "til": "2026-11-05",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -121,6 +121,10 @@
    "visninger": 3,
    "brugere": 2
   },
+  "/2026/11/how-does-generative-ai-learn": {
+   "visninger": 3,
+   "brugere": 1
+  },
   "/2024/09/blog-post": {
    "visninger": 2,
    "brugere": 2
@@ -190,10 +194,6 @@
    "brugere": 2
   },
   "/2026/10/why-seo-is-important": {
-   "visninger": 2,
-   "brugere": 1
-  },
-  "/2026/11/how-does-generative-ai-learn": {
    "visninger": 2,
    "brugere": 1
   },

@@ -1936,19 +1936,19 @@
   ]
  },
  "/2026/10/why-product-management-is-good-career": {
-  "dato": "2026-10-05T16:08:21.340Z",
+  "dato": "2026-11-05T07:51:45.179Z",
   "valg": [
+   {
+    "q": "What is the best way to learn product management?",
+    "sti": "/2026/10/best-way-learn-product-management"
+   },
+   {
+    "q": "What does product management involve?",
+    "sti": "/2026/10/what-does-product-management-involve"
+   },
    {
     "q": "Difference between product management and product marketing?",
     "sti": "/2026/09/product-management-vs-marketing"
-   },
-   {
-    "q": "Difference between product roadmap and backlog?",
-    "sti": "/2026/09/product-roadmap-vs-backlog"
-   },
-   {
-    "q": "What is MVP product development process?",
-    "sti": "/2026/09/what-is-mvp-software-development"
    }
   ]
  },
@@ -2396,6 +2396,19 @@
    {
     "q": "Difference between large language models and generative AI?",
     "sti": "/2026/09/large-language-models-vs-generative-ai"
+   }
+  ]
+ },
+ "/2026/11/windows-11-home-vs-pro-guide": {
+  "dato": "2026-11-05T07:51:44.464Z",
+  "valg": [
+   {
+    "q": "Why do users say Zorin OS has lower RAM usage and better speed than Windows 11?",
+    "sti": "/2026/05/zorin-os-vs-windows-11-real-world"
+   },
+   {
+    "q": "What date is Windows 10 support ending?",
+    "sti": "/2026/05/exploring-windows-10-is-dead-in-2025"
    }
   ]
  }

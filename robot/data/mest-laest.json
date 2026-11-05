@@ -1,7 +1,7 @@
 {
- "hentet": "2026-11-04T15:42:39.406Z",
- "fra": "2026-10-29",
- "til": "2026-11-04",
+ "hentet": "2026-11-05T07:51:46.490Z",
+ "fra": "2026-10-30",
+ "til": "2026-11-05",
  "dage": 7,
  "sider": {
   "/2026/10/what-are-intelligent-agents-ai": {
@@ -16,13 +16,13 @@
    "visninger": 6,
    "brugere": 2
   },
-  "/2026/10/how-phishing-resistant-mfa-works": {
-   "visninger": 5,
-   "brugere": 2
-  },
   "/2026/05/exploring-claude-just-changed-making": {
    "visninger": 3,
    "brugere": 2
+  },
+  "/2026/11/how-does-generative-ai-learn": {
+   "visninger": 3,
+   "brugere": 1
   },
   "/2026/03/guide-to-databricks-success": {
    "visninger": 2,
@@ -32,6 +32,10 @@
    "visninger": 2,
    "brugere": 1
   },
+  "/2026/10/how-phishing-resistant-mfa-works": {
+   "visninger": 2,
+   "brugere": 2
+  },
   "/2026/10/product-management-business-development": {
    "visninger": 2,
    "brugere": 2
@@ -39,10 +43,6 @@
   "/2026/10/what-is-cybersecurity-importance": {
    "visninger": 2,
    "brugere": 2
-  },
-  "/2026/11/how-does-generative-ai-learn": {
-   "visninger": 2,
-   "brugere": 1
   },
   "/2024/08/a-comprehensive-review-of-cyber": {
    "visninger": 1,
@@ -69,10 +69,6 @@
    "brugere": 1
   },
   "/2026/10/how-long-learn-web-development": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/10/how-payment-processors-work": {
    "visninger": 1,
    "brugere": 1
   },

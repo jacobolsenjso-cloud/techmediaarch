@@ -539,5 +539,61 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-05T07:51:46.523Z",
+  "artikel": "/2026/11/windows-11-home-vs-pro-guide",
+  "usd": 0.4558,
+  "kr": 3.13,
+  "dele": {
+   "artikel": {
+    "kr": 3.09,
+    "billeder": 2,
+    "soegninger": 4,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-05T07:58:04.234Z",
+  "artikel": "/2026/11/how-does-generative-ai-learn",
+  "omskrevet": true,
+  "usd": 0.6481,
+  "kr": 4.45,
+  "dele": {
+   "artikel": {
+    "kr": 4.45,
+    "billeder": 4,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-05T07:58:04.374Z",
+  "artikel": null,
+  "omskrevet": true,
+  "usd": 0,
+  "kr": 0,
+  "dele": {
+   "artikel": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
  }
 ]
