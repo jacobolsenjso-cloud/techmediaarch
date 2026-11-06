@@ -36,7 +36,7 @@ import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
 import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
-import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord, storeBogstaver, somSpoergsmaal, gentagerSig } from './lib/sprog.mjs';
+import { rensMarkdown, markdownRest, udenFedeSoegeord, foersteAfsnit, antalOrd, FOERSTE_MAKS, saetninger, uklarKilde, klistretSoegeord, storeBogstaver, somSpoergsmaal, gentagerSig, laesbarhed, svaerhed } from './lib/sprog.mjs';
 import { laesHjerne, stemmeBlok, stemmePrompt, tjekStemme, fletInd, senesteStemmeAfsnit } from './lib/hjerne.mjs';
 import { kildeHenvisninger, kendtNavn, domaenerTilNavne } from './lib/kildenavne.mjs';
 import { parse as yamlParse, stringify as yamlStringify } from 'yaml';
@@ -164,13 +164,17 @@ let gamleEmner = gammel ? [...gammel.krop.matchAll(/<h[23]\b[^>]*>([\s\S]*?)<\/h
 For each related search phrase, answer whether it asks about the SAME subject with the SAME meaning, so an article on the main topic would naturally answer it.
 Watch out for words with two meanings. Example: "how does generative ai learn" is about how the MACHINE is trained; "should i learn generative ai" and "how long does it take to learn generative ai" are about a PERSON studying — a different subject, so answer no.
 Say no to side topics: careers, whether/how long to learn it, courses, salaries, prices of unrelated products, other products or brands, news.
-Return JSON {"samme": [numbers of the phrases on the same subject]}
-${[...valgt.beslaegtede, ...gamleEmner].map((k, i) => `${i + 1}. ${k}`).join('\n')}`);
-    const ok = new Set((Array.isArray(r.samme) ? r.samme : []).map((n) => parseInt(n, 10)));
+${gamleEmner.length ? 'Do the same for each heading of the old article (H-list): yes if the heading covers part of the main topic (how it works, its parts, steps, examples, risks), no if it is about a side topic.\n' : ''}Return JSON {"samme": [numbers of the search phrases on the same subject]${gamleEmner.length ? ', "overskrifter": [H-numbers (just the number) of the headings on the same subject]' : ''}}
+Search phrases:
+${valgt.beslaegtede.map((k, i) => `${i + 1}. ${k}`).join('\n')}${gamleEmner.length ? `\nHeadings of the old article (H-list):\n${gamleEmner.map((k, i) => `H${i + 1}. ${k}`).join('\n')}` : ''}`);
+    // 6/11-2026: før stod søgeord og overskrifter i ÉN nummereret liste, og 3.8 Flash svarede kun for søgeordene — alle
+    // 12 overskrifter blev droppet. Nu to lister og to svar.
+    const tal = (x) => (Array.isArray(x) ? x : []).map((n) => parseInt(String(n).replace(/^H/i, ''), 10));
+    const ok = new Set(tal(r.samme));
     if (gamleEmner.length) {
-      const nb = valgt.beslaegtede.length;
-      const gDroppet = gamleEmner.filter((_, i) => !ok.has(nb + i + 1));
-      gamleEmner = gamleEmner.filter((_, i) => ok.has(nb + i + 1));
+      const okH = new Set(tal(r.overskrifter));
+      const gDroppet = gamleEmner.filter((_, i) => !okH.has(i + 1));
+      gamleEmner = gamleEmner.filter((_, i) => okH.has(i + 1));
       log(`- Gamle overskrifter om selve emnet: ${gamleEmner.length} af ${gamleEmner.length + gDroppet.length}${gDroppet.length ? ` · droppet: ${gDroppet.join(' · ')}` : ''}`);
     }
     const beholdt = valgt.beslaegtede.filter((_, i) => ok.has(i + 1));
@@ -314,6 +318,7 @@ ${fakta}
 
 Rules:
 - At least 1200 words, 7-10 sections with <h2> (and <h3> where useful), each section 120-250 words. Write longer only when the researched facts give enough material; never pad to reach a length (Jacob 6/10-2026).
+- Write so a 14-15-year-old (8th-9th grade) understands every paragraph on first reading (Jacob 6/11-2026): everyday words instead of academic ones ("use" not "utilize", "help" not "facilitate"), most sentences under 20 words, one idea per sentence. When a technical term is needed, explain it in plain words the first time it appears, with a short everyday example where it helps. No formulas, math notation, Greek letters or academic jargon (no "P(X)", "joint probability distribution", "Nash equilibrium"); describe the idea instead. Plain does not mean childish: keep every fact precise.
 - Write like a technology journalist at a news publication, not like an analyst or a marketer (Jacob 28/9-2026):
   lead with the most important facts, attribute facts to their source in the sentence ("according to IBM", "NIST defines ..."),
   short paragraphs, concrete examples, neutral tone, no hype words, no "our analysis", "the verdict" or "key takeaways" framing.
@@ -643,20 +648,27 @@ let stemme = false;
   try {
     const tal = (t) => (synligTekst(t).match(/\d[\d.,]*/g) || []).sort().join('|');
     const ord = (t) => synligTekst(t).split(/\s+/).filter(Boolean).length;
-    const liste = saetninger(html).filter((s) => ord(s) >= 6 && !/\b(I|I'm|I've|my|me)\b/.test(synligTekst(s))).slice(0, 150);
-    const r = await json(`You are the copy editor of a tech news site. Below are numbered sentences from one article about "${valgt.hoved}".
-Find the sentences that sound stiff, unnatural or machine-written, or that have a grammar or word-choice error (for example "a ambiguous", "Organization teams apply", a technical term used wrongly). Rewrite ONLY those, in plain, natural English that a careful human journalist would write for ordinary readers.
-Keep the meaning, every number, every name and every HTML tag (especially <a ...>...</a>) exactly as they are. Do not add facts or sources. If a sentence is fine, leave it out. At most 15 fixes.
-Return JSON {"fixes":[{"n": number, "new": "the corrected sentence with its HTML"}]}
+    // 6/11-2026 (Jacob: "8. til 9. klasse … kan forstå det"): de 40 SVÆRESTE sætninger (lange, mange lange ord) skrives
+    // om til almindeligt sprog — før kun stive/forkerte sætninger, og teksten lå på klassetrin 13,6-16,6. En sætning må
+    // gerne deles i to (længden må stige til 1,8x), men tal, links, navne og kilder er de samme. Læsbarheden logges.
+    const foer = laesbarhed(html);
+    const alle = saetninger(html).filter((s) => ord(s) >= 6 && !/\b(I|I'm|I've|my|me)\b/.test(synligTekst(s)));
+    const liste = [...alle].sort((a, b) => svaerhed(b) - svaerhed(a)).slice(0, 40);
+    const r = await json(`You are the copy editor of a tech news site whose readers include 14-15-year-olds (8th-9th grade). Below are the hardest numbered sentences from one article about "${valgt.hoved}".
+Rewrite each sentence that a 14-15-year-old would struggle with, and every sentence that sounds stiff or machine-written, into plain, natural English: everyday words ("use" not "utilize"), short sentences (you may split one sentence into two), explain a technical term in a few plain words the first time if needed. No formulas or academic jargon.
+Keep the meaning, every number, every name and every HTML tag (especially <a ...>...</a>) exactly as they are. Do not add facts, examples with numbers, or sources. If a sentence is already easy, leave it out. At most 30 fixes.
+Return JSON {"fixes":[{"n": number, "new": "the rewritten sentence(s) with its HTML"}]}
 ${liste.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
     let rettet = 0, kasseret = 0;
-    for (const f of Array.isArray(r.fixes) ? r.fixes.slice(0, 15) : []) {
+    for (const f of Array.isArray(r.fixes) ? r.fixes.slice(0, 30) : []) {
       const x = liste[parseInt(f.n, 10) - 1]; const ny = rensMarkdown(String(f.new || '').trim());
       const ok = x && ny && ny !== x && html.includes(x) && hrefs(ny) === hrefs(x) && tal(ny) === tal(x) && !uklarKilde(ny)
-        && !ukendteKilder(ny, kildeLinks).length && !tjekTal([ny]).length && ord(ny) >= ord(x) * 0.6 && ord(ny) <= ord(x) * 1.4;
+        && !ukendteKilder(ny, kildeLinks).length && !tjekTal([ny]).length && ord(ny) >= ord(x) * 0.6 && ord(ny) <= ord(x) * 1.8;
       if (ok) { html = html.replace(x, () => ny); rettet++; } else kasseret++;
     }
-    log(`- Naturligt sprog: ${rettet} sætninger rettet${kasseret ? `, ${kasseret} forslag kasseret af vagterne` : ''} (af ${liste.length} læst)`);
+    const efter = laesbarhed(html);
+    log(`- Naturligt sprog: ${rettet} sætninger gjort lettere${kasseret ? `, ${kasseret} forslag kasseret af vagterne` : ''} (de ${liste.length} sværeste af ${alle.length})`);
+    log(`- Læsbarhed (klassetrin, mål ca. 8-9): ${foer.klassetrin} → ${efter.klassetrin} · ord pr. sætning ${foer.ordPrSaetning} → ${efter.ordPrSaetning} · svære ord ${foer.svaereOrdPct} % → ${efter.svaereOrdPct} %`);
   } catch (e) { log(`- Naturligt sprog: fejlede (${String(e.message).slice(0, 80)}) — teksten er uændret`); }
 }
 

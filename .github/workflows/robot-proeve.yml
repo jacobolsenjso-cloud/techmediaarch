@@ -33,16 +33,16 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
-      - name: Skriv "How Does Generative AI Learn?" om med den nye model (prøve)
+      - name: Skriv Microsoft 365-artiklen om (prøve 2: 3.8 Flash + 8.-9. klasse)
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           CLOUDFLARE_AI_TOKEN: ${{ secrets.CLOUDFLARE_AI_TOKEN }}
-        run: node robot/artikel.mjs --omskriv /2026/11/how-does-generative-ai-learn --maade fuld --efter 2026-11-05
+        run: node robot/artikel.mjs --omskriv /2026/10/what-is-included-in-microsoft-365 --maade fuld --efter 2026-11-03
       - name: Artiklen i resuméet (til læsning)
         if: always()
         run: |
-          f=src/content/posts/2026/11/how-does-generative-ai-learn.md
+          f=src/content/posts/2026/10/what-is-included-in-microsoft-365.md
           { echo; echo '## Prøveartiklen (tekst uden HTML)'; echo; sed -e 's/<[^>]*>/ /g' "$f" | tr -s ' ' | grep -v '^ *$'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v6
         if: always()
@@ -50,5 +50,5 @@ jobs:
           name: robot-proeve
           path: |
             robot/ud/
-            src/content/posts/2026/11/how-does-generative-ai-learn.md
+            src/content/posts/2026/10/what-is-included-in-microsoft-365.md
           if-no-files-found: ignore

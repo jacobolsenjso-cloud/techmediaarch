@@ -143,3 +143,24 @@ export function gentagerSig(h) {
   }
   return false;
 }
+
+// Læsbarhed (Jacob 6/11-2026: "så dem omkring 8. til 9. klasse kan forstå det"). Flesch-Kincaid-klassetrin (amerikansk
+// skoleår) ud fra ord pr. sætning og stavelser pr. ord + andel svære ord (3+ stavelser). Målt 6/11 på tre artikler:
+// klassetrin 13,6-16,6 (universitetsniveau), 24-31 % svære ord. Målet er ca. 8-9.
+export function stavelser(o) {
+  let w = String(o).toLowerCase().replace(/[^a-z]/g, '');
+  if (!w) return 0; if (w.length <= 3) return 1;
+  w = w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '').replace(/^y/, '');
+  return Math.max(1, (w.match(/[aeiouy]{1,2}/g) || []).length);
+}
+export function laesbarhed(h) {
+  const t = synlig(h).replace(/&[a-z]+;|&#\d+;/g, ' ');
+  const s = t.split(/(?<=[.!?])\s+/).filter((x) => x.split(/\s+/).filter(Boolean).length >= 3);
+  const o = t.match(/[A-Za-z][A-Za-z'-]*/g) || [];
+  if (!s.length || !o.length) return { klassetrin: 0, ordPrSaetning: 0, svaereOrdPct: 0 };
+  const st = o.reduce((a, x) => a + stavelser(x), 0); const svaere = o.filter((x) => stavelser(x) >= 3).length;
+  return { klassetrin: Math.round((0.39 * o.length / s.length + 11.8 * st / o.length - 15.59) * 10) / 10,
+    ordPrSaetning: Math.round(o.length / s.length * 10) / 10, svaereOrdPct: Math.round(1000 * svaere / o.length) / 10 };
+}
+// Hvor svær er én sætning? (bruges til at vælge de sværeste sætninger til omskrivning i 4e)
+export const svaerhed = (s) => { const o = synlig(s).match(/[A-Za-z][A-Za-z'-]*/g) || []; return o.length ? 0.39 * o.length + 11.8 * o.reduce((a, x) => a + stavelser(x), 0) / o.length : 0; };
