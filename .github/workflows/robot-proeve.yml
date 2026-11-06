@@ -33,7 +33,7 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
-      - name: Skriv Microsoft 365-artiklen om (prøve 2: 3.8 Flash + 8.-9. klasse)
+      - name: "Skriv Microsoft 365-artiklen om (prøve 2 - 3.8 Flash + 8.-9. klasse)"
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
