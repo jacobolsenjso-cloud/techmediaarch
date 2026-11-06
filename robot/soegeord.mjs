@@ -195,6 +195,19 @@ if (harAdgang()) {
   } catch (e) { sc = { fejl: e.message }; }
 }
 
+// --- Klynger (Jacob 6/11-2026, forslag 3) -----------------------------------
+// En pakke er en "klynge", når dens søgeord deler mindst 2 kerneord med søgninger, hvor Google ALLEREDE viser en af
+// sitets sider (fx MVP, product roadmap, content marketing). Nye artikler om de emner styrker siderne omkring dem og kan
+// linke til hinanden. Kun ANTALLET gemmes (repoet er offentligt — søgningerne skrives aldrig ud, Jacobs regel 26/9).
+// robot/artikel.mjs tager klynge-pakker før de andre.
+if (sc && !sc.fejl) {
+  const gscKerner = sc.opdater.map((g) => kerne(g.q));
+  for (const r of Object.values(resultat)) for (const p of r.pakker) {
+    const pk = [p.hoved, ...p.beslaegtede].map((q) => kerne(q));
+    p.klynge = gscKerner.filter((gk) => pk.some((k) => [...k].filter((w) => gk.has(w)).length >= 2)).length;
+  }
+}
+
 // --- Læselisten ------------------------------------------------------------
 const L = [];
 const dato = new Date().toISOString().slice(0, 16).replace('T', ' ');
@@ -208,7 +221,7 @@ for (const emne of emneListe) {
   L.push(`## ${emne} (hylden ${hyldeAf[emne]}: ${prHylde[hyldeAf[emne]]}) — ${r.antal} artikler i dag`, '', `${r.forslag} forslag: ${r.fri} fri, ${r.tvivl} tvivl, ${r.afvist.length} afvist.`, '');
   if (!r.pakker.length) L.push('_Ingen pakker — for få frie forslag. Startordene bør skiftes._', '');
   r.pakker.forEach((p, i) => {
-    L.push(`**${i + 1}. ${p.hoved}**${p.tvivlMod ? `  ⚠ tvivl — ligner: "${p.tvivlMod}"` : ''}`);
+    L.push(`**${i + 1}. ${p.hoved}**${p.klynge ? `  · klynge (${p.klynge} søgninger, Google viser os for)` : ''}${p.tvivlMod ? `  ⚠ tvivl — ligner: "${p.tvivlMod}"` : ''}`);
     p.beslaegtede.forEach((b) => L.push(`   - ${b}${p.brede.includes(b) ? '  _(kun samme emne)_' : ''}`));
     if (p.mangler) L.push(`   - _(${p.mangler} beslægtede mangler)_`);
     L.push('');

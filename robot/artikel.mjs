@@ -125,6 +125,9 @@ const liste = JSON.parse(fs.readFileSync(sti('robot/ud/soegeord-liste.json'), 'u
 const alle = Object.entries(liste.resultat).flatMap(([emne, r]) => r.pakker.map((p) => ({ ...p, emne })));
 let kandidater = HOVED ? alle.filter((p) => p.hoved === HOVED) : alle;
 if (!kandidater.length) throw new Error(HOVED ? `Hovedsøgeordet "${HOVED}" findes ikke i dagens liste` : 'Ingen pakker i listen');
+// Klynger først (Jacob 6/11-2026, forslag 3): pakker om emner, Google allerede viser sitet for (robot/soegeord.mjs
+// "klynge"), kommer før de andre; inden for hver gruppe gælder den gamle orden (tyndeste hylde først).
+kandidater = [...kandidater].sort((a, b) => ((b.klynge || 0) > 0) - ((a.klynge || 0) > 0));
 // Tyndeste emne først (listen er allerede sorteret sådan); Gemini vurderer de 8 første.
 const vurdering = await json(`You pick topics for evergreen explainer articles on a tech blog (techmediaarch.com).
 For each numbered keyword, answer whether it is a sensible, evergreen article topic in correct English: not news of the day, not prices/stock moves, not local/legal advice, not a product accessory, not nonsense.
@@ -135,7 +138,7 @@ if (!valgt) throw new Error('Gemini godkendte ingen af pakkerne');
 // Til tidsplanen (robot/plan.mjs): så et afvist søgeord kan hvile i 30 dage.
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
 fs.writeFileSync(sti('robot/ud/valgt.json'), JSON.stringify({ hoved: valgt.hoved, emne: valgt.emne }));
-log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}`);
+log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}  \n**Klynge:** ${valgt.klynge ? `ja (${valgt.klynge} søgninger, Google viser os for)` : 'nej'} · ${kandidater.filter((p) => p.klynge).length} af ${kandidater.length} pakker var klynger`);
 }
 
 // Formord bag på hovedsøgeordet fjernes (31/10-2026, prøve #38): "apple mdm enrollment guide" gav både titlen
