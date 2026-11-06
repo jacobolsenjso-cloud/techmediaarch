@@ -1,117 +1,149 @@
 ---
-title: What Is Included in a Microsoft 365 Subscription?
-description: Discover everything included in Microsoft 365, from core productivity tools and cloud storage to security features, collaborative apps, and enterprise tiers.
+title: What Does a Microsoft 365 Subscription Include?
+description: Discover the full range of office apps, cloud storage services, business email hosting, and security tools bundled inside a Microsoft 365 subscription.
 published: 2026-10-31T22:31:06.031Z
-updated: 2026-11-02T11:45:05.050Z
+updated: 2026-11-06T15:55:09.314Z
 labels:
   - It
-image: /images/cb3f8b08e4a95195-gm.jpg
+image: /images/7161b13126af594a-gm.jpg
 keyword: what does microsoft 365 include
 relatedKeywords:
-  - what does microsoft 365 basic include
-  - what does microsoft 365 personal include
-  - what does microsoft 365 business standard include
+  - what do you get with microsoft 365
+  - what apps come with microsoft 365
+  - what is included in a microsoft 365 subscription
 robot: true
-stemme: true
-omskrevet: 2026-11-02
+omskrevet: 2026-11-06
 omskrivning: fuld
-opskrift: 2
 gammelTitel: What Is Included in a Microsoft 365 Subscription?
+opskrift: 2
 ---
-<p>Microsoft 365 is a cloud-based subscription platform that includes productivity applications such as Word, Excel, PowerPoint, and Outlook, alongside OneDrive cloud storage, device security, and collaboration tools. Exact features and desktop application access vary depending on whether you choose a Basic, Personal, or Business tier.</p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Interconnected brass gears and glowing glass conduits in an artisan workshop." height="768" src="/images/cb3f8b08e4a95195-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Interconnected brass gears and glowing glass conduits in an artisan workshop.</td></tr></tbody></table><div class="tma-overblik"><p class="tma-overblik-titel">Key takeaways</p><ul><li>Microsoft 365 Basic includes 100 GB of cloud storage and web apps, but excludes downloadable desktop applications and Copilot AI.</li><li>Microsoft 365 Personal provides 1 TB of cloud storage, desktop apps on up to 5 devices, and Copilot AI.</li><li>Microsoft 365 Business Standard supports up to 300 users, offering 1 TB storage and 50 GB Exchange mailboxes per user.</li><li>Microsoft Copilot automates document creation, spreadsheet data analysis, slide deck generation, and email summarizing across supported applications.</li></ul></div>
+<p>A Microsoft 365 subscription includes downloadable apps, secure cloud storage, and ongoing online communication tools. Subscribers receive core applications like Word and Excel, cloud storage through OneDrive, and continuous product updates.</p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="An intricate brass armillary mechanism holds a glowing vapor sphere surrounded by radiant light." height="768" src="/images/7161b13126af594a-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">An intricate brass armillary mechanism holds a glowing vapor sphere surrounded by radiant light.</td></tr></tbody></table><div class="tma-overblik"><p class="tma-overblik-titel">Key takeaways</p><ul><li>Microsoft Copilot uses generative artificial intelligence inside apps to draft reports, summarize long email threads, and analyze spreadsheet data.</li><li>Built-in security automatically detects ransomware attacks and allows users to restore files to an earlier point in time.</li><li>A single licensed user can sign into software across five devices simultaneously, including computers, tablets, and phones.</li><li>Subscribers access creative tools like Clipchamp for video editing and Microsoft Designer for creating graphic designs.</li></ul></div>
 
 <h2>The Core Architecture of Microsoft 365</h2>
 
-<p>Microsoft 365 functions as a unified software ecosystem designed for individuals, families, businesses, enterprise environments, and educational institutions. According to Microsoft 365, Microsoft officially <a href="https://www.microsoft.com/en-us/microsoft-365/basic" rel="noopener" target="_blank">rebranded its Office 365</a> suite as Microsoft 365 in 2020 to reflect its expanded focus on cloud services and integrated tools.</p>
+<p>Microsoft 365 operates as a unified cloud subscription platform. It combines traditional desktop office programs with online services, central user management, and shared data storage.</p>
 
-<p>A <a href="/2026/11/microsoft-365-vs-office-differences">Microsoft 365 subscription</a> provides continuous access to productivity apps, security updates, cloud storage, and technical support across connected devices. While free accounts offer web versions with 5 GB of storage, paid plans unlock desktop app installations and larger storage allocations.</p>
+<p>The platform is organized across <a href="https://www.microsoft.com/en-sa/microsoft-365/buy/compare-all-microsoft-365-products" rel="noopener" target="_blank">three main user tiers</a>, according to Microsoft Store. These tiers target individual consumers, small and midsize businesses with up to 300 users, and large enterprise environments.</p>
 
-<p>Core productivity applications bundled across Microsoft 365 offerings include Microsoft Word, Excel, PowerPoint, Outlook, Teams, OneNote, and OneDrive. Licensing options range from consumer tiers like Basic and Personal to commercial plans such as Business Standard and enterprise editions.</p>
+<p>Subscribers get regular software fixes and new features automatically. This model differs from <a href="/2026/11/microsoft-365-vs-office-differences">perpetual-license Office editions</a>, which only receive basic bug fixes without getting new features.</p>
+
+<p>Subscribers also receive direct technical support from Microsoft via chat and online channels. This protection covers both the office apps and compatible versions of the Windows operating system.</p>
 
 <h2>Cloud Infrastructure and Generative AI Integration</h2>
 
-<p>Cloud infrastructure allows users to store documents centrally and synchronize edits in real time across mobile phones, tablets, and desktop computers. Microsoft 365 integrates generative AI capabilities through Microsoft Copilot across productivity tools like Word, Excel, PowerPoint, Outlook, and Teams.</p>
+<p>The cloud framework provides shared infrastructure for email hosting and team communication. Microsoft Exchange Online powers professional business email, custom domain names, shared contact lists, and synced calendars.</p>
 
-<p>AI integration automates document creation, spreadsheet data analysis, slide deck generation, and email summarizing across supported applications. Subscription plans determine whether users receive web-only application interfaces or full desktop software with offline functionality.</p>
+<p>SharePoint Online helps teams work together and hosts internal company websites. Organizations use SharePoint to build internal company websites, manage shared folders, and automate team tasks.</p>
+
+<p>Microsoft Teams brings chat, audio calling, and video meetings together in one place. Team members can share files and organize projects directly inside dedicated team channels.</p>
+
+<p>Newer subscriptions also include artificial intelligence through Microsoft Copilot. Generative AI is computer software that creates new text, images, or summaries from simple human prompts.</p>
+
+<p>Copilot works directly inside Word, Excel, PowerPoint, and Teams. The tool drafts written reports, summarizes long email threads, and analyzes complex spreadsheet data automatically.</p>
 
 <h2>What Does Microsoft 365 Basic Include?</h2>
 
-<p>Microsoft 365 Basic is designed for a single user and includes 100 GB of secure cloud storage shared across OneDrive and Outlook. The plan officially replaced the former standalone OneDrive 100 GB subscription tier on January 30, 2023, automatically transitioning existing subscribers.</p>
+<p><a href="https://support.microsoft.com/en-us/office/lifecycle/lc-account/what-s-the-difference-between-microsoft-365-and-office-2024" rel="noopener" target="_blank">Microsoft 365 Basic</a> is the starter plan for individual consumers. It is designed for individual users who need affordable cloud storage and web access without heavy desktop software.</p>
 
-<p>Subscribers receive ad-free secure web and mobile email through Outlook.com alongside built-in email security features. The 100 GB storage allocation covers personal photos, documents, and email attachments accessible across web and mobile platforms.</p>
+<p>The Basic plan provides 100 GB of secure OneDrive cloud storage, according to Microsoft Support. It also includes an ad-free Outlook mailbox with calendar scheduling tools.</p>
 
-<p>Security features in Microsoft 365 Basic include OneDrive ransomware protection, file recovery tools, ad-free web email, and 24/7 technical support. However, this tier excludes downloadable desktop applications and Microsoft Copilot AI capabilities.</p>
+<p>Subscribers do not receive downloadable, offline desktop applications like Word or Excel. Instead, users access lightweight web and mobile editions through an internet browser or phone app.</p>
+
+<p>The service includes strong file security tools directly inside OneDrive. The storage automatically detects ransomware attacks and lets you restore files to an earlier point in time.</p>
 
 <h2>What Does Microsoft 365 Personal Include?</h2>
 
-<p>Microsoft 365 Personal is licensed for one individual user account and permits simultaneous sign-in on up to 5 devices at once. Supported devices include Windows PCs, Mac computers, tablets, and mobile phones connected to the same account.</p>
+<p>Microsoft 365 Personal expands storage capacity and adds offline computer software for one person. An individual user gets 1 TB (1,000 GB) of secure cloud storage on OneDrive, according to ION247.</p>
 
-<p>Subscribers get 1 TB of secure OneDrive cloud storage for personal document backups and media files. </p>
+<p>The plan includes downloadable desktop installations of Word, Excel, PowerPoint, OneNote, and Outlook. These full applications run natively on both Windows PCs and Apple Mac computers.</p>
 
-<p>Security is augmented through Microsoft Defender, which provides identity monitoring, data protection, and cross-device security management. Microsoft Teams is included with all-day video calling features for personal video calls and group collaboration.</p>
-
-<h2>Advanced AI and Automation in Personal Subscriptions</h2>
-
-<p>Microsoft 365 Personal integrates Copilot AI directly into desktop applications to assist with content creation and data analysis. Users can draft text in Word, analyze data sets in Excel, build presentations in PowerPoint, and manage inbox messages in Outlook.</p>
-
-<p>Subscribers receive higher usage limits than free accounts for visual AI assistance through screens or cameras and AI-generated audio transformation features. Users maintaining desktop environments on older operating systems can evaluate upgrading options when assessing app performance, such as reviewing <a href="/2026/05/exploring-windows-10-is-dead-in-2025">running Windows 10 safely</a>.</p>
-
-<p>Integrating smart assistance into daily document work can save time, but I always approach these features with healthy skepticism. In my experience, you get much better results from built-in assistants by asking clear, step-by-step questions instead of broad instructions. Taking time to understand what the software actually produces is the best way to keep your work accurate.</p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Glowing crystal spheres connected by threads of light in a marble hall." height="768" src="/images/7262fa003a6e9205-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Glowing crystal spheres connected by threads of light in a marble hall.</td></tr></tbody></table><h2>What Does Microsoft 365 Business Standard Include?</h2>
-
-<p>Microsoft 365 Business Standard targets small and medium-sized organizations, supporting a maximum cap of up to 300 user accounts. Each licensed user can install desktop applications on up to 5 PCs or Macs, 5 tablets, and 5 mobile devices simultaneously.</p>
-
-<p>Business Standard provides business-class email hosting through Exchange Online, giving each user a 50 GB mailbox with custom domain support. Every user receives 1 TB of individual OneDrive cloud storage for corporate file management and team file sharing.</p>
-
-<p>Microsoft 365 Business Standard bundles several specialized web services to streamline daily office workflows:</p>
+<p>The following options outline how individual users can install and use their license:</p>
 
 <ul>
-<li><strong>Exchange Online:</strong> Business email hosting with 50 GB mailboxes and custom domain support.</li>
-<li><strong>Microsoft Teams:</strong> Video conferencing, persistent team chat, and webinar hosting capabilities.</li>
-<li><strong>SharePoint Online and Loop:</strong> Team site document repositories and flexible co-authoring workspaces.</li>
-<li><strong>Planner and Bookings:</strong> Visual project task assignment and online customer appointment scheduling.</li>
+    <li>Sign into installed desktop software on personal Windows laptops or desktop PCs.</li>
+    <li>Run native productivity apps on Apple Mac computers with full offline support.</li>
+    <li>Install touch-friendly mobile apps on Apple iPad tablets and iPhones.</li>
+    <li>Deploy mobile versions across Android smartphones and Android tablets.</li>
+    <li>Maintain up to five active device sign-ins simultaneously under a single user account.</li>
 </ul>
 
-<p>According to Ncbar, licensed users can <a href="https://www.ncbar.org/2025/04/15/a-sweet-suite-exploring-all-the-ms-365-business-standard-apps/" rel="noopener" target="_blank">view, launch, and manage</a> all assigned web applications centrally at m365.cloud.microsoft/apps.</p>
+<p>Microsoft 365 Family provides these exact same desktop software benefits for larger households. The Family tier delivers up to 6 TB of total cloud storage, split as 1 TB each for six distinct users.</p>
+
+<h2>Advanced AI, Automation, and Creative Tools</h2>
+
+<p>Beyond standard spreadsheets and documents, subscriptions include modern creative apps and tools for managing tasks. Microsoft Clipchamp is a video editor that lets you work with multiple video tracks, record your screen, and add automatic captions.</p>
+
+<p>Microsoft Designer uses artificial intelligence to help you create graphic designs. Users can type natural text descriptions to create digital artwork, social media banners, and printable invitations.</p>
+
+<p>Microsoft Loop gives teams flexible collaborative workspaces. Loop components like tables, lists, and note blocks stay synced across Word documents, Teams chats, and Outlook emails.</p>
+
+<p>Subscribers also get dedicated tools to track daily responsibilities. Microsoft To Do manages personal to-do lists, while Microsoft Planner organizes team assignments on visual project boards.</p>
+
+<p>Microsoft Forms creates interactive customer feedback surveys and online quizzes with real-time data export into Excel. Microsoft Lists organizes structured data, such as office asset inventories and project issue trackers.</p>
+
+<p>Windows users also get Microsoft Access to build custom databases that connect and organize information. Meanwhile, desktop publisher software has ended; Microsoft retired Microsoft Publisher in October 2026.</p>
+
+<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="An open tiered chest holds mechanical gears, tools, and a glowing levitating glass orb." height="768" src="/images/58b26699650d72d2-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">An open tiered chest holds mechanical gears, tools, and a glowing levitating glass orb.</td></tr></tbody></table><h2>What Does Microsoft 365 Business Standard Include?</h2>
+
+<p>Microsoft 365 Business Standard is targeted at small and medium-sized organizations with up to 300 workers. It combines cloud-hosted services with downloadable desktop software for company computers.</p>
+
+<p>Business Standard delivers full offline desktop installations of Word, Excel, PowerPoint, and Outlook. It also provides Microsoft Access exclusively for Windows workstations.</p>
+
+<p>In contrast, Microsoft 365 Business Basic restricts users to online web browsers and mobile apps. Business Standard includes everything from Business Basic while adding full offline desktop tools.</p>
+
+<p>The plan also includes Microsoft Bookings. This scheduling app lets outside clients and coworkers book meetings directly on an employee's Outlook calendar.</p>
 
 <h2>Enterprise Applications and Security Features</h2>
 
-<p>According to Encorebusiness, Microsoft 365 Business Standard provides <a href="https://www.encorebusiness.com/blog/m365-business-basic-vs-standard-vs-premium/" rel="noopener" target="_blank">baseline security features</a> like multi-factor authentication and basic email threat protection.</p>
+<p>Microsoft Entra ID manages user accounts, permission settings, and single sign-on across company networks.</p>
 
-<p>However, Business Standard excludes advanced enterprise endpoint management tools like Microsoft Intune. Organizations receive 24/7 web and phone technical administrator support directly from Microsoft to resolve service issues.</p>
+<p>Business plans protect remote mobile devices using Microsoft Intune, according to Mindcore. Intune enforces company security rules and lets IT managers erase company data from lost phones.</p>
 
-<p>Businesses comparing <a href="/2026/11/windows-11-home-vs-pro-guide">client platform deployments</a> can examine performance differences, such as evaluating <a href="/2026/05/zorin-os-vs-windows-11-real-world">Zorin OS versus Windows 11 app compatibility</a>.</p>
+<p>Data compliance is managed through Microsoft Purview, according to M365 Maps. Purview gives administrators tools to search content, track user activity, set file-saving rules, and automatically prevent data leaks.</p>
 
-<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="An open wooden chest contains a glowing crystal, copper gears, and a light-splitting prism." height="768" src="/images/6b6fde0fa278b941-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">An open wooden chest contains a glowing crystal, copper gears, and a light-splitting prism.</td></tr></tbody></table><h2>Comparing Desktop Applications and Storage Across Tiers</h2>
-
-<p>The following breakdown highlights key structural differences across the primary Microsoft 365 subscription plans:</p>
+<p>Businesses can choose between several security and management plans:</p>
 
 <ul>
-<li><strong>Microsoft 365 Basic:</strong> Provides 100 GB cloud storage, web/mobile apps only, ad-free Outlook, and excludes desktop installations and Copilot AI.</li>
-<li><strong>Microsoft 365 Personal:</strong> Offers 1 TB storage, full desktop apps for PC/Mac across 5 concurrent devices, Copilot AI integration, and Microsoft Defender.</li>
-<li><strong>Microsoft 365 Business Standard:</strong> Includes 1 TB storage per user, 50 GB Exchange mailboxes, desktop apps across 15 devices per user, Teams webinars, SharePoint, Loop, and Planner.</li>
+    <li>Microsoft 365 Business Premium, which adds Intune device controls and Defender for Business.</li>
+    <li>Microsoft 365 Apps for Enterprise, which supplies desktop software without requiring Exchange email hosting.</li>
+    <li>Microsoft 365 Enterprise E3, which bundles core software, Exchange, SharePoint, and Core eDiscovery.</li>
+    <li>Microsoft 365 Enterprise E5, which adds Power BI Pro, Teams Phone, and Defender XDR threat intelligence.</li>
+    <li>Microsoft 365 Frontline plans like F1 and F3, which equip deskless workers with mobile tools and shift managers.</li>
 </ul>
 
-<p>Web versions run directly in internet browsers, offering light document editing without local system installations. Desktop installations provide full offline capability, advanced macro support, and deeper system integration.</p>
+<p>Personal and business accounts also get security protection from Microsoft Defender. The software watches for device threats, blocks malware, and sends real-time security alerts.</p>
+
+<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="An intricate brass clockwork mechanism with polished gears and counterweights running in alignment." height="768" src="/images/3f8431a77bfb9faa-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">An intricate brass clockwork mechanism with polished gears and counterweights running in alignment.</td></tr></tbody></table><h2>Comparing Desktop Applications and Storage Across Tiers</h2>
+
+<p>How much storage you get and which apps are included depend on whether you have a personal or business plan. Personal tiers allocate storage to an individual, while business tiers allocate storage per licensed seat.</p>
+
+<p>Microsoft 365 Basic offers 100 GB of cloud storage, but it excludes desktop apps. Microsoft 365 Personal provides 1 TB of storage alongside fully installed software for one user.</p>
+
+<p><a href="https://learn.microsoft.com/en-us/microsoft-365/admin/admin-overview/what-is-microsoft-365-for-business?view=o365-worldwide" rel="noopener" target="_blank">Commercial users</a> on Business Basic or Business Standard receive 1 TB of OneDrive storage per person, according to Microsoft Learn. Business email through Exchange Online includes dedicated mailbox storage separate from your file storage.</p>
+
+<p>Each licensed user can use desktop software across five devices simultaneously, according to Mindcore. This rule covers desktop computers, laptops, tablets, and phones under one account.</p>
 
 <h2>Security and Collaboration Ecosystems</h2>
 
-<p>Data security in Microsoft 365 relies on built-in encryption, multi-factor authentication, and automated backup routines. Personal subscribers protect personal files with OneDrive ransomware detection and one-click file recovery capabilities.</p>
+<p>The platform links personal file storage directly to shared workspaces. Files stored in personal OneDrive folders can be moved seamlessly into shared SharePoint libraries for group access.</p>
 
-<p>Business environments utilize central admin portals to manage domain records, user access permissions, and mailbox settings.</p>
+<p>When OneDrive detects an active ransomware attack, it alerts the user and guides them through restoring uncorrupted files.</p>
 
-<p>Having dealt with hijacked online accounts in the past, I know how painful it is to recover lost access. That is why I always prioritize basic safeguards like unique passwords and steady cloud backups above everything else. Setting up strong security upfront gives you the peace of mind needed to work without unexpected disruptions.</p><h2>FAQ</h2>
+<p>Multiple people can edit shared documents at the exact same time. Multiple team members can edit a single Word document or Excel spreadsheet together without overwriting each other's work.</p>
+
+<h2>FAQ</h2>
 
 <h3>What is the main difference between Microsoft 365 Basic and Personal?</h3>
-<p>Microsoft 365 Basic provides 100 GB of cloud storage and limits application access to web and mobile versions of Word, Excel, and PowerPoint without Copilot AI. Microsoft 365 Personal increases cloud storage to 1 TB, adds fully installable desktop applications for PC and Mac, includes Microsoft Defender security, and incorporates integrated Copilot AI assistance.</p>
+<p>Microsoft 365 Basic includes 100 GB of cloud storage and web-only Office apps without downloadable software. Microsoft 365 Personal includes 1 TB of cloud storage and full desktop software for PC and Mac. Personal also includes support for advanced generative AI features.</p>
 
 <h3>Does Microsoft 365 Basic include Copilot AI features?</h3>
-<p>No, Microsoft 365 Basic excludes Copilot AI capabilities and advanced generative AI assistant tools. Users who require Copilot integration inside apps like Word or Excel must upgrade to a plan that supports AI features, such as Microsoft 365 Personal.</p>
+<p>No, Microsoft 365 Basic does not include Microsoft Copilot generative AI features. Copilot features are available only on certain plans, including Personal, Family, and business subscriptions. Basic users only receive standard web applications and storage protection.</p>
 
 <h3>How many devices can run Microsoft 365 Business Standard?</h3>
-<p>Each licensed Microsoft 365 Business Standard user can install and run fully featured productivity apps on up to 15 devices simultaneously. This allocation permits up to 5 PCs or Macs, 5 tablets, and 5 mobile phones per user account.</p>
+<p>A single Microsoft 365 Business Standard license allows a user to sign in on up to five devices at the same time. This total can include any mix of desktop PCs, Macs, tablets, and smartphones. Each user manages their active installations through their central account page.</p>
 
 <h3>What desktop apps are included with Microsoft 365 Business Standard?</h3>
-<p>Microsoft 365 Business Standard includes downloadable desktop versions of Word, Excel, PowerPoint, Outlook, and OneNote for both PC and Mac. </p>
+<p>Business Standard includes downloadable desktop versions of Microsoft Word, Excel, PowerPoint, and Outlook for PC and Mac. Windows computer users also receive access to Microsoft Access for relational database work. The plan also includes Microsoft Teams for video conferencing and chat.</p>
 
 <h3>How does OneDrive file storage differ between personal and business plans?</h3>
-<p>Personal plans like Microsoft 365 Basic offer 100 GB of personal storage, while Microsoft 365 Personal provides 1 TB for a single user account. Business Standard provides 1 TB of individual OneDrive storage per user alongside shared team repositories managed through SharePoint Online and Exchange email hosting with 50 GB mailboxes.</p><h2>Sources</h2><ul><li><a href="https://support.microsoft.com/en-us/accounts-billing/subscriptions/compare-microsoft-365-and-office-plans" rel="noopener" target="_blank">Compare Microsoft 365 and Office plans | Microsoft Support</a></li><li><a href="https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-plan-options" rel="noopener" target="_blank">Microsoft 365 and Office 365 plan options - Service Descriptions | Microsoft Learn</a></li><li><a href="https://www.microsoft.com/en-us/microsoft-365/basic" rel="noopener" target="_blank">Microsoft 365 for Individuals User Guide | Microsoft 365</a></li><li><a href="https://www.alwaysbeyond.com/blog/microsoft-365-business-basic-vs-standard-full-comparison" rel="noopener" target="_blank">Microsoft 365 Business Basic vs Standard: Full Comparison</a></li><li><a href="https://www.hp.com/us-en/tech-takes/software/explainer/what-is-microsoft-365.html" rel="noopener" target="_blank">What Is Microsoft 365? Apps, Features, and Plans Explained | HP® Official Site</a></li><li><a href="https://www.encorebusiness.com/blog/m365-business-basic-vs-standard-vs-premium/" rel="noopener" target="_blank">Microsoft 365 Business Basic vs Business Standard vs Business Premium</a></li><li><a href="https://m365grid.com/plan/microsoft-365-business-standard/" rel="noopener" target="_blank">What's included in Microsoft 365 Business Standard? | m365-grid</a></li><li><a href="https://www.ncbar.org/2025/04/15/a-sweet-suite-exploring-all-the-ms-365-business-standard-apps/" rel="noopener" target="_blank">A Sweet Suite: Exploring All the MS 365 Business Standard Apps - North Carolina Bar Association</a></li></ul>
+<p>Personal plans grant 100 GB in Basic or 1 TB in Personal dedicated to an individual's private Microsoft account. Business plans grant 1 TB of company-controlled storage per licensed seat managed by company IT administrators. Business storage links directly to company SharePoint folders and tools that monitor security rules.</p><h2>Sources</h2><ul><li><a href="https://support.microsoft.com/en-us/office/lifecycle/lc-account/what-s-the-difference-between-microsoft-365-and-office-2024" rel="noopener" target="_blank">What's the difference between Microsoft 365 and Office 2024? | Microsoft Support</a></li><li><a href="https://learn.microsoft.com/en-us/microsoft-365/admin/admin-overview/what-is-microsoft-365-for-business?view=o365-worldwide" rel="noopener" target="_blank">Microsoft 365 for Business Overview - Microsoft 365 admin | Microsoft Learn</a></li><li><a href="https://www.microsoft.com/en-sa/microsoft-365/buy/compare-all-microsoft-365-products" rel="noopener" target="_blank">Compare Microsoft 365 Plans &amp; Pricing (Formerly Office 365) – Microsoft Store</a></li><li><a href="https://www.hp.com/us-en/tech-takes/software/explainer/what-is-microsoft-365.html" rel="noopener" target="_blank">What Is Microsoft 365? Apps, Features, and Plans Explained | HP® Official Site</a></li><li><a href="https://mind-core.com/blogs/what-are-microsoft-365-apps-for-enterprise/" rel="noopener" target="_blank">What Are Microsoft 365 Apps for Enterprise? | Mindcore</a></li><li><a href="https://m365maps.com/matrix.htm" rel="noopener" target="_blank">Feature Matrix | M365 Maps</a></li><li><a href="https://www.ion247.com/insights/microsoft-365-personal-business-and-enterprise-plans-which-is-right-for-you/" rel="noopener" target="_blank">Microsoft 365 Personal, Business, and Enterprise Plans: Which is Right for You? - ION247</a></li><li><a href="https://skymigrate.com/microsoft-365-plans-comparison-pricing-features/" rel="noopener" target="_blank">Microsoft 365 Plans Comparison: Pricing &amp; Features (2026)</a></li></ul>

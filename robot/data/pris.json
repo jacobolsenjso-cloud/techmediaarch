@@ -666,5 +666,35 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-06T15:55:09.332Z",
+  "artikel": "/2026/10/what-is-included-in-microsoft-365",
+  "omskrevet": true,
+  "usd": 0.4552,
+  "kr": 3.13,
+  "dele": {
+   "artikel": {
+    "kr": 3.13,
+    "billeder": 6,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-06T16:04:24.860Z",
+  "artikel": "/2026/05/the-no-cost-blogger-blueprint-create",
+  "omskrevet": true,
+  "usd": 0.3816,
+  "kr": 2.62,
+  "dele": {
+   "artikel": {
+    "kr": 2.62,
+    "billeder": 4,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
  }
 ]
