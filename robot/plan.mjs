@@ -184,7 +184,7 @@ if (arg === '--tjek') {
     summary(`**Omskrivning ${iDag.length + 1} af ${OMSKRIV_PR_DAG} i dag:** ${naeste.sti} (${naeste.maade}${naeste.visninger ? ', har visninger' : ''}) · ${tilbage} tilbage i køen · ${krMd.toFixed(2)} kr brugt i ${md}`);
     if (fs.existsSync(sti('robot/ud'))) for (const f of fs.readdirSync(sti('robot/ud')).filter((x) => /^pris-.+\.json$|^proeveartikel\.json$/.test(x))) fs.rmSync(sti('robot/ud', f));
     const foer = aendret();
-    const r = spawnSync('node', ['robot/artikel.mjs', '--omskriv', naeste.sti, '--maade', naeste.maade, ...(naeste.igen ? ['--igen'] : [])], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    const r = spawnSync('node', ['robot/artikel.mjs', '--omskriv', naeste.sti, '--maade', naeste.maade, ...(naeste.igen ? ['--igen'] : []), ...(naeste.efter ? ['--efter', naeste.efter] : [])], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
     process.stdout.write(r.stdout || ''); process.stderr.write(r.stderr || '');
     let stop = false;
     if (r.status === 0) summary(`**Skrevet om:** ${laes('robot/ud/proeveartikel.json', {}).titel} — ${SITE}${naeste.sti}`);

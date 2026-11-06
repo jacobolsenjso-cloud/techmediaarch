@@ -70,7 +70,12 @@ if (OMSKRIV) {
   gammel = { fm: yamlParse(d[1]) || {}, krop: d[2] };
   // --igen (31/10-2026): må skrives om igen, hvis den er lavet med en ældre opskrift (robot/lib/arkiv.mjs OPSKRIFT)
   igen = process.argv.includes('--igen') && (Number(gammel.fm.opskrift) || 1) < OPSKRIFT;
-  if (gammel.fm.omskrevet && !igen) throw new Error(`Omskrivning: ${OMSKRIV} er allerede skrevet om (${gammel.fm.omskrevet})`);
+  // --efter ÅÅÅÅ-MM-DD (6/11-2026): køens "efter"-felt — en artikel omskrevet på eller før datoen må skrives om igen
+  // (kvalitetsfejl fundet bagefter). Uden dette stoppede M365-omskrivningen 5/11 her ved hver kørsel (min fejl 4/11:
+  // plan.mjs kendte "efter", artikel.mjs gjorde ikke).
+  const efter = arg('efter');
+  const igenEfter = /^\d{4}-\d{2}-\d{2}$/.test(efter) && String(gammel.fm.omskrevet || '') <= efter;
+  if (gammel.fm.omskrevet && !igen && !igenEfter) throw new Error(`Omskrivning: ${OMSKRIV} er allerede skrevet om (${gammel.fm.omskrevet})`);
 }
 const gemFrontmatter = (fm, krop) => fs.writeFileSync(gammelFil, `---\n${yamlStringify(fm, { lineWidth: 0 }).trimEnd()}\n---\n${krop}`);
 const iDag = new Date().toISOString().slice(0, 10);
