@@ -1,0 +1,54 @@
+# PRØVE af en nyere tekstmodel (6/11-2026, Jacob: "mål, om vi kan gå et step op") — findes KUN på grenen model-38 og
+# slettes, før noget lægges på main. Skriver "How Does Generative AI Learn?" om (samme artikel, som 3.5 Flash skrev om
+# 5/11 for 4,45 kr) og lægger artiklen i kørslens resumé, så den kan læses uden download. Udgiver, bygger og pusher intet.
+name: Robot (prøve på gren)
+
+on:
+  push:
+    branches: [model-38]
+    paths: ['robot/**', '.github/workflows/robot-proeve.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: robot-proeve
+  cancel-in-progress: true
+
+jobs:
+  proeve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Hent hjernen (jacob-hjerne, privat, kun læsning)
+        continue-on-error: true
+        uses: actions/checkout@v5
+        with:
+          repository: jacobolsenjso-cloud/jacob-hjerne
+          ssh-key: ${{ secrets.HJERNE_NOEGLE }}
+          path: _hjerne
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Skriv "How Does Generative AI Learn?" om med den nye model (prøve)
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLOUDFLARE_AI_TOKEN: ${{ secrets.CLOUDFLARE_AI_TOKEN }}
+        run: node robot/artikel.mjs --omskriv /2026/11/how-does-generative-ai-learn --maade fuld --efter 2026-11-05
+      - name: Artiklen i resuméet (til læsning)
+        if: always()
+        run: |
+          f=src/content/posts/2026/11/how-does-generative-ai-learn.md
+          { echo; echo '## Prøveartiklen (tekst uden HTML)'; echo; sed -e 's/<[^>]*>/ /g' "$f" | tr -s ' ' | grep -v '^ *$'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: robot-proeve
+          path: |
+            robot/ud/
+            src/content/posts/2026/11/how-does-generative-ai-learn.md
+          if-no-files-found: ignore

@@ -9,7 +9,7 @@ export const TEKSTMODEL = 'gemini-3.5-flash-lite';
 // Artiklerne skrives med den stærkere model (Jacob 31/10-2026): flash-lite gav svingende kvalitet (prøve #38: 8 kilder
 // og 1.500 ord, #39: 4 kilder, 1.100 ord og mange enkeltsætninger). robot/artikel.mjs vælger den; resten (søgeordslisten,
 // dubletter) bruger stadig flash-lite.
-export const ARTIKELMODEL = 'gemini-3.5-flash';
+export const ARTIKELMODEL = 'gemini-3.8-flash';   // PRØVE 6/11-2026 på grenen model-38 (før: gemini-3.5-flash)
 let tekstModel = TEKSTMODEL;
 export const brugTekstmodel = (m) => { tekstModel = m; };
 // 31/10-2026 (Jacob): samme billedmodel som techfeedwatch — den gav de rige, fortællende billeder i prøverne.
@@ -24,6 +24,8 @@ export const KONTROLMODEL = 'gemini-3.5-flash';   // billedkontrollen (stærkere
 export const PRISER = {
   'gemini-3.5-flash-lite': { ind: 0.30, ud: 2.50 },
   'gemini-2.5-flash': { ind: 0.30, ud: 2.50 },
+  // 6/11-2026: introduktionspris til 31/12-2026; fra 1/1-2027 1,50 / 7,50 (flere prislister, bl.a. eesel.ai, layer3labs.io)
+  'gemini-3.8-flash': { ind: 0.75, ud: 3.75 },
   'gemini-3.5-flash': { ind: 1.50, ud: 9.00 },  // 31/10: manglede, så prisen stod som "UKENDT" (Googles prisliste via pricepertoken.com m.fl.)
 };
 export const BILLEDPRIS = 0.034;             // USD pr. billede (nano-banana-2.1, som techfeedwatch måler)
