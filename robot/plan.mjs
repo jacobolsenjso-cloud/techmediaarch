@@ -159,6 +159,25 @@ if (arg === '--tjek') {
   // så videoopsummeringerne, så resten af T/V). En afvist artikel hviler 30 dage (robot/data/omskriv-proevet.json).
   // Hele dagens kvote tages i dagens første kørsel; den anden kørsel samler op, hvis noget blev afvist.
   const koe = laes(OMSKRIV_KOE, []);
+  // Googles prioritet (Jacob 6/11-2026, forslag 1): sider, Google allerede viser (Search Console, 28 dage, mindst
+  // VIS_MIN visninger), skrives om FØRST — flest visninger først. Målt 6/11: 4 sider stod for 85 % af visningerne
+  // (MVP 804, AI detector 951, content marketing 559, product roadmap 565 på en uge), men lå som nr. 9-92 i køen.
+  // Punkter med "efter" (kendte fejl, Jacobs ordre) kommer stadig allerførst. Kan Search Console ikke læses,
+  // bruges køens egen rækkefølge. En side med visninger hos Google tæller som "med visninger" (højst 1 om dagen).
+  const VIS_MIN = 20;
+  const gscVis = new Map();
+  try {
+    const { hentSider } = await import('./lib/searchconsole.mjs');
+    for (const s of (await hentSider({ dage: 28 })).sider) {
+      const p = new URL(s.side).pathname.replace(/\.html$/, '').replace(/\/$/, '');
+      gscVis.set(p, (gscVis.get(p) || 0) + s.visninger);
+    }
+  } catch (e) { summary(`**Omskrivning:** Search Console kunne ikke læses (${String(e.message).slice(0, 100)}) — køens egen rækkefølge bruges`); }
+  const visGoogle = (k) => gscVis.get(k.sti) || 0;
+  const harVis = (k) => !!k.visninger || visGoogle(k) > 0;
+  const ordnet = [...koe.filter((k) => k.efter),
+    ...koe.filter((k) => !k.efter && visGoogle(k) >= VIS_MIN).sort((a, b) => visGoogle(b) - visGoogle(a)),
+    ...koe.filter((k) => !k.efter && visGoogle(k) < VIS_MIN)];
   const proevet = laes(OMSKRIV_PROEVET, []);
   const fm = (s) => { try { return parse(fs.readFileSync(sti(`src/content/posts${s}.md`), 'utf8').match(/^---\r?\n([\s\S]*?)\r?\n---/)[1]) || {}; } catch { return {}; } };
   const iDagDato = new Date().toISOString().slice(0, 10);
@@ -173,15 +192,15 @@ if (arg === '--tjek') {
   for (let forsoeg = 0; forsoeg < OMSKRIV_FORSOEG_PR_KOERSEL; forsoeg++) {
     const hviler = new Set(proevet.filter((p) => Date.now() - new Date(p.dato) < 30 * 864e5).map((p) => p.sti));
     const iDag = koe.filter((k) => fm(k.sti).omskrevet === iDagDato);
-    const visIDag = iDag.filter((k) => k.visninger).length;
+    const visIDag = iDag.filter(harVis).length;
     const krMd = laes(PRIS, []).filter((p) => dkDato(new Date(p.dato)).slice(0, 7) === md).reduce((s, p) => s + (p.kr || 0), 0);
     const tilbage = koe.filter((k) => !faerdig(k)).length;
     // Næste i køen; er dagens kvote for artikler med visninger brugt, springes de over til i morgen
-    const naeste = koe.find((k) => !faerdig(k) && !hviler.has(k.sti) && !(k.visninger && visIDag >= OMSKRIV_VISNINGER_PR_DAG));
+    const naeste = ordnet.find((k) => !faerdig(k) && !hviler.has(k.sti) && !(harVis(k) && visIDag >= OMSKRIV_VISNINGER_PR_DAG));
     if (iDag.length >= OMSKRIV_PR_DAG) { summary(`**Omskrivning:** færdig for i dag — ${iDag.length} af ${OMSKRIV_PR_DAG} (heraf ${visIDag} med visninger) · ${tilbage} tilbage i køen`); break; }
     if (!naeste) { summary(`**Omskrivning:** intet at gøre lige nu (${tilbage} tilbage i køen, ${hviler.size} hviler, ${visIDag} med visninger i dag)`); break; }
     if (krMd >= OMSKRIV_LOFT_KR) { summary(`**Omskrivning:** springer over — ${krMd.toFixed(2)} kr brugt i ${md} (loft for omskrivning ${OMSKRIV_LOFT_KR} kr)`); break; }
-    summary(`**Omskrivning ${iDag.length + 1} af ${OMSKRIV_PR_DAG} i dag:** ${naeste.sti} (${naeste.maade}${naeste.visninger ? ', har visninger' : ''}) · ${tilbage} tilbage i køen · ${krMd.toFixed(2)} kr brugt i ${md}`);
+    summary(`**Omskrivning ${iDag.length + 1} af ${OMSKRIV_PR_DAG} i dag:** ${naeste.sti} (${naeste.maade}${harVis(naeste) ? `, har visninger${visGoogle(naeste) ? ` — ${visGoogle(naeste)} hos Google på 28 dage` : ''}` : ''}) · ${tilbage} tilbage i køen · ${krMd.toFixed(2)} kr brugt i ${md}`);
     if (fs.existsSync(sti('robot/ud'))) for (const f of fs.readdirSync(sti('robot/ud')).filter((x) => /^pris-.+\.json$|^proeveartikel\.json$/.test(x))) fs.rmSync(sti('robot/ud', f));
     const foer = aendret();
     const r = spawnSync('node', ['robot/artikel.mjs', '--omskriv', naeste.sti, '--maade', naeste.maade, ...(naeste.igen ? ['--igen'] : []), ...(naeste.efter ? ['--efter', naeste.efter] : [])], { cwd: sti(), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
