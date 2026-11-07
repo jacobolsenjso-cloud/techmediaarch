@@ -1,19 +1,19 @@
 {
- "hentet": "2026-11-05T15:52:27.077Z",
- "fra": "2026-10-30",
- "til": "2026-11-05",
+ "hentet": "2026-11-07T13:10:26.249Z",
+ "fra": "2026-11-01",
+ "til": "2026-11-07",
  "dage": 7,
  "sider": {
-  "/2026/10/what-are-intelligent-agents-ai": {
-   "visninger": 17,
-   "brugere": 5
-  },
   "/2026/10/what-is-included-in-microsoft-365": {
-   "visninger": 10,
+   "visninger": 9,
    "brugere": 2
   },
+  "/2026/10/what-are-intelligent-agents-ai": {
+   "visninger": 8,
+   "brugere": 4
+  },
   "/2026/10/how-generative-ai-creates-images": {
-   "visninger": 6,
+   "visninger": 5,
    "brugere": 2
   },
   "/2026/05/exploring-claude-just-changed-making": {
@@ -28,35 +28,19 @@
    "visninger": 2,
    "brugere": 1
   },
-  "/2026/06/agentic-ai-vs-ai-agents-technical": {
-   "visninger": 2,
-   "brugere": 1
-  },
-  "/2026/10/how-phishing-resistant-mfa-works": {
-   "visninger": 2,
-   "brugere": 2
-  },
   "/2026/10/product-management-business-development": {
    "visninger": 2,
    "brugere": 2
-  },
-  "/2026/10/what-is-cybersecurity-importance": {
-   "visninger": 2,
-   "brugere": 2
-  },
-  "/2024/08/a-comprehensive-review-of-cyber": {
-   "visninger": 1,
-   "brugere": 1
   },
   "/2024/09/Metas Posts using metas ai tools": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/the-best-ai-detector-free-tools-to-spot": {
+  "/2026/05/the-real-arch-linux-myths-trade-offs": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/the-real-arch-linux-myths-trade-offs": {
+  "/2026/06/agentic-ai-vs-ai-agents-technical": {
    "visninger": 1,
    "brugere": 1
   },
@@ -72,11 +56,15 @@
    "visninger": 1,
    "brugere": 1
   },
+  "/2026/10/how-phishing-resistant-mfa-works": {
+   "visninger": 1,
+   "brugere": 1
+  },
   "/2026/10/what-are-crypto-wallet-addresses": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/10/what-to-do-after-product-management": {
+  "/2026/10/what-is-cybersecurity-importance": {
    "visninger": 1,
    "brugere": 1
   },

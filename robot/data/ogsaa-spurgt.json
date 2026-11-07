@@ -1953,24 +1953,20 @@
   ]
  },
  "/2026/10/how-ransomware-gets-installed": {
-  "dato": "2026-10-07T14:37:46.835Z",
+  "dato": "2026-11-07T13:10:23.570Z",
   "valg": [
    {
     "q": "What does ransomware do to the files it gets control of?",
     "sti": "/2026/10/what-are-ransomware-canary-files"
    },
    {
-    "q": "What are phishing attacks?",
-    "sti": "/2026/10/what-are-phishing-attacks"
-   },
-   {
-    "q": "How does phishing through email work?",
-    "sti": "/2026/09/what-are-phishing-emails"
+    "q": "How to access ransomware protection?",
+    "sti": "/2026/10/how-to-access-ransomware-protection"
    }
   ]
  },
  "/2026/10/what-does-api-mean-in-software": {
-  "dato": "2026-10-07T20:43:43.506Z",
+  "dato": "2026-11-07T13:10:24.076Z",
   "valg": [
    {
     "q": "What does MVP in software development mean?",
@@ -2418,6 +2414,19 @@
    {
     "q": "What does Microsoft 365 include?",
     "sti": "/2026/10/what-is-included-in-microsoft-365"
+   }
+  ]
+ },
+ "/2026/11/generative-ai-environmental-impact": {
+  "dato": "2026-11-07T13:10:23.086Z",
+  "valg": [
+   {
+    "q": "What role do data centers play in AI development?",
+    "sti": "/2025/01/market-insights-trumps-stargate-and-ais-rising-tide"
+   },
+   {
+    "q": "What are the environmental benefits of using AI in nuclear energy?",
+    "sti": "/2024/10/google quits big tech to focus on ai in nuclear energy"
    }
   ]
  }

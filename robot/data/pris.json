@@ -696,5 +696,61 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-07T13:10:26.256Z",
+  "artikel": "/2026/11/generative-ai-environmental-impact",
+  "usd": 0.4089,
+  "kr": 2.81,
+  "dele": {
+   "artikel": {
+    "kr": 2.77,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0.01,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-07T13:16:24.596Z",
+  "artikel": "/2026/10/what-are-intelligent-agents-ai",
+  "omskrevet": true,
+  "usd": 0.3588,
+  "kr": 2.46,
+  "dele": {
+   "artikel": {
+    "kr": 2.46,
+    "billeder": 5,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-07T13:24:42.565Z",
+  "artikel": "/2026/05/can-ai-detection-be-trusted-blind-tests",
+  "omskrevet": true,
+  "usd": 0.411,
+  "kr": 2.82,
+  "dele": {
+   "artikel": {
+    "kr": 2.82,
+    "billeder": 4,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
  }
 ]

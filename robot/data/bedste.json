@@ -1,7 +1,7 @@
 {
- "hentet": "2026-11-05T15:52:26.461Z",
- "fra": "2026-08-08",
- "til": "2026-11-05",
+ "hentet": "2026-11-07T13:10:25.623Z",
+ "fra": "2026-08-10",
+ "til": "2026-11-07",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -234,10 +234,6 @@
    "brugere": 1
   },
   "/2024/10/Get ready to deploy a fleet of ai agents startups": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2024/10/Googles rtt reveals the full extent of web rtt data logging": {
    "visninger": 1,
    "brugere": 1
   },
