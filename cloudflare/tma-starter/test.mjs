@@ -15,10 +15,13 @@ t('ingen start om søndagen', !tider.some((x) => x.startsWith('11-08')));
 t('kl. 07:43 og 15:43 UTC', skalStarte(new Date(Date.UTC(2026, 10, 2, 7, 43))) && skalStarte(new Date(Date.UTC(2026, 10, 2, 15, 43))) && !skalStarte(new Date(Date.UTC(2026, 10, 2, 7, 17))));
 t('aldrig samtidig med tfw-starter (minut 17 og 37)', !tider.some((x) => /:(17|37)$/.test(x)));
 // Workerens tider og wrangler.toml skal være ens
-const cron = '43 7,15 * * 1-6';
+const cron = '43 7,15 * * MON-SAT';
 const toml = fs.readFileSync(new URL('./wrangler.toml', import.meta.url), 'utf8');
 const yml = fs.readFileSync(new URL('../../.github/workflows/robot-tidsplan.yml', import.meta.url), 'utf8');
 t('wrangler.toml har samme tid som workeren', toml.includes(`crons = ["${cron}"]`));
+// Cloudflare: 1 = søndag, 7 = lørdag (GitHub: 0 = søndag). Tal i ugedagsfeltet er forbudt — kun navne (7/11-2026).
+const cfCrons = (toml.match(/^crons = \[(.*)\]/m) || [])[1] || '';
+t('wrangler.toml: ugedage skrevet med navne, ikke tal', [...cfCrons.matchAll(/"([^"]+)"/g)].every(([, c]) => /^[A-Z]{3}(-[A-Z]{3})?$/.test(c.trim().split(/\s+/)[4] || '')));
 // GitHubs egen tidsplan (reserve): schedule og jobbets "if" SKAL være ens, ellers kører jobbet aldrig
 const ghCron = (yml.match(/- cron: '([^']+)'/) || [])[1];
 t(`robot-tidsplan.yml: schedule og "if" er ens (${ghCron})`, !!ghCron && yml.includes(`github.event.schedule == '${ghCron}'`));

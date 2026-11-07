@@ -13,7 +13,9 @@ preview_urls = false
 # Minut 43 (Jacob 4/11): skævt, og aldrig samtidig med tfw-starter (minut 17 og 37). Robottens egen GitHub-tidsplan
 # (robot-tidsplan.yml) er reserve. Bruger 1 af kontoens 5 gratis tidsplaner (målt 4/11: kun tfw-starter havde en).
 [triggers]
-crons = ["43 7,15 * * 1-6"]
+# UGEDAGE MED NAVN (7/11-2026): Cloudflare tæller 1 = SØNDAG ... 7 = lørdag (ikke som GitHub, hvor 0 = søndag).
+# "1-6" betød derfor søndag-fredag: lørdag 7/11 startede intet. Navne kan ikke misforstås.
+crons = ["43 7,15 * * MON-SAT"]
 
 [observability]
 enabled = true
