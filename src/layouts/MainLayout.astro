@@ -160,10 +160,10 @@ const nyeste = INDLAEG[0];
           ad.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9695260339642032';
           document.head.appendChild(ad);
         }
-        function naarLedig() {
-          if ('requestIdleCallback' in window) requestIdleCallback(hentGoogle, { timeout: 3000 });
-          else setTimeout(hentGoogle, 1500);
-        }
+        // 7/11-2026 (Jacobs valg): 5 sekunder efter "load" i stedet for ledig tid (højst 3 s). Rigtige læsere ruller
+        // normalt inden da, og så hentes alt straks (lytterne nedenfor). Målt 7/11 (Lighthouse mobil, 4 kørsler):
+        // score 70-76 → 93-95, ventetid 0,7-0,9 s → 0,05 s. Kun den, der lukker siden inden 5 s uden at røre den, får ingen annonce.
+        function naarLedig() { setTimeout(hentGoogle, 5000); }
         if (document.readyState === 'complete') naarLedig();
         else window.addEventListener('load', naarLedig, { once: true });
         // Læseren rører siden: hent med det samme, så annoncer ikke kommer for sent
