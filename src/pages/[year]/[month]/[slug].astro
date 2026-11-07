@@ -140,7 +140,9 @@ const IKON_OP = '<svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke
 const IKON_NED = '<svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>';
 const IKON_DEL = '<svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>';
 const IKON_GEM = '<svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>';
-const bundHtml = `<aside class="tma-bund" data-ekstra="1" aria-labelledby="bund-heading"><span class="tma-bund-titel" id="bund-heading">Was this article helpful?</span><span class="tma-bund-sub">One click tells me what to write more of. No account, nothing personal.</span><span class="tma-bund-knapper"><span class="pill-group" role="group" aria-labelledby="bund-heading"><button type="button" id="likeBtn" aria-pressed="false">${IKON_OP}<span>Yes</span></button><span class="pill-divider" aria-hidden="true"></span><button type="button" id="dislikeBtn" aria-pressed="false">${IKON_NED}<span>No</span></button></span><button type="button" class="action-pill share-trigger" aria-label="Share this article">${IKON_DEL}<span class="share-text">Share</span></button><button type="button" class="action-pill save-trigger" aria-pressed="false" title="Save to Read later">${IKON_GEM}<span class="save-text">Save</span></button></span><span class="tma-bund-tak" id="bundTak" role="status" aria-live="polite"></span></aside>`;
+// Grunde ved "No" (Jacob 7/11): ét klik, sendes til Analytics som article_feedback_reason, så vi kan se, hvad der skal rettes
+const GRUNDE = [['too_basic', 'Too basic'], ['too_technical', 'Too technical'], ['outdated', 'Outdated'], ['not_answered', "Didn't answer my question"]];
+const bundHtml = `<aside class="tma-bund" data-ekstra="1" aria-labelledby="bund-heading"><span class="tma-bund-titel" id="bund-heading">Was this article helpful?</span><span class="tma-bund-sub">One click tells me what to write more of. No account, nothing personal.</span><span class="tma-bund-knapper"><span class="pill-group" role="group" aria-labelledby="bund-heading"><button type="button" id="likeBtn" aria-pressed="false">${IKON_OP}<span>Yes</span></button><span class="pill-divider" aria-hidden="true"></span><button type="button" id="dislikeBtn" aria-pressed="false">${IKON_NED}<span>No</span></button></span><button type="button" class="action-pill share-trigger" aria-label="Share this article">${IKON_DEL}<span class="share-text">Share</span></button><button type="button" class="action-pill save-trigger" aria-pressed="false" title="Save to Read later">${IKON_GEM}<span class="save-text">Save</span></button></span><span class="tma-bund-tak" id="bundTak" role="status" aria-live="polite"></span><span class="tma-bund-grunde" id="bundGrunde" role="group" aria-label="What was the problem?" hidden>${GRUNDE.map(([k, t]) => `<button type="button" class="tma-grund" data-grund="${k}" aria-pressed="false">${t}</button>`).join('')}</span></aside>`;
 const slut = faqStart >= 0 ? faqStart : krop.length;
 // Kun hvis der er et billede/resumé før pladsen (målt 3/11: 168 af 198 artikler). Ellers ville annoncen stå allerførst
 // i brødteksten (30 ældre video-artikler) — der klarer Auto ads det som før.
@@ -276,6 +278,12 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .post-body .tma-bund-tak:not(:empty) { margin-top: 10px; }
     .post-body .tma-bund-tak a { color: var(--teal-text); }
     .post-body .tma-bund .action-pill, .post-body .tma-bund .pill-group button { text-decoration: none; }
+    .post-body .tma-bund-grunde { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .post-body .tma-bund-grunde[hidden] { display: none; }
+    .post-body .tma-grund { min-height: 36px; padding: 0 14px; background: transparent; border: 1px solid var(--border-color); border-radius: 999px; color: var(--text-color); font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .post-body .tma-grund:hover { background: var(--hover-bg); }
+    .post-body .tma-grund.er-valgt { border-color: var(--teal-text); color: var(--teal-text); background: color-mix(in srgb, var(--teal) 10%, transparent); }
+    @media (max-width: 600px) { .post-body .tma-grund { min-height: 44px; } }
     .listen-note { font-size: 0.8rem; color: var(--muted); margin: -12px 0 22px 0; }
     .listen-note a { color: inherit; }
     /* Mobil: 44 px høje knapper (fingerstørrelse) og lidt mindre luft, så de fire står pænt */
@@ -365,12 +373,6 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .disclosure-box strong { color: var(--text-color); }
     .disclosure-box a { color: var(--teal-text); font-weight: 600; }
     .disclosure-top { margin: 0 0 25px 0; }
-    .share-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 40px; }
-    .share-cta-title { font-weight: 700; font-size: 1.05rem; margin: 0 0 4px 0; }
-    .share-cta-sub { font-size: 0.9rem; color: var(--muted); margin: 0; }
-    .share-cta-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: var(--bg-color); border: none; border-radius: var(--radius); padding: 11px 20px; min-height: 44px; font-size: 0.95rem; font-weight: 600; cursor: pointer; flex-shrink: 0; font-family: inherit; transition: background 0.2s, transform 0.2s; }
-    .share-cta-btn:hover { filter: brightness(1.12); }
-    .share-cta-btn svg { width: 16px; height: 16px; }
     /* Forfatterboks (29/9, Jacobs ønske): samme udseende som på techfeedwatch, egen tekst til Tech Media Arch */
     .author-box { display: flex; gap: 20px; align-items: flex-start; width: 100%; box-sizing: border-box; background: var(--card-bg); border: 1px solid var(--border-color); border-left: 4px solid var(--teal); border-radius: var(--radius); padding: 28px; margin: 10px 0 30px; }
     .author-box-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; object-position: center top; flex-shrink: 0; }
@@ -413,9 +415,7 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       .article-title { font-size: 2.1rem; }
       .nav-row { flex-direction: column; gap: 12px; }
       .nav-tom { display: none; }
-      .share-cta { flex-direction: column; align-items: flex-start; }
-      .share-cta-btn { width: 100%; justify-content: center; }
-      .author-box { padding: 18px; gap: 12px; flex-direction: column; align-items: flex-start; }
+          .author-box { padding: 18px; gap: 12px; flex-direction: column; align-items: flex-start; }
       .author-box-photo { width: 56px; height: 56px; }
       .author-box-name { font-size: 1.05rem; }
       .author-box-title { font-size: 0.85rem; margin: 3px 0 12px 0; }
@@ -512,16 +512,7 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       {/* Stod før som fodnote i hvert indlæg (Blogger-feedets fodnote). Resources-artikler har den øverst i stedet. */}
       {!erResources && <p class="disclosure-box"><strong>Affiliate disclosure:</strong> Please note that some links on Tech Media Arch are affiliate links. We may receive a commission, at no extra cost to you, if you click through our links and make a purchase from one of our partners.</p>}
 
-      <div class="share-cta">
-        <div>
-          <p class="share-cta-title">Share this article</p>
-          <p class="share-cta-sub">Send it to someone who follows AI and tech, or save the link for later.</p>
-        </div>
-        <button type="button" class="share-cta-btn share-trigger" aria-label="Share this article">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-          <span class="share-text">Share</span>
-        </button>
-      </div>
+      {/* "Share this article"-boksen er fjernet 7/11-2026 (Jacob): Share står nu øverst og i bundboksen over "People also ask". */}
 
       {/* Forfatterboks (29/9): teksten skal være sand for artiklens slags — robotartikler og de ældre artikler er lavet forskelligt (Jacob 29/9) */}
       <div class="author-box" id="author">
@@ -615,21 +606,41 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       var like = document.getElementById('likeBtn'), dislike = document.getElementById('dislikeBtn'), tak = document.getElementById('bundTak');
       if (like && dislike) {
         var stemmer = function () { return hent('tmaHelpful', '{}'); };
+        var grunde = function () { return hent('tmaHelpfulGrund', '{}'); };
+        var grundBoks = document.getElementById('bundGrunde');
+        var grundKnapper = grundBoks ? grundBoks.querySelectorAll('.tma-grund') : [];
         var vis = function () {
           var v = stemmer()[sti];
           like.classList.toggle('er-valgt', v === 'helpful'); like.setAttribute('aria-pressed', String(v === 'helpful'));
           dislike.classList.toggle('er-valgt', v === 'not_helpful'); dislike.setAttribute('aria-pressed', String(v === 'not_helpful'));
+          var g = grunde()[sti];
           if (tak) {
             if (v === 'helpful') tak.textContent = 'Thanks! That tells me what to write more of.';
-            else if (v === 'not_helpful') tak.innerHTML = 'Thanks for telling me. What was missing or unclear? <a href="/p/contact-us">Write to me</a> — I read every message.';
+            else if (v === 'not_helpful' && g) tak.innerHTML = 'Thanks, that helps me fix it. Want to add something? <a href="/p/contact-us">Write to me</a> — I read every message.';
+            else if (v === 'not_helpful') tak.textContent = 'Thanks for telling me. What was the problem?';
             else tak.textContent = '';
+          }
+          if (grundBoks) {
+            grundBoks.hidden = v !== 'not_helpful';
+            grundKnapper.forEach(function (k) { var er = v === 'not_helpful' && k.dataset.grund === g; k.classList.toggle('er-valgt', er); k.setAttribute('aria-pressed', String(er)); });
           }
         };
         var stem = function (valg) {
           var alle = stemmer();
           if (alle[sti] === valg) delete alle[sti]; else { alle[sti] = valg; maal('article_feedback', { feedback: valg }); }
-          gem('tmaHelpful', alle); vis();
+          gem('tmaHelpful', alle);
+          if (alle[sti] !== 'not_helpful') { var gr = grunde(); if (gr[sti]) { delete gr[sti]; gem('tmaHelpfulGrund', gr); } }
+          vis();
         };
+        // Grund ved "No": ét valg; tryk på samme igen fortryder. Sendes kun, når valget ændres.
+        grundKnapper.forEach(function (k) {
+          k.addEventListener('click', function () {
+            var alle = grunde();
+            if (alle[sti] === k.dataset.grund) delete alle[sti];
+            else { alle[sti] = k.dataset.grund; maal('article_feedback_reason', { reason: k.dataset.grund }); }
+            gem('tmaHelpfulGrund', alle); vis();
+          });
+        });
         like.addEventListener('click', function () { stem('helpful'); });
         dislike.addEventListener('click', function () { stem('not_helpful'); });
         vis();
