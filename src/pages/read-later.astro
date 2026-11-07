@@ -1,0 +1,98 @@
+---
+// Read later (7/11-2026, Jacob: "ligesom på techfeedwatch"): artikler, læseren har gemt med Save-knappen på
+// artikelsiden. Listen ligger kun i læserens egen browser (localStorage "tmaSaved") — intet sendes til os. Derfor
+// bygges listen af et lille script i browseren, og siden er noindex: for Google er den tom.
+import MainLayout from '../layouts/MainLayout.astro';
+---
+<MainLayout title="Read later" description="Articles you saved on Tech Media Arch to read later. The list is stored only in your own browser." noindex breadcrumb={[{ navn: 'Read later', href: '/read-later' }]}>
+  {/* is:global: rækkerne laves af scriptet, så Astros afgrænsede stil ville ikke ramme dem (målt 7/11) */}
+  <style is:global>
+    .rl-wrap { padding-bottom: 48px; }
+    .rl-wrap > * { max-width: 760px; }
+    .rl-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .rl-head h1 { margin: 0; }
+    .rl-icon { width: 26px; height: 26px; fill: none; stroke: var(--teal-text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .rl-count { color: var(--muted); font-size: 0.95rem; margin: 0 0 22px 0; }
+    .rl-list { display: flex; flex-direction: column; gap: 12px; }
+    .rl-item { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; gap: 16px; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 12px; }
+    .rl-thumb { width: 120px; aspect-ratio: 16 / 9; border-radius: calc(var(--radius) - 2px); overflow: hidden; background: var(--hover-bg); }
+    .rl-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rl-title { font-weight: 600; font-size: 1.02rem; line-height: 1.4; color: var(--text-color); text-decoration: none; }
+    .rl-title:hover { text-decoration: underline; }
+    .rl-date { display: block; margin-top: 4px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+    .rl-remove { min-height: 44px; padding: 0 14px; background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius); color: var(--text-color); font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+    .rl-remove:hover { background: var(--hover-bg); }
+    .rl-empty { background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: var(--radius); padding: 28px 24px; color: var(--muted); }
+    .rl-empty a { color: var(--teal-text); }
+    /* Fortryd-besked nederst efter "Remove" (som techfeedwatch) */
+    .rl-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; background: var(--text-color); color: var(--bg-color); padding: 10px 12px 10px 18px; border-radius: var(--radius); box-shadow: var(--shadow); font-size: 0.92rem; z-index: 1000; max-width: calc(100% - 32px); box-sizing: border-box; }
+    .rl-toast[hidden] { display: none; }
+    .rl-toast span { white-space: nowrap; }
+    .rl-toast button { min-height: 40px; padding: 0 12px; background: transparent; color: inherit; border: 1px solid currentColor; border-radius: var(--radius); font: inherit; font-weight: 700; cursor: pointer; }
+    @media (max-width: 600px) {
+      .rl-item { grid-template-columns: 84px minmax(0, 1fr); gap: 12px; }
+      .rl-thumb { width: 84px; }
+      .rl-remove { grid-column: 1 / -1; width: 100%; }
+    }
+  </style>
+
+  <div class="page-wrapper rl-wrap" style="padding-top: 24px;">
+    <div class="rl-head">
+      <svg class="rl-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      <h1>Read later</h1>
+    </div>
+    <p class="rl-count" id="rlCount">Articles you saved with the <strong>Save</strong> button. The list is kept only in this browser — nothing is sent to us.</p>
+    <div class="rl-list" id="rlList"></div>
+    <p class="rl-empty" id="rlEmpty">Nothing saved yet. Use the <strong>Save</strong> button under the title of any article, and it will appear here. <a href="/latest">See the newest articles →</a></p>
+  </div>
+  <div class="rl-toast" id="rlToast" role="status" hidden><span>Removed from Read later</span><button type="button" id="rlUndo">Undo</button></div>
+
+  <script is:inline>
+    (function () {
+      var liste = document.getElementById('rlList'), tom = document.getElementById('rlEmpty'), antal = document.getElementById('rlCount');
+      var toast = document.getElementById('rlToast'), fortryd = document.getElementById('rlUndo');
+      var sidst = null, toastTimer = null, standard = antal.textContent;
+      var hent = function () { try { return JSON.parse(localStorage.getItem('tmaSaved') || '[]'); } catch (e) { return []; } };
+      var skriv = function (l) { try { localStorage.setItem('tmaSaved', JSON.stringify(l)); } catch (e) {} };
+      var dato = function (t) { try { return new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return ''; } };
+      // Kun adresser på sitet selv (begynder med én /) — alt andet springes over
+      var gyldig = function (x) { return x && typeof x.href === 'string' && /^\/[^/]/.test(x.href); };
+      var tegn = function () {
+        var gemte = hent().filter(gyldig);
+        liste.textContent = '';
+        tom.hidden = gemte.length > 0;
+        // Tom liste: standardteksten igen (før stod "1 article saved" tilbage efter sidste Remove — målt 7/11)
+        antal.textContent = gemte.length ? '' : standard;
+        if (gemte.length) antal.textContent = gemte.length + (gemte.length === 1 ? ' article saved' : ' articles saved') + ' · kept only in this browser';
+        gemte.forEach(function (x) {
+          var r = document.createElement('div'); r.className = 'rl-item';
+          var thumb = document.createElement('a'); thumb.className = 'rl-thumb'; thumb.href = x.href; thumb.tabIndex = -1; thumb.setAttribute('aria-hidden', 'true');
+          if (x.img && /^\//.test(x.img)) { var img = document.createElement('img'); img.src = x.img; img.alt = ''; img.loading = 'lazy'; thumb.appendChild(img); }
+          var tekst = document.createElement('div');
+          var a = document.createElement('a'); a.className = 'rl-title'; a.href = x.href; a.textContent = x.title || x.href;
+          var d = document.createElement('span'); d.className = 'rl-date'; d.textContent = x.savedAt ? 'Saved ' + dato(x.savedAt) : '';
+          tekst.appendChild(a); tekst.appendChild(d);
+          var fjern = document.createElement('button'); fjern.type = 'button'; fjern.className = 'rl-remove'; fjern.textContent = 'Remove';
+          fjern.setAttribute('aria-label', 'Remove ' + (x.title || 'article') + ' from Read later');
+          fjern.addEventListener('click', function () {
+            var l = hent(), i = -1;
+            l.forEach(function (y, n) { if (y.href === x.href) i = n; });
+            if (i === -1) return;
+            sidst = { item: l[i], i: i };
+            l.splice(i, 1); skriv(l); tegn();
+            toast.hidden = false; clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { toast.hidden = true; }, 6000);
+          });
+          r.appendChild(thumb); r.appendChild(tekst); r.appendChild(fjern);
+          liste.appendChild(r);
+        });
+      };
+      fortryd.addEventListener('click', function () {
+        if (!sidst) return;
+        var l = hent(); l.splice(Math.min(sidst.i, l.length), 0, sidst.item); skriv(l);
+        sidst = null; toast.hidden = true; tegn();
+      });
+      tegn();
+    })();
+  </script>
+</MainLayout>

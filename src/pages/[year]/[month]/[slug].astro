@@ -133,6 +133,14 @@ const tocHtml = toc.length ? `<nav class="toc-container" data-ekstra="1" aria-la
 // og billede står stadig først (AdSense-regel: der skal være indhold at læse før annoncer).
 // Pladsen har fast højde (CSS nedenfor), så teksten ikke hopper, når annoncen kommer. Auto ads kører videre længere nede.
 const annonceHtml = `<aside class="tma-annonce" data-ekstra="1" aria-label="Advertisement"><span class="tma-annonce-label">Advertisement</span><ins class="adsbygoogle" data-ad-client="ca-pub-9695260339642032" data-ad-slot="1043274802"></ins></aside>`;
+// Bundboksen (7/11-2026, Jacob: "lige over People also ask"): Helpful/Not helpful, Share og Save, når læseren er færdig.
+// Står inde i brødteksten som "People also ask" (samme sted: før FAQ, ellers nederst). Kun <aside>/<span> — ingen <p>
+// eller <li>, så Auto-annoncer ikke kan sætte en annonce ind midt i boksen. data-ekstra: tjek-site ser bort fra den.
+const IKON_OP = '<svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>';
+const IKON_NED = '<svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>';
+const IKON_DEL = '<svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>';
+const IKON_GEM = '<svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>';
+const bundHtml = `<aside class="tma-bund" data-ekstra="1" aria-labelledby="bund-heading"><span class="tma-bund-titel" id="bund-heading">Was this article helpful?</span><span class="tma-bund-sub">One click tells me what to write more of. No account, nothing personal.</span><span class="tma-bund-knapper"><span class="pill-group" role="group" aria-labelledby="bund-heading"><button type="button" id="likeBtn" aria-pressed="false">${IKON_OP}<span>Yes</span></button><span class="pill-divider" aria-hidden="true"></span><button type="button" id="dislikeBtn" aria-pressed="false">${IKON_NED}<span>No</span></button></span><button type="button" class="action-pill share-trigger" aria-label="Share this article">${IKON_DEL}<span class="share-text">Share</span></button><button type="button" class="action-pill save-trigger" aria-pressed="false" title="Save to Read later">${IKON_GEM}<span class="save-text">Save</span></button></span><span class="tma-bund-tak" id="bundTak" role="status" aria-live="polite"></span></aside>`;
 const slut = faqStart >= 0 ? faqStart : krop.length;
 // Kun hvis der er et billede/resumé før pladsen (målt 3/11: 168 af 198 artikler). Ellers ville annoncen stå allerførst
 // i brødteksten (30 ældre video-artikler) — der klarer Auto ads det som før.
@@ -140,7 +148,7 @@ const efterBillede = efterFoersteBillede(krop, slut);
 const broedtekst = medKildeOrden(indsaet(krop, [
   { pos: efterBillede, html: (efterBillede > 0 ? annonceHtml : '') + tocHtml },
   { pos: foranMidterOverskrift(krop, slut), html: forslagHtml },
-  { pos: slut, html: paaHtml },
+  { pos: slut, html: bundHtml + paaHtml },
 ]));
 
 const schema = {
@@ -245,7 +253,38 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
     .action-bar { display: flex; gap: 10px; margin-bottom: 22px; align-items: center; flex-wrap: wrap; }
     .action-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--card-bg); border-radius: var(--radius); height: 40px; padding: 0 16px; border: 1px solid var(--border-color); color: var(--text-color); font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
     .action-pill:hover { background: var(--hover-bg); }
-    .action-icon { width: 18px; height: 18px; }
+    .action-icon { width: 18px; height: 18px; flex-shrink: 0; }
+    /* Helpful/Not helpful som én pille med skillestreg (som techfeedwatch) */
+    .pill-group { display: inline-flex; align-items: center; height: 40px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; }
+    .pill-group button { display: inline-flex; align-items: center; gap: 6px; height: 100%; padding: 0 14px; background: transparent; border: none; color: var(--text-color); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .pill-group button:hover { background: var(--hover-bg); }
+    .pill-divider { width: 1px; height: 20px; background: var(--border-color); }
+    /* Valgt: hyldens farve og udfyldt ikon. display: inline-flex ovenfor ville ellers overtrumfe hidden. */
+    :is(.action-bar, .tma-bund) .er-valgt { color: var(--teal-text); }
+    :is(.action-bar, .tma-bund) .er-valgt .action-icon { fill: currentColor; }
+    .action-pill[hidden], .listen-note[hidden] { display: none; }
+    #listenBtn .ikon-pause { display: none; }
+    #listenBtn.taler { background: var(--teal); border-color: var(--teal); color: var(--bg-color); }
+    #listenBtn.taler .ikon-afspil { display: none; }
+    #listenBtn.taler .ikon-pause { display: inline; }
+    /* Bundboksen (7/11): samme kort-stil som "People also ask" lige under den */
+    .post-body .tma-bund { font-family: var(--font-display); font-size: 1rem; line-height: 1.45; display: flex; flex-direction: column; gap: 4px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px 22px; margin: 36px 0 20px 0; }
+    .post-body .tma-bund-titel { font-family: var(--font-display, inherit); font-weight: 700; font-size: 1.12rem; line-height: 1.35; color: var(--text-color); }
+    .post-body .tma-bund-sub { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
+    .post-body .tma-bund-knapper { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; align-items: center; }
+    .post-body .tma-bund-tak { font-size: 0.92rem; line-height: 1.5; color: var(--text-color); min-height: 0; }
+    .post-body .tma-bund-tak:not(:empty) { margin-top: 10px; }
+    .post-body .tma-bund-tak a { color: var(--teal-text); }
+    .post-body .tma-bund .action-pill, .post-body .tma-bund .pill-group button { text-decoration: none; }
+    .listen-note { font-size: 0.8rem; color: var(--muted); margin: -12px 0 22px 0; }
+    .listen-note a { color: inherit; }
+    /* Mobil: 44 px høje knapper (fingerstørrelse) og lidt mindre luft, så de fire står pænt */
+    @media (max-width: 600px) {
+      .action-bar { gap: 8px; }
+      .action-pill, .pill-group { height: 44px; }
+      .action-pill { padding: 0 12px; }
+      .pill-group button { padding: 0 12px; }
+    }
     /* Indholdsfortegnelsen står fra 1/10 INDE i brødteksten under første billede (lib/artikelbokse.mjs) — uden ul/li,
        så punkterne er <a> i en <span>. Reglerne er knyttet til .post-body, så de vinder over brødtekstens linkstil. */
     /* Synlig men rolig (Jacob 1/11-2026): et neutralt kort — farven er forbeholdt "Key takeaways" lige over, så de to
@@ -423,12 +462,24 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
         </div>
       </div>
 
-      <div class="action-bar">
+      {/* Handlingsknapper (7/11-2026, Jacob: "ligesom techfeedwatch"): Listen, Share og Save øverst. Helpful/Not helpful
+          står kun i bunden (Jacob 7/11: "giver kun mening i bunden") — se bundHtml. Listen vises kun, hvis browseren kan
+          læse op (scriptet nederst fjerner hidden). Save gemmes kun i læserens egen browser (siden Read later). */}
+      <div class="action-bar" data-save-href={p.href} data-save-title={p.title} data-save-img={p.image ?? ''}>
+        <button type="button" id="listenBtn" class="action-pill" hidden aria-pressed="false">
+          <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon class="ikon-afspil" points="6 4 19 12 6 20 6 4"></polygon><g class="ikon-pause"><line x1="8" y1="5" x2="8" y2="19"></line><line x1="16" y1="5" x2="16" y2="19"></line></g></svg>
+          <span id="listenLabel">Listen</span>
+        </button>
         <button type="button" class="action-pill share-trigger" aria-label="Share this article">
           <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
           <span class="share-text">Share</span>
         </button>
+        <button type="button" class="action-pill save-trigger" aria-pressed="false" title="Save to Read later">
+          <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          <span class="save-text">Save</span>
+        </button>
       </div>
+      <p class="listen-note" id="listenNote" hidden>Read aloud by your browser's built-in voice.</p>
 
       {/* Trin 6, forslag 3: "Start here"-forløbet — kun på artikler, der står på en hyldes "Start here"-liste */}
       {serieNr > 0 && (
@@ -545,6 +596,129 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
       )}
     </aside>
   </div>
+
+  {/* Listen, Helpful/Not helpful og Save (7/11-2026). Lånt fra techfeedwatchs artikelside og tilpasset:
+      - Helpful/Not helpful og Save gemmes kun i læserens egen browser (localStorage). Vi viser ingen tal: der findes
+        ingen rigtige stemmetal, og opdigtede tal ville vildlede.
+      - Helpful/Not helpful, Listen og Save sendes som hændelser til Analytics (gtag), så Jacob kan se, hvad der bruges.
+        Jacobs egne klik er mærket som intern trafik (MainLayout), så de tæller ikke med.
+      - Listen bruger browserens indbyggede stemme (gratis, intet sendes ud). Læser titel, forspalte og brødtekst —
+        ikke indholdsfortegnelse, annoncer, "People also ask", billedtekster, FAQ og kildeliste. */}
+  <script is:inline>
+    (function () {
+      var sti = location.pathname;
+      var maal = function (navn, data) { if (typeof gtag === 'function') { data.article = sti; gtag('event', navn, data); } };
+      var hent = function (k, std) { try { return JSON.parse(localStorage.getItem(k) || std); } catch (e) { return JSON.parse(std); } };
+      var gem = function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+      // Helpful / Not helpful (kun i bundboksen): ét valg pr. artikel, tryk igen fortryder. Takketekst under knapperne.
+      var like = document.getElementById('likeBtn'), dislike = document.getElementById('dislikeBtn'), tak = document.getElementById('bundTak');
+      if (like && dislike) {
+        var stemmer = function () { return hent('tmaHelpful', '{}'); };
+        var vis = function () {
+          var v = stemmer()[sti];
+          like.classList.toggle('er-valgt', v === 'helpful'); like.setAttribute('aria-pressed', String(v === 'helpful'));
+          dislike.classList.toggle('er-valgt', v === 'not_helpful'); dislike.setAttribute('aria-pressed', String(v === 'not_helpful'));
+          if (tak) {
+            if (v === 'helpful') tak.textContent = 'Thanks! That tells me what to write more of.';
+            else if (v === 'not_helpful') tak.innerHTML = 'Thanks for telling me. What was missing or unclear? <a href="/p/contact-us">Write to me</a> — I read every message.';
+            else tak.textContent = '';
+          }
+        };
+        var stem = function (valg) {
+          var alle = stemmer();
+          if (alle[sti] === valg) delete alle[sti]; else { alle[sti] = valg; maal('article_feedback', { feedback: valg }); }
+          gem('tmaHelpful', alle); vis();
+        };
+        like.addEventListener('click', function () { stem('helpful'); });
+        dislike.addEventListener('click', function () { stem('not_helpful'); });
+        vis();
+      }
+
+      // Save (øverst og i bunden): listen på /read-later. Nyeste øverst; højst 100, så den ikke vokser uden grænse.
+      var bar = document.querySelector('.action-bar[data-save-href]');
+      var gemKnapper = document.querySelectorAll('.save-trigger');
+      if (bar && gemKnapper.length) {
+        var artikel = { href: bar.dataset.saveHref, title: bar.dataset.saveTitle, img: bar.dataset.saveImg };
+        var gemte = function () { return hent('tmaSaved', '[]'); };
+        var visGem = function () {
+          var er = gemte().some(function (x) { return x.href === artikel.href; });
+          gemKnapper.forEach(function (k) {
+            k.classList.toggle('er-valgt', er); k.setAttribute('aria-pressed', String(er));
+            var t = k.querySelector('.save-text'); if (t) t.textContent = er ? 'Saved' : 'Save';
+          });
+        };
+        gemKnapper.forEach(function (k) {
+          k.addEventListener('click', function () {
+            var liste = gemte(), i = -1;
+            liste.forEach(function (x, n) { if (x.href === artikel.href) i = n; });
+            if (i === -1) { liste.unshift({ href: artikel.href, title: artikel.title, img: artikel.img, savedAt: Date.now() }); maal('save_article', {}); }
+            else liste.splice(i, 1);
+            gem('tmaSaved', liste.slice(0, 100)); visGem();
+          });
+        });
+        visGem();
+      }
+
+      // Listen: korte stykker (Chrome afbryder lange oplæsninger, og korte gør pause/stop øjeblikkelig)
+      var lyt = document.getElementById('listenBtn'), note = document.getElementById('listenNote'), lytTekst = document.getElementById('listenLabel');
+      if (!lyt || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance !== 'function') return;
+      lyt.hidden = false; if (note) note.hidden = false;
+      var tale = window.speechSynthesis, stykker = null, nr = 0, tilstand = 'stille', vagt = null, nu = null;
+      var byg = function () {
+        var dele = [];
+        var h1 = document.querySelector('h1.article-title'); if (h1) dele.push(h1.textContent.trim());
+        var fs = document.querySelector('.forspalte'); if (fs) dele.push(fs.textContent.trim());
+        var krop = document.querySelector('.post-body');
+        if (krop) {
+          var k = krop.cloneNode(true);
+          // Alt fra FAQ og kildelisten og ned læses ikke
+          var stop = k.querySelector('h2#faq, h2#sources, .faq-box');
+          // (også når FAQ'en ligger inde i en boks: alt efter den fjernes på hvert niveau op til brødteksten)
+          if (stop) { for (var n = stop; n && n !== k; n = n.parentNode) { while (n.nextSibling) n.nextSibling.remove(); } stop.remove(); }
+          k.querySelectorAll('pre, code, table, figure, script, style, .toc-container, .tma-annonce, .paa, .tr-caption-container, .tma-wm, .tma-bund').forEach(function (x) { x.remove(); });
+          // Overskrifter og afsnit skal have punktum imellem, ellers løber de sammen i oplæsningen
+          k.querySelectorAll('h2, h3, h4, p, li, .tma-overblik-titel, .tma-overblik-punkt').forEach(function (x) { x.appendChild(document.createTextNode('. ')); });
+          dele.push(k.textContent);
+        }
+        var tekst = dele.join('. ').replace(/https?:\/\/\S+/g, ' ').replace(/\s+/g, ' ').replace(/([.!?])\s*\.(\s|$)/g, '$1$2').trim();
+        var saetn = tekst.match(/[^.!?]+[.!?]+["')\]]*|\S+$/g) || [tekst], ud = [], buf = '';
+        saetn.forEach(function (s) { if ((buf + s).length > 220 && buf) { ud.push(buf.trim()); buf = ''; } buf += s + ' '; });
+        if (buf.trim()) ud.push(buf.trim());
+        return ud.filter(Boolean);
+      };
+      var ui = function (t) {
+        tilstand = t;
+        lyt.classList.toggle('taler', t === 'taler');
+        lyt.setAttribute('aria-pressed', String(t !== 'stille'));
+        lytTekst.textContent = t === 'taler' ? 'Pause' : (t === 'pause' ? 'Resume' : 'Listen');
+      };
+      var stopAlt = function () { tale.cancel(); clearInterval(vagt); vagt = null; nr = 0; ui('stille'); };
+      var naesteStykke = function () {
+        if (!stykker || nr >= stykker.length) { stopAlt(); return; }
+        var u = new SpeechSynthesisUtterance(stykker[nr]);
+        u.lang = 'en-US'; u.rate = 1;
+        u.onend = function () { nr++; if (tilstand === 'taler') naesteStykke(); };
+        u.onerror = function () { stopAlt(); };
+        nu = u; // hold fast i stykket: ellers kan browseren rydde det væk midt i oplæsningen (kendt fælde)
+        tale.speak(u);
+      };
+      lyt.addEventListener('click', function () {
+        if (tilstand === 'taler') { tale.pause(); ui('pause'); return; }
+        if (tilstand === 'pause') { tale.resume(); ui('taler'); return; }
+        if (!stykker) stykker = byg();
+        if (!stykker.length) return;
+        tale.cancel(); nr = 0; ui('taler'); naesteStykke();
+        // Vagthund: starter kun igen, hvis køen er død (hverken i gang, på pause eller på vej)
+        clearInterval(vagt);
+        vagt = setInterval(function () { if (tilstand === 'taler' && !tale.speaking && !tale.pending && !tale.paused) naesteStykke(); }, 1500);
+        maal('listen_article', {});
+      });
+      // Skifter man fane eller forlader siden, stopper lyden — så knappen ikke påstår, den spiller
+      document.addEventListener('visibilitychange', function () { if (document.hidden && tilstand !== 'stille') stopAlt(); });
+      window.addEventListener('pagehide', stopAlt);
+    })();
+  </script>
 
   {/* Del-knapper: telefonens egen del-menu når den findes, ellers kopieres linket. */}
   <script is:inline>

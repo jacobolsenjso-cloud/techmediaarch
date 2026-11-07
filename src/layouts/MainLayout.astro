@@ -709,6 +709,11 @@ const nyeste = INDLAEG[0];
             Best of each shelf
           </a>
         )}
+        {/* Read later (7/11-2026, som techfeedwatch): artikler gemt med Save-knappen — listen ligger kun i læserens browser */}
+        <a href="/read-later" class={`nav-item ${aktiv('/read-later') ? 'active' : ''}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          Read later
+        </a>
         <hr class="nav-sep" />
         <a href="/p/sitemap" class={`nav-item ${aktiv('/p/sitemap') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
