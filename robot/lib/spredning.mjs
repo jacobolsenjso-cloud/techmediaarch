@@ -14,7 +14,10 @@
 import { kerne } from './tekst.mjs';
 
 // Brede ord, der ikke gør to emner til det samme (stammer, som kerne() laver dem)
-const BREDE = new Set(['ai', 'tech', 'techno', 'digita', 'online', 'tool', 'app', 'comput', 'softwa', 'best', 'guide', 'free', 'new', 'top', 'way', 'people', 'busine']);
+// + almindelige udsagns- og tillægsord (målt i prøve #51, 9/11: "how does ai force differentiate itself from ai coding
+// assistant" hvilede mod "how does generative ai differ from traditional ai" kun pga. "differ")
+const BREDE = new Set(['ai', 'tech', 'techno', 'digita', 'online', 'tool', 'app', 'comput', 'softwa', 'best', 'guide', 'free', 'new', 'top', 'way', 'people', 'busine',
+  'differ', 'compar', 'learn', 'make', 'cost', 'long', 'take', 'help', 'need', 'happen', 'start', 'better', 'good', 'bad', 'want', 'find', 'choose', 'used', 'itself', 'right', 'now', 'year', '2026', '2025']);
 const emneOrd = (q) => new Set([...kerne(q)].filter((w) => !BREDE.has(w)));
 
 // nye: [{ hoved, hylde, dato }] — nye artikler (ikke omskrivninger) de sidste `dage` dage

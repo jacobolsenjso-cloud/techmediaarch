@@ -95,7 +95,10 @@ export function mestEns(q, indeks, n = 10) {
 
 // Lag 3 — Gemini. Kaldes kun, når nøglen findes (trin 2).
 // Returnerer { samme: bool, mod } eller null, hvis laget ikke kunne køre.
-export async function geminiSammeHensigt(q, kandidater, { model = 'gemini-3.5-flash-lite' } = {}) {
+// Model (9/11-2026): gemini-3.8-flash i stedet for 3.5-flash-lite. Målt i prøve #51: "how does ai tools use water" slap
+// igennem mod både "Why Does Generative AI Consume So Much Water?" og miljøartiklens vand-afsnit. Prisen er lille
+// (ca. 57 korte kald pr. liste ≈ 0,05 kr).
+export async function geminiSammeHensigt(q, kandidater, { model = 'gemini-3.8-flash' } = {}) {
   const noegle = process.env.GEMINI_API_KEY;
   if (!noegle || !kandidater.length) return null;
   const liste = kandidater.map((c, i) => `${i + 1}. ${c.tekst}`).join('\n');
