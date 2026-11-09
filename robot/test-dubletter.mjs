@@ -16,6 +16,15 @@ t('med afsnit peger kontrollen på vand-afsnittet', String(mestEns(q, med, 1)[0]
 t('med afsnit sendes vand-søgeordet til Gemini (tvivl eller delvist overlap)', tjek(q, med).dom === 'tvivl' || delvistOverlap(q, med));
 t('et afsnit afviser aldrig alene (højst tvivl)', !tjek('water consumption generative ai cooling systems', med).alle?.some((h) => h.dom === 'afvist' && h.tekst.includes('section')));
 t('fremmed emne er stadig frit', tjek('difference between kubernetes and docker', med).dom === 'fri');
+// Kørsel #52: mange "AI Tools"-artikler med samme andel skubbede vand-artiklen ud af Geminis top 10.
+// Det sjældne ord ("water") skal vægte mest.
+const vand = { titel: 'Why Does Generative AI Consume So Much Water?', sti: '/2026/11/generative-ai-water-consumption', soegeord: ['how does generative ai use water'] };
+const vaerktoej = Array.from({ length: 15 }, (_, i) => ({ titel: `Best AI Tools for Task ${i}`, sti: `/2024/0${(i % 9) + 1}/ai-tools-${i}`, soegeord: [] }));
+const stor = lavIndeks([...vaerktoej, vand]);
+const top = mestEns('how does ai tools use water', stor, 10);
+t(`vand-artiklen er med blandt Geminis 10 (nr. ${top.findIndex((a) => a.sti === vand.sti) + 1})`, top.some((a) => a.sti === vand.sti));
+t('vand-artiklen er nr. 1', top[0]?.sti === vand.sti);
+t('delvist overlap ser stadig højeste andel', delvistOverlap('how does ai tools use water', stor));
 // overskrifter() læser rigtige filer: FAQ og kilder tæller ikke
 const tmp = path.join(os.tmpdir(), '_test-overskrifter.md');
 fs.writeFileSync(tmp, '---\ntitle: x\n---\n<h2>Water Consumption in AI Cooling Systems</h2><p>a</p><h2>Conclusion</h2><h2>FAQ</h2><h3>Does AI use water?</h3><h2>Sources</h2>');

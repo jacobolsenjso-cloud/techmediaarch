@@ -24,7 +24,8 @@ export const GRAENSE = { afvist: 0.75, tvivl: 0.75 };
 // fælles ("phishing"), og lag 2 kræver 2. Står mindst halvdelen af det nye søgeords
 // kerne i en eksisterende artikel, skal Gemini (lag 3) også afgøre "fri"-søgeord.
 export const DELVIS = 0.5;
-export const delvistOverlap = (q, indeks) => (mestEns(q, indeks, 1)[0]?.andel || 0) >= DELVIS;
+// Højeste andel blandt ALLE artikler (mestEns sorterer efter vægtede ord, så nr. 1 er ikke altid den med flest fælles ord).
+export const delvistOverlap = (q, indeks) => mestEns(q, indeks, Infinity).some((a) => a.andel >= DELVIS);
 
 // { afsnit: true } (Jacob 9/11-2026, rettelse 1): også artiklernes afsnitsoverskrifter, så et emne, der allerede har
 // et helt afsnit i en artikel, ikke bliver sin egen artikel. Afsnittets kerne er titlens + overskriftens (afsnittet
@@ -83,14 +84,38 @@ export function tjek(q, indeks) {
 }
 
 // De n mest ens artikler (til Gemini i lag 3 og til læselisten).
+// Rækkefølge (Jacob 9/11-2026, kørsel #52): sjældne ord vægter mest (idf = hvor få artikler ordet står i).
+// Før blev der kun sorteret på andel, så "how does ai tools use water" fik 10 gamle "AI Tools"-artikler (2 af 3 ord)
+// sendt til Gemini, og vand-artiklen (også 2 af 3) kom aldrig med. "andel" er uændret, så grænserne holder.
+const idfCache = new WeakMap();
+function idf(indeks) {
+  if (idfCache.has(indeks)) return idfCache.get(indeks);
+  const df = new Map();
+  const stier = new Set();
+  const set = new Set();
+  for (const el of indeks) {
+    stier.add(el.sti);
+    for (const w of el.kerne) { const n = `${el.sti}\u0000${w}`; if (!set.has(n)) { set.add(n); df.set(w, (df.get(w) || 0) + 1); } }
+  }
+  const N = stier.size;
+  const f = (w) => Math.log((N + 1) / ((df.get(w) || 0) + 1)) + 1;
+  idfCache.set(indeks, f);
+  return f;
+}
+
 export function mestEns(q, indeks, n = 10) {
   const k = kerne(q);
+  const vaegt = idf(indeks);
+  const total = [...k].reduce((s, w) => s + vaegt(w), 0) || 1;
   const set = new Map();
   for (const el of indeks) {
     const { andel } = daekning(k, el.kerne);
-    if (andel > 0 && (!set.has(el.sti) || set.get(el.sti).andel < andel)) set.set(el.sti, { andel, tekst: el.tekst, sti: el.sti });
+    if (!andel) continue;
+    const score = [...k].filter((w) => el.kerne.has(w)).reduce((s, w) => s + vaegt(w), 0) / total;
+    const f = set.get(el.sti);
+    if (!f || f.score < score || (f.score === score && f.andel < andel)) set.set(el.sti, { andel, score, tekst: el.tekst, sti: el.sti });
   }
-  return [...set.values()].sort((a, b) => b.andel - a.andel).slice(0, n);
+  return [...set.values()].sort((a, b) => b.score - a.score || b.andel - a.andel).slice(0, n);
 }
 
 // Lag 3 — Gemini. Kaldes kun, når nøglen findes (trin 2).
