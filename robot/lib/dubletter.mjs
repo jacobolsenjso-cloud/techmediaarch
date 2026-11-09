@@ -26,11 +26,19 @@ export const GRAENSE = { afvist: 0.75, tvivl: 0.75 };
 export const DELVIS = 0.5;
 export const delvistOverlap = (q, indeks) => (mestEns(q, indeks, 1)[0]?.andel || 0) >= DELVIS;
 
-export function lavIndeks(artikler, brugte = []) {
+// { afsnit: true } (Jacob 9/11-2026, rettelse 1): også artiklernes afsnitsoverskrifter, så et emne, der allerede har
+// et helt afsnit i en artikel, ikke bliver sin egen artikel. Afsnittets kerne er titlens + overskriftens (afsnittet
+// "Water Consumption in AI Cooling Systems" handler om GENERATIVE AI's vandforbrug, fordi titlen siger det). Et afsnit
+// kan aldrig give "afvist" alene i lag 2 — kun "tvivl", så Gemini (lag 3) afgør, om læseren får sit svar dér.
+// Kun søgeordsrobotten bruger det; artikel.mjs' linkforslag bruger stadig kun titler og søgeord.
+export function lavIndeks(artikler, brugte = [], { afsnit = false } = {}) {
   const ind = [];
   for (const a of artikler) {
     ind.push({ tekst: a.titel, sti: a.sti, kerne: kerne(a.titel), norm: normaliser(a.titel) });
     for (const s of a.soegeord || []) ind.push({ tekst: s, sti: a.sti, kerne: kerne(s), norm: normaliser(s) });
+    if (afsnit) for (const h of a.overskrifter || []) {
+      ind.push({ tekst: `${a.titel} — section: "${h}"`, sti: a.sti, kerne: new Set([...kerne(a.titel), ...kerne(h)]), norm: null, afsnit: true });
+    }
   }
   for (const b of brugte) ind.push({ tekst: b.q, sti: b.artikel || '(brugt søgeord)', kerne: kerne(b.q), norm: normaliser(b.q) });
   return ind;
@@ -61,7 +69,8 @@ export function tjek(q, indeks) {
   const hits = [];
   for (const el of indeks) {
     const r = sammenlign(k, el.kerne);
-    if (r) hits.push({ ...r, tekst: el.tekst, sti: el.sti });
+    // Et afsnit afviser aldrig alene: højst "tvivl" → Gemini afgør
+    if (r) hits.push({ ...r, dom: el.afsnit && r.dom === 'afvist' ? 'tvivl' : r.dom, tekst: el.tekst, sti: el.sti });
   }
   if (!hits.length) return { dom: 'fri' };
   const af = hits.filter((h) => h.dom === 'afvist');
@@ -91,7 +100,7 @@ export async function geminiSammeHensigt(q, kandidater, { model = 'gemini-3.5-fl
   if (!noegle || !kandidater.length) return null;
   const liste = kandidater.map((c, i) => `${i + 1}. ${c.tekst}`).join('\n');
   // 5/10-2026: "fully served" var for strengt til delvist overlap — nu "samme kerneemne".
-  const prompt = `New article keyword: "${q}"\nExisting articles:\n${liste}\n\nWould a reader searching the new keyword get their question answered by one of the existing articles, because it covers the same core topic and search intent, even if worded differently (e.g. "what are phishing attacks" vs. "What Are Phishing Emails and How Do Cyberattacks Work?")? A narrower sub-topic with its own clear intent (e.g. "ransomware canary files" vs. "what is ransomware") is NOT the same. Answer only JSON: {"same": true|false, "number": <number or 0>}`;
+  const prompt = `New article keyword: "${q}"\nExisting articles:\n${liste}\n\nWould a reader searching the new keyword get their question answered by one of the existing articles, because it covers the same core topic and search intent, even if worded differently (e.g. "what are phishing attacks" vs. "What Are Phishing Emails and How Do Cyberattacks Work?")? An existing article that has a whole section on the topic (shown as 'section: "..."') counts as answering it (e.g. "how does generative ai use water" vs. 'How Does Generative AI Affect the Environment? — section: "Water Consumption in AI Cooling Systems"'). A narrower sub-topic with its own clear intent that an existing article only mentions in passing (e.g. "ransomware canary files" vs. "what is ransomware") is NOT the same. Answer only JSON: {"same": true|false, "number": <number or 0>}`;
   try {
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: 'POST',

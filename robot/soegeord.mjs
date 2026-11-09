@@ -42,7 +42,7 @@ const HOVED_LAG = { 'what is': 1, 'how does': 1, 'what are': 1, 'how to use': 1,
 const froe = JSON.parse(fs.readFileSync(sti('robot/froe.json'), 'utf8'));
 const alle = artikler();
 const optalt = antalPrEmne(alle);
-const indeks = lavIndeks(alle, brugte());
+const indeks = lavIndeks(alle, brugte(), { afsnit: true });   // også afsnitsoverskrifter (9/11-2026, rettelse 1)
 const hvilende = new Set(proevedeForNylig(30).map((x) => normaliser(x.q)));
 
 // Emner i den rækkefølge, rotationen senere vil tage dem. Trin 7 (Jacob 29/10-2026): kun emner på de 5 hylder

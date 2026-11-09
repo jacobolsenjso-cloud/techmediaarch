@@ -47,7 +47,26 @@ function frontmatter(fil) {
   return m ? (parse(m[1]) || {}) : {};
 }
 
-// Alle artikler (og sider) som [{ titel, sti, labels, soegeord: [..] }].
+// Afsnitsoverskrifter (h2/h3) i brødteksten — det, artiklen faktisk dækker (Jacob 9/11-2026, rettelse 1).
+// Målt 9/11: "How Does Generative AI Affect the Environment?" havde et helt afsnit "Water Consumption in AI
+// Cooling Systems" (26 gange "water"), men dubletkontrollen kendte kun titel og søgeord, så robotten skrev to dage
+// efter "Why Does Generative AI Consume So Much Water?" — næsten samme artikel. FAQ og kildelisten tæller ikke
+// (korte svar), og heller ikke generiske overskrifter som "Conclusion".
+const GENERISK = /^(faq|frequently asked questions|sources|references|key takeaways|conclusion|introduction|summary|final thoughts|the bottom line|bottom line|overview|what('| i)s next|wrapping up)\b/i;
+export function overskrifter(fil) {
+  let krop = '';
+  try { krop = fs.readFileSync(fil, 'utf8').replace(/^---\r?\n[\s\S]*?\r?\n---/, ''); } catch { return []; }
+  const stop = krop.search(/<h2[^>]*>\s*(FAQ|Frequently Asked Questions|Sources)\s*<\/h2>|\n##\s+(FAQ|Frequently Asked Questions|Sources)\b/i);
+  if (stop > 0) krop = krop.slice(0, stop);
+  const ud = [];
+  for (const m of krop.matchAll(/<h[23][^>]*>([\s\S]*?)<\/h[23]>|^#{2,3}\s+(.+)$/gim)) {
+    const t = String(m[1] ?? m[2] ?? '').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, "'").replace(/\s+/g, ' ').trim();
+    if (t && t.length >= 8 && !GENERISK.test(t)) ud.push(t);
+  }
+  return [...new Set(ud)];
+}
+
+// Alle artikler (og sider) som [{ titel, sti, labels, soegeord: [..], overskrifter: [..], dato }].
 // "soegeord" er hovedsøgeordet + de 5 beslægtede for artikler, robotten har
 // skrevet; de gamle Blogger-artikler har kun overskriften.
 export function artikler() {
@@ -61,6 +80,8 @@ export function artikler() {
         // Adresser uden .html (Jacob 29/9-2026) — samme som sitet (src/lib/adresse.mjs)
         titel: String(d.title || ''), sti: `/${aar}/${md}/${f.replace(/\.md$/, '')}`, labels: d.labels || [], robot: d.robot === true,
         soegeord: [d.keyword, ...(d.relatedKeywords || [])].filter(Boolean).map(String),
+        overskrifter: overskrifter(path.join(mappe, f)),
+        dato: String(d.published || ''),
       });
     }
   }

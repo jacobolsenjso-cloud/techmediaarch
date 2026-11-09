@@ -3,6 +3,7 @@
 // (src/lib/eksterne-links.mjs), hvor de er målt i drift: ingen forkortere,
 // ingen sociale medier/butikker, ingen affiliate-links, højst ét pr. domæne.
 import { efterRang, kildeRang } from '../../src/lib/kilderang.mjs';
+import { erPdf, pdfTekst, PDF_MAKS_BYTES } from './pdf.mjs';
 const UA = 'techmediaarch-robot/1.0 (+https://www.techmediaarch.com)';
 export const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
 const FORKORTERE = /(^|\.)(bit\.ly|tinyurl\.com|t\.co|goo\.gl|ow\.ly|buff\.ly|rebrand\.ly|cutt\.ly|is\.gd|amzn\.to|geni\.us|linktr\.ee|lnk\.to|bitdefend\.me|shorturl\.at|tiny\.cc|rb\.gy|s\.id|bl\.ink|dub\.sh|shor\.by|smarturl\.it|hyperurl\.co|kit\.co|beacons\.ai|stan\.store|bio\.link)$/i;
@@ -17,20 +18,28 @@ const ren = (u) => { const url = new URL(u); for (const k of [...url.searchParam
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 // Følg Googles omdirigering til den rigtige side; kræv 200 + HTML + en titel.
-async function hent(u, timeoutMs = 10000) {
+async function hent(u, timeoutMs = 10000, reserveTitel = '') {
   const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     // Målt 31/10-2026: support.apple.com svarer 429 (prøve #38), og microsoft.com lukker forbindelsen helt (kørsel #55,
     // 10 Microsoft-kilder afvist) til robottens navn — begge svarer 200 til en almindelig browser. Ved 403/429 eller
     // en afbrudt forbindelse prøves én gang til som browser (kun ét sidekald mere).
-    const somBrowser = () => fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': BROWSER_UA, accept: 'text/html' } });
+    const somBrowser = () => fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': BROWSER_UA, accept: 'text/html,application/pdf;q=0.9' } });
     let res;
-    try { res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': UA, accept: 'text/html' } }); }
+    try { res = await fetch(u, { redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': UA, accept: 'text/html,application/pdf;q=0.9' } }); }
     catch (e) { if (ctrl.signal.aborted) throw e; res = await somBrowser(); }
     if (res.status === 403 || res.status === 429) res = await somBrowser();
     // Årsagen gemmes (2/11-2026): "svarer ikke med en side" alene kunne ikke forklare, hvorfor 17 microsoft.com-kilder
     // faldt fra i prøve #49, mens de samme sider svarede 200 udefra. Nu står HTTP-koden/typen/værten i loggen.
     if (res.status !== 200) return { fejl: `HTTP ${res.status} fra ${new URL(res.url).hostname}` };
+    // PDF (9/11-2026, rettelse 4): læses som tekst (robot/lib/pdf.mjs) i stedet for at blive afvist
+    if (erPdf(res, res.url)) {
+      if (Number(res.headers.get('content-length') || 0) > PDF_MAKS_BYTES) return { fejl: `PDF for stor fra ${new URL(res.url).hostname}` };
+      const p = await pdfTekst(await res.arrayBuffer());
+      if (p.fejl) return { fejl: `${p.fejl} fra ${new URL(res.url).hostname}` };
+      const titel = (p.titel || reserveTitel || '').slice(0, 200);
+      return titel ? { url: res.url, titel: `${titel}${/\bpdf\b/i.test(titel) ? '' : ' (PDF)'}`, pdf: true } : { fejl: `PDF uden titel fra ${new URL(res.url).hostname}` };
+    }
     if (!/text\/html/i.test(res.headers.get('content-type') || '')) return { fejl: `ikke HTML (${(res.headers.get('content-type') || '?').split(';')[0]}) fra ${new URL(res.url).hostname}` };
     const html = (await res.text()).slice(0, 300000);
     // Afkod HTML-tegn i titlen (ellers blev "What's" til "What&amp;#39;s" i kildelisten, målt 26/9).
@@ -48,7 +57,8 @@ export async function kontrollerKilder(kilder, max = 4) {
   const sat = []; const afvist = []; const domaener = new Set();
   for (const k of kilder) {
     if (sat.length >= max) break;
-    const s = await hent(k.uri);
+    // PDF uden egen titel får Geminis titel for kilden (fx "gao.gov") — dog aldrig bare et domæne, se pdf.mjs
+    const s = await hent(k.uri, 10000, /\s/.test(k.titel || '') ? k.titel : '');
     if (!s || s.fejl) { afvist.push({ kilde: k.titel, grund: `svarer ikke med en side${s?.fejl ? ` (${s.fejl})` : ''}` }); continue; }
     let url; try { url = ren(s.url); } catch { afvist.push({ kilde: k.titel, grund: 'ugyldig adresse' }); continue; }
     const host = new URL(url).hostname;

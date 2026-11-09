@@ -33,6 +33,7 @@ import { kontrollerKilder, kildeliste } from './lib/links.mjs';
 import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder, udenEgenKildeliste, KILDE_LOFT, KILDE_LOFT_MAKS } from './lib/kildenavne.mjs';
 import { artikler, sti, emner, OPSKRIFT } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
+import { spred, nyeArtikler, hvilerMod } from './lib/spredning.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
 import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
@@ -125,9 +126,18 @@ const liste = JSON.parse(fs.readFileSync(sti('robot/ud/soegeord-liste.json'), 'u
 const alle = Object.entries(liste.resultat).flatMap(([emne, r]) => r.pakker.map((p) => ({ ...p, emne })));
 let kandidater = HOVED ? alle.filter((p) => p.hoved === HOVED) : alle;
 if (!kandidater.length) throw new Error(HOVED ? `Hovedsøgeordet "${HOVED}" findes ikke i dagens liste` : 'Ingen pakker i listen');
-// Klynger først (Jacob 6/11-2026, forslag 3): pakker om emner, Google allerede viser sitet for (robot/soegeord.mjs
-// "klynge"), kommer før de andre; inden for hver gruppe gælder den gamle orden (tyndeste hylde først).
-kandidater = [...kandidater].sort((a, b) => ((b.klynge || 0) > 0) - ((a.klynge || 0) > 0));
+// Rækkefølge (Jacob 9/11-2026, rettelse 3 — robot/lib/spredning.mjs): emner, der har fået en ny artikel de sidste
+// 7 dage, hviler; hylden med færrest nye artikler først; derefter klynger (6/11, forslag 3) før andre; ellers den gamle
+// orden (tyndeste hylde først). Før stod klyngerne øverst alene, og 6 af 9 nye artikler blev om generativ AI.
+const spredLog = [];   // skrives efter overskriften "# Prøveartikel"
+{
+  const hyldeAfArtikel = (a) => planHylde(a.sti) || (a.labels || []).map((l) => emner().find((e) => e.etiket === l)?.hylde || EKSTRA_ETIKETTER[l]).find(Boolean);
+  const nye = nyeArtikler(artikler(), hyldeAfArtikel, { dage: 7 });
+  const r = spred(kandidater, nye, (emne) => emner().find((e) => e.etiket === emne)?.hylde || EKSTRA_ETIKETTER[emne]);
+  kandidater = r.sorteret;
+  spredLog.push(`- Spredning: ${nye.length} nye artikler de sidste 7 dage (${Object.entries(r.prHylde).map(([h, n]) => `${h} ${n}`).join(', ') || 'ingen'}) · ${r.hviler.length} pakker hviler (samme emne som en ny artikel)${r.hviler.length ? `, fx "${r.hviler[0].hoved}" (mod "${r.hviler[0].mod}")` : ''}`);
+  if (!HOVED && kandidater.length && hvilerMod(kandidater[0].hoved, nye)) spredLog.push('- Spredning: ALLE pakker hviler i dag — den mindst belastede hylde bruges alligevel');
+}
 // Tyndeste emne først (listen er allerede sorteret sådan); Gemini vurderer de 8 første.
 const vurdering = await json(`You pick topics for evergreen explainer articles on a tech blog (techmediaarch.com).
 For each numbered keyword, answer whether it is a sensible, evergreen article topic in correct English: not news of the day, not prices/stock moves, not local/legal advice, not a product accessory, not nonsense.
@@ -139,6 +149,7 @@ if (!valgt) throw new Error('Gemini godkendte ingen af pakkerne');
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
 fs.writeFileSync(sti('robot/ud/valgt.json'), JSON.stringify({ hoved: valgt.hoved, emne: valgt.emne }));
 log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}  \n**Klynge:** ${valgt.klynge ? `ja (${valgt.klynge} søgninger, Google viser os for)` : 'nej'} · ${kandidater.filter((p) => p.klynge).length} af ${kandidater.length} pakker var klynger`);
+spredLog.forEach(log);
 }
 
 // Formord bag på hovedsøgeordet fjernes (31/10-2026, prøve #38): "apple mdm enrollment guide" gav både titlen
@@ -321,7 +332,7 @@ ${fakta}
 
 Rules:
 - At least 1200 words, 7-10 sections with <h2> (and <h3> where useful), each section 120-250 words. Write longer only when the researched facts give enough material; never pad to reach a length (Jacob 6/10-2026).
-- Write so a 14-15-year-old (8th-9th grade) understands every paragraph on first reading (Jacob 6/11-2026): everyday words instead of academic ones ("use" not "utilize", "help" not "facilitate"), most sentences under 20 words, one idea per sentence. When a technical term is needed, explain it in plain words the first time it appears, with a short everyday example where it helps. No formulas, math notation, Greek letters or academic jargon (no "P(X)", "joint probability distribution", "Nash equilibrium"); describe the idea instead. Plain does not mean childish: keep every fact precise.
+- Write so a 14-15-year-old (8th-9th grade) understands every paragraph on first reading (Jacob 6/11-2026): everyday words instead of academic ones ("use" not "utilize", "help" not "facilitate"), short sentences: aim for 12-14 words on average and rarely more than 20 (Jacob 9/11-2026: measured 17 words and grade 12 — too hard), one idea per sentence, prefer short common words over long ones (after the first mention, write "AI" instead of "artificial intelligence"). When a technical term is needed, explain it in plain words the first time it appears, with a short everyday example where it helps. No formulas, math notation, Greek letters or academic jargon (no "P(X)", "joint probability distribution", "Nash equilibrium"); describe the idea instead. Plain does not mean childish: keep every fact precise.
 - Write like a technology journalist at a news publication, not like an analyst or a marketer (Jacob 28/9-2026):
   lead with the most important facts, attribute facts to their source in the sentence ("according to IBM", "NIST defines ..."),
   short paragraphs, concrete examples, neutral tone, no hype words, no "our analysis", "the verdict" or "key takeaways" framing.
@@ -654,23 +665,42 @@ let stemme = false;
     // 6/11-2026 (Jacob: "8. til 9. klasse … kan forstå det"): de 40 SVÆRESTE sætninger (lange, mange lange ord) skrives
     // om til almindeligt sprog — før kun stive/forkerte sætninger, og teksten lå på klassetrin 13,6-16,6. En sætning må
     // gerne deles i to (længden må stige til 1,8x), men tal, links, navne og kilder er de samme. Læsbarheden logges.
+    // 9/11-2026 (Jacob: "det skal rettes … gør dig umage"): målt 9/11 lå nye artikler stadig på klassetrin 12,1-12,7,
+    // fordi kun de 40 sværeste sætninger blev rettet (højst 30). Nu i op til 3 runder: ALLE sætninger over klassetrin 10
+    // (Flesch-Kincaid for den enkelte sætning), 40 ad gangen, indtil artiklen er nede på 9,5 eller intet flytter sig.
+    // Samme vagter som før på hver eneste rettelse.
     const foer = laesbarhed(html);
-    const alle = saetninger(html).filter((s) => ord(s) >= 6 && !/\b(I|I'm|I've|my|me)\b/.test(synligTekst(s)));
-    const liste = [...alle].sort((a, b) => svaerhed(b) - svaerhed(a)).slice(0, 40);
-    const r = await json(`You are the copy editor of a tech news site whose readers include 14-15-year-olds (8th-9th grade). Below are the hardest numbered sentences from one article about "${valgt.hoved}".
-Rewrite each sentence that a 14-15-year-old would struggle with, and every sentence that sounds stiff or machine-written, into plain, natural English: everyday words ("use" not "utilize"), short sentences (you may split one sentence into two), explain a technical term in a few plain words the first time if needed. No formulas or academic jargon.
-Keep the meaning, every number, every name and every HTML tag (especially <a ...>...</a>) exactly as they are. Do not add facts, examples with numbers, or sources. If a sentence is already easy, leave it out. At most 30 fixes.
+    const SAETNING_MAKS = 10, MAAL = 9.5, RUNDER = 3, PR_KALD = 40;
+    const klasse = (x) => svaerhed(x) - 15.59;   // klassetrin for én sætning
+    let rettet = 0, kasseret = 0, kald = 0, runder = 0, sidst = foer.klassetrin;
+    const set = new Set();   // sætninger, der allerede er forsøgt (rettede eller kasserede), sendes ikke igen
+    for (let runde = 1; runde <= RUNDER; runde++) {
+      const alle = saetninger(html).filter((x) => ord(x) >= 6 && !/\b(I|I'm|I've|my|me)\b/.test(synligTekst(x)) && !set.has(x));
+      const svaere = alle.filter((x) => klasse(x) > SAETNING_MAKS).sort((a, b) => svaerhed(b) - svaerhed(a));
+      if (!svaere.length) break;
+      runder++;
+      for (let k = 0; k < svaere.length && k < PR_KALD * 2; k += PR_KALD) {
+        const liste = svaere.slice(k, k + PR_KALD);
+        liste.forEach((x) => set.add(x));
+        kald++;
+        const r = await json(`You are the copy editor of a tech news site whose readers include 14-15-year-olds (8th-9th grade). Below are numbered sentences from one article about "${valgt.hoved}" that are too hard to read.
+Rewrite each one into plain, natural English that a 14-15-year-old understands on first reading: everyday words ("use" not "utilize", "help" not "facilitate"), short sentences of about 10-15 words (split a long sentence into two or three), and "AI" instead of "artificial intelligence". Explain a technical term in a few plain words if needed. No formulas or academic jargon. It must still sound like a normal person writing, not like a children's book.
+Keep the meaning, every number, every name and every HTML tag (especially <a ...>...</a>) exactly as they are. Do not add facts, examples with numbers, or sources. If a sentence is already easy, leave it out.
 Return JSON {"fixes":[{"n": number, "new": "the rewritten sentence(s) with its HTML"}]}
-${liste.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
-    let rettet = 0, kasseret = 0;
-    for (const f of Array.isArray(r.fixes) ? r.fixes.slice(0, 30) : []) {
-      const x = liste[parseInt(f.n, 10) - 1]; const ny = rensMarkdown(String(f.new || '').trim());
-      const ok = x && ny && ny !== x && html.includes(x) && hrefs(ny) === hrefs(x) && tal(ny) === tal(x) && !uklarKilde(ny)
-        && !ukendteKilder(ny, kildeLinks).length && !tjekTal([ny]).length && ord(ny) >= ord(x) * 0.6 && ord(ny) <= ord(x) * 1.8;
-      if (ok) { html = html.replace(x, () => ny); rettet++; } else kasseret++;
+${liste.map((x, i) => `${i + 1}. ${x}`).join('\n')}`);
+        for (const f of Array.isArray(r.fixes) ? r.fixes.slice(0, PR_KALD) : []) {
+          const x = liste[parseInt(f.n, 10) - 1]; const ny = rensMarkdown(String(f.new || '').trim());
+          const ok = x && ny && ny !== x && html.includes(x) && hrefs(ny) === hrefs(x) && tal(ny) === tal(x) && !uklarKilde(ny)
+            && !ukendteKilder(ny, kildeLinks).length && !tjekTal([ny]).length && ord(ny) >= ord(x) * 0.6 && ord(ny) <= ord(x) * 1.8;
+          if (ok) { html = html.replace(x, () => ny); rettet++; } else kasseret++;
+        }
+      }
+      const nu = laesbarhed(html).klassetrin;
+      if (nu <= MAAL || nu >= sidst - 0.1) { sidst = nu; break; }
+      sidst = nu;
     }
     const efter = laesbarhed(html);
-    log(`- Naturligt sprog: ${rettet} sætninger gjort lettere${kasseret ? `, ${kasseret} forslag kasseret af vagterne` : ''} (de ${liste.length} sværeste af ${alle.length})`);
+    log(`- Naturligt sprog: ${rettet} sætninger gjort lettere${kasseret ? `, ${kasseret} forslag kasseret af vagterne eller ladt være` : ''} (${runder} runde${runder === 1 ? '' : 'r'}, ${kald} kald; sætninger over klassetrin ${SAETNING_MAKS})`);
     log(`- Læsbarhed (klassetrin, mål ca. 8-9): ${foer.klassetrin} → ${efter.klassetrin} · ord pr. sætning ${foer.ordPrSaetning} → ${efter.ordPrSaetning} · svære ord ${foer.svaereOrdPct} % → ${efter.svaereOrdPct} %`);
   } catch (e) { log(`- Naturligt sprog: fejlede (${String(e.message).slice(0, 80)}) — teksten er uændret`); }
 }

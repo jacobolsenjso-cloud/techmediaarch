@@ -7,6 +7,7 @@
 // Tal skrevet på forskellige måder sammenlignes som værdier: "$300,000" = "300000" = "$300K" = "0.3 million".
 // Enkeltcifre (trin, "3 types") og årstal tælles ikke — samme regel som målingen (robot/ud/_maal-tal-kilder.mjs).
 
+import { erPdf, pdfTekst } from './pdf.mjs';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36';
 const GANGE = { k: 1e3, thousand: 1e3, m: 1e6, mn: 1e6, million: 1e6, millions: 1e6, b: 1e9, bn: 1e9, billion: 1e9, billions: 1e9, t: 1e12, trillion: 1e12 };
 const TAL = /(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)(?:\s?(thousand|millions?|billions?|trillion|bn|mn|[kmbt])\b)?/gi;
@@ -56,7 +57,10 @@ export async function hentKildeTekster(urls, timeoutMs = 15000) {
   return Promise.all(urls.map(async (u) => {
     try {
       const r = await fetch(u, { redirect: 'follow', signal: AbortSignal.timeout(timeoutMs), headers: { 'user-agent': UA, accept: 'text/html,*/*' } });
-      return r.ok ? synligTekst((await r.text()).slice(0, 1500000)) : '';
+      if (!r.ok) return '';
+      // PDF-kilde (9/11-2026, rettelse 4): teksten læses ud af PDF'en, så tallene kan kontrolleres mod den
+      if (erPdf(r, r.url)) { const p = await pdfTekst(await r.arrayBuffer()); return p.fejl ? '' : p.tekst; }
+      return synligTekst((await r.text()).slice(0, 1500000));
     } catch { return ''; }
   }));
 }
