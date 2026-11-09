@@ -1,7 +1,7 @@
 {
- "hentet": "2026-11-07T13:10:25.623Z",
- "fra": "2026-08-10",
- "til": "2026-11-07",
+ "hentet": "2026-11-09T07:58:02.423Z",
+ "fra": "2026-08-12",
+ "til": "2026-11-09",
  "dage": 90,
  "kilde": "analytics",
  "sider": {
@@ -10,8 +10,8 @@
    "brugere": 6
   },
   "/2026/10/what-are-intelligent-agents-ai": {
-   "visninger": 17,
-   "brugere": 5
+   "visninger": 18,
+   "brugere": 6
   },
   "/2026/09/what-are-phishing-emails": {
    "visninger": 14,
@@ -29,6 +29,10 @@
    "visninger": 9,
    "brugere": 6
   },
+  "/2026/10/how-generative-ai-creates-images": {
+   "visninger": 8,
+   "brugere": 4
+  },
   "/2026/05/the-real-arch-linux-myths-trade-offs": {
    "visninger": 7,
    "brugere": 3
@@ -41,29 +45,29 @@
    "visninger": 7,
    "brugere": 3
   },
-  "/2026/10/how-generative-ai-creates-images": {
+  "/2026/10/how-phishing-resistant-mfa-works": {
    "visninger": 6,
-   "brugere": 2
+   "brugere": 3
   },
   "/2024/08/tube-magic-ai-tools-for-growing-on": {
    "visninger": 5,
    "brugere": 1
+  },
+  "/2026/05/exploring-claude-just-changed-making": {
+   "visninger": 6,
+   "brugere": 5
   },
   "/2026/05/the-best-ai-detector-free-tools-to-spot": {
    "visninger": 8,
    "brugere": 5
   },
   "/2026/05/the-impact-of-googles-new-video-model": {
-   "visninger": 5,
-   "brugere": 5
+   "visninger": 6,
+   "brugere": 6
   },
   "/2026/09/what-are-zero-trust-security-models": {
    "visninger": 5,
    "brugere": 1
-  },
-  "/2026/10/how-phishing-resistant-mfa-works": {
-   "visninger": 5,
-   "brugere": 2
   },
   "/2026/10/why-web-development-career": {
    "visninger": 5,
@@ -72,10 +76,6 @@
   "/2026/04/mastering-chatgpt": {
    "visninger": 5,
    "brugere": 5
-  },
-  "/2026/05/exploring-claude-just-changed-making": {
-   "visninger": 5,
-   "brugere": 4
   },
   "/2026/05/kling-ai-tutorial-create-stunning-ai": {
    "visninger": 5,
@@ -94,6 +94,10 @@
    "brugere": 3
   },
   "/2026/10/what-are-saas-product-companies": {
+   "visninger": 4,
+   "brugere": 2
+  },
+  "/2026/11/how-does-generative-ai-learn": {
    "visninger": 4,
    "brugere": 2
   },
@@ -121,10 +125,6 @@
    "visninger": 3,
    "brugere": 2
   },
-  "/2026/11/how-does-generative-ai-learn": {
-   "visninger": 3,
-   "brugere": 1
-  },
   "/2024/09/blog-post": {
    "visninger": 2,
    "brugere": 2
@@ -135,6 +135,10 @@
   },
   "/2026/03/guide-to-databricks-success": {
    "visninger": 4,
+   "brugere": 2
+  },
+  "/2026/04/create-hollywood-style-films-with-this-free-ai-workflow": {
+   "visninger": 3,
    "brugere": 2
   },
   "/2026/04/gemma-4-explained-pricing-limits-and": {
@@ -181,6 +185,10 @@
    "visninger": 4,
    "brugere": 2
   },
+  "/2026/10/how-payment-processors-work": {
+   "visninger": 2,
+   "brugere": 2
+  },
   "/2026/10/product-management-business-development": {
    "visninger": 2,
    "brugere": 2
@@ -194,6 +202,10 @@
    "brugere": 2
   },
   "/2026/10/why-seo-is-important": {
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/11/generative-ai-vs-traditional-ai": {
    "visninger": 2,
    "brugere": 1
   },
@@ -293,10 +305,6 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/04/create-hollywood-style-films-with-this-free-ai-workflow": {
-   "visninger": 1,
-   "brugere": 1
-  },
   "/2026/04/ex-amazon-ai-leader-one-year-until-ai": {
    "visninger": 1,
    "brugere": 1
@@ -341,11 +349,11 @@
    "visninger": 2,
    "brugere": 2
   },
-  "/2026/10/how-long-learn-web-development": {
+  "/2026/09/large-language-models-vs-generative-ai": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/10/how-payment-processors-work": {
+  "/2026/10/how-long-learn-web-development": {
    "visninger": 1,
    "brugere": 1
   },
@@ -370,6 +378,18 @@
    "brugere": 1
   },
   "/2026/10/why-system-design-interview": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/11/generative-ai-environmental-impact": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/11/microsoft-365-vs-office-differences": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/11/windows-11-home-vs-pro-guide": {
    "visninger": 1,
    "brugere": 1
   }

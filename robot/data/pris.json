@@ -752,5 +752,61 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-09T07:58:03.045Z",
+  "artikel": "/2026/11/generative-ai-water-consumption",
+  "usd": 0.3792,
+  "kr": 2.61,
+  "dele": {
+   "artikel": {
+    "kr": 2.57,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0.01,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-09T08:06:41.412Z",
+  "artikel": "/2026/09/what-is-mvp-software-development",
+  "omskrevet": true,
+  "usd": 0.3419,
+  "kr": 2.35,
+  "dele": {
+   "artikel": {
+    "kr": 2.35,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-09T08:19:01.720Z",
+  "artikel": "/2024/09/AI Audio Recorder The Plaud NotePin",
+  "omskrevet": true,
+  "usd": 0.455,
+  "kr": 3.13,
+  "dele": {
+   "artikel": {
+    "kr": 3.13,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
  }
 ]

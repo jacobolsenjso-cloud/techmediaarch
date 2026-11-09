@@ -1,58 +1,42 @@
 {
- "hentet": "2026-11-07T13:10:26.249Z",
- "fra": "2026-11-01",
- "til": "2026-11-07",
+ "hentet": "2026-11-09T07:58:03.038Z",
+ "fra": "2026-11-03",
+ "til": "2026-11-09",
  "dage": 7,
  "sider": {
-  "/2026/10/what-is-included-in-microsoft-365": {
-   "visninger": 9,
+  "/2026/11/how-does-generative-ai-learn": {
+   "visninger": 4,
+   "brugere": 2
+  },
+  "/2026/04/create-hollywood-style-films-with-this-free-ai-workflow": {
+   "visninger": 2,
+   "brugere": 1
+  },
+  "/2026/10/how-generative-ai-creates-images": {
+   "visninger": 2,
    "brugere": 2
   },
   "/2026/10/what-are-intelligent-agents-ai": {
-   "visninger": 8,
-   "brugere": 4
-  },
-  "/2026/10/how-generative-ai-creates-images": {
-   "visninger": 5,
+   "visninger": 2,
    "brugere": 2
+  },
+  "/2026/11/generative-ai-vs-traditional-ai": {
+   "visninger": 2,
+   "brugere": 1
   },
   "/2026/05/exploring-claude-just-changed-making": {
-   "visninger": 3,
-   "brugere": 2
-  },
-  "/2026/11/how-does-generative-ai-learn": {
-   "visninger": 3,
-   "brugere": 1
-  },
-  "/2026/03/guide-to-databricks-success": {
-   "visninger": 2,
-   "brugere": 1
-  },
-  "/2026/10/product-management-business-development": {
-   "visninger": 2,
-   "brugere": 2
-  },
-  "/2024/09/Metas Posts using metas ai tools": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/05/the-real-arch-linux-myths-trade-offs": {
+  "/2026/05/the-impact-of-googles-new-video-model": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/06/agentic-ai-vs-ai-agents-technical": {
+  "/2026/09/large-language-models-vs-generative-ai": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/09/what-are-phishing-emails": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/09/what-is-ransomware-cyber-security": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/10/how-long-learn-web-development": {
+  "/2026/10/how-payment-processors-work": {
    "visninger": 1,
    "brugere": 1
   },
@@ -60,15 +44,15 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/10/what-are-crypto-wallet-addresses": {
+  "/2026/11/generative-ai-environmental-impact": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/10/what-is-cybersecurity-importance": {
+  "/2026/11/microsoft-365-vs-office-differences": {
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/10/why-system-design-interview": {
+  "/2026/11/windows-11-home-vs-pro-guide": {
    "visninger": 1,
    "brugere": 1
   }

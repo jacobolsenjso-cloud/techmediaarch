@@ -93,7 +93,7 @@ robot: true
 <p>Several structured frameworks guide modern development teams:</p>
 <ul>
 <li>The Aha! Framework, which integrates strategic planning and agile delivery to help teams deliver a Minimum Lovable Product, according to Aha!</li>
-<li>The Lean Startup framework, built on the Build-Measure-Learn cycle, Minimum Viable Product, and validated learning, as noted by Amplitude.</li>
+<li>The Lean Startup framework, built on the Build-Measure-Learn cycle, <a href="/2026/09/what-is-mvp-software-development">Minimum Viable Product</a>, and validated learning, as noted by Amplitude.</li>
 <li>Agile development cycles, which incorporate continuous stakeholder feedback during short sprints.</li>
 </ul>
 

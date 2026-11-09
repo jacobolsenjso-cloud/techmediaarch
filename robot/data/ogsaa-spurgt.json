@@ -1975,7 +1975,7 @@
   ]
  },
  "/2026/10/difference-between-seo-and-sem": {
-  "dato": "2026-10-08T14:41:30.355Z",
+  "dato": "2026-11-09T07:58:01.182Z",
   "valg": [
    {
     "q": "How does content marketing help with SEO?",
@@ -1986,13 +1986,13 @@
     "sti": "/2026/10/why-seo-is-important"
    },
    {
-    "q": "What is the best way to learn seo?",
-    "sti": "/2026/10/seo-best-practices-guide"
+    "q": "How will algorithm updates affect SEO strategies in the future?",
+    "sti": "/2024/09/New AI-Powered Labels Aim to Revive User Trust"
    }
   ]
  },
  "/2026/10/what-is-product-roadmap": {
-  "dato": "2026-10-08T20:47:17.135Z",
+  "dato": "2026-11-09T07:58:01.670Z",
   "valg": [
    {
     "q": "Difference between product roadmap and backlog?",
@@ -2427,6 +2427,19 @@
    {
     "q": "What are the environmental benefits of using AI in nuclear energy?",
     "sti": "/2024/10/google quits big tech to focus on ai in nuclear energy"
+   }
+  ]
+ },
+ "/2026/11/generative-ai-water-consumption": {
+  "dato": "2026-11-09T07:58:00.364Z",
+  "valg": [
+   {
+    "q": "How much water do AI data centers use?",
+    "sti": "/2026/11/generative-ai-environmental-impact"
+   },
+   {
+    "q": "What role do data centers play in AI development?",
+    "sti": "/2025/01/market-insights-trumps-stargate-and-ais-rising-tide"
    }
   ]
  }
