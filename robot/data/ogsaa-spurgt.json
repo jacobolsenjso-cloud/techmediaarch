@@ -2005,15 +2005,15 @@
   ]
  },
  "/2026/10/cybersecurity-analyst-vs-engineer": {
-  "dato": "2026-10-10T13:50:16.309Z",
+  "dato": "2026-11-09T15:55:14.310Z",
   "valg": [
    {
     "q": "How can AI improve cybersecurity?",
     "sti": "/2024/09/Artificial Intelligence AI has transformed the cybersecurity"
    },
    {
-    "q": "How does traditional cybersecurity differ from AI-driven approaches?",
-    "sti": "/2025/01/how-artificial-intelligence-can-enhance-your-cybersecurity-strategy"
+    "q": "What is AI in cybersecurity?",
+    "sti": "/2024/09/the-ai-takeover-why-personhood-is"
    },
    {
     "q": "What is the impact of AI on cybersecurity?",
@@ -2440,6 +2440,15 @@
    {
     "q": "What role do data centers play in AI development?",
     "sti": "/2025/01/market-insights-trumps-stargate-and-ais-rising-tide"
+   }
+  ]
+ },
+ "/2026/11/what-generative-ai-cannot-do": {
+  "dato": "2026-11-09T15:55:13.611Z",
+  "valg": [
+   {
+    "q": "Do AI detectors actually work?",
+    "sti": "/2026/05/can-ai-detection-be-trusted-blind-tests"
    }
   ]
  }

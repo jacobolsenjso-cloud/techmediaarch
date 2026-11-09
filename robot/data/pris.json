@@ -808,5 +808,31 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-09T15:55:16.930Z",
+  "artikel": "/2026/11/what-generative-ai-cannot-do",
+  "usd": 0.3127,
+  "kr": 2.15,
+  "dele": {
+   "artikel": {
+    "kr": 2.11,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.03,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
  }
 ]
