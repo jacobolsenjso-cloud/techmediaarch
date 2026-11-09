@@ -11,7 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { sti } from './arkiv.mjs';
-import { normaliser } from './tekst.mjs';
+import { normaliser, kerne, daekning } from './tekst.mjs';
 
 export const MAKS_PR_KALD = 700;         // DataForSEO's grænse
 export const MAKS_KALD = 4;              // pr. kørsel: 2.441 mulige hovedsøgeord målt 9/11 → 4 kald første gang (ca. $0,25),
@@ -132,4 +132,37 @@ export function talTekst(t) {
   if (t === undefined) return 'søgetal: ikke spurgt';
   if (t === null) return 'søgetal: ukendt hos DataForSEO';
   return [`${t.v} søgn./md`, t.kd !== null ? `sværhed ${t.kd}` : null, t.j ? 'tidløs' : null, t.a !== null && t.a <= -50 ? `faldende (${t.a} %)` : null].filter(Boolean).join(' · ');
+}
+
+// --- Omskrivning (Jacob 9/11-2026: "omskrivningen skal også have søgetal") -------------------------------------
+// Kandidater til hovedsøgeordet: Geminis formuleringer af artiklens emne (eller artiklens egne søgeord) + de søgninger,
+// Google ALLEREDE viser siden for (Search Console). En Search Console-søgning vægter ×1,5 — siden må ikke miste det,
+// den allerede bliver fundet på — men tæller kun, når den handler om artiklens emne (mindst 2/3 af dens kerneord står i
+// den gamle titel eller Geminis formuleringer); ellers kunne en bred søgning ("what is ai"), hvor siden står på plads 60,
+// flytte hele artiklen. Search Console-søgningerne skrives ALDRIG i loggen (den er offentlig) — kun antallet.
+// kandidater: [{ q, kilde: 'gemini' | 'egen' | 'gsc', vis }]; talFor(q) → {v,kd,j,a} | null | undefined
+export const GSC_BONUS = 1.5;
+export const GSC_MIN_VIS = 3;
+export function vaelgHoved(kandidater, talFor) {
+  const k = kandidater.map((x, i) => {
+    const t = talFor(x.q);
+    return { ...x, i, t, g: gruppe(t), score: vaerdi(t) * (x.kilde === 'gsc' ? GSC_BONUS : 1) };
+  });
+  const kendte = k.filter((x) => x.g === 0).sort((a, b) => b.score - a.score || (b.vis || 0) - (a.vis || 0) || a.i - b.i);
+  if (kendte.length) return { valgt: kendte[0], grund: 'flest søgninger × lethed', kendte };
+  // Ingen søgetal: den søgning, Google oftest viser siden for (mindst 5 visninger), ellers første forslag som før
+  const gsc = k.filter((x) => x.kilde === 'gsc' && (x.vis || 0) >= 5).sort((a, b) => b.vis - a.vis)[0];
+  if (gsc) return { valgt: gsc, grund: 'Search Console (ingen søgetal)', kendte };
+  return { valgt: k.find((x) => x.kilde !== 'gsc') || k[0], grund: 'første forslag (ingen søgetal)', kendte };
+}
+
+// Handler Search Console-søgningen om artiklens emne? Mindst 2/3 af dens kerneord (og mindst 2, hvis den har flere) skal stå i emneteksterne
+// (den gamle titel + Geminis formuleringer). Navnet på sitet tæller aldrig (det er en navnesøgning, ikke et emne).
+export function gscOmEmnet(q, emneTekster) {
+  if (/techmediaarch|tech media arch/i.test(q)) return false;
+  const emne = new Set(emneTekster.flatMap((t) => [...kerne(t)]));
+  const k = kerne(q);
+  const d = daekning(k, emne);
+  // Kort spørgsmål med ét kerneord ("how does ransomware work" → ransom): det ene skal stå i emnet
+  return k.size > 0 && d.faelles >= Math.min(2, k.size) && d.andel >= 2 / 3;
 }

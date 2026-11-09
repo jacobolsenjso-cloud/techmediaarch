@@ -34,7 +34,9 @@ import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder, udenEgenKildelis
 import { artikler, sti, emner, OPSKRIFT } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { spred, nyeArtikler, hvilerMod } from './lib/spredning.mjs';
-import { talTekst } from './lib/dataforseo.mjs';
+import { talTekst, hentTal, vaelgHoved, gscOmEmnet, GSC_MIN_VIS } from './lib/dataforseo.mjs';
+import { harAdgang, hentSoegninger } from './lib/searchconsole.mjs';
+import { normaliser } from './lib/tekst.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
 import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
@@ -116,10 +118,40 @@ Title: "${gammel.fm.gammelTitel || gammel.fm.title}"
 Headings: ${overskr.slice(0, 20).join(' | ')}
 Start of text: ${gammel.krop.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 1500)}
 
-Return JSON {"hoved": "the main search phrase people type into Google for this subject, lowercase, 2-7 words", "beslaegtede": ["5 different related search phrases, lowercase"]}`);
+Return JSON {"hoved": "the main search phrase people type into Google for this subject, lowercase, 2-7 words", "flere": ["up to 7 OTHER common ways people type the SAME main question into Google (same subject and intent, different wording), lowercase, 2-8 words"], "beslaegtede": ["5 different related search phrases, lowercase"]}`);
   valgt = { hoved: String(s.hoved || '').trim().toLowerCase(), beslaegtede: (Array.isArray(s.beslaegtede) ? s.beslaegtede : []).map((x) => String(x).trim().toLowerCase()).filter(Boolean).slice(0, 5), emne: (gammel.fm.labels || [])[0] || '' };
   if (!valgt.hoved || valgt.beslaegtede.length < 3) throw new Error('Omskrivning: Gemini gav ingen brugbare søgeord — artiklen afvist');
-  log(`# Omskrivning\n\n**Adresse:** ${OMSKRIV}  \n**Gammel titel:** ${gammel.fm.title}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}`);
+  // Søgetal (Jacob 9/11-2026, robot/lib/dataforseo.mjs vaelgHoved): kandidater = Geminis formuleringer af SAMME spørgsmål
+  // (eller artiklens eget hovedsøgeord — dens beslægtede er andre spørgsmål og må ikke blive hovedet) + de søgninger,
+  // Google allerede viser siden for. Search Console-søgningerne skrives ALDRIG i loggen (offentlig) og kommer ikke med
+  // som beslægtede (de står i artiklens frontmatter); kun et Search Console-hoved kan blive synligt — som artiklens emne.
+  const formuleringer = [...new Set([valgt.hoved, ...(egne ? [] : (Array.isArray(s.flere) ? s.flere : []))]
+    .map((x) => normaliser(x)).filter((x) => x && x.split(' ').length >= 2))].slice(0, 8);
+  let gscKand = []; let gscFejl = '';
+  if (harAdgang()) {
+    try {
+      const renSti = (u) => String(u).replace(/^https?:\/\/(www\.)?techmediaarch\.com/, '').replace(/\?m=1$/, '').replace(/\.html$/, '').replace(/\/$/, '');
+      const prQ = new Map();
+      for (const r of await hentSoegninger({ dage: 90 })) if (renSti(r.side) === OMSKRIV.replace(/\/$/, '')) prQ.set(normaliser(r.q), (prQ.get(normaliser(r.q)) || 0) + r.visninger);
+      gscKand = [...prQ].filter(([q, vis]) => vis >= GSC_MIN_VIS && gscOmEmnet(q, [gammel.fm.gammelTitel || gammel.fm.title, ...formuleringer]))
+        .sort((a, b) => b[1] - a[1]).slice(0, 10).map(([q, vis]) => ({ q, kilde: 'gsc', vis }));
+    } catch (e) { gscFejl = e.message; }
+  }
+  const kand = [...formuleringer.map((q) => ({ q, kilde: egne ? 'egen' : 'gemini' }))];
+  for (const g of gscKand) { const f = kand.find((x) => x.q === g.q); if (f) f.vis = g.vis; else kand.push(g); }   // samme søgning: beholder kilden, får visningerne
+  const { tal: omTal, log: omDfs } = await hentTal(kand.map((x) => x.q));
+  const v = vaelgHoved(kand, (q) => (omTal.has(normaliser(q)) ? omTal.get(normaliser(q)) : undefined));
+  const foersteForslag = valgt.hoved;
+  valgt.hoved = v.valgt.q; valgt.tal = v.valgt.t;
+  // Beslægtede: Geminis første forslag (hvis det blev skiftet ud) og de næstbedste kendte formuleringer først, så Geminis
+  const ekstraBes = v.kendte.filter((x) => x.kilde !== 'gsc' && x.q !== valgt.hoved).slice(0, 2).map((x) => x.q);
+  valgt.beslaegtede = [...new Set([...(foersteForslag !== valgt.hoved ? [foersteForslag] : []), ...ekstraBes, ...valgt.beslaegtede.map(normaliser)])]
+    .filter((q) => q !== valgt.hoved).slice(0, 5);
+  log(`# Omskrivning\n\n**Adresse:** ${OMSKRIV}  \n**Gammel titel:** ${gammel.fm.title}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}`
+    + `  \n**Søgetal:** ${talTekst(valgt.tal)} · valgt efter ${v.grund}${v.valgt.kilde === 'gsc' ? ' (en søgning, Google allerede viser siden for)' : ''}`
+    + `${foersteForslag !== valgt.hoved ? ` · skiftet fra ${egne ? 'artiklens eget hovedsøgeord' : 'Geminis første forslag'} "${foersteForslag}"` : ''}`
+    + ` · ${formuleringer.length} formuleringer + ${gscKand.length} fra Search Console slået op (${omDfs.fraHusk} fra hukommelsen, ${omDfs.sendt} sendt, $${omDfs.pris})`
+    + `${omDfs.fejl ? ` · ⚠ DataForSEO fejlede: ${omDfs.fejl}` : ''}${gscFejl ? ` · Search Console: ${gscFejl}` : ''}`);
 } else {
 // --brug-liste: genbrug robot/ud/soegeord-liste.json (kun til afprøvning uden net)
 if (!process.argv.includes('--brug-liste')) execFileSync('node', ['robot/soegeord.mjs', '--pakker', '5', ...(EMNE ? ['--emne', EMNE] : [])], { cwd: sti(), stdio: ['ignore', 'ignore', 'inherit'] });

@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { oversaet, vaerdi, gruppe, hentTal, laesHusk, talTekst, MIN_SOEGNINGER } from './lib/dataforseo.mjs';
+import { oversaet, vaerdi, gruppe, hentTal, laesHusk, talTekst, MIN_SOEGNINGER, vaelgHoved, gscOmEmnet } from './lib/dataforseo.mjs';
 import { spred } from './lib/spredning.mjs';
 let fejl = 0;
 const t = (navn, ok) => { console.log(`${ok ? 'OK  ' : 'FEJL'} ${navn}`); if (!ok) fejl++; };
@@ -81,4 +81,26 @@ t(`for få søgninger bagerst trods tom hylde (${s.at(-1)})`, s.at(-1) === 'what
 t(`tom hylde før travl hylde: DevOps før Infosec (${s.join(' | ')})`, s.indexOf('what is devops engineer') < s.indexOf('how much does cybersecurity pay'));
 t('klynge tæller dobbelt: ci/cd (700×2) før devops engineer (1100)', s[0] === 'what is a ci cd pipeline' && s[1] === 'what is devops engineer');
 t('kendte søgetal før ukendte på samme hylde', s.indexOf('what is devops engineer') < s.indexOf('how does kubernetes work'));
+// 4. Omskrivning: valg af hovedsøgeord (vaelgHoved) og Search Console-filteret (gscOmEmnet)
+const T = { 'what is ransomware': { v: 9900, kd: 70, j: true, a: 0 }, 'ransomware meaning': { v: 1300, kd: 20, j: true, a: 0 },
+  'ransomware definition': { v: 15, kd: 10, j: false, a: 0 }, 'how does ransomware attack work': { v: 400, kd: 25, j: true, a: 0 } };
+const tf = (q) => (q in T ? T[q] : null);
+let v = vaelgHoved([{ q: 'what is ransomware', kilde: 'gemini' }, { q: 'ransomware meaning', kilde: 'gemini' }, { q: 'ransomware definition', kilde: 'gemini' }], tf);
+// 9900×0,3×1,5 = 4455 mod 1300×0,8×1,5 = 1560
+t(`flest søgninger × lethed vinder (${v.valgt.q})`, v.valgt.q === 'what is ransomware' && v.kendte.length === 2);
+v = vaelgHoved([{ q: 'ransomware meaning', kilde: 'gemini' }, { q: 'how does ransomware attack work', kilde: 'gsc', vis: 40 }], tf);
+// 1560 mod 400×0,75×1,5×1,5 (Search Console-bonus) = 675 → Geminis vinder stadig
+t(`Search Console-bonus ×1,5 vender ikke et klart større tal (${v.valgt.q})`, v.valgt.q === 'ransomware meaning');
+v = vaelgHoved([{ q: 'ransomware definition', kilde: 'gemini' }, { q: 'how does ransomware attack work', kilde: 'gsc', vis: 40 }], tf);
+t(`kendte søgetal slår for få søgninger (${v.valgt.q}, ${v.grund})`, v.valgt.q === 'how does ransomware attack work');
+v = vaelgHoved([{ q: 'ukendt a b', kilde: 'gemini' }, { q: 'ukendt c d', kilde: 'gsc', vis: 12 }], () => null);
+t(`ingen søgetal: Search Console-søgningen med flest visninger (${v.grund})`, v.valgt.q === 'ukendt c d' && /Search Console/.test(v.grund));
+v = vaelgHoved([{ q: 'ukendt a b', kilde: 'gemini' }, { q: 'ukendt c d', kilde: 'gsc', vis: 4 }], () => undefined);
+t(`ingen søgetal og få visninger: Geminis første forslag som før (${v.grund})`, v.valgt.q === 'ukendt a b' && /første forslag/.test(v.grund));
+const emne = ['What Is Ransomware and How Does It Work?', 'what is ransomware'];
+t('Search Console om emnet tæller (ét kerneord)', gscOmEmnet('how does ransomware work', emne));
+t('Search Console om emnet tæller (flere kerneord)', gscOmEmnet('what is ransomware attack', ['What Is a Ransomware Attack?']));
+t('et underemne, artiklen ikke handler om, tæller ikke ("ransomware spread")', !gscOmEmnet('how does ransomware spread', emne));
+t('bred søgning uden for emnet tæller ikke ("what is ai")', !gscOmEmnet('what is ai', emne) && !gscOmEmnet('what is malware', emne));
+t('navnesøgning på sitet tæller aldrig', !gscOmEmnet('techmediaarch ransomware', emne));
 console.log(fejl ? `${fejl} FEJL` : 'alt OK'); process.exit(fejl ? 1 : 0);
