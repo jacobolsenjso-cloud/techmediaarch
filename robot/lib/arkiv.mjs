@@ -53,6 +53,15 @@ function frontmatter(fil) {
 // efter "Why Does Generative AI Consume So Much Water?" — næsten samme artikel. FAQ og kildelisten tæller ikke
 // (korte svar), og heller ikke generiske overskrifter som "Conclusion".
 const GENERISK = /^(faq|frequently asked questions|sources|references|key takeaways|conclusion|introduction|summary|final thoughts|the bottom line|bottom line|overview|what('| i)s next|wrapping up)\b/i;
+// Ren tekst af en overskrift (kun til sammenligning — vises aldrig som HTML). Rettet 9/11-2026 efter CodeQL #29/#30:
+// mærker fjernes, til der ikke er flere (så "<scr<b>ipt>" ikke efterlader "<script>"), og entiteter afkodes i ÉN omgang
+// (ellers blev "&amp;#39;" først til "&#39;" og så til "'").
+const ENTITETER = { '&amp;': '&', '&#39;': "'", '&rsquo;': "'", '&quot;': '"', '&lt;': '<', '&gt;': '>', '&nbsp;': ' ' };
+export function renTekst(s) {
+  let t = String(s), foer;
+  do { foer = t; t = t.replace(/<[^<>]*>/g, ''); } while (t !== foer);
+  return t.replace(/[<>]/g, '').replace(/&(?:amp|#39|rsquo|quot|lt|gt|nbsp);/g, (e) => ENTITETER[e]).replace(/\s+/g, ' ').trim();
+}
 export function overskrifter(fil) {
   let krop = '';
   try { krop = fs.readFileSync(fil, 'utf8').replace(/^---\r?\n[\s\S]*?\r?\n---/, ''); } catch { return []; }
@@ -60,7 +69,7 @@ export function overskrifter(fil) {
   if (stop > 0) krop = krop.slice(0, stop);
   const ud = [];
   for (const m of krop.matchAll(/<h[23][^>]*>([\s\S]*?)<\/h[23]>|^#{2,3}\s+(.+)$/gim)) {
-    const t = String(m[1] ?? m[2] ?? '').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&#39;|&rsquo;/g, "'").replace(/\s+/g, ' ').trim();
+    const t = renTekst(String(m[1] ?? m[2] ?? ''));
     if (t && t.length >= 8 && !GENERISK.test(t)) ud.push(t);
   }
   return [...new Set(ud)];
