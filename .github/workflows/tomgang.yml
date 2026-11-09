@@ -29,3 +29,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node robot/plan.mjs --tomgang
+      # DataForSEO-saldo (Jacob 9/11-2026): rød under $10, så søgetallene aldrig stopper i stilhed. Kører også, når
+      # tomgangstjekket ovenfor er rødt (always), så begge fejl ses i samme kørsel.
+      - name: DataForSEO-saldo
+        if: always()
+        env:
+          DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
+          DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
+        run: node robot/dataforseo-saldo.mjs

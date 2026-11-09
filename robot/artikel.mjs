@@ -34,6 +34,7 @@ import { kunKontrolleredeFakta, kildeNavneTekst, ukendteKilder, udenEgenKildelis
 import { artikler, sti, emner, OPSKRIFT } from './lib/arkiv.mjs';
 import { lavIndeks, mestEns } from './lib/dubletter.mjs';
 import { spred, nyeArtikler, hvilerMod } from './lib/spredning.mjs';
+import { talTekst } from './lib/dataforseo.mjs';
 import { linkIndsaet, udenLinks } from './lib/linkfrase.mjs';
 import { faqSchema } from '../src/lib/faqschema.mjs';
 import { delAfsnit, fjernGentagelser, fyldKandidater, antalKropSaetninger, fjernSaetninger, samlEnkelte } from './lib/afsnit.mjs';
@@ -140,15 +141,18 @@ const spredLog = [];   // skrives efter overskriften "# Prøveartikel"
 }
 // Tyndeste emne først (listen er allerede sorteret sådan); Gemini vurderer de 8 første.
 const vurdering = await json(`You pick topics for evergreen explainer articles on a tech blog (techmediaarch.com).
-For each numbered keyword, answer whether it is a sensible, evergreen article topic in correct English: not news of the day, not prices/stock moves, not local/legal advice, not a product accessory, not nonsense.
-Return JSON: {"ok":[numbers of acceptable keywords, best first]}
+For each numbered keyword, answer whether it is a sensible, evergreen article topic in correct English: not news of the day, not prices/stock moves, not local/legal advice, not a product accessory, not a question about spelling or word usage, not about a TV show, film or game plot, not nonsense.
+Return JSON: {"ok":[numbers of acceptable keywords]}
 ${kandidater.slice(0, 8).map((p, i) => `${i + 1}. ${p.hoved}`).join('\n')}`);
-valgt = kandidater[(vurdering.ok?.[0] || 0) - 1];
+// Den FØRSTE godkendte i vores rækkefølge vælges (9/11-2026): rækkefølgen bygger nu på søgetal (DataForSEO), så Gemini
+// skal kun sortere uegnede emner fra — ikke selv vælge den "bedste". Før tog robotten Geminis favorit.
+const godkendte = (vurdering.ok || []).map(Number).filter((n) => Number.isInteger(n) && n >= 1 && n <= Math.min(8, kandidater.length));
+valgt = godkendte.length ? kandidater[Math.min(...godkendte) - 1] : undefined;
 if (!valgt) throw new Error('Gemini godkendte ingen af pakkerne');
 // Til tidsplanen (robot/plan.mjs): så et afvist søgeord kan hvile i 30 dage.
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
 fs.writeFileSync(sti('robot/ud/valgt.json'), JSON.stringify({ hoved: valgt.hoved, emne: valgt.emne }));
-log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}  \n**Klynge:** ${valgt.klynge ? `ja (${valgt.klynge} søgninger, Google viser os for)` : 'nej'} · ${kandidater.filter((p) => p.klynge).length} af ${kandidater.length} pakker var klynger`);
+log(`# Prøveartikel\n\n**Emne:** ${valgt.emne}  \n**Hovedsøgeord:** ${valgt.hoved}  \n**Beslægtede:** ${valgt.beslaegtede.join(' · ')}  \n**Klynge:** ${valgt.klynge ? `ja (${valgt.klynge} søgninger, Google viser os for)` : 'nej'} · ${kandidater.filter((p) => p.klynge).length} af ${kandidater.length} pakker var klynger  \n**Søgetal:** ${talTekst(valgt.tal)}${liste.dfs?.fejl ? ` (DataForSEO fejlede i dag: ${liste.dfs.fejl})` : ''}`);
 spredLog.forEach(log);
 }
 
