@@ -19,7 +19,7 @@ on:
       opgave:
         description: 'Hvad skal robotten gøre?'
         type: choice
-        options: [soegeord, noegletjek, proeveartikel, proeveomskriv, test-foraeldet, faq-ekstra]
+        options: [soegeord, noegletjek, proeveartikel, proeveomskriv, test-foraeldet, faq-ekstra, dataforseo-maaling]
         default: soegeord
       omskriv:
         description: 'proeveomskriv: artiklens adresse, fx /2026/04/mdm-activate-your-mac-with-this-essential-guide'
@@ -68,6 +68,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           CLOUDFLARE_AI_TOKEN: ${{ secrets.CLOUDFLARE_AI_TOKEN }}
+          DATAFORSEO_LOGIN: ${{ secrets.DATAFORSEO_LOGIN }}
+          DATAFORSEO_PASSWORD: ${{ secrets.DATAFORSEO_PASSWORD }}
           # Input sendes som miljøvariabler, ikke direkte ind i kommandoen.
           OPGAVE: ${{ inputs.opgave }}
           EMNE: ${{ inputs.emne }}
@@ -92,6 +94,10 @@ jobs:
             faq-ekstra)
               # 32 minutter, så der er tid til at gemme grenen inden jobbets loft på 40
               node robot/faq-ekstra.mjs --minutter 32 ;;
+            dataforseo-maaling)
+              # Måling 9/11-2026: søgeordsrobotten som normalt, derefter ét DataForSEO-kald (højst ca. $0,10)
+              node robot/soegeord.mjs --pakker 5 --gem robot/ud/raa.json > /dev/null
+              node robot/dataforseo-maaling.mjs > /dev/null ;;
             *) echo "Ukendt opgave"; exit 1 ;;
           esac
       - name: Gem prøveartiklen på en egen gren (ikke main)
