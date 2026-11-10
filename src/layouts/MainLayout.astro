@@ -645,6 +645,58 @@ const nyeste = INDLAEG[0];
         .top-links a::after, .post-body :is(p, li) a, .icon-btn, .card-thumb, :is(.lead-card, .lead-mini, .side-item, .home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"]) { transition: none !important; }
         :is(.lead-card, .lead-mini, .side-item, .home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"], .nav-card, .article-card):hover { transform: none !important; }
       }
+
+      /* ===== Hover 2.0 (10/11-2026, Jacob: "gør hover-effekten lidt mere tydelig ... lidt mere lækker") =====
+         Ét sæt regler for ALLE artikler, der kan klikkes: kort (forside, Latest, søgning, relaterede), rækker (hylder,
+         All articles, forsidens hyldeafsnit), sidekolonnen, "Read next" og megamenuen.
+         1) Titlen bliver blå, og en blød streg glider op under den (understregning pr. linje, så lange titler også får den).
+         2) Billeder løfter sig med en blød blå skygge; billeder i en ramme zoomer også let ind (3 % — mere skar vandmærket af).
+         3) Kort med kant løfter sig 4 px med blå skær i skyggen.
+         Kun på enheder med mus (hover: hover). På telefon (ingen mus) løfter kortet sig i stedet ved tryk (klassen .tryk nedenfor).
+         Alt slås fra ved "mindre bevægelse" i styresystemet. */
+      :root { --hov-ease: cubic-bezier(0.22, 1, 0.36, 1); --hov-skaer: 0 16px 36px -14px color-mix(in srgb, var(--teal) 42%, transparent); }
+      body.dark-mode { --hov-skaer: 0 16px 36px -14px color-mix(in srgb, var(--teal) 30%, transparent); }
+      :is(.article-card .card-title, .lead-title, .lead-mini-title, .hylde-stor-titel, .raekke-titel, .hylde-raekke-titel, .side-item-title, .las-naeste-titel, .mega-nyeste-titel) {
+        text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: 7px; text-decoration-color: transparent;
+        /* !important: sidernes egne regler har "transition: color 0.15s" med højere vægt, så stregen ellers sprang frem i stedet for at glide */
+        transition: color 0.2s ease, text-decoration-color 0.3s ease, text-underline-offset 0.3s var(--hov-ease) !important;
+      }
+      html body .article-card { transition: transform 0.35s var(--hov-ease), box-shadow 0.35s var(--hov-ease), border-color 0.3s ease; }
+      :is(.raekke, .hylde-raekke, .hylde-stor) img { transition: transform 0.45s var(--hov-ease), box-shadow 0.45s var(--hov-ease), filter 0.4s ease; }
+      :is(.article-card, .lead-card, .lead-mini, .side-item, .mega-nyeste, .las-naeste-link) img { transition: transform 0.7s var(--hov-ease), filter 0.4s ease; }
+      html body :is(.lead-card, .lead-mini, .side-item) .card-thumb { transition: transform 0.35s var(--hov-ease), box-shadow 0.35s var(--hov-ease); }
+      @media (hover: hover) {
+        :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste):hover :is(.card-title, .lead-title, .lead-mini-title, .hylde-stor-titel, .raekke-titel, .hylde-raekke-titel, .side-item-title, .las-naeste-titel, .mega-nyeste-titel) {
+          color: var(--teal-text); text-decoration-color: color-mix(in srgb, var(--teal-text) 55%, transparent); text-underline-offset: 3px;
+        }
+        /* Zoom kun 3 %: med 6 % blev vandmærket "techmediaarch.com" i billedets hjørne skåret af (målt 10/11). Løftet og
+           skyggen nedenfor gør i stedet effekten tydelig. */
+        html body :is(.article-card, .lead-card, .lead-mini, .side-item, .mega-nyeste, .las-naeste-link):hover img { transform: scale(1.03); filter: saturate(1.08) brightness(1.03); }
+        html body :is(.raekke, .hylde-raekke, .hylde-stor):hover img { transform: translateY(-3px); box-shadow: 0 0 0 1px var(--rule-light), var(--hov-skaer); filter: saturate(1.08) brightness(1.03); }
+        html body .article-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover), var(--hov-skaer); border-color: color-mix(in srgb, var(--teal) 28%, var(--rule-light)); }
+        html body :is(.lead-card, .lead-mini, .side-item):hover .card-thumb { box-shadow: var(--shadow-hover), var(--hov-skaer); transform: translateY(-4px); }
+        html body .post-body a.las-naeste-link:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover), var(--hov-skaer); }
+      }
+      /* Telefon (Jacob 10/11: "når man trykker ... løfter op ... viser en skygge, så man kan se, man trykker"):
+         der findes ingen hover, så scriptet nederst sætter klassen .tryk, SÅ SNART fingeren rører et kort, og lader den
+         blive, mens næste side hentes. Kortet løfter sig med blå skygge, billedet zoomer, titlen bliver blå med streg.
+         Ruller man i stedet, fjernes .tryk med det samme, så kortene ikke hopper under fingeren. */
+      :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste, .vej).tryk { position: relative; z-index: 2; }
+      html body .article-card.tryk, html body .post-body a.las-naeste-link.tryk, html body .vej.tryk { transform: translateY(-5px) scale(1.012); box-shadow: var(--shadow-hover), var(--hov-skaer); transition: transform 0.22s var(--hov-ease), box-shadow 0.22s var(--hov-ease), border-color 0.2s ease; }
+      /* Kun kort uden farvet kant får blå kant — "Read next" beholder hyldens farve i venstre kant (målt 10/11) */
+      html body :is(.article-card, .vej).tryk { border-color: color-mix(in srgb, var(--teal) 35%, var(--rule-light)); }
+      /* "Related" på mobil viser kortene som rækker uden runde hjørner — løftet så kantet ud (målt 10/11), så de rundes under trykket */
+      html body .article-card.tryk { border-radius: var(--radius-lg) !important; }
+      html body :is(.lead-card, .lead-mini, .side-item).tryk .card-thumb { box-shadow: var(--shadow-hover), var(--hov-skaer); transform: translateY(-4px); transition: transform 0.22s var(--hov-ease), box-shadow 0.22s var(--hov-ease); }
+      html body :is(.article-card, .lead-card, .lead-mini, .side-item, .mega-nyeste, .las-naeste-link).tryk img { transform: scale(1.03); filter: saturate(1.1) brightness(1.04); transition: transform 0.4s var(--hov-ease), filter 0.3s ease; }
+      html body :is(.raekke, .hylde-raekke, .hylde-stor).tryk img { transform: translateY(-4px) scale(1.02); box-shadow: 0 0 0 1px var(--rule-light), var(--hov-skaer); filter: saturate(1.1) brightness(1.04); transition: transform 0.22s var(--hov-ease), box-shadow 0.22s var(--hov-ease), filter 0.3s ease; }
+      html body :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste).tryk :is(.card-title, .lead-title, .lead-mini-title, .hylde-stor-titel, .raekke-titel, .hylde-raekke-titel, .side-item-title, .las-naeste-titel, .mega-nyeste-titel) {
+        color: var(--teal-text); text-decoration-color: color-mix(in srgb, var(--teal-text) 55%, transparent); text-underline-offset: 3px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html body :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste, .vej),
+        html body :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste, .vej) :is(img, .card-thumb) { transform: none !important; transition: none !important; }
+      }
     </style>
   </head>
   <body>
@@ -927,6 +979,36 @@ const nyeste = INDLAEG[0];
         // Har læseren slået beskeder fra i browseren, ryddes markeringen, så knappen viser det rigtige
         if (kan && laes('tma_push') && Notification.permission !== 'granted') skriv('tma_push', null);
         setTimeout(synk, 6000); // efter siden er færdig — konkurrerer ikke med indholdet
+      })();
+    </script>
+
+    {/* Tryk-løft på telefon (10/11-2026, Hover 2.0): se CSS'en ved ".tryk". Kun fingre (pointerType "touch") — en mus
+        har hover i stedet. Klassen sættes ved første berøring (før klikket), så løftet kan ses, mens næste side hentes;
+        navigationen forsinkes IKKE. Bevæger fingeren sig mere end 10 px (rulning), eller afbryder browseren berøringen,
+        fjernes klassen straks. Kommer man tilbage med "Tilbage" (siden genskabt fra browserens hukommelse), ryddes den også. */}
+    <script is:inline>
+      (function () {
+        var KORT = '.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste, .vej';
+        var aktiv = null, x0 = 0, y0 = 0, ur = null, start = null;
+        var fjern = function () { clearTimeout(ur); clearTimeout(start); if (aktiv) aktiv.classList.remove('tryk'); aktiv = null; };
+        document.addEventListener('pointerdown', function (e) {
+          if (e.pointerType !== 'touch' || !e.target.closest) return;
+          var k = e.target.closest(KORT); fjern(); if (!k) return;
+          aktiv = k; x0 = e.clientX; y0 = e.clientY;
+          // 60 ms ventetid: begynder fingeren at rulle, når browseren at melde det (pointercancel/pointermove) først,
+          // så kortet ikke blinker op under en rulning. Et tryk varer længere, så løftet ses stadig før sideskiftet.
+          start = setTimeout(function () { if (aktiv === k) k.classList.add('tryk'); }, 60);
+        }, { passive: true });
+        document.addEventListener('pointermove', function (e) {
+          if (aktiv && (Math.abs(e.clientX - x0) > 10 || Math.abs(e.clientY - y0) > 10)) fjern();
+        }, { passive: true });
+        document.addEventListener('pointercancel', fjern, { passive: true });
+        // Slipper fingeren uden at siden skifter (fx et kort uden link), lægger kortet sig igen efter et øjeblik
+        // Et meget hurtigt tryk (under 60 ms) får stadig løftet: klassen sættes straks, når fingeren slippes
+        document.addEventListener('pointerup', function () { if (aktiv) { clearTimeout(start); aktiv.classList.add('tryk'); clearTimeout(ur); ur = setTimeout(fjern, 900); } }, { passive: true });
+        window.addEventListener('pageshow', fjern);
+        // iOS Safari viser kun berørings-tilstande, når siden lytter efter touchstart
+        document.addEventListener('touchstart', function () {}, { passive: true });
       })();
     </script>
 
