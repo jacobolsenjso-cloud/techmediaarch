@@ -21,8 +21,10 @@ https://techmediaarch.:konto.workers.dev/*
   Cache-Control: public, max-age=86400
 /jacob-olsen-96.jpg
   Cache-Control: public, max-age=86400
+# Manifestet (appen, 10/11-2026): højst en time i browserens cache — med et døgn kaldte Chrome ikke sitet installérbart,
+# fordi den gamle udgave lå gemt. Ved ændringer: skift også ?v= i MainLayout.astro.
 /manifest.webmanifest
-  Cache-Control: public, max-age=86400
+  Cache-Control: public, max-age=3600
 # Appens service worker (10/11-2026): skal altid tjekkes mod serveren, ellers kan en læser sidde fast på en
 # gammel udgave. Siden registrerer den også med updateViaCache: 'none'.
 /sw.js
