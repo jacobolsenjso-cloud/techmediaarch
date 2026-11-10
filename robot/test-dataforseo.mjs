@@ -24,11 +24,12 @@ t('tekst', talTekst(cyber) === '4400 søgn./md · sværhed 10 · tidløs' && tal
 // 2. hentTal med falsk fetch og midlertidig hukommelse
 const fil = path.join(os.tmpdir(), `_dfs-test-${process.pid}.json`);
 const nu = Date.parse('2026-11-09T12:00:00Z');
-let sendtSidst = null, kaldt = 0, svarKode = 20000;
+let sendtSidst = null, tagSidst = null, kaldt = 0, svarKode = 20000;
 globalThis.fetch = async (url, opt) => {
   kaldt++;
   if (!String(opt.headers.authorization).startsWith('Basic ')) throw new Error('ingen login sendt');
   sendtSidst = JSON.parse(opt.body)[0].keywords;
+  tagSidst = JSON.parse(opt.body)[0].tag;
   return { ok: true, status: 200, json: async () => ({ status_code: 20000, tasks: [{ status_code: svarKode, status_message: svarKode === 20000 ? 'Ok.' : 'Daily limit exceeded', cost: 0.0124,
     result: [{ items: [item('how much does cybersecurity pay', 4400, 10), item('what is a vpn', 0, null)] }] }] }) };
 };
@@ -38,6 +39,7 @@ t('uden nøgle: intet kald, fejl i loggen, robotten kører videre', kaldt === 0 
 process.env.DATAFORSEO_LOGIN = 'test'; process.env.DATAFORSEO_PASSWORD = 'test';
 r = await hentTal(['How much does cybersecurity pay?', 'what is a vpn', 'what is a vpn', 'can ai be banned', 'x '.repeat(50)], { nu, fil });
 t(`sender normaliseret, uden dubletter og uden for lange (${JSON.stringify(sendtSidst)})`, JSON.stringify(sendtSidst) === JSON.stringify(['how much does cybersecurity pay', 'what is a vpn', 'can ai be banned']));
+t(`kaldet bærer mærket "tma" (${tagSidst})`, tagSidst === 'tma');
 t('fundet → tal, ukendt → null', r.tal.get('how much does cybersecurity pay')?.v === 4400 && r.tal.get('can ai be banned') === null && r.tal.get('what is a vpn')?.v === 0);
 t('log: sendt 3, fundet 2, pris', r.log.sendt === 3 && r.log.fundet === 2 && r.log.pris === 0.0124);
 r = await hentTal(['how much does cybersecurity pay', 'can ai be banned', 'what is devops'], { nu: nu + 864e5, fil });

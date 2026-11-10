@@ -18,6 +18,9 @@ export const MAKS_KALD = 4;              // pr. kørsel: 2.441 mulige hovedsøge
                                          // derefter kun nye spørgsmål (hukommelsen), dvs. typisk ét lille kald
 export const HUSK_DAGE = 30;             // søgetal er månedstal; ældre svar hentes igen
 export const MIN_SOEGNINGER = 20;        // under dette tæller et søgeord som "for få søgninger"
+// Mærke på hvert kald (Jacob 10/11-2026): kontoen deles med techfeedwatch ("tfw"); DataForSEO har ingen underkonti,
+// så forbruget pr. site kan kun skilles ad via dette mærke (ses ved hvert kald under Usage → API calls).
+export const TAG = 'tma';
 export const SALDO_ADVARSEL = 10;        // $ — under dette giver tomgangsalarmen rødt (mail til Jacob)
 const HUSK = process.env.DATAFORSEO_HUSK || 'robot/data/dataforseo.json';   // DATAFORSEO_HUSK kun til test
 const fuld = (f) => (path.isAbsolute(f) ? f : sti(f));   // tests bruger en midlertidig fil
@@ -111,10 +114,10 @@ export async function hentTal(qs, { nu = Date.now(), maks = MAKS_PR_KALD, kald_ 
   for (let i = 0; i < nye.length; i += maks) {
     const del = nye.slice(i, i + maks);
     try {
-      const r = await kald('dataforseo_labs/google/keyword_overview/live', [{ keywords: del, location_code: 2840, language_code: 'en' }]);
+      const r = await kald('dataforseo_labs/google/keyword_overview/live', [{ keywords: del, location_code: 2840, language_code: 'en', tag: TAG }]);
       const opg = r.j?.tasks?.[0];
       if (!r.ok || opg?.status_code !== 20000) {
-        // Fx 40203 = dagsloftet ($2) er nået, 40200 = saldoen er tom
+        // Fx 40203 = dagsloftet ($3 for hele kontoen fra 10/11-2026) er nået, 40200 = saldoen er tom
         log.fejl = `HTTP ${r.status} ${opg?.status_code || r.j?.status_code || ''} ${skjul(opg?.status_message || r.j?.status_message || '')}`.trim();
         break;
       }
