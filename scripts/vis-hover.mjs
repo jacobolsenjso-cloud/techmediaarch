@@ -9,7 +9,9 @@ import os from 'node:os';
 import sharp from 'sharp';
 
 const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const BASE = 'http://localhost:8787';
+// Andet argument = andet site, fx https://www.techmediaarch.com til test på det levende site (annoncer blokeres stadig)
+const BASE = process.argv[3] || 'http://localhost:8787';
+const VAERT = new URL(BASE).hostname;
 const PORT = 9337;
 const ud = process.argv[2] || 'hover-billeder';
 fs.mkdirSync(ud, { recursive: true });
@@ -21,7 +23,7 @@ if (!svar || svar.status !== 200) { console.error('STOP: ' + BASE + ' svarer ikk
 
 // Alt andet end localhost peges væk (annonce-/YouTube-scripts får ellers Chrome uden vindue til at hænge)
 const chrome = spawn(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars',
-  '--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1',
+  `--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1, EXCLUDE ${VAERT}`,
   `--remote-debugging-port=${PORT}`, '--user-data-dir=' + path.join(os.tmpdir(), 'tma-hover-chrome'), 'about:blank'], { stdio: 'ignore' });
 
 function connect(url) {
