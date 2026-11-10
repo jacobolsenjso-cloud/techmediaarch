@@ -154,7 +154,13 @@ const nyeste = INDLAEG[0];
             ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-TJTC0HR0JK';
             document.head.appendChild(ga);
             gtag('js', new Date());
-            gtag('config', 'G-TJTC0HR0JK', window.tmaIntern ? { traffic_type: 'internal' } : {});
+            // app_display_mode (10/11-2026, appen): "standalone" = åbnet som installeret app, "browser" = almindelig fane.
+            // Sendes med hver sidevisning, så Analytics kan vise app-brug for sig (tilpasset dimension "App display mode").
+            var tmaKonf = { app_display_mode: window.tmaVisning || 'browser' };
+            if (window.tmaIntern) tmaKonf.traffic_type = 'internal';
+            gtag('config', 'G-TJTC0HR0JK', tmaKonf);
+            // Først EFTER config: en hændelse lagt i kø før config når ikke frem til målingen
+            if (window.tmaAppAaben) gtag('event', 'app_open', {});
           }
           // AdSense: samme konto som før (pub-9695260339642032), auto-annoncer
           var ad = document.createElement('script');
@@ -171,6 +177,45 @@ const nyeste = INDLAEG[0];
         else window.addEventListener('load', naarLedig, { once: true });
         // Læseren rører siden: hent med det samme, så annoncer ikke kommer for sent
         ['scroll', 'pointerdown', 'keydown'].forEach(function (h) { window.addEventListener(h, hentGoogle, { once: true, passive: true }); });
+      })();
+    </script>
+
+    {/* Appen (10/11-2026, Jacob: "byg appen ligesom techfeedwatch"): service workeren (public/sw.js) registreres
+        EFTER load, så den aldrig konkurrerer med tekst, skrifter eller annoncer. Annoncer og Analytics går urørt
+        uden om den. Her måles også, om siden er åbnet som installeret app (window.tmaVisning, sendes til Analytics
+        ovenfor), og installationsknappen på /app gøres klar (Chrome/Edge/Android giver "beforeinstallprompt"). */}
+    <script is:inline>
+      (function () {
+        var mq = window.matchMedia ? window.matchMedia('(display-mode: standalone)') : null;
+        window.tmaVisning = ((mq && mq.matches) || navigator.standalone === true) ? 'standalone' : 'browser';
+        var maal = function (navn, data) { if (typeof gtag === 'function') gtag('event', navn, data || {}); };
+        // Én "app_open" pr. gang appen startes (ikke pr. side)
+        if (window.tmaVisning === 'standalone') {
+          // Selve hændelsen sendes af Google-indlæseren ovenfor, lige efter config
+          try { if (!sessionStorage.getItem('tma-app-aaben')) { sessionStorage.setItem('tma-app-aaben', '1'); window.tmaAppAaben = true; } } catch (e) {}
+        }
+        window.addEventListener('beforeinstallprompt', function (e) {
+          e.preventDefault(); // Browserens egen bjælke vises ikke; knappen på /app bruger hændelsen i stedet
+          window.tmaInstall = e;
+          document.dispatchEvent(new Event('tma-kan-installeres'));
+        });
+        window.addEventListener('appinstalled', function () {
+          window.tmaInstall = null;
+          maal('app_installed', {});
+          document.dispatchEvent(new Event('tma-installeret'));
+        });
+        if ('serviceWorker' in navigator) {
+          var reg = function () {
+            // updateViaCache 'none': sw.js hentes altid fra nettet, så ingen sidder fast på en gammel udgave
+            navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' }).catch(function () { /* sitet virker fint uden */ });
+          };
+          if (document.readyState === 'complete') reg(); else window.addEventListener('load', reg, { once: true });
+        }
+        // Til knapperne (Save, push): service workeren, når den er klar — men aldrig ventetid for evigt
+        window.tmaSw = function () {
+          if (!('serviceWorker' in navigator)) return Promise.reject(new Error('sw'));
+          return Promise.race([navigator.serviceWorker.ready, new Promise(function (_, nej) { setTimeout(function () { nej(new Error('sw')); }, 8000); })]);
+        };
       })();
     </script>
 
@@ -717,6 +762,11 @@ const nyeste = INDLAEG[0];
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
           Read later
         </a>
+        {/* Appen (10/11-2026): installér + daglig besked */}
+        <a href="/app" class={`nav-item ${aktiv('/app') ? 'active' : ''}`}>
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>
+          Get the app
+        </a>
         <hr class="nav-sep" />
         <a href="/p/sitemap" class={`nav-item ${aktiv('/p/sitemap') ? 'active' : ''}`}>
           <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
@@ -765,6 +815,7 @@ const nyeste = INDLAEG[0];
                   <a href="/a-z" class="footer-link">A–Z index</a>
                   <a href="/p/sitemap" class="footer-link">Sitemap</a>
                   <a href="/rss.xml" class="footer-link">RSS</a>
+                  <a href="/app" class="footer-link">Get the app</a>
                 </div>
                 <div class="footer-col">
                   <span class="footer-col-titel">About</span>
@@ -793,6 +844,88 @@ const nyeste = INDLAEG[0];
     </div>
 
     <button type="button" id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to top" title="Scroll to top">↑</button>
+
+    {/* Push-beskeder (appen trin 3, 10/11-2026; som techfeedwatch: højst 1 om dagen). Tegner knappen i alle
+        [data-push-felt] (siden /app). iPhone/iPad kan kun få beskeder fra en installeret app (Apples regel), så
+        dér vises en vejledning til "Add to Home Screen" i stedet. Tilmeldingen ligger hos tma-push (cloudflare/tma-push):
+        kun push-adressen, intet navn, ingen mail, ingen IP. */}
+    <script is:inline>
+      (function () {
+        var API = 'https://tma-push.jacobolsenjso.workers.dev';
+        var VAPID = 'BF6qTvgEwd0bz_zmMlFKnlhrdHU6VsrfnspU6iyChKJ-oBpsOQCcqEXKv7VXEFeF42p7GUt16SyNvajeBoLTDn4';
+        var laes = function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+        var skriv = function (k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+        var maal = function (navn) { if (typeof gtag === 'function') gtag('event', navn, {}); };
+        var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        var installeret = window.tmaVisning === 'standalone';
+        var kan = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+        var travl = false, fejltekst = '';
+        function tilstand() {
+          if (iOS && !installeret) return 'ios';
+          if (!kan) return 'ikke';
+          if (Notification.permission === 'denied') return 'blokeret';
+          return laes('tma_push') ? 'til' : 'fra';
+        }
+        function noegle() {
+          var s = VAPID.replace(/-/g, '+').replace(/_/g, '/'); s += '='.repeat((4 - s.length % 4) % 4);
+          var r = atob(s), u = new Uint8Array(r.length); for (var i = 0; i < r.length; i++) u[i] = r.charCodeAt(i); return u;
+        }
+        function send(sti, data) {
+          return fetch(API + sti, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) })
+            .then(function (r) { if (!r.ok) throw new Error(sti + ' ' + r.status); });
+        }
+        // Husk hvilken push-adresse tma-push kender, og hvornår (browsere kan skifte adressen)
+        function husk(s) { if (s) skriv('tma_push_synk', { ep: s.endpoint, t: Date.now() }); }
+        function tilmeld() {
+          return Notification.requestPermission().then(function (svar) {
+            if (svar !== 'granted') return;
+            return window.tmaSw().then(function (reg) {
+              return reg.pushManager.getSubscription().then(function (s) { return s || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: noegle() }); });
+            }).then(function (s) {
+              return send('/subscribe', { subscription: s.toJSON() }).then(function () { skriv('tma_push', 1); husk(s); maal('push_subscribe'); });
+            });
+          });
+        }
+        function afmeld() {
+          return window.tmaSw().then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (s) {
+            if (!s) return;
+            return send('/unsubscribe', { endpoint: s.endpoint }).catch(function () {}).then(function () { return s.unsubscribe(); });
+          }).then(function () { skriv('tma_push', null); skriv('tma_push_synk', null); maal('push_unsubscribe'); });
+        }
+        // Fornyer tilmeldingen højst en gang om ugen (tma-push glemmer den efter 180 dage uden besøg)
+        function synk() {
+          if (!kan || !laes('tma_push') || Notification.permission !== 'granted') return;
+          window.tmaSw().then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (s) {
+            if (!s) { skriv('tma_push', null); tegn(); return; }
+            var sidst = laes('tma_push_synk') || {};
+            if (sidst.ep === s.endpoint && Date.now() - (sidst.t || 0) < 7 * 864e5) return;
+            return send('/subscribe', { subscription: s.toJSON() }).then(function () { husk(s); });
+          }).catch(function () {});
+        }
+        var TEKST = {
+          fra: '<button type="button" class="push-knap" data-push-handling="til">Get a daily notification</button><span class="push-note">At most one a day, when there is a new answer. Turn it off anytime.</span>',
+          til: '<span class="push-paa">Daily notification is on</span><button type="button" class="push-link" data-push-handling="fra">Turn off</button>',
+          blokeret: '<span class="push-note">Notifications are blocked for this site. Allow them in your browser\'s site settings to get a daily notification.</span>',
+          ikke: '<span class="push-note">This browser can\'t show notifications. They work in Chrome, Edge, Firefox and Safari.</span>',
+          ios: '<span class="push-note">On iPhone and iPad, Apple only allows notifications from installed apps. Install Tech Media Arch first (see above), open it from your home screen, and come back to this page.</span>',
+        };
+        function tegn() {
+          var t = tilstand(), html = TEKST[t] + (fejltekst ? '<span class="push-fejl" role="alert">' + fejltekst + '</span>' : '');
+          document.querySelectorAll('[data-push-felt]').forEach(function (el) { el.innerHTML = html; el.setAttribute('data-push-tilstand', t); el.hidden = false; });
+        }
+        document.addEventListener('click', function (e) {
+          var k = e.target.closest && e.target.closest('[data-push-handling]'); if (!k || travl) return;
+          travl = true; fejltekst = ''; k.disabled = true;
+          (k.getAttribute('data-push-handling') === 'til' ? tilmeld() : afmeld())
+            .catch(function () { fejltekst = 'Something went wrong. Please try again.'; })
+            .then(function () { travl = false; tegn(); });
+        });
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tegn); else tegn();
+        // Har læseren slået beskeder fra i browseren, ryddes markeringen, så knappen viser det rigtige
+        if (kan && laes('tma_push') && Notification.permission !== 'granted') skriv('tma_push', null);
+        setTimeout(synk, 6000); // efter siden er færdig — konkurrerer ikke med indholdet
+      })();
+    </script>
 
     {/* "Cookie settings" åbner Googles egen samtykkedialog igen — vises kun,
         når Googles CMP faktisk er indlæst. */}

@@ -666,8 +666,34 @@ const crumbs = krumme ? [krumme, { navn: p.title, href: p.href }] : [{ navn: p.t
             if (i === -1) { liste.unshift({ href: artikel.href, title: artikel.title, img: artikel.img, savedAt: Date.now() }); maal('save_article', {}); }
             else liste.splice(i, 1);
             gem('tmaSaved', liste.slice(0, 100)); visGem();
+            offline(i === -1 ? 'gem' : 'fjern');
           });
         });
+        // Appen trin 2 (10/11-2026): en gemt artikel lægges også i telefonens offline-lager (public/sw.js), så den kan
+        // læses uden net. Billederne er dem, browseren faktisk viste her (currentSrc), ikke alle størrelser i srcset.
+        // Uden service worker (gammel browser, privat vindue) virker Save som før — kun uden offline-kopi.
+        var offline = function (handling) {
+          if (!window.tmaSw) return;
+          var send = function (billeder) {
+            window.tmaSw().then(function (reg) {
+              if (reg.active) reg.active.postMessage({ type: handling, href: artikel.href, billeder: billeder });
+            }).catch(function () {});
+          };
+          if (handling !== 'gem') { send([]); return; }
+          // Billeder længere nede er ikke hentet endnu (loading="lazy"). De hentes nu, så browseren selv vælger den
+          // rigtige størrelse/WebP-fil — den samme, den vil bede om igen uden net. Højst 5 sekunders ventetid.
+          var imgs = Array.prototype.slice.call(document.querySelectorAll('.post-body img'));
+          imgs.forEach(function (b) { b.loading = 'eager'; });
+          Promise.race([
+            Promise.all(imgs.map(function (b) { return b.complete ? null : new Promise(function (ok) { b.addEventListener('load', ok, { once: true }); b.addEventListener('error', ok, { once: true }); }); })),
+            new Promise(function (ok) { setTimeout(ok, 5000); }),
+          ]).then(function () {
+            // Miniaturen til listen på /read-later først, så den også vises uden net
+            var billeder = artikel.img ? [artikel.img] : [];
+            imgs.forEach(function (b) { var s = b.currentSrc || b.src; if (s && billeder.indexOf(s) === -1) billeder.push(s); });
+            send(billeder);
+          });
+        };
         visGem();
       }
 

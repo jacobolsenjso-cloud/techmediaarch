@@ -1,0 +1,109 @@
+---
+// /app (10/11-2026, appen): "Get the app" — installér Tech Media Arch på hjemmeskærmen og slå den daglige besked til.
+// Installér-knappen virker i Chrome, Edge og Android (browserens "beforeinstallprompt", gemt af MainLayout som
+// window.tmaInstall). Safari på iPhone/iPad og Firefox har ingen knap — dér vises en kort vejledning.
+// noindex: siden er en funktion for læserne, ikke et svar til Google (og den står ikke i sitemap).
+import MainLayout from '../layouts/MainLayout.astro';
+---
+<MainLayout title="Get the Tech Media Arch app" description="Install Tech Media Arch on your phone or computer: one tap to open, saved articles to read offline, and an optional daily notification." noindex breadcrumb={[{ navn: 'Get the app', href: '/app' }]}>
+  <div class="page-wrapper app-wrap">
+    <div class="app-top">
+      <img src="/icon-192.png" alt="" width="72" height="72" class="app-ikon" />
+      <div>
+        <h1>Get the Tech Media Arch app</h1>
+        <p class="app-lead">The same answers, one tap away. It's free, takes a few seconds, and needs no app store.</p>
+      </div>
+    </div>
+
+    <section class="app-kort" aria-labelledby="appInstall">
+      <h2 id="appInstall">Install</h2>
+      <div id="appInstallFelt">
+        <p class="app-ok" id="appErInstalleret" hidden>You're using the app. Welcome!</p>
+        <button type="button" class="push-knap" id="appInstallKnap" hidden>Install the app</button>
+        <div id="appVejledning">
+          <details class="app-trin" data-platform="ios">
+            <summary>iPhone or iPad (Safari)</summary>
+            <ol><li>Tap the <strong>Share</strong> button (the square with an arrow).</li><li>Choose <strong>Add to Home Screen</strong>, then tap <strong>Add</strong>.</li></ol>
+          </details>
+          <details class="app-trin" data-platform="android">
+            <summary>Android (Chrome)</summary>
+            <ol><li>Tap the <strong>⋮</strong> menu at the top right.</li><li>Choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li></ol>
+          </details>
+          <details class="app-trin" data-platform="computer">
+            <summary>Computer (Chrome or Edge)</summary>
+            <ol><li>Click the install icon at the right end of the address bar, or open the browser menu.</li><li>Choose <strong>Install Tech Media Arch</strong>.</li></ol>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="app-kort" aria-labelledby="appFaar">
+      <h2 id="appFaar">What you get</h2>
+      <ul class="app-liste">
+        <li><strong>One tap to open.</strong> Tech Media Arch gets its own icon and opens without the browser bars.</li>
+        <li><strong>Read offline.</strong> Articles you save with the <strong>Save</strong> button can be read without a connection, on the <a href="/read-later">Read later</a> page.</li>
+        <li><strong>A daily notification, if you want it.</strong> At most one a day, only when there is a new answer.</li>
+      </ul>
+    </section>
+
+    <section class="app-kort" aria-labelledby="appBesked">
+      <h2 id="appBesked">Daily notification</h2>
+      <div class="push-felt" data-push-felt hidden></div>
+      <p class="app-privat">Nothing about you is stored: only the anonymous address your browser uses for notifications. Read more in our <a href="/p/privacy-policy">Privacy Policy</a>.</p>
+    </section>
+  </div>
+
+  <style is:global>
+    .app-wrap { max-width: 760px; padding-top: 28px; padding-bottom: 56px; }
+    .app-top { display: flex; gap: 18px; align-items: center; margin-bottom: 26px; }
+    .app-ikon { width: 72px; height: 72px; border-radius: 18px; box-shadow: var(--shadow); flex: none; }
+    .app-top h1 { margin: 0 0 6px; font-size: 1.9rem; line-height: 1.15; }
+    .app-lead { margin: 0; font-family: var(--font-serif); font-size: 1.08rem; line-height: 1.55; color: var(--ink-2); }
+    .app-kort { background: var(--card-bg); border: 1px solid var(--rule-light); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 20px 22px; margin-bottom: 18px; }
+    .app-kort h2 { margin: 0 0 12px; font-size: 1.2rem; }
+    .app-ok { margin: 0; font-weight: 600; color: var(--verified); }
+    .app-trin { border-top: 1px solid var(--rule-light); }
+    .app-trin:first-child { border-top: 0; }
+    .app-trin summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+    .app-trin ol { margin: 0 0 12px; padding-left: 1.3em; font-family: var(--font-serif); line-height: 1.6; }
+    .app-trin[data-foreslaaet] summary::after { content: 'Your device'; margin-left: 10px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+    .app-liste { margin: 0; padding-left: 1.2em; font-family: var(--font-serif); line-height: 1.6; display: flex; flex-direction: column; gap: 8px; }
+    .app-liste a, .app-privat a { color: var(--teal-text); }
+    .app-privat { margin: 14px 0 0; font-size: 0.88rem; color: var(--muted); line-height: 1.5; }
+    /* Knapperne bruges også af push-feltet (tegnet af MainLayout) */
+    .push-felt { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+    .push-knap { font: inherit; font-size: 0.98rem; font-weight: 600; min-height: 46px; padding: 0 22px; border-radius: var(--radius); border: 0; background: var(--teal); color: var(--bg-color); cursor: pointer; }
+    .push-knap:disabled { opacity: 0.6; cursor: wait; }
+    .push-note { color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+    .push-paa { font-weight: 600; color: var(--verified); }
+    .push-link { font: inherit; font-size: 0.92rem; background: none; border: 0; padding: 0 4px; min-height: 44px; color: var(--teal-text); text-decoration: underline; cursor: pointer; }
+    .push-fejl { flex-basis: 100%; color: #b42318; font-size: 0.9rem; }
+    body.dark-mode .push-fejl { color: #ff8a80; }
+    @media (max-width: 600px) { .app-top { align-items: flex-start; } .app-ikon { width: 56px; height: 56px; border-radius: 14px; } .app-top h1 { font-size: 1.55rem; } }
+  </style>
+
+  <script is:inline>
+    (function () {
+      var knap = document.getElementById('appInstallKnap'), vejl = document.getElementById('appVejledning'), ok = document.getElementById('appErInstalleret');
+      var maal = function (navn) { if (typeof gtag === 'function') gtag('event', navn, {}); };
+      var ua = navigator.userAgent;
+      var platform = (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) ? 'ios' : (/Android/.test(ua) ? 'android' : 'computer');
+      // Læserens egen enhed åbnes og markeres; de andre står lukket nedenunder
+      var egen = vejl.querySelector('[data-platform="' + platform + '"]');
+      if (egen) { egen.open = true; egen.setAttribute('data-foreslaaet', ''); vejl.insertBefore(egen, vejl.firstChild); }
+      var vis = function () {
+        if (window.tmaVisning === 'standalone') { ok.hidden = false; knap.hidden = true; vejl.hidden = true; return; }
+        knap.hidden = !window.tmaInstall;
+      };
+      knap.addEventListener('click', function () {
+        var e = window.tmaInstall; if (!e) return;
+        maal('app_install_click');
+        e.prompt();
+        (e.userChoice || Promise.resolve({})).then(function (valg) { if (valg && valg.outcome === 'accepted') { ok.hidden = false; ok.textContent = 'Installed! Open Tech Media Arch from your home screen or app list.'; vejl.hidden = true; } window.tmaInstall = null; vis(); });
+      });
+      document.addEventListener('tma-kan-installeres', vis);
+      document.addEventListener('tma-installeret', function () { ok.hidden = false; ok.textContent = 'Installed! Open Tech Media Arch from your home screen or app list.'; knap.hidden = true; vejl.hidden = true; });
+      vis();
+    })();
+  </script>
+</MainLayout>

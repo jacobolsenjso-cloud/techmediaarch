@@ -1,0 +1,35 @@
+# tma-push (10/11-2026, appen trin 3): push-beskeder for techmediaarch.com. Lavet af opret.mjs.
+# Udgives KUN med udgiv.cmd i denne mappe (= npx wrangler deploy -c wrangler.toml).
+name = "tma-push"
+main = "worker.mjs"
+compatibility_date = "2026-11-01"
+# Offentlig adresse (workers.dev): sitet sender tilmeldinger hertil og henter beskedens tekst.
+workers_dev = true
+preview_urls = false
+
+[[kv_namespaces]]
+binding = "SUBS"
+id = "41757c1e3188441ea50d09660d02e692"
+
+# Højst 10 tilmeldinger i minuttet pr. afsender (som tfw-push), ellers kunne et script fylde lageret.
+# namespace_id 1702: techfeedwatch bruger 1701 — de to tællere må ikke blandes.
+[[ratelimits]]
+name = "BEGRAENS"
+namespace_id = "1702"
+simple = { limit = 10, period = 60 }
+
+# Udsendelsen: hvert 10. minut 17:00-18:50 UTC = 18:00-19:50 dansk vintertid (19:00-20:50 sommertid),
+# efter eftermiddagens artikel (robotten starter 16:43). Én portion á 40 pr. kørsel; KV sørger for, at
+# ingen får to beskeder samme dag. 12 kørsler = plads til ca. 480 tilmeldte — skal udvides, når der er flere.
+# Bruger 1 af kontoens 5 gratis tidsplaner (de andre: tfw-starter, tma-starter).
+[triggers]
+crons = ["*/10 17-18 * * *"]
+
+[vars]
+# Den OFFENTLIGE halvdel af push-nøglen (står også i sitets kode, src/layouts/MainLayout.astro). Den hemmelige
+# halvdel er secret VAPID_PRIVATE_JWK, lagt af opret.mjs uden at blive vist eller gemt.
+VAPID_PUBLIC = "BF6qTvgEwd0bz_zmMlFKnlhrdHU6VsrfnspU6iyChKJ-oBpsOQCcqEXKv7VXEFeF42p7GUt16SyNvajeBoLTDn4"
+
+# Ingen logning: privatlivspolitikken lover, at vi ikke gemmer IP-adresser med tilmeldingen.
+[observability]
+enabled = false

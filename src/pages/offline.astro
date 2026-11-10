@@ -1,0 +1,64 @@
+---
+// Offline-siden (10/11-2026, appen trin 1): vises af service workeren (public/sw.js), når der ikke er
+// forbindelse, og siden ikke findes i telefonens gemte kopier. noindex — den skal aldrig i søgeresultater,
+// og den står ikke i sitemap (kun SIDER og hylder gør). Listen over gemte artikler laves af scriptet
+// nedenfor ud fra "Read later" (localStorage tmaSaved) og viser kun dem, der faktisk ligger gemt offline.
+import MainLayout from '../layouts/MainLayout.astro';
+---
+<MainLayout title="You're offline" description="Tech Media Arch could not reach the network. Articles you saved are still here." noindex>
+  <div class="page-wrapper offline-wrap">
+    <svg class="offline-ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 1l22 22"/><path d="M16.7 11.7a6 6 0 0 0-3.4-1.6"/><path d="M5 12.5a10 10 0 0 1 3.5-2.2"/><path d="M2 8.8a15 15 0 0 1 5-3"/><path d="M22 8.8a15 15 0 0 0-8.7-3.7"/><path d="M8.5 16.2a4 4 0 0 1 5 0"/><circle cx="12" cy="20" r="0.6"/></svg>
+    <h1>You're offline</h1>
+    <p class="offline-lead">We couldn't reach the network. Articles you saved with the <strong>Save</strong> button can still be read, and so can pages you opened recently. This page reconnects on its own when you're back online.</p>
+    <div class="offline-knapper">
+      <button type="button" id="offlineRetry" class="offline-knap offline-knap-primaer">Try again</button>
+      <a href="/read-later" class="offline-knap">Read later</a>
+    </div>
+    <p class="offline-status" id="offlineStatus" role="status" hidden>Back online, reloading…</p>
+    <section class="offline-gemte" id="offlineGemte" hidden>
+      <h2>Saved for offline reading</h2>
+      <ul id="offlineListe"></ul>
+    </section>
+  </div>
+
+  <style is:global>
+    .offline-wrap { max-width: 560px; padding-top: 64px; padding-bottom: 64px; text-align: center; }
+    .offline-ikon { width: 56px; height: 56px; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; margin-bottom: 18px; }
+    .offline-wrap h1 { margin: 0 0 10px; font-size: 1.8rem; }
+    .offline-lead { margin: 0 0 26px; font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.6; color: var(--ink-2); }
+    .offline-knapper { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .offline-knap { font: inherit; font-size: 0.95rem; font-weight: 600; min-height: 44px; padding: 0 22px; border-radius: var(--radius); display: inline-flex; align-items: center; cursor: pointer; text-decoration: none; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); }
+    .offline-knap-primaer { background: var(--teal); color: var(--bg-color); border-color: var(--teal); }
+    .offline-status { margin-top: 18px; font-weight: 600; color: var(--teal-text); }
+    .offline-gemte { margin-top: 40px; text-align: left; }
+    .offline-gemte h2 { font-size: 1.15rem; margin: 0 0 10px; }
+    .offline-gemte ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .offline-gemte a { display: block; padding: 12px 14px; min-height: 44px; box-sizing: border-box; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); color: var(--text-color); text-decoration: none; font-weight: 600; line-height: 1.4; }
+    .offline-gemte a:hover { border-color: var(--teal); color: var(--teal-text); }
+  </style>
+
+  <script is:inline>
+    (function () {
+      var knap = document.getElementById('offlineRetry'), status = document.getElementById('offlineStatus');
+      if (knap) knap.addEventListener('click', function () { location.reload(); });
+      window.addEventListener('online', function () { if (status) status.hidden = false; setTimeout(function () { location.reload(); }, 600); });
+      // Gemte artikler, der faktisk ligger i telefonens offline-lager (cachen "tma-gemte", se sw.js)
+      var gemte = [];
+      try { gemte = JSON.parse(localStorage.getItem('tmaSaved') || '[]'); } catch (e) {}
+      if (!('caches' in window) || !gemte.length) return;
+      caches.open('tma-gemte').then(function (c) {
+        return Promise.all(gemte.map(function (x) {
+          if (!x || typeof x.href !== 'string' || !/^\/[^/]/.test(x.href)) return null;
+          return c.match(x.href).then(function (hit) { return hit ? x : null; });
+        }));
+      }).then(function (fundne) {
+        var liste = document.getElementById('offlineListe'), boks = document.getElementById('offlineGemte');
+        fundne.filter(Boolean).forEach(function (x) {
+          var li = document.createElement('li'), a = document.createElement('a');
+          a.href = x.href; a.textContent = x.title || x.href; li.appendChild(a); liste.appendChild(li);
+        });
+        if (liste.children.length) boks.hidden = false;
+      }).catch(function () {});
+    })();
+  </script>
+</MainLayout>

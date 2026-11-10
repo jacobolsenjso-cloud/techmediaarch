@@ -20,6 +20,10 @@ import MainLayout from '../layouts/MainLayout.astro';
     .rl-title { font-weight: 600; font-size: 1.02rem; line-height: 1.4; color: var(--text-color); text-decoration: none; }
     .rl-title:hover { text-decoration: underline; }
     .rl-date { display: block; margin-top: 4px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+    /* "Available offline" (appen trin 2): grøn som "Verified"-stemplet, med en lille prik */
+    .rl-offline { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--verified); }
+    .rl-offline::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .rl-offline[hidden] { display: none; }
     .rl-remove { min-height: 44px; padding: 0 14px; background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius); color: var(--text-color); font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
     .rl-remove:hover { background: var(--hover-bg); }
     .rl-empty { background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: var(--radius); padding: 28px 24px; color: var(--muted); }
@@ -57,6 +61,30 @@ import MainLayout from '../layouts/MainLayout.astro';
       var dato = function (t) { try { return new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return ''; } };
       // Kun adresser på sitet selv (begynder med én /) — alt andet springes over
       var gyldig = function (x) { return x && typeof x.href === 'string' && /^\/[^/]/.test(x.href); };
+      // Appen trin 2 (10/11-2026): gemte artikler ligger også i telefonens offline-lager (cachen "tma-gemte", public/sw.js).
+      // Listen viser "Available offline" ved dem, der ligger der. Artikler gemt før appen fandtes (eller hvor
+      // hentningen fejlede) hentes ind nu, når der er net — kun selve siden og miniaturen.
+      var tilSw = function (type, x) {
+        if (!window.tmaSw) return;
+        window.tmaSw().then(function (reg) { if (reg.active) reg.active.postMessage({ type: type, href: x.href, billeder: x.img ? [x.img] : [] }); }).catch(function () {});
+      };
+      var forsoegt = {};
+      var markerOffline = function () {
+        if (!('caches' in window)) return;
+        caches.open('tma-gemte').then(function (c) {
+          liste.querySelectorAll('.rl-item').forEach(function (r) {
+            var href = r.getAttribute('data-href');
+            c.match(href).then(function (hit) {
+              var m = r.querySelector('.rl-offline');
+              if (m) m.hidden = !hit;
+              // Kun ét forsøg pr. artikel pr. besøg: fejler hentningen, svarer service workeren — uden denne vagt
+              // ville svaret starte et nyt forsøg i ring
+              if (!hit && navigator.onLine && !forsoegt[href]) { forsoegt[href] = 1; tilSw('gem', { href: href, img: r.getAttribute('data-img') }); }
+            });
+          });
+        }).catch(function () {});
+      };
+      if (navigator.serviceWorker) navigator.serviceWorker.addEventListener('message', function (e) { if (e.data && e.data.type === 'tma-gemt') markerOffline(); });
       var tegn = function () {
         var gemte = hent().filter(gyldig);
         liste.textContent = '';
@@ -66,12 +94,14 @@ import MainLayout from '../layouts/MainLayout.astro';
         if (gemte.length) antal.textContent = gemte.length + (gemte.length === 1 ? ' article saved' : ' articles saved') + ' · kept only in this browser';
         gemte.forEach(function (x) {
           var r = document.createElement('div'); r.className = 'rl-item';
+          r.setAttribute('data-href', x.href); if (x.img && /^\//.test(x.img)) r.setAttribute('data-img', x.img);
           var thumb = document.createElement('a'); thumb.className = 'rl-thumb'; thumb.href = x.href; thumb.tabIndex = -1; thumb.setAttribute('aria-hidden', 'true');
           if (x.img && /^\//.test(x.img)) { var img = document.createElement('img'); img.src = x.img; img.alt = ''; img.loading = 'lazy'; thumb.appendChild(img); }
           var tekst = document.createElement('div');
           var a = document.createElement('a'); a.className = 'rl-title'; a.href = x.href; a.textContent = x.title || x.href;
           var d = document.createElement('span'); d.className = 'rl-date'; d.textContent = x.savedAt ? 'Saved ' + dato(x.savedAt) : '';
-          tekst.appendChild(a); tekst.appendChild(d);
+          var off = document.createElement('span'); off.className = 'rl-offline'; off.textContent = 'Available offline'; off.hidden = true;
+          tekst.appendChild(a); tekst.appendChild(d); tekst.appendChild(off);
           var fjern = document.createElement('button'); fjern.type = 'button'; fjern.className = 'rl-remove'; fjern.textContent = 'Remove';
           fjern.setAttribute('aria-label', 'Remove ' + (x.title || 'article') + ' from Read later');
           fjern.addEventListener('click', function () {
@@ -80,16 +110,19 @@ import MainLayout from '../layouts/MainLayout.astro';
             if (i === -1) return;
             sidst = { item: l[i], i: i };
             l.splice(i, 1); skriv(l); tegn();
+            tilSw('fjern', x);
             toast.hidden = false; clearTimeout(toastTimer);
             toastTimer = setTimeout(function () { toast.hidden = true; }, 6000);
           });
           r.appendChild(thumb); r.appendChild(tekst); r.appendChild(fjern);
           liste.appendChild(r);
         });
+        markerOffline();
       };
       fortryd.addEventListener('click', function () {
         if (!sidst) return;
         var l = hent(); l.splice(Math.min(sidst.i, l.length), 0, sidst.item); skriv(l);
+        tilSw('gem', sidst.item);
         sidst = null; toast.hidden = true; tegn();
       });
       tegn();

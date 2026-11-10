@@ -2,10 +2,10 @@
 title: Privacy policy
 description: "What personal data Tech Media Arch processes (analytics, ads, hosting, email), why, for how long, and your rights under the GDPR."
 published: 2026-02-16T12:08:00.000+01:00
-updated: 2026-11-02T12:00:00.000+01:00
+updated: 2026-11-10T12:00:00.000+01:00
 bloggerId: "1645160759921631795"
 ---
-<p><strong>Last updated: 2 November 2026</strong></p>
+<p><strong>Last updated: 10 November 2026</strong></p>
 <p>This policy explains what personal data is processed when you visit Tech Media Arch (www.techmediaarch.com), why, and what your rights are. It describes what the site actually does.</p>
 <h2>Who is responsible</h2>
 <p>Tech Media Arch is run by Jacob S. Olsen, Denmark, who is the data controller. Contact: <a href="mailto:info@techmediaarch.com">info@techmediaarch.com</a>.</p>
@@ -23,11 +23,15 @@ bloggerId: "1645160759921631795"
 <h3>YouTube videos in older articles</h3>
 <p>Some older articles show a YouTube video. The preview image is loaded from YouTube, and the video itself is only loaded from YouTube when you click play. From then on, YouTube's own privacy policy applies.</p>
 <h3>Settings stored in your browser</h3>
-<p>If you switch between light and dark mode, the choice is saved in your browser's local storage so the page looks the same next time. It is not sent to us.</p>
+<p>If you switch between light and dark mode, the choice is saved in your browser's local storage so the page looks the same next time. The same goes for articles you save with the Save button (the Read later list) and your answers to "Was this helpful?". None of this is sent to us.</p>
+<h3>The app and offline reading</h3>
+<p>You can install Tech Media Arch as an app on your phone or computer (see <a href="/app">Get the app</a>). To make pages open when you are offline, your browser keeps copies of pages you opened recently and of the articles you saved. These copies stay on your device, are never sent to us, and are removed when you remove an article from Read later or clear the site's data in your browser.</p>
+<h3>Notifications (optional)</h3>
+<p>If you turn on the daily notification, your browser gives us an anonymous delivery address for notifications. We store only that address, on Cloudflare, to send you at most one notification a day when there is a new article. We do not store your name, email or IP address with it. You can turn notifications off at any time on the <a href="/app">Get the app</a> page, which deletes the address at once, or in your browser settings, after which the address is deleted the next time a notification cannot be delivered. If you do not visit the site for 180 days, the address is deleted automatically. The notification itself is delivered by your browser's push service (for example Google, Apple, Mozilla or Microsoft). Legal basis: consent (GDPR article 6(1)(a)).</p>
 <h3>Email</h3>
 <p>If you write to info@techmediaarch.com, we use your email address and message only to answer you, and keep them for as long as needed for that. Email is handled by our email provider, Hostinger. Legal basis: our legitimate interest in answering you (GDPR article 6(1)(f)).</p>
 <h2>Who receives data</h2>
-<p>Data is processed by the providers named above: Cloudflare (hosting and security), Google (Analytics, AdSense, consent message and YouTube) and Hostinger (email). Some of them process data outside the EU, for example in the United States. They do so under the safeguards described in their own terms, such as the EU–U.S. Data Privacy Framework or the EU's standard contractual clauses. We do not sell personal data. See also <a href="/p/we-not-sell-your-personal-information">Do Not Sell My Personal Information</a>.</p>
+<p>Data is processed by the providers named above: Cloudflare (hosting, security and notification addresses), your browser's push service (only if you turn on notifications), Google (Analytics, AdSense, consent message and YouTube) and Hostinger (email). Some of them process data outside the EU, for example in the United States. They do so under the safeguards described in their own terms, such as the EU–U.S. Data Privacy Framework or the EU's standard contractual clauses. We do not sell personal data. See also <a href="/p/we-not-sell-your-personal-information">Do Not Sell My Personal Information</a>.</p>
 <h2>Your rights</h2>
 <p>You have the right to ask for access to your data, to have it corrected or deleted, to restrict or object to its processing, to data portability, and to withdraw consent at any time without affecting earlier processing. Write to info@techmediaarch.com. Most data is held by Google and Cloudflare; we will help you with your request as far as we can.</p>
 <p>You can also complain to the Danish Data Protection Agency (Datatilsynet), <a href="https://www.datatilsynet.dk" rel="noopener" target="_blank">www.datatilsynet.dk</a>, or to the data protection authority where you live.</p>
