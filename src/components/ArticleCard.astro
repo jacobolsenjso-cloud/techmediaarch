@@ -28,7 +28,7 @@ const emne = hylde ? { navn: hylde.navn, farve: hylde.farve } : p.emner[0];
       <Maerke id={`c${p.aar}${p.maaned}`} />{badge && <span class="card-badge">{badge}</span>}
     </div>
   )}
-  <H class="card-title">{p.title}</H>
+  <H class="card-title"><span class="streg">{p.title}</span></H>
   {!udenUdsnit && <A class="card-excerpt">{udsnit(p.description)}</A>}
   <A class="card-meta">
     {/* Hylden på sin egen linje (1/11-2026): med de længere hyldenavne brød datoen ellers om med en løs "·" for enden */}

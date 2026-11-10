@@ -198,7 +198,7 @@ const VEJE = [
         <a href={hoved.href} class="lead-card" style={maerke(hoved) ? `--tag-accent: ${maerke(hoved)!.farve}` : undefined}>
           {hoved.image ? <div class="card-thumb"><picture class="tma-pic">{webpSrcset(hoved.image) && <source type="image/webp" srcset={webpSrcset(hoved.image)} sizes="(max-width: 700px) 92vw, 700px" />}<img src={hoved.image} srcset={miniSrcset(hoved.image) || undefined} sizes="(max-width: 700px) 92vw, 700px" alt="" loading="eager" /></picture></div> : null}
           {maerke(hoved) && <span class="lead-eyebrow">{maerke(hoved)!.navn}</span>}
-          <h2 class="lead-title">{hoved.title}</h2>
+          <h2 class="lead-title"><span class="streg">{hoved.title}</span></h2>
           <p class="lead-excerpt">{udsnit(hoved.description, 230)}</p>
           <p class="card-meta"><span>{datoTekst(hoved.published)}</span><span aria-hidden="true">·</span><span>{hoved.minutter} min read</span></p>
         </a>
@@ -209,7 +209,7 @@ const VEJE = [
               <div>
                 {/* Mærke over titlen (Jacob 5/10-2026), som på hovedhistorien — fra 28/10 hylden i stedet for emnet */}
                 {maerke(p) && <span class="lead-eyebrow lead-mini-eyebrow">{maerke(p)!.navn}</span>}
-                <h3 class="lead-mini-title">{p.title}</h3>
+                <h3 class="lead-mini-title"><span class="streg">{p.title}</span></h3>
                 <p class="card-meta"><span>{datoTekst(p.published)}</span></p>
               </div>
             </a>
@@ -248,7 +248,7 @@ const VEJE = [
         <div class="hylde-afsnit-grid">
           <a href={stor.href} class="hylde-stor">
             {stor.image && <picture class="tma-pic">{webpSrcset(stor.image) && <source type="image/webp" srcset={webpSrcset(stor.image)} sizes="(max-width: 860px) 92vw, 620px" />}<img src={stor.image} srcset={miniSrcset(stor.image) || undefined} sizes="(max-width: 860px) 92vw, 620px" alt="" loading="lazy" decoding="async" /></picture>}
-            <span class="hylde-stor-titel">{stor.title}</span>
+            <span class="hylde-stor-titel"><span class="streg">{stor.title}</span></span>
             {stor.description && <span class="hylde-stor-besk">{stor.description}</span>}
             <span class="hylde-stor-meta">{datoTekst(stor.published)} · {stor.minutter} min read</span>
           </a>

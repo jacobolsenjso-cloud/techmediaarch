@@ -17,7 +17,7 @@ const maerke = h ? { navn: h.navn, farve: h.farve } : p.emner[0] ? { navn: p.emn
     : <span class="raekke-tom" style={maerke ? `--h: ${maerke.farve}` : undefined}></span>}
   <span class="raekke-tekst">
     {hylde && maerke && <span class="raekke-maerke" style={`--h: ${maerke.farve}`}>{maerke.navn}</span>}
-    <span class="raekke-titel">{p.title}</span>
+    <span class="raekke-titel"><span class="streg">{p.title}</span></span>
     {besk && p.description && <span class="raekke-besk">{p.description}</span>}
     <span class="raekke-meta">{datoTekst(p.published)} · {p.minutter} min read</span>
   </span>

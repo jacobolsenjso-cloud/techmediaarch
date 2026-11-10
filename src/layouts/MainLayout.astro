@@ -646,41 +646,91 @@ const nyeste = INDLAEG[0];
         :is(.lead-card, .lead-mini, .side-item, .home-search button, .share-cta-btn, .action-pill, .post-body a.tma-knap, button[type="submit"], .nav-card, .article-card):hover { transform: none !important; }
       }
 
-      /* ===== Hover 2.0 (10/11-2026, Jacob: "gør hover-effekten lidt mere tydelig ... lidt mere lækker") =====
-         Ét sæt regler for ALLE artikler, der kan klikkes: kort (forside, Latest, søgning, relaterede), rækker (hylder,
-         All articles, forsidens hyldeafsnit), sidekolonnen, "Read next" og megamenuen.
-         1) Titlen bliver blå, og en blød streg glider op under den (understregning pr. linje, så lange titler også får den).
-         2) Billeder løfter sig med en blød blå skygge; billeder i en ramme zoomer også let ind (3 % — mere skar vandmærket af).
-         3) Kort med kant løfter sig 4 px med blå skær i skyggen.
-         Kun på enheder med mus (hover: hover). På telefon (ingen mus) løfter kortet sig i stedet ved tryk (klassen .tryk nedenfor).
-         Alt slås fra ved "mindre bevægelse" i styresystemet. */
-      :root { --hov-ease: cubic-bezier(0.22, 1, 0.36, 1); --hov-skaer: 0 16px 36px -14px color-mix(in srgb, var(--teal) 42%, transparent); }
-      body.dark-mode { --hov-skaer: 0 16px 36px -14px color-mix(in srgb, var(--teal) 30%, transparent); }
-      :is(.article-card .card-title, .lead-title, .lead-mini-title, .hylde-stor-titel, .raekke-titel, .hylde-raekke-titel, .side-item-title, .las-naeste-titel, .mega-nyeste-titel) {
-        text-decoration-line: underline; text-decoration-thickness: 2px; text-underline-offset: 7px; text-decoration-color: transparent;
-        /* !important: sidernes egne regler har "transition: color 0.15s" med højere vægt, så stregen ellers sprang frem i stedet for at glide */
-        transition: color 0.2s ease, text-decoration-color 0.3s ease, text-underline-offset 0.3s var(--hov-ease) !important;
+      /* ===== Hover 3.0 (10/11-2026 aften, Jacob: "hover-effekten på computeren ... lidt kedelig ... gør det mere spændende,
+         så både links og tekster og diverse genveje bliver løftet ... rigtig blødt ... stregen skal køre fra venstre mod højre")
+         Erstatter Hover 2.0 fra samme aften. Mobilens tryk-løft (.tryk nedenfor) er beholdt — "på mobilen virker det rimelig godt".
+         Tre byggeklodser:
+         1) STREGEN: titler på alle artikelkort har en <span class="streg"> om teksten. Stregen er en baggrund i logoets farver
+            (blå → lilla), der vokser fra 0 til 100 % bredde forankret i VENSTRE side — så den tegnes fra venstre mod højre, også
+            hen over flere linjer, i læseretningen. Når musen går væk, skifter forankringen til højre, og stregen trækker sig
+            ud mod højre. (text-decoration kan ikke tegnes gradvist; det kan en baggrund.)
+         2) LØFTET: kort, billeder, knapper og genveje løfter sig med "fjeder"-kurven (--hov-fjeder): hurtig start, blød
+            opbremsning og en lille, næsten usynlig efterbølge. 0,35-0,55 s — kort nok til ikke at føles langsomt.
+         3) SKYGGEN: et blødt blåt skær under det løftede (--hov-skaer), så det ser ud til at svæve lidt over siden.
+         Alt sker kun med mus (hover: hover); ved "mindre bevægelse" i styresystemet slås bevægelserne fra. */
+      :root {
+        --hov-ease: cubic-bezier(0.22, 1, 0.36, 1);
+        --hov-fjeder: cubic-bezier(0.34, 1.36, 0.64, 1);
+        --hov-skaer: 0 18px 40px -16px color-mix(in srgb, var(--teal) 45%, transparent);
+        --hov-streg: linear-gradient(90deg, var(--teal-text), #7c3aed);
       }
-      html body .article-card { transition: transform 0.35s var(--hov-ease), box-shadow 0.35s var(--hov-ease), border-color 0.3s ease; }
-      :is(.raekke, .hylde-raekke, .hylde-stor) img { transition: transform 0.45s var(--hov-ease), box-shadow 0.45s var(--hov-ease), filter 0.4s ease; }
-      :is(.article-card, .lead-card, .lead-mini, .side-item, .mega-nyeste, .las-naeste-link) img { transition: transform 0.7s var(--hov-ease), filter 0.4s ease; }
-      html body :is(.lead-card, .lead-mini, .side-item) .card-thumb { transition: transform 0.35s var(--hov-ease), box-shadow 0.35s var(--hov-ease); }
+      body.dark-mode { --hov-skaer: 0 18px 40px -16px color-mix(in srgb, var(--teal) 32%, transparent); --hov-streg: linear-gradient(90deg, var(--teal-text), #b69cff); }
+
+      /* --- 1) Stregen under titlerne --- */
+      .streg { background-image: var(--hov-streg); background-repeat: no-repeat; background-size: 0% 2px; background-position: 100% 100%; padding-bottom: 3px; transition: background-size 0.5s var(--hov-ease); }
+      /* Titlernes farve glider (sidernes egne regler har en hurtig "transition: color 0.15s" med højere vægt — derfor !important) */
+      :is(.card-title, .lead-title, .lead-mini-title, .hylde-stor-titel, .raekke-titel, .hylde-raekke-titel, .side-item-title, .las-naeste-titel, .mega-nyeste-titel) { transition: color 0.3s ease !important; text-decoration: none !important; }
+
+      /* Overgange i hvile (så bevægelsen også er blød på vej tilbage) */
+      html body :is(.article-card, .vej, .post-body a.las-naeste-link, .mega-nyeste) { transition: transform 0.5s var(--hov-fjeder), box-shadow 0.45s var(--hov-ease), border-color 0.3s ease; }
+      html body :is(.lead-card, .lead-mini, .side-item) .card-thumb { transition: transform 0.5s var(--hov-fjeder), box-shadow 0.45s var(--hov-ease); }
+      html body :is(.raekke, .hylde-raekke, .hylde-stor) img { transition: transform 0.5s var(--hov-fjeder), box-shadow 0.45s var(--hov-ease), filter 0.4s ease; }
+      html body :is(.article-card, .lead-card, .lead-mini, .side-item, .mega-nyeste, .las-naeste-link) img { transition: transform 0.9s var(--hov-ease), filter 0.4s ease; }
+      html body :is(.raekke-tekst, .hylde-raekke-tekst, .side-item-tekst, .las-naeste-tekst) { transition: transform 0.45s var(--hov-fjeder); }
+
       @media (hover: hover) {
-        :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste):hover :is(.card-title, .lead-title, .lead-mini-title, .hylde-stor-titel, .raekke-titel, .hylde-raekke-titel, .side-item-title, .las-naeste-titel, .mega-nyeste-titel) {
-          color: var(--teal-text); text-decoration-color: color-mix(in srgb, var(--teal-text) 55%, transparent); text-underline-offset: 3px;
-        }
-        /* Zoom kun 3 %: med 6 % blev vandmærket "techmediaarch.com" i billedets hjørne skåret af (målt 10/11). Løftet og
-           skyggen nedenfor gør i stedet effekten tydelig. */
-        html body :is(.article-card, .lead-card, .lead-mini, .side-item, .mega-nyeste, .las-naeste-link):hover img { transform: scale(1.03); filter: saturate(1.08) brightness(1.03); }
-        html body :is(.raekke, .hylde-raekke, .hylde-stor):hover img { transform: translateY(-3px); box-shadow: 0 0 0 1px var(--rule-light), var(--hov-skaer); filter: saturate(1.08) brightness(1.03); }
-        html body .article-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover), var(--hov-skaer); border-color: color-mix(in srgb, var(--teal) 28%, var(--rule-light)); }
-        html body :is(.lead-card, .lead-mini, .side-item):hover .card-thumb { box-shadow: var(--shadow-hover), var(--hov-skaer); transform: translateY(-4px); }
-        html body .post-body a.las-naeste-link:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover), var(--hov-skaer); }
+        /* Titlen: blå, og stregen tegnes fra venstre */
+        :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste):hover :is(.card-title, .lead-title, .lead-mini-title, .hylde-stor-titel, .raekke-titel, .hylde-raekke-titel, .side-item-title, .las-naeste-titel, .mega-nyeste-titel) { color: var(--teal-text); }
+        :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste):hover .streg { background-size: 100% 2px; background-position: 0 100%; }
+
+        /* Kort med kant svæver op */
+        html body .article-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover), var(--hov-skaer); border-color: color-mix(in srgb, var(--teal) 30%, var(--rule-light)); }
+        html body .post-body a.las-naeste-link:hover, html body .mega-nyeste:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover), var(--hov-skaer); }
+        html body .vej:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover), var(--hov-skaer); }
+        html body .vej:hover .vej-pil { transform: translateX(5px); }
+        /* Billeder uden kant: selve billedet svæver op; teksten ved siden af glider en anelse til højre */
+        html body :is(.lead-card, .lead-mini, .side-item):hover .card-thumb { transform: translateY(-5px); box-shadow: var(--shadow-hover), var(--hov-skaer); }
+        html body :is(.raekke, .hylde-raekke, .hylde-stor):hover img { transform: translateY(-5px); box-shadow: 0 0 0 1px var(--rule-light), var(--hov-skaer); filter: saturate(1.1) brightness(1.04); }
+        html body :is(.raekke, .hylde-raekke):hover :is(.raekke-tekst, .hylde-raekke-tekst), html body .side-item:hover .side-item-tekst, html body .post-body a.las-naeste-link:hover .las-naeste-tekst { transform: translateX(4px); }
+        /* Billeder i ramme zoomer langsomt (3 % — mere skar vandmærket af, målt 10/11) */
+        html body :is(.article-card, .lead-card, .lead-mini, .side-item, .mega-nyeste, .las-naeste-link):hover img { transform: scale(1.03); filter: saturate(1.1) brightness(1.04); }
+
+        /* --- 2) Genveje: menu, knapper, filtre, sidefod --- */
+        /* Topbjælkens links: stregen i logoets farver tegnes fra venstre (samme bevægelse som titlerne) */
+        html body .top-links a::after { background: var(--hov-streg); transition: transform 0.45s var(--hov-ease); }
+        /* Ikonknapperne (søg, mørk tilstand, menu) hopper blødt op */
+        html body .icon-btn { transition: transform 0.4s var(--hov-fjeder), box-shadow 0.35s var(--hov-ease), border-color 0.25s ease, color 0.25s ease, background 0.25s ease; }
+        html body .icon-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow), var(--hov-skaer); }
+        /* Menuens punkter og megamenuens hylder glider til højre; ikonet vokser en smule */
+        html body :is(.nav-item, .mega-item) { transition: transform 0.4s var(--hov-fjeder), background 0.25s ease, color 0.25s ease; }
+        html body :is(.nav-item, .mega-item):hover { transform: translateX(5px); }
+        html body :is(.nav-icon, .nav-hylde-ikon, .mega-ikon) { transition: transform 0.4s var(--hov-fjeder), opacity 0.2s ease; }
+        html body :is(.nav-item, .mega-item):hover :is(.nav-icon, .nav-hylde-ikon, .mega-ikon) { transform: scale(1.12); }
+        /* Filtre/hyldeknapper og sidetal løfter sig */
+        html body :is(.chip, .pagination-btn, .pagination-num) { transition: transform 0.4s var(--hov-fjeder), box-shadow 0.35s var(--hov-ease), background 0.25s ease, border-color 0.25s ease; }
+        html body :is(.chip, .pagination-btn, .pagination-num):hover { transform: translateY(-3px); box-shadow: var(--shadow), var(--hov-skaer); }
+        /* Knapper (Listen/Share/Save, søg, Read later, appen, PAA) løfter sig */
+        html body :is(.action-pill, .home-search button, .share-cta-btn, .post-body a.tma-knap, button[type="submit"], .push-knap, .offline-knap, .rl-remove, .pill-group button) { transition: transform 0.4s var(--hov-fjeder), box-shadow 0.35s var(--hov-ease), filter 0.25s ease, background 0.25s ease; }
+        html body :is(.action-pill, .home-search button, .share-cta-btn, .post-body a.tma-knap, button[type="submit"], .push-knap, .offline-knap, .rl-remove, .pill-group button):hover { transform: translateY(-3px); box-shadow: var(--shadow), var(--hov-skaer); filter: none; }
+        /* Spørgsmål på forsiden og "People also ask": glider til højre, pilen skubbes */
+        html body :is(.home-question, .post-body a.paa-link) { transition: transform 0.4s var(--hov-fjeder), background 0.25s ease, border-color 0.25s ease; }
+        html body :is(.home-question, .post-body a.paa-link):hover { transform: translateX(4px); }
+        html body :is(.home-question-arrow, .paa-arrow) { transition: transform 0.4s var(--hov-fjeder), color 0.25s ease !important; }
+        html body :is(.home-question:hover .home-question-arrow, .post-body a.paa-link:hover .paa-arrow) { transform: translateX(5px); }
+        /* Tekstlinks med pil ("See all →", "How we verify →", A–Z) og sidefodens links: samme streg fra venstre */
+        /* background-origin content-box: stregen sidder under selve teksten, ikke under linkets luft (sidefodens links har 5 px luft) */
+        html body :is(.hylde-afsnit-alle, .verif-link, .mega-az, .latest-more a, .footer-link, .hylde-boks a, .hylde-start-liste a) { text-decoration: none !important; background-origin: content-box; background-image: var(--hov-streg); background-repeat: no-repeat; background-size: 0% 2px; background-position: 100% 100%; transition: background-size 0.45s var(--hov-ease), color 0.25s ease, transform 0.4s var(--hov-fjeder); }
+        html body :is(.hylde-afsnit-alle, .verif-link, .mega-az, .latest-more a, .footer-link, .hylde-boks a, .hylde-start-liste a):hover { background-size: 100% 2px; background-position: 0 100%; color: var(--teal-text); }
+        /* Sidefodens links glider også en anelse til højre (de står i lodrette kolonner) */
+        html body .footer-link:hover { transform: translateX(3px); }
+        /* Links i artiklernes brødtekst: samme farvede streg, blødere og trækker sig ud mod højre */
+        html body .post-body :is(p, li) a:not(.paa-link):not(.tma-knap):not(:has(> img, > .tma-pic)) { background-image: var(--hov-streg); background-position: 100% 100%; transition: background-size 0.45s var(--hov-ease), border-color 0.25s ease, color 0.25s ease; }
+        html body .post-body :is(p, li) a:not(.paa-link):not(.tma-knap):not(:has(> img, > .tma-pic)):hover { background-position: 0 100%; }
       }
-      /* Telefon (Jacob 10/11: "når man trykker ... løfter op ... viser en skygge, så man kan se, man trykker"):
-         der findes ingen hover, så scriptet nederst sætter klassen .tryk, SÅ SNART fingeren rører et kort, og lader den
-         blive, mens næste side hentes. Kortet løfter sig med blå skygge, billedet zoomer, titlen bliver blå med streg.
-         Ruller man i stedet, fjernes .tryk med det samme, så kortene ikke hopper under fingeren. */
+
+      /* Telefon (Jacob 10/11: "når man trykker ... løfter op ... viser en skygge, så man kan se, man trykker" — beholdt fra
+         Hover 2.0, han synes det virker): scriptet nederst sætter .tryk, SÅ SNART fingeren rører et kort, og lader den blive,
+         mens næste side hentes. Ruller man i stedet, fjernes .tryk med det samme, så kortene ikke hopper under fingeren. */
       :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste, .vej).tryk { position: relative; z-index: 2; }
       html body .article-card.tryk, html body .post-body a.las-naeste-link.tryk, html body .vej.tryk { transform: translateY(-5px) scale(1.012); box-shadow: var(--shadow-hover), var(--hov-skaer); transition: transform 0.22s var(--hov-ease), box-shadow 0.22s var(--hov-ease), border-color 0.2s ease; }
       /* Kun kort uden farvet kant får blå kant — "Read next" beholder hyldens farve i venstre kant (målt 10/11) */
@@ -690,12 +740,14 @@ const nyeste = INDLAEG[0];
       html body :is(.lead-card, .lead-mini, .side-item).tryk .card-thumb { box-shadow: var(--shadow-hover), var(--hov-skaer); transform: translateY(-4px); transition: transform 0.22s var(--hov-ease), box-shadow 0.22s var(--hov-ease); }
       html body :is(.article-card, .lead-card, .lead-mini, .side-item, .mega-nyeste, .las-naeste-link).tryk img { transform: scale(1.03); filter: saturate(1.1) brightness(1.04); transition: transform 0.4s var(--hov-ease), filter 0.3s ease; }
       html body :is(.raekke, .hylde-raekke, .hylde-stor).tryk img { transform: translateY(-4px) scale(1.02); box-shadow: 0 0 0 1px var(--rule-light), var(--hov-skaer); filter: saturate(1.1) brightness(1.04); transition: transform 0.22s var(--hov-ease), box-shadow 0.22s var(--hov-ease), filter 0.3s ease; }
-      html body :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste).tryk :is(.card-title, .lead-title, .lead-mini-title, .hylde-stor-titel, .raekke-titel, .hylde-raekke-titel, .side-item-title, .las-naeste-titel, .mega-nyeste-titel) {
-        color: var(--teal-text); text-decoration-color: color-mix(in srgb, var(--teal-text) 55%, transparent); text-underline-offset: 3px;
-      }
+      html body :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste).tryk :is(.card-title, .lead-title, .lead-mini-title, .hylde-stor-titel, .raekke-titel, .hylde-raekke-titel, .side-item-title, .las-naeste-titel, .mega-nyeste-titel) { color: var(--teal-text); }
+      /* På telefon tegnes stregen hurtigere (tryk varer kort) */
+      html body .tryk .streg { background-size: 100% 2px; background-position: 0 100%; transition: background-size 0.3s var(--hov-ease); }
+
       @media (prefers-reduced-motion: reduce) {
-        html body :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste, .vej),
-        html body :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste, .vej) :is(img, .card-thumb) { transform: none !important; transition: none !important; }
+        html body :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste, .vej, .icon-btn, .nav-item, .mega-item, .chip, .pagination-btn, .pagination-num, .action-pill, .home-question, .footer-link, .push-knap, .offline-knap, .rl-remove),
+        html body :is(.article-card, .lead-card, .lead-mini, .hylde-stor, .raekke, .hylde-raekke, .side-item, .las-naeste-link, .mega-nyeste, .vej) :is(img, .card-thumb, .raekke-tekst, .hylde-raekke-tekst, .side-item-tekst, .las-naeste-tekst) { transform: none !important; transition: none !important; }
+        .streg { transition: none !important; }
       }
     </style>
   </head>
@@ -762,7 +814,7 @@ const nyeste = INDLAEG[0];
             {nyeste && (
               <a href={nyeste.href} class="mega-nyeste">
                 {nyeste.image && <picture class="tma-pic">{webpSrcset(nyeste.image) && <source type="image/webp" srcset={webpSrcset(nyeste.image)} sizes="320px" />}<img src={nyeste.image} srcset={miniSrcset(nyeste.image) || undefined} sizes="320px" alt="" loading="lazy" decoding="async" /></picture>}
-                <span class="mega-nyeste-tekst"><span class="mega-badge">Newest answer</span><span class="mega-nyeste-titel">{nyeste.title}</span></span>
+                <span class="mega-nyeste-tekst"><span class="mega-badge">Newest answer</span><span class="mega-nyeste-titel"><span class="streg">{nyeste.title}</span></span></span>
               </a>
             )}
             <a href="/p/start-here" class="mega-start">
