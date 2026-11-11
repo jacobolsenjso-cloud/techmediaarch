@@ -946,5 +946,31 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-11T23:48:21.855Z",
+  "artikel": "/2026/11/phishing-vs-spam-differences",
+  "usd": 0.4699,
+  "kr": 3.23,
+  "dele": {
+   "artikel": {
+    "kr": 2.48,
+    "billeder": 4,
+    "soegninger": 3,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.75,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
  }
 ]
