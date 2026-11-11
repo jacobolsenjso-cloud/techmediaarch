@@ -42,7 +42,12 @@ jobs:
   artikel:
     if: github.event.schedule == '17 9,17 * * 1-6' || inputs.opgave == 'artikel' || inputs.opgave == 'omskriv'
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    # 11/11-2026: 40 min var for lidt. #62 (4/11) og #81 (11/11) blev stoppet ved 45 min, #74 sluttede på præcis 40,
+    # fordi én ny artikel (op til 22 min) + 2 omskrivninger (op til 21 min) + byg + breddetjek tilsammen er over 40.
+    # #81 nåede at udgive, men blev stoppet, før Bing fik besked. Nu: hvert langt trin har sit eget loft (artikel 30,
+    # omskriv 30, breddetjek 10, Bing 15), og hele kørslen får plads til dem alle (90). Hænger ét trin, rammer det
+    # sit eget loft — de næste trin (byg, udgiv, Bing) når stadig at køre.
+    timeout-minutes: 90
     steps:
       # ref: main (4/11-2026): uden den henter GitHub main, som den så ud, da kørslen blev BESTILT. #60 ventede i kø bag
       # #59 og startede derfor på en gammel main uden #59's data — loft og pris blev læst forkert, og udgivelsen fejlede.
@@ -70,6 +75,7 @@ jobs:
         run: node robot/plan.mjs --tjek
       - name: Skriv artiklen
         if: steps.plan.outputs.koer == 'ja' && inputs.opgave != 'omskriv'
+        timeout-minutes: 30
         env:
           # Nøglerne kommer fra GitHub Secrets og skrives aldrig ud.
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
@@ -91,6 +97,7 @@ jobs:
       # artiklen ovenfor blev afvist.
       - name: Skriv ældre artikler om
         if: always() && steps.plan.outputs.omskriv == 'ja'
+        timeout-minutes: 30
         env:
           GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
