@@ -920,5 +920,31 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-11T16:00:00.670Z",
+  "artikel": "/2026/11/how-design-systems-unify-products",
+  "usd": 0.4054,
+  "kr": 2.79,
+  "dele": {
+   "artikel": {
+    "kr": 1.92,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.87,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
  }
 ]
