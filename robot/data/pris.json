@@ -864,5 +864,61 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-11T08:05:31.543Z",
+  "artikel": "/2026/11/how-data-engineering-works",
+  "usd": 0.5915,
+  "kr": 4.06,
+  "dele": {
+   "artikel": {
+    "kr": 3.3,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   },
+   "ogsaa": {
+    "kr": 0.01,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   },
+   "soegeord": {
+    "kr": 0.75,
+    "billeder": 0,
+    "soegninger": 0,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-11T08:13:24.953Z",
+  "artikel": "/2026/09/how-content-marketing-helps-seo",
+  "omskrevet": true,
+  "usd": 0.3239,
+  "kr": 2.23,
+  "dele": {
+   "artikel": {
+    "kr": 2.23,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-11T08:26:10.874Z",
+  "artikel": "/2024/09/Artificial Intelligence AI has transformed the cybersecurity",
+  "omskrevet": true,
+  "usd": 0.4944,
+  "kr": 3.4,
+  "dele": {
+   "artikel": {
+    "kr": 3.4,
+    "billeder": 4,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
  }
 ]

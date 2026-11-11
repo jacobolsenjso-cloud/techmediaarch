@@ -2022,7 +2022,7 @@
   ]
  },
  "/2026/10/difference-between-java-and-python": {
-  "dato": "2026-10-10T19:22:36.072Z",
+  "dato": "2026-11-11T08:05:28.425Z",
   "valg": [
    {
     "q": "What is Python programming used for?",
@@ -2035,28 +2035,23 @@
   ]
  },
  "/2026/10/how-to-use-ai-marketing-tools": {
-  "dato": "2026-10-11T14:09:44.997Z",
-  "valg": [
-   {
-    "q": "How are AI detection tools compared to other standard software in the modern content toolkit?",
-    "sti": "/2026/05/can-ai-detection-be-trusted-blind-tests"
-   }
-  ]
+  "dato": "2026-11-11T08:05:28.966Z",
+  "valg": []
  },
  "/2026/10/best-way-learn-product-management": {
-  "dato": "2026-10-11T19:39:28.302Z",
+  "dato": "2026-11-11T08:05:29.522Z",
   "valg": [
+   {
+    "q": "What does product management involve?",
+    "sti": "/2026/10/what-does-product-management-involve"
+   },
    {
     "q": "Why product management is a good career?",
     "sti": "/2026/10/why-product-management-is-good-career"
    },
    {
-    "q": "Difference between product management and product marketing?",
-    "sti": "/2026/09/product-management-vs-marketing"
-   },
-   {
-    "q": "What is product roadmap in product management?",
-    "sti": "/2026/10/what-is-product-roadmap"
+    "q": "Difference between product management and project management?",
+    "sti": "/2026/10/what-to-do-after-product-management"
    }
   ]
  },
@@ -2449,6 +2444,15 @@
    {
     "q": "Do AI detectors actually work?",
     "sti": "/2026/05/can-ai-detection-be-trusted-blind-tests"
+   }
+  ]
+ },
+ "/2026/11/how-data-engineering-works": {
+  "dato": "2026-11-11T08:05:27.750Z",
+  "valg": [
+   {
+    "q": "How is generative AI trained on raw data?",
+    "sti": "/2026/11/how-does-generative-ai-learn"
    }
   ]
  }

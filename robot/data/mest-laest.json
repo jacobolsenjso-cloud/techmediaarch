@@ -1,13 +1,9 @@
 {
- "hentet": "2026-11-09T15:55:16.923Z",
- "fra": "2026-11-03",
- "til": "2026-11-09",
+ "hentet": "2026-11-11T08:05:31.508Z",
+ "fra": "2026-11-05",
+ "til": "2026-11-11",
  "dage": 7,
  "sider": {
-  "/2026/11/how-does-generative-ai-learn": {
-   "visninger": 4,
-   "brugere": 2
-  },
   "/2026/04/create-hollywood-style-films-with-this-free-ai-workflow": {
    "visninger": 2,
    "brugere": 1
@@ -16,15 +12,23 @@
    "visninger": 2,
    "brugere": 2
   },
-  "/2026/10/what-are-intelligent-agents-ai": {
+  "/2026/11/generative-ai-environmental-impact": {
    "visninger": 2,
-   "brugere": 2
+   "brugere": 1
   },
   "/2026/11/generative-ai-vs-traditional-ai": {
    "visninger": 2,
    "brugere": 1
   },
+  "/2026/11/windows-11-home-vs-pro-guide": {
+   "visninger": 2,
+   "brugere": 2
+  },
   "/2026/05/exploring-claude-just-changed-making": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/05/the-10-best-ai-tools-to-revolutionize": {
    "visninger": 1,
    "brugere": 1
   },
@@ -44,15 +48,27 @@
    "visninger": 1,
    "brugere": 1
   },
-  "/2026/11/generative-ai-environmental-impact": {
+  "/2026/10/how-to-use-ai-in-ux-design": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/what-are-intelligent-agents-ai": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/10/why-system-design-interview": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/11/generative-ai-water-consumption": {
+   "visninger": 1,
+   "brugere": 1
+  },
+  "/2026/11/how-does-generative-ai-learn": {
    "visninger": 1,
    "brugere": 1
   },
   "/2026/11/microsoft-365-vs-office-differences": {
-   "visninger": 1,
-   "brugere": 1
-  },
-  "/2026/11/windows-11-home-vs-pro-guide": {
    "visninger": 1,
    "brugere": 1
   }
