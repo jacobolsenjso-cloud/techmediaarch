@@ -1,7 +1,7 @@
 // Selvtest af tma-push (10/11-2026): logikken i logik.mjs og udsendelsen i worker.mjs med et falsk lager
 // og falske push-tjenester. Kør: node test.mjs  — skal slutte med "alt OK".
 import assert from 'node:assert/strict';
-import { gyldigtEndpoint, endpointId, nyeArtikler, beskedFor, vapidToken, metadataPasser } from './logik.mjs';
+import { gyldigtEndpoint, endpointId, nyeArtikler, beskedFor, vapidToken, metadataPasser, usDag } from './logik.mjs';
 import { sendPortion } from './worker.mjs';
 
 let fejl = 0;
@@ -79,6 +79,22 @@ await t('udsendelse: alle får én besked, 410 fjernes, intet to gange samme dag
   assert.equal(modtaget.length, 90, 'hver tilmelding præcis én gang');
   assert.equal(new Set(modtaget).size, 90);
   assert.equal(env.SUBS.data.has(`s:${'7'.padStart(64, '0')}`), false, '410 er fjernet');
+});
+// 12/11-2026: udsendelsen kører 23:00-00:50 UTC (amerikansk aften) og krydser UTC-midnat — det må aldrig give to beskeder
+await t('udsendelse over UTC-midnat: samme dag, én besked', async () => {
+  const jwk = await crypto.subtle.exportKey('jwk', (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign'])).privateKey);
+  const env = { SUBS: falskKV(90), VAPID_PUBLIC: 'pub', VAPID_PRIVATE_JWK: JSON.stringify(jwk) };
+  const modtaget = [];
+  globalThis.fetch = async (url) => { if (String(url).endsWith('/app-data/nyeste.json')) return new Response(JSON.stringify(artikler)); modtaget.push(String(url)); return new Response(null, { status: 201 }); };
+  const foerMidnat = new Date('2026-11-10T23:00:00Z'), efterMidnat = new Date('2026-11-11T00:40:00Z');
+  assert.equal(usDag(foerMidnat), '2026-11-10'); assert.equal(usDag(efterMidnat), '2026-11-10', 'stadig 10/11 i New York');
+  await sendPortion(env, foerMidnat); await sendPortion(env, foerMidnat);
+  for (let i = 0; i < 4; i++) await sendPortion(env, efterMidnat);
+  assert.equal(modtaget.length, 90, 'hver tilmelding præcis én gang, også efter UTC-midnat');
+  assert.equal(new Set(modtaget).size, 90);
+  assert.equal([...env.SUBS.data.keys()].filter((k) => k.startsWith('koersel:')).length, 1, 'kun én dag i KV');
+  // Sommertid: 00:40 UTC i juli = 20:40 i New York, samme dato
+  assert.equal(usDag(new Date('2026-07-02T00:40:00Z')), '2026-07-01');
 });
 await t('ingen nye artikler = ingen beskeder', async () => {
   const env = { SUBS: falskKV(5), VAPID_PUBLIC: 'pub', VAPID_PRIVATE_JWK: '{}' };

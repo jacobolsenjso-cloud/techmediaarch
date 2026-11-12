@@ -18,12 +18,13 @@ name = "BEGRAENS"
 namespace_id = "1702"
 simple = { limit = 10, period = 60 }
 
-# Udsendelsen: hvert 10. minut 17:00-18:50 UTC = 18:00-19:50 dansk vintertid (19:00-20:50 sommertid),
-# efter eftermiddagens artikel (robotten starter 16:43). Én portion á 40 pr. kørsel; KV sørger for, at
+# Udsendelsen (Jacob 12/11-2026: amerikansk aften): hvert 10. minut 23:00-00:50 UTC = 18:00-19:50 i New York
+# (vintertid; 19:00-20:50 sommertid) = 0:00-1:50 dansk tid. Begge dagens artikler (8:43 og 16:43 dansk) er ude før.
+# "Dagen" (KV koersel:<dato>) er østkystdatoen, så den ikke skifter ved UTC-midnat midt i udsendelsen (usDag). Én portion á 40 pr. kørsel; KV sørger for, at
 # ingen får to beskeder samme dag. 12 kørsler = plads til ca. 480 tilmeldte — skal udvides, når der er flere.
 # Bruger 1 af kontoens 5 gratis tidsplaner (de andre: tfw-starter, tma-starter).
 [triggers]
-crons = ["*/10 17-18 * * *"]
+crons = ["*/10 23,0 * * *"]
 
 [vars]
 # Den OFFENTLIGE halvdel af push-nøglen (står også i sitets kode, src/layouts/MainLayout.astro). Den hemmelige

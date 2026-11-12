@@ -17,7 +17,7 @@
 //                                fornyer den), så glemte tilmeldinger ikke bliver liggende.
 //   koersel:<dato>               dagens tilstand: færdig?, tællere, artiklerne der var med (til i morgen).
 //   jwt:<push-tjeneste>          VAPID-token genbruges i op til 11 timer (Apple: højst ny hver time).
-import { gyldigtEndpoint, endpointId, nyeArtikler, beskedFor, vapidToken, metadataPasser } from './logik.mjs';
+import { gyldigtEndpoint, endpointId, nyeArtikler, beskedFor, vapidToken, metadataPasser, usDag } from './logik.mjs';
 
 const SITE = 'https://www.techmediaarch.com';
 // localhost: kun til test med "npm run preview" (wrangler dev, port 8787) på Jacobs pc
@@ -31,7 +31,8 @@ const cors = (req) => {
   return { 'access-control-allow-origin': OPRINDELSER.includes(o) ? o : SITE, 'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-allow-headers': 'content-type', vary: 'origin' };
 };
 const svar = (data, status, req) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...cors(req) } });
-const dag = (nu, foer = 0) => new Date(nu.getTime() - foer * 864e5).toISOString().slice(0, 10);
+// Udsendelsens dag = østkystdato (12/11-2026), så den ikke skifter midt i aftenens udsendelse (se usDag i logik.mjs)
+const dag = (nu, foer = 0) => usDag(nu, foer);
 
 async function hentArtikler() {
   // user-agent: Cloudflare kan afvise forespørgsler uden navn (faldgrube fra techfeedwatch)

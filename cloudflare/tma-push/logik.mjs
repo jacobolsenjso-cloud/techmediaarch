@@ -26,14 +26,19 @@ export async function endpointId(endpoint) {
   return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Artikler fra i dag og i går (UTC) ud fra /app-data/nyeste.json ({ u, t, p, h }), nyeste først.
+// "Dagen" regnes i amerikansk østkysttid (Jacob 12/11-2026: beskeden skal ud om aftenen i USA). Udsendelsen kører
+// 23:00-00:50 UTC; med UTC-datoen ville dagen skifte midt i udsendelsen, og nogle kunne få to beskeder samme aften.
+// I New York er det 18:00-19:50 (vintertid) / 19:00-20:50 (sommertid) — samme dato hele vejen.
+export const usDag = (nu, foer = 0) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date(nu.getTime() - foer * 864e5));
+
+// Artikler fra i dag og i går (østkystdato) ud fra /app-data/nyeste.json ({ u, t, p, h }), nyeste først.
 // allerede: adresser fra GÅRSDAGENS udsendelse — de sendes ikke igen (ellers samme artikel to dage i træk).
 export function nyeArtikler(alle, nu = new Date(), allerede = []) {
-  const idag = nu.toISOString().slice(0, 10);
-  const igaar = new Date(nu.getTime() - 864e5).toISOString().slice(0, 10);
+  const idag = usDag(nu);
+  const igaar = usDag(nu, 1);
   return (Array.isArray(alle) ? alle : [])
     .filter((a) => a && typeof a.u === 'string' && /^\/[^/]/.test(a.u) && a.t)
-    .filter((a) => { const d = new Date(a.p); return !isNaN(d) && [idag, igaar].includes(d.toISOString().slice(0, 10)); })
+    .filter((a) => { const d = new Date(a.p); return !isNaN(d) && [idag, igaar].includes(usDag(d)); })
     .filter((a) => !allerede.includes(a.u))
     // Samme tidspunkt: sorter på adressen, så udsendelsen og /besked altid vælger den samme
     .sort((a, b) => new Date(b.p) - new Date(a.p) || a.u.localeCompare(b.u));
