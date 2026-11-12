@@ -1,87 +1,136 @@
 ---
-title: "What Is a Content Marketing Strategy: Definition & Guide"
-description: "Discover what a content marketing strategy is, how it differs from content execution, and why it is essential for driving profitable customer action."
+title: How Do You Build an Effective Content Marketing Strategy?
+description: Learn how to build a content marketing strategy that attracts your ideal audience, answers key questions, and turns regular visitors into loyal buyers.
 published: 2026-10-15T19:15:43.138Z
-updated: 2026-10-15T19:15:43.138Z
+updated: 2026-11-12T07:55:05.518Z
 labels:
   - Marketing
   - Video
-image: /images/436f6bf1da4afc82-gm.jpg
-keyword: "what is content marketing strategy"
+image: /images/c7743727d1693b3a-gm.jpg
+keyword: content marketing strategy
 relatedKeywords:
-  - "difference between content marketing and content strategy"
-  - "is content marketing dead"
-  - "how much does content marketing cost"
-  - "difference between content marketing and social media marketing"
-  - "how to use content marketing to grow your business"
+  - what is content marketing strategy
+  - difference between content marketing and content strategy
+  - how to create a content marketing strategy
 robot: true
+stemme: true
+omskrevet: 2026-11-12
+omskrivning: fuld
+opskrift: 2
+gammelTitel: "What Is a Content Marketing Strategy: Definition & Guide"
 ---
-<p>Content marketing is the strategic creation and distribution of valuable content designed to attract a target audience by pulling them in rather than pushing traditional ad messages, as Vertex AI Search reports. It focuses on creating consistent material to drive profitable customer action, according to the <a href="https://contentmarketinginstitute.com/what-is-content-marketing" rel="noopener" target="_blank">Content Marketing Institute</a>.</p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Digital content strategy framework illustration" height="768" src="/images/436f6bf1da4afc82-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Digital content strategy framework illustration</td></tr></tbody></table>
+<p>A <a href="https://contentmarketinginstitute.com/what-is-content-marketing" rel="noopener" target="_blank">content marketing</a> strategy is a business plan for creating useful media. It outlines how a company will attract, engage, and keep customers. Instead of pitching products directly, it solves customer problems to build trust and drive commercial sales.</p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Polished steel spheres drawn across dark stone toward a glowing amber prism" height="768" src="/images/c7743727d1693b3a-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Polished steel spheres drawn across dark stone toward a glowing amber prism</td></tr></tbody></table><div class="tma-overblik"><p class="tma-overblik-titel">Key takeaways</p><ul><li>Start by auditing existing web pages to spot outdated, repeated, or unviewed content before writing new articles.</li><li>Organize content into topic clusters by connecting comprehensive pillar pages to detailed articles on related subjects.</li><li>Matching media formats to specific stages of the buyer journey can boost conversion rates by up to 73 percent.</li><li>Business buyers spend 27 percent of their research time searching online and only 5 to 6 percent with sales reps.</li></ul></div>
 
-<h2>Defining Content Strategy Versus Content Execution</h2>
+<p>According to Contentmarketinginstitute, this approach shares consistent, helpful media with a specific audience. The goal is to encourage actions that make money from customers. This process replaces annoying ads with helpful answers. Potential buyers search for these answers on their own.</p>
 
-<p>A <a href="https://www.corporatecomm.com/blog/what-is-a-content-marketing-strategy" rel="noopener" target="_blank">content marketing strategy</a> acts as a guide for creating, distributing, and managing content across multiple channels to achieve business goals and stand out from competitors, per Corporate Communications, Inc. According to Screendragon, a content strategy defines the overarching framework, workflow, governance, and the who, what, where, and why of content output, whereas content marketing is the tactical execution and promotion.</p><p>MarketMuse notes that content strategy serves as an organization-wide approach dictated by high-level business goals rather than existing solely as a marketing tactic.</p>
+<h2>What Is a Content Marketing Strategy?</h2>
 
-<p>WG Content states that content strategy defines objectives, target audiences, and structure, while content marketing directly focuses on tactical execution and distribution. A comprehensive content strategy works to convert targeted traffic arriving from content marketing efforts into actionable leads, followers, and paying customers, according to Forbes.</p><p>SciencePOD outlines that content strategy addresses the overall planning and management of a business entire content ecosystem, while content marketing uses targeted assets to generate customer actions.</p>
+<p>Ama defines content marketing as a pull strategy. Instead of pushing unwanted sales pitches, companies publish educational media. This earns the attention of buyers naturally.</p>
+
+<p>Contentmarketinginstitute calls this strategy the operational "why." It shows who the content helps, why the team makes it, and how each post works.</p><p>According to Ama, about 90 percent of organizations now use content marketing. Roughly 80 percent of buyers prefer reading articles about a company instead of looking at paid ads.</p>
+
+<p>Loyola Unive explains how this works as a business model. Companies engage visitors by offering solutions to their daily problems. Solving customer problems step by step works well. It turns regular website visitors into strong sales leads and loyal buyers.</p>
+
+<h2>Difference Between Content Marketing and Content Strategy</h2>
+
+<p>Content strategy manages a company's entire online presence. In contrast, content marketing focuses specifically on growth and winning new customers.</p>
+
+<p>UX Articles by Center Centre notes that the two fields stem from different historical origins. Content strategy grew out of user experience design. It also comes from information architecture, which organizes website content clearly. In contrast, content marketing grew out of brand storytelling and public relations. It also focuses on getting people interested in buying.</p>
+
+<p>According to Contentmarketinginstitute, content strategy guides a brand. It plans how to create, share, and manage useful content across the whole business. It covers tech support pages, legal rules, employee handbooks, and app screens.</p>
+
+<p>Contentmarketinginstitute notes that content marketing has a single focus. It finds an audience, holds their attention, and turns them into buyers.</p>
 
 <h2>Production Assets and Operational Frameworks</h2>
 
-<p>1SEO Digital Agency reports that content marketing handles production assets—such as articles, videos, and whitepapers—that lead people to the sales funnel, while content strategy establishes why and how those topics tie to offerings.</p><p>If you are refining your search approach alongside these operational frameworks, you might want to read <a href="/2026/09/how-content-marketing-helps-seo">How Content Marketing Helps SEO and Drives Organic Traffic</a> for additional optimization context.</p>
+<p>Ama breaks execution into three key parts. You must solve customer problems, share posts in the right places, and keep up two-way chats.</p>
+
+<p>Hubspot explains the difference between a big-picture strategy and a day-to-day content plan. The strategy dictates the core purpose and topic selection. The content plan handles logistics, such as editorial calendars, deadlines, and writer schedules.</p>
+
+<p>Teams rely on a few basic elements to publish content on a steady schedule:</p>
 
 <ul>
-  <li>Articles and blog posts designed for search engines</li>
-  <li>Informative whitepapers targeting specific industry problems</li>
-  <li>Video content demonstrating product use cases</li>
-  <li>Case studies highlighting past client successes</li>
+  <li>Write an editorial mission statement. It should clearly explain who your audience is and how your content helps them.</li>
+  <li>Data-informed buyer personas that capture customer pain points and objections.</li>
+  <li>Structured topic clusters that group related content around central themes.</li>
+  <li>Written production schedules help keep work on track and prevent project delays.</li>
 </ul>
 
-<h2>Current State of the Digital Landscape</h2>
+<p>Hubspot recommends organizing website pages into topic clusters. This framework groups related articles around one main subject. Teams build comprehensive pillar pages that anchor broad topics.</p><p>Teams then link those main guides to specific, detailed articles to build authority. This connects directly to <a href="/2026/09/how-content-marketing-helps-seo">how SEO and content marketing work together</a>.</p>
 
-<p>Content marketing is far from dead, but the landscape has shifted to demand high impact, sophisticated AI workflows, and direct links to business outcomes, according to Reddit. Reddit also notes that content marketing remains a reliable user acquisition channel, though lazy content marketing featuring low-effort material has ceased to work effectively.</p><p>Entrepreneur Middle East reports that in a digital ecosystem flooded with massive data volumes, content marketing struggles if it feels generic; today consumers demand genuine connection and inspiration rather than superficial promotional noise.</p>
+<h2>How to Create a Content Marketing Strategy Step by Step</h2>
 
-<p>Impact Networking states that content marketing is far from dead, but the margin for low-effort content is razor-thin, leaving the field active primarily for teams focused on deep storytelling and structural relevance.</p><p>Teams leveraging modern technology stacks can scale operations effectively by applying insights found in <a href="/2026/10/how-to-use-ai-marketing-tools">How to Use AI Marketing Tools to Scale Strategy and ROI</a>.</p>
+<p>Building an effective strategy requires deliberate research before writing a single post.</p>
 
-<div style="text-align:center;"><iframe allowfullscreen="true" height="360" src="https://www.youtube.com/embed/DSOfPEyeMNg?rel=0" width="640"></iframe></div><h2>Financial Investments and Production Costs</h2>
+<p>Digital.gov advises teams to start with a thorough content audit. Planners list website addresses, authors, and update schedules. This helps them spot outdated pages, fill knowledge gaps, and clear out useless old content.</p>
 
-<p>B2B content marketing costs vary widely by scale, ranging from $4,000 to $10,000 per month for small businesses, $10,000 to $40,000 per month for medium-sized businesses, and up to $60,000 monthly for enterprises, according to Digital Elevator.</p><p>Carly AI points out that Orbit Media research indicates the average human-written blog post takes 3 hours and 20 minutes to produce with an average length of 1,312 words. Ahrefs notes that human-written blog posts cost an average of $611 to produce compared to $131 for AI-generated posts, showcasing a significant 4.7x production cost gap.</p>
+<p>Follow these essential steps to assemble an actionable plan:</p>
 
-<p>WebFX states that content marketing agency pricing models commonly feature monthly retainers ranging from $1,000 to $20,000 to cover ongoing copywriting and execution. Column Five reports that B2B content marketing agencies typically charge between $5,000 and $15,000 per month for ongoing engagements, with marketplace data indicating hourly rates generally fall between $100 and $149.</p><p>Alien Road adds that comprehensive content marketing campaigns run by specialized digital agencies range from $2,000 to $10,000 per month, covering strategy development, execution, and performance analytics.</p>
+<ol>
+  <li>Define the audience mission by stating who reads the content and what unique value they receive.</li>
+  <li>Audit existing web pages to spot content that is repeated, broken, or not getting views.</li>
+  <li>Create customer profiles based on real questions people ask and the media they use.</li>
+  <li>Align media formats with stages in the customer buying journey.</li>
+  <li>Assign team members to review every post. They should also make sure the content follows accessibility rules.</li>
+</ol>
 
-<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Team planning a content marketing strategy" height="768" src="/images/c97472c1a968f8b3-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Team planning a content marketing strategy</td></tr></tbody></table><h2>Content Marketing Versus Social Media Channels</h2>
+<p>Teams often want to write many helpful articles quickly without losing quality. To do this, they check out <a href="/2024/10/meet%20harbor%20the%20ai%20seo%20blog%20writer%20that%20dominates%20google%20rankings">AI blog writing tools that target Google rankings</a>. These automated workflows help speed up drafting while human editors keep the information accurate.</p>
 
-<p>Social media provides a digital channel to promote a brand and converse directly with prospects, whereas content marketing provides the underlying valuable information and ideas shared across those channels, according to NYTLicensing.</p><p>Landingi explains that social media marketing utilizes platforms like Facebook, Instagram, LinkedIn, and TikTok specifically to expand a brand reach and distribute content to drive traffic. Build Your Firm notes that social media marketing acts as a functional component of broader content marketing efforts, focusing heavily on community interaction and platform-specific virality.</p>
+<table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Tiered granite aqueduct directing cascading water through brass sluice gates" height="768" src="/images/3a3fc264821657a1-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Tiered granite aqueduct directing cascading water through brass sluice gates</td></tr></tbody></table><h2>Mapping Content to the Modern Buyer Journey</h2>
 
-<p>AI bees states that content marketing centres on producing and owning core information assets like blogs, guides, and videos, whereas social media marketing centers on sharing and promoting those assets across specific networking platforms.</p><p>You can review <a href="/2024/10/meet%20harbor%20the%20ai%20seo%20blog%20writer%20that%20dominates%20google%20rankings">Meet Harbor: The AI SEO Blog Writer that Dominates Google Rankings</a> to see how automated generation supports core asset creation.</p>
+<p>Today's buyers rarely decide to purchase something right away. Instead, they do their own research through several stages before choosing what to buy.</p>
 
-<h2>Scaling Enterprise and Small Business Growth</h2>
+<p>Optimist notes that business buyers research on their own. They spend 27 percent of their buying time searching online. They spend another 22 percent in team meetings to reach an agreement. Those same buyers spend just 5 to 6 percent of their research time talking directly to sales reps.</p>
 
-<p>Businesses can use content marketing to grow by developing an authentic brand voice, establishing a reliable repository of industry knowledge, and guiding prospects smoothly down the sales funnel, according to NYTLicensing.</p><p>Lean Labs reports that consistent content marketing drives organic search engine traffic, builds online visibility, and establishes a brand as a trusted industry authority that naturally captures high-quality leads.</p><p>Salesforce states that small businesses can scale content marketing reach by utilizing co-marketing partnerships, such as collaborating with complementary local businesses to cross-promote workshops or shared content.</p>
+<p>Buyers spend very little time with sales reps. Because of this, published content must teach them the basics early on. Co points out that matching content directly to buyer journey stages pays off. Businesses see up to 73 percent higher conversion rates. This means far more visitors take action than when sites use generic content.</p>
 
-<p>eLearning Industry notes that a structured content marketing strategy uses diverse assets like case studies, webinars, and whitepapers aligned with a company exact niche to build long-term customer loyalty and trust.</p><p>Monday.com points out that content strategies can be optimized for growth by tracking both leading indicators like engagement and lagging indicators like revenue attribution, while repurposing core assets like whitepapers into multi-channel social media threads.</p><p>The Marketing Centre highlights that effective business growth relies on mapping content formats to distinct buyer stages, utilizing awareness-stage pain point solutions, consideration-stage case studies, and conversion-stage product deep-dives.</p>
+<p>Ama tells marketers to match media formats directly to each stage of the buying process:</p>
 
 <ul>
-  <li>Mapping content to awareness-stage buyer pain points</li>
-  <li>Deploying consideration-stage case studies and webinars</li>
-  <li>Utilizing conversion-stage product deep-dives</li>
-  <li>Repurposing whitepapers into social media threads</li>
+  <li>Top-of-Funnel (TOFU): These are simple guides and articles. They introduce basic ideas to new visitors.</li>
+  <li>Middle-of-Funnel (MOFU): These are comparison guides and online seminars. They help people weigh different choices.</li>
+  <li>Bottom-of-Funnel (BOFU): These are customer success stories and product demos. They prove a product is worth buying.</li>
 </ul>
 
-<h2>FAQ</h2>
+<h2>Content Governance, Accessibility, and AI Workflows</h2>
 
-<h3>What is content marketing strategy?</h3>
-<p>A content marketing strategy acts as a formal guide for creating, distributing, and managing content across multiple channels to achieve specific business goals. It defines target audiences, objectives, and structures to ensure that published assets stand out from competitors. Ultimately, it directs the production of valuable material designed to pull in customers rather than relying on traditional interruption advertising.</p>
+<p>Teams must also manage what they publish. This keeps information accurate, secure, and easy to find over time.</p>
 
-<h3>Difference between content marketing and content strategy?</h3>
-<p>Content strategy defines the overarching framework, governance, and the overall who, what, where, and why of content output across an entire organization. Content marketing is the tactical execution and promotion that utilizes those guidelines to produce assets like articles and videos. While strategy dictates the high-level business goals and ecosystem management, content marketing handles the direct distribution and lead generation assets.</p>
+<p>Digital.gov says content governance is a key safety net. It keeps everyday publishing running smoothly. Clear management rules put specific people in charge of each page. They schedule regular updates and use plain language. They also follow Section 508 accessibility rules to help everyone read their content.</p>
 
-<h3>Is content marketing dead?</h3>
-<p>Content marketing is far from dead, but the digital landscape has shifted to demand high impact, sophisticated workflows, and direct links to business outcomes. Low-effort or generic material no longer works because consumers demand genuine connection and inspiration. Modern campaigns require deep storytelling, structural relevance, and sophisticated execution to capture user attention.</p>
+<p>The rise of automated tools has made clear guidelines even more necessary. Contentmarketinginstitute revealed that while most business-to-business marketers use generative AI tools in their daily work, 61 percent report that their organizations have zero formal rules governing AI usage.</p>
 
-<h3>How much does content marketing cost?</h3>
-<p>Content marketing costs vary widely depending on whether a business handles production internally or hires an outside agency. B2B programs range from $4,000 to $10,000 per month for small businesses and up to $60,000 for enterprises. Agency retainers frequently span from $1,000 to $20,000 monthly to cover ongoing copywriting, execution, and performance analytics.</p>
+<p>Unchecked AI usage creates accuracy and copyright concerns. Teams wanting to roll out software safely should review <a href="/2026/10/how-to-use-ai-marketing-tools">methods for using AI marketing tools to scale ROI</a>. Doing this helps protect their brand reputation.</p>
 
-<h3>Difference between content marketing and social media marketing?</h3>
-<p>Content marketing centres on producing and owning core information assets like comprehensive guides, blogs, and videos. Social media marketing utilizes specific networking platforms like Facebook, Instagram, and LinkedIn to promote those assets and converse directly with prospects. Social media acts as a functional channel for distribution and community interaction, whereas content marketing provides the underlying valuable information.</p>
+<p>Using automated software without clear rules is a huge gamble. Computer-generated text can easily introduce sneaky errors. I believe being completely transparent about how tools are used builds lasting trust with your audience. Keeping a healthy dose of skepticism and reviewing every claim by hand remains the smartest safeguard.</p><table align="center" cellpadding="0" cellspacing="0" class="tr-caption-container" style="margin-left: auto; margin-right: auto;"><tbody><tr><td style="text-align: center;"><img alt="Stone beacon tower casting warm light over sea cliffs and mist" height="768" src="/images/e101322296920856-gm.jpg" width="1366" loading="lazy" /></td></tr><tr><td class="tr-caption" style="text-align: center;">Stone beacon tower casting warm light over sea cliffs and mist</td></tr></tbody></table><h2>Scaling Enterprise and Small Business Growth</h2>
 
-<h3>How to use content marketing to grow your business?</h3>
-<p>Businesses can drive growth by developing an authentic brand voice and establishing a reliable repository of industry knowledge that guides prospects smoothly down the sales funnel. Consistent publishing builds organic search visibility, establishes industry authority, and captures high-quality leads. Companies also scale reach by mapping distinct content formats to buyer stages and utilizing co-marketing partnerships.</p><h2>Sources</h2><ul><li><a href="https://www.ama.org/marketing-news/what-is-content-marketing/" rel="noopener" target="_blank">What is Content Marketing? A Beginners Guide</a></li><li><a href="https://contentmarketinginstitute.com/what-is-content-marketing" rel="noopener" target="_blank">What Is Content Marketing?</a></li><li><a href="https://www.corporatecomm.com/blog/what-is-a-content-marketing-strategy" rel="noopener" target="_blank">What is a Content Marketing Strategy? | Corporate Communications Inc.</a></li><li><a href="https://blog.marketmuse.com/content-strategy-vs-content-marketing/" rel="noopener" target="_blank">What’s the Difference Between Content Strategy vs Content Marketing</a></li></ul>
+<p>Content marketing works for small startups and large corporations alike. However, each group faces different day-to-day challenges. Contentmarketinginstitute reports that many business-to-business marketers plan to raise their content budgets each year. Others expect their budgets to stay the same.</p>
+
+<p>Contentmarketinginstitute found that few big-company marketers think their content strategy works well. Teams hit major roadblocks. In one survey, 47 percent of respondents reported a lack of clear goals. Many also said they struggle to connect their content to the buyer journey.</p>
+
+<p>Hubspot research shows that short videos offer the best return on investment. In fact, 31 percent of marketers call short videos their top-performing media format. Pairing videos with sign-up forms connects directly to <a href="/2026/10/how-email-marketing-makes-money">proven ways email marketing drives revenue</a>. This helps companies make more money.</p>
+
+<h2>Measuring Performance and Iterating Over Time</h2>
+
+<p>Marketers need to track data that shows real business results. They should not just focus on shallow numbers like views or likes.</p>
+
+<p>Hubspot recommends setting clear, trackable goals. Marketers call these key performance indicators. These goals separate basic website visits from actual sales results. Page views and quick visits only show initial interest. Actual sales and revenue prove that your content truly makes money.</p>
+
+<p>Digital.gov advises teams to treat published content like an evolving digital product. Do not treat publishing as the finish line. Instead, set regular times to update and improve your published work.</p><p>Regular updates keep content useful. They also help newsletters follow <a href="/2026/10/email-marketing-best-practices">email marketing best practices for higher conversions</a>. This helps turn more readers into buyers.</p>
+
+<p>Technology moves fast. What seems accurate today can easily become outdated tomorrow. Across the websites I run, setting aside time to update older pieces and correct errors is a steady routine. Treating published work as a living document is the most practical way to keep information truly helpful.</p><h2>FAQ</h2>
+
+<h3>What is content marketing strategy in simple words?</h3>
+<p>A content marketing strategy is a business plan for creating and sharing helpful media. Its main purpose is to attract a target audience, answer their questions, and guide them toward buying a product or service.</p>
+
+<h3>What is the difference between content marketing and content strategy?</h3>
+<p>Content strategy manages all internal and external content across an organization. This includes technical manuals and text on screens. Content marketing is one part of that work. It focuses on drawing people in and keeping their attention. Then, it uses media to turn them into paying customers.</p>
+
+<h3>How do you create a content marketing strategy from scratch?</h3>
+<p>Start by identifying your audience. Then, write a clear editorial mission statement that outlines the exact problems you will solve. Next, review the content you already have. Plan new topics that match each buying step. Finally, set clear publishing rules and track your business results over time.</p>
+
+<h3>How does content marketing grow a business?</h3>
+<p>Content marketing drives growth by building customer trust while people do their own research. Businesses answer questions through articles and videos. This draws in search traffic and guides potential leads. This creates sales without relying only on paid ads.</p>
+
+<h3>Why do most enterprise content strategies fail?</h3>
+<p>Enterprise content strategies often fail due to vague goals and poor journey mapping. According to Contentmarketinginstitute, many large teams struggle. They fail to match their content to each step of the buyer's journey. They also fail to track meaningful sales numbers.</p><h2>Sources</h2><ul><li><a href="https://digital.gov/topics/content-strategy" rel="noopener" target="_blank">Content strategy | Digital.gov</a></li><li><a href="https://contentmarketinginstitute.com/what-is-content-marketing" rel="noopener" target="_blank">What Is Content Marketing?</a></li><li><a href="https://www.ama.org/marketing-news/what-is-content-marketing/" rel="noopener" target="_blank">What is Content Marketing? A Beginners Guide</a></li><li><a href="https://www.loyola.edu/sellinger-business/academics/departments/marketing/blog/2025/what-is-content-marketing.html" rel="noopener" target="_blank">The What, When, Why, and How of Content Marketing | Sellinger School of Business and Management | Loyola Unive</a></li><li><a href="https://www.floodlightnewmarketing.co.uk/blog/8-proven-content-marketing-strategy-frameworks-2026" rel="noopener" target="_blank">Content Marketing Strategy: The Complete 2026 Guide</a></li><li><a href="https://www.yesoptimist.com/content-marketing-strategy/" rel="noopener" target="_blank">How to Build a Content Marketing Strategy that (Still) Works in 2026 | Optimist</a></li><li><a href="https://blog.hubspot.com/marketing/marketing-strategy" rel="noopener" target="_blank">How to create a complete marketing strategy [data + expert tips]</a></li><li><a href="https://articles.centercentre.com/definition_content_strategy/" rel="noopener" target="_blank">A Definition of Content Strategy — UX Articles by Center Centre</a></li></ul>

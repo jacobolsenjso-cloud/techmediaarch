@@ -972,5 +972,35 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-12T07:55:21.072Z",
+  "artikel": "/2026/10/what-is-content-marketing-strategy",
+  "omskrevet": true,
+  "usd": 0.4354,
+  "kr": 2.99,
+  "dele": {
+   "artikel": {
+    "kr": 2.99,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-12T08:04:48.345Z",
+  "artikel": "/2024/09/Youre LEAKING Your LOCATION",
+  "omskrevet": true,
+  "usd": 0.3835,
+  "kr": 2.63,
+  "dele": {
+   "artikel": {
+    "kr": 2.63,
+    "billeder": 4,
+    "soegninger": 4,
+    "ukendtPris": []
+   }
+  }
  }
 ]
