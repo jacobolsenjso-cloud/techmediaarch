@@ -2481,5 +2481,18 @@
     "sti": "/2026/10/how-phishing-resistant-mfa-works"
    }
   ]
+ },
+ "/2026/11/how-cloud-computing-works": {
+  "dato": "2026-11-12T16:02:53.304Z",
+  "valg": [
+   {
+    "q": "How does Google's market share for custom cloud AI chips compare to competitors?",
+    "sti": "/2024/12/how google makes custom cloud chips"
+   },
+   {
+    "q": "Can OpenAI work with other cloud providers besides Microsoft Azure?",
+    "sti": "/2025/01/the-future-of-ai-microsoft-and-openai-strengthen-partnership"
+   }
+  ]
  }
 }
