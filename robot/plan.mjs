@@ -29,8 +29,14 @@ const SITE = 'https://www.techmediaarch.com';
 
 const dkDato = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Copenhagen' }).format(d);            // 2026-09-26
 const dkDag = (d) => new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Copenhagen', weekday: 'short' }).format(d); // Sat
+const dkTime = (d) => Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Copenhagen', hour: '2-digit', hourCycle: 'h23' }).format(d));
 // 'f' = før kl. 12 dansk tid, 'e' = efter (halvdagsreglen i maaUdgive)
-const halvdag = (d) => (Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Copenhagen', hour: '2-digit', hourCycle: 'h23' }).format(d)) < 12 ? 'f' : 'e');
+const halvdag = (d) => (dkTime(d) < 12 ? 'f' : 'e');
+// Natteregel (Jacob 12/11-2026): intet udgives fra kl. 0 til 6 dansk tid — hverken nye artikler eller omskrivninger.
+// Baggrund: GitHubs reservekørsel kom 6 timer for sent (#84 startede 00:31 12/11) og udgav en artikel kl. 00:50.
+// Kørslen kl. 8:43 tager i stedet over, så ingen artikel går tabt.
+export const NAT_FRA = 0, NAT_TIL = 6;
+export const erNat = (d) => dkTime(d) >= NAT_FRA && dkTime(d) < NAT_TIL;
 const laes = (f, tom) => { try { return JSON.parse(fs.readFileSync(sti(f), 'utf8')); } catch { return tom; } };
 const skrivJson = (f, d) => fs.writeFileSync(sti(f), JSON.stringify(d, null, 1) + '\n');
 const summary = (t) => { console.log(t); if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, t + '\n'); };
@@ -53,6 +59,7 @@ export function robotArtikler() {
 // Må der udgives nu? Returnerer { ok, grund }.
 export function maaUdgive(nu = new Date(), liste = robotArtikler()) {
   if (FRIDAGE.includes(dkDag(nu))) return { ok: false, grund: `fridag (${dkDag(nu)}, dansk tid)` };
+  if (erNat(nu)) return { ok: false, grund: `nat (kl. ${dkTime(nu)}, dansk tid — intet udgives kl. ${NAT_FRA}-${NAT_TIL})` };
   const iDag = liste.filter((a) => dkDato(a.udgivet) === dkDato(nu)).length;
   const loft = loftFor(nu);
   if (iDag >= loft) return { ok: false, grund: `loftet er nået: ${iDag} af ${loft} i dag` };
@@ -112,8 +119,9 @@ const arg = process.argv[2];
 if (arg === '--tjek') {
   const { ok, grund } = maaUdgive();
   // Omskrivning kører 6 dage om ugen (Jacob 30/10-2026) — også tirsdag og fredag, hvor der ikke kommer nye artikler
-  const omskriv = !OMSKRIV_FRIDAGE.includes(dkDag(new Date()));
-  summary(`**Tidsplan:** ny artikel ${ok ? 'kører' : 'springer over'} — ${grund} · omskrivning ${omskriv ? 'kører' : `springer over (fridag ${dkDag(new Date())})`}`);
+  const nat = erNat(new Date());
+  const omskriv = !OMSKRIV_FRIDAGE.includes(dkDag(new Date())) && !nat;
+  summary(`**Tidsplan:** ny artikel ${ok ? 'kører' : 'springer over'} — ${grund} · omskrivning ${omskriv ? 'kører' : nat ? 'springer over (nat)' : `springer over (fridag ${dkDag(new Date())})`}`);
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `koer=${ok ? 'ja' : 'nej'}\nomskriv=${omskriv ? 'ja' : 'nej'}\n`);
 } else if (arg === '--koer') {
   fs.rmSync(sti('robot/ud/valgt.json'), { force: true });   // aldrig et gammelt valg fra en tidligere kørsel
