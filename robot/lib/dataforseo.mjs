@@ -176,3 +176,72 @@ export function gscOmEmnet(q, emneTekster) {
   // Kort spørgsmål med ét kerneord ("how does ransomware work" → ransom): det ene skal stå i emnet
   return k.size > 0 && d.faelles >= Math.min(2, k.size) && d.andel >= 2 / 3;
 }
+
+// --- Anden kilde: spørgsmål FRA DataForSEO (Jacob 13/11-2026: "selvfølgelig skal det bygges") -----------------------
+// Googles autoforslag viser højst ca. 10 forslag pr. præfiks og startord — typisk de mest populære og dermed sværeste.
+// DataForSEO's "Keyword Suggestions" giver alle søgninger i databasen, der INDEHOLDER startordet (USA, engelsk), med
+// søgetal og sværhed. Robotten beder kun om dem med mindst MIN_SOEGNINGER søgninger og sværhed højst KD_MAKS, de
+// mest søgte først, og beholder spørgsmålene. De kommer ind i samme bunke som autoforslagene og går gennem samme
+// dubletkontrol, præfiks-regler og spredning.
+// Pris (dataforseo.com/pricing, 13/11-2026): $0,012 pr. kald + $0,00012 pr. fundet søgeord → ca. $0,024 pr. startord
+// med 100 svar. Ét kald pr. startord, gemt i FORSLAG_DAGE dage (robot/data/dataforseo-forslag.json) → de 41 startord
+// koster ca. $1 hver 30. dag. Søgetallene lægges også i den almindelige hukommelse, så de ikke betales igen.
+export const FORSLAG_DAGE = 30;
+export const FORSLAG_GRAENSE = 100;   // højst så mange søgeord pr. startord (de mest søgte)
+const FORSLAG = process.env.DATAFORSEO_FORSLAG || 'robot/data/dataforseo-forslag.json';   // DATAFORSEO_FORSLAG kun til test
+// Spørgsmål = starter med et spørgeord. Præcis samme præfiks-liste som autoforslagene (robot/lib/autoforslag.mjs).
+export function praefiksFor(q, praefikser) {
+  return [...praefikser].sort((a, b) => b.length - a.length).find((p) => q === p || q.startsWith(p + ' ')) || null;
+}
+
+// froer: startordene i prioriteret rækkefølge. Returnerer { pr: Map(startord → [{ q, t }]), log }.
+export async function hentSpoergsmaal(froer, praefikser, { nu = Date.now(), fil = FORSLAG, husk_ = HUSK } = {}) {
+  let gemt = {};
+  try { gemt = JSON.parse(fs.readFileSync(fuld(fil), 'utf8')); } catch {}
+  const graense = nu - FORSLAG_DAGE * 864e5;
+  const log = { fraHusk: 0, kald: 0, fundet: 0, spoergsmaal: 0, pris: 0, fejl: null };
+  const pr = new Map();
+  const nye = [];
+  for (const f of froer) {
+    const g = gemt[f];
+    if (g && Date.parse(g.d) >= graense) { pr.set(f, g.s); log.fraHusk++; } else nye.push(f);
+  }
+  if (nye.length && !harNoegle()) log.fejl = 'nøglen mangler (DATAFORSEO_LOGIN/PASSWORD)';
+  else if (nye.length) {
+    const husk = laesHusk(nu, husk_);
+    const d = new Date(nu).toISOString().slice(0, 10);
+    for (const f of nye) {
+      try {
+        const r = await kald('dataforseo_labs/google/keyword_suggestions/live', [{
+          keyword: f, location_code: 2840, language_code: 'en', tag: TAG, limit: FORSLAG_GRAENSE,
+          include_seed_keyword: false, order_by: ['keyword_info.search_volume,desc'],
+          filters: [['keyword_info.search_volume', '>=', MIN_SOEGNINGER], 'and', ['keyword_properties.keyword_difficulty', '<=', KD_MAKS]],
+        }]);
+        const opg = r.j?.tasks?.[0];
+        if (!r.ok || opg?.status_code !== 20000) {
+          log.fejl = `HTTP ${r.status} ${opg?.status_code || r.j?.status_code || ''} ${skjul(opg?.status_message || r.j?.status_message || '')}`.trim();
+          break;   // fx dagsloftet: stop, resten prøves næste gang
+        }
+        const items = opg.result?.[0]?.items || [];
+        const s = [];
+        for (const it of items) {
+          const q = normaliser(it.keyword || '');
+          const t = oversaet(it);
+          if (!gyldig(q)) continue;
+          husk[q] = { d, t };   // søgetallet er betalt — gem det, så hentTal ikke spørger igen
+          if (praefiksFor(q, praefikser)) s.push({ q, t });
+        }
+        gemt[f] = { d, s };
+        pr.set(f, s);
+        log.kald++; log.fundet += items.length; log.spoergsmaal += s.length;
+        log.pris = Math.round((log.pris + (opg.cost || 0)) * 1e6) / 1e6;
+      } catch (e) { log.fejl = skjul(e.message); break; }
+    }
+    if (log.kald) {
+      fs.mkdirSync(path.dirname(fuld(fil)), { recursive: true });
+      fs.writeFileSync(fuld(fil), JSON.stringify(Object.fromEntries(Object.entries(gemt).sort(([a], [b]) => a.localeCompare(b))), null, 1) + '\n');
+      gemHusk(husk, husk_);
+    }
+  }
+  return { pr, log };
+}

@@ -15,13 +15,13 @@
 // Listen skrives til robot/ud/soegeord-liste.md (og GitHubs job-oversigt).
 import fs from 'node:fs';
 import path from 'node:path';
-import { hentForslag, omFroe } from './lib/autoforslag.mjs';
+import { hentForslag, omFroe, PRAEFIKSER } from './lib/autoforslag.mjs';
 import { harAdgang, hentSoegninger } from './lib/searchconsole.mjs';
 import { artikler, antalPrEmne, antalPrHylde, brugte, proevedeForNylig, emner, sti } from './lib/arkiv.mjs';
 import { lavIndeks, tjek, sammenlign, mestEns, geminiSammeHensigt, delvistOverlap } from './lib/dubletter.mjs';
 import { kerne, normaliser } from './lib/tekst.mjs';
 import { gemPrisVedExit } from './lib/gemini.mjs';
-import { hentTal, saldo, vaerdi, gruppe, talTekst, SALDO_ADVARSEL } from './lib/dataforseo.mjs';
+import { hentTal, saldo, vaerdi, gruppe, talTekst, SALDO_ADVARSEL, hentSpoergsmaal, praefiksFor } from './lib/dataforseo.mjs';
 gemPrisVedExit('soegeord');   // pristælleren (trin 7): Geminis dublet-tjek (lag 3) koster også
 
 const arg = (navn, std) => { const i = process.argv.indexOf(`--${navn}`); return i > 0 ? process.argv[i + 1] : std; };
@@ -73,6 +73,28 @@ else {
     }
   }
   if (GEM) { fs.mkdirSync(path.dirname(path.resolve(GEM)), { recursive: true }); fs.writeFileSync(GEM, JSON.stringify(raa, null, 1)); }
+}
+
+// --- 1b. Spørgsmål fra DataForSEO (anden kilde, Jacob 13/11-2026) ------------------------------------------------
+// Søgninger med startordet, sværhed højst KD_MAKS og mindst 20 søgninger/md (USA), som Googles autoforslag ikke viste.
+// De lægges i samme bunke som autoforslagene (plads 50+, dvs. efter Googles egne i den gamle rækkefølge) og går
+// gennem præcis samme filtre. Ikke ved --fra (test uden net), så testen er den samme hver gang.
+let dfsSp = { kald: 0, fraHusk: 0, fundet: 0, spoergsmaal: 0, nye: 0, pris: 0, fejl: FRA ? 'slået fra (--fra)' : null };
+if (!FRA) {
+  const froer = [...new Set(emneListe.flatMap((e) => froe[e] || []))];
+  const { pr, log } = await hentSpoergsmaal(froer, PRAEFIKSER);
+  dfsSp = { ...log, nye: 0 };
+  for (const emne of emneListe) {
+    const kendt = new Set((raa[emne] || []).map((x) => x.q));
+    for (const f of froe[emne] || []) {
+      (pr.get(f) || []).forEach(({ q }, i) => {
+        if (kendt.has(q)) return;
+        kendt.add(q); dfsSp.nye++;
+        raa[emne].push({ q, praefiks: praefiksFor(q, PRAEFIKSER), froe: f, plads: 50 + i, kilde: 'dfs' });
+      });
+    }
+  }
+  console.error(`DataForSEO-spørgsmål: ${dfsSp.spoergsmaal} fundet, ${dfsSp.nye} nye ud over autoforslagene (${dfsSp.kald} kald, ${dfsSp.fraHusk} fra hukommelsen, $${dfsSp.pris})${dfsSp.fejl ? ' — ' + dfsSp.fejl : ''}`);
 }
 
 // --- 2+3. Dubletter og pakker ---------------------------------------------
@@ -256,6 +278,8 @@ L.push(`**Søgetal (DataForSEO):** ${dfs.fraHusk} fra hukommelsen · ${dfs.sendt
   + ` · saldo ${dfsSaldo.saldo !== undefined ? `$${dfsSaldo.saldo}` : `ukendt (${dfsSaldo.fejl})`}`
   + `${dfs.fejl ? `  \n⚠ **DataForSEO fejlede: ${dfs.fejl}** — pakkerne er valgt uden søgetal i dag.` : ''}`
   + `${dfsSaldo.saldo !== undefined && dfsSaldo.saldo !== null && dfsSaldo.saldo < SALDO_ADVARSEL ? `  \n⚠ **Saldoen er under $${SALDO_ADVARSEL} — fyld op på app.dataforseo.com.**` : ''}`, '');
+// Anden kilde (13/11-2026): spørgsmål fundet hos DataForSEO ud over Googles autoforslag
+L.push(`**Spørgsmål fra DataForSEO (sværhed ≤ 30):** ${dfsSp.spoergsmaal} fundet · ${dfsSp.nye} nye ud over Googles autoforslag · ${dfsSp.kald} kald, ${dfsSp.fraHusk} startord fra hukommelsen · pris $${dfsSp.pris}${dfsSp.fejl ? ` · ${dfsSp.fejl}` : ''}`, '');
 for (const emne of emneListe) {
   const r = resultat[emne];
   L.push(`## ${emne} (hylden ${hyldeAf[emne]}: ${prHylde[hyldeAf[emne]]}) — ${r.antal} artikler i dag`, '', `${r.forslag} forslag: ${r.fri} fri, ${r.tvivl} tvivl, ${r.afvist.length} afvist.`, '');

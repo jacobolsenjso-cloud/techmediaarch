@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { oversaet, vaerdi, gruppe, hentTal, laesHusk, talTekst, MIN_SOEGNINGER, vaelgHoved, gscOmEmnet, KD_MAKS } from './lib/dataforseo.mjs';
+import { oversaet, vaerdi, gruppe, hentTal, laesHusk, talTekst, MIN_SOEGNINGER, vaelgHoved, gscOmEmnet, KD_MAKS, hentSpoergsmaal, praefiksFor } from './lib/dataforseo.mjs';
 import { spred } from './lib/spredning.mjs';
 let fejl = 0;
 const t = (navn, ok) => { console.log(`${ok ? 'OK  ' : 'FEJL'} ${navn}`); if (!ok) fejl++; };
@@ -108,4 +108,35 @@ t('Search Console om emnet tæller (flere kerneord)', gscOmEmnet('what is ransom
 t('et underemne, artiklen ikke handler om, tæller ikke ("ransomware spread")', !gscOmEmnet('how does ransomware spread', emne));
 t('bred søgning uden for emnet tæller ikke ("what is ai")', !gscOmEmnet('what is ai', emne) && !gscOmEmnet('what is malware', emne));
 t('navnesøgning på sitet tæller aldrig', !gscOmEmnet('techmediaarch ransomware', emne));
+// 5. Anden kilde: spørgsmål fra DataForSEO (hentSpoergsmaal, 13/11-2026) — falsk fetch, midlertidige filer
+{
+  const PR = ['what is', 'how does', 'is', 'how much does', 'difference between'];
+  const ffil = path.join(os.tmpdir(), `_dfs-forslag-${process.pid}.json`), hfil = path.join(os.tmpdir(), `_dfs-husk2-${process.pid}.json`);
+  let body = null; let n = 0;
+  globalThis.fetch = async (url, opt) => {
+    n++; body = JSON.parse(opt.body)[0];
+    return { ok: true, status: 200, json: async () => ({ status_code: 20000, tasks: [{ status_code: 20000, cost: 0.0132,
+      result: [{ items: [item('is smart glasses worth it', 880, 4), item('smart glasses for runners', 1300, 9), item('what is smart glasses display', 90, 12)] }] }] }) };
+  };
+  t('praefiksFor: længste præfiks vinder, kun hele ord', praefiksFor('how much does x cost', PR) === 'how much does' && praefiksFor('island x', PR) === null);
+  let r2 = await hentSpoergsmaal(['smart glasses'], PR, { nu, fil: ffil, husk_: hfil });
+  t(`beder om sværhed ≤ ${KD_MAKS}, mindst 20 søgn., USA, mærket tma, mest søgte først`, JSON.stringify(body.filters) === JSON.stringify([['keyword_info.search_volume', '>=', 20], 'and', ['keyword_properties.keyword_difficulty', '<=', KD_MAKS]])
+    && body.location_code === 2840 && body.tag === 'tma' && body.keyword === 'smart glasses' && body.order_by[0] === 'keyword_info.search_volume,desc');
+  const s = (r2.pr.get('smart glasses') || []).map((x) => x.q);
+  t(`kun spørgsmål beholdes (${JSON.stringify(s)})`, JSON.stringify(s) === JSON.stringify(['is smart glasses worth it', 'what is smart glasses display']));
+  t('søgetallene lægges i den almindelige hukommelse (også ikke-spørgsmål)', laesHusk(nu, hfil)['smart glasses for runners']?.t?.v === 1300 && laesHusk(nu, hfil)['is smart glasses worth it']?.t?.kd === 4);
+  t('log: 1 kald, 3 fundet, 2 spørgsmål, pris', r2.log.kald === 1 && r2.log.fundet === 3 && r2.log.spoergsmaal === 2 && r2.log.pris === 0.0132);
+  n = 0; r2 = await hentSpoergsmaal(['smart glasses'], PR, { nu: nu + 10 * 864e5, fil: ffil, husk_: hfil });
+  t('10 dage senere: fra hukommelsen, intet kald (ingen pris)', n === 0 && r2.log.fraHusk === 1 && r2.pr.get('smart glasses').length === 2);
+  n = 0; r2 = await hentSpoergsmaal(['smart glasses'], PR, { nu: nu + 31 * 864e5, fil: ffil, husk_: hfil });
+  t('efter 30 dage: hentes igen', n === 1 && r2.log.kald === 1);
+  globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ status_code: 20000, tasks: [{ status_code: 40203, status_message: 'Daily limit exceeded' }] }) });
+  r2 = await hentSpoergsmaal(['ai agents', 'big data'], PR, { nu, fil: ffil, husk_: hfil });
+  t(`dagsloft: stop, fejl i loggen, robotten kører videre (${r2.log.fejl})`, /40203/.test(r2.log.fejl) && r2.log.kald === 0 && !r2.pr.has('ai agents'));
+  delete process.env.DATAFORSEO_LOGIN;
+  r2 = await hentSpoergsmaal(['nyt startord'], PR, { nu, fil: ffil, husk_: hfil });
+  t('uden nøgle: intet kald, fejl i loggen, gemte startord bruges stadig', /nøglen mangler/.test(r2.log.fejl) && !r2.pr.has('nyt startord'));
+  fs.unlinkSync(ffil); fs.unlinkSync(hfil);
+}
+
 console.log(fejl ? `${fejl} FEJL` : 'alt OK'); process.exit(fejl ? 1 : 0);
