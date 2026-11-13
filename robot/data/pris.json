@@ -1028,5 +1028,35 @@
     "ukendtPris": []
    }
   }
+ },
+ {
+  "dato": "2026-11-13T07:50:14.968Z",
+  "artikel": "/2026/10/web-vs-software-development",
+  "omskrevet": true,
+  "usd": 0.3,
+  "kr": 2.06,
+  "dele": {
+   "artikel": {
+    "kr": 2.06,
+    "billeder": 3,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
+ },
+ {
+  "dato": "2026-11-13T07:57:50.272Z",
+  "artikel": "/2024/09/blog-post_575",
+  "omskrevet": true,
+  "usd": 0.3709,
+  "kr": 2.55,
+  "dele": {
+   "artikel": {
+    "kr": 2.55,
+    "billeder": 4,
+    "soegninger": 3,
+    "ukendtPris": []
+   }
+  }
  }
 ]
