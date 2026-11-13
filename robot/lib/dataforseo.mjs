@@ -194,6 +194,12 @@ export function praefiksFor(q, praefikser) {
   return [...praefikser].sort((a, b) => b.length - a.length).find((p) => q === p || q.startsWith(p + ' ')) || null;
 }
 
+// Står startordet samlet i spørgsmålet? Hvert ord må have flertals-s ("ai agent" ⊂ "ai agents"), ellers ord for ord i rækkefølge.
+export function indeholderFrase(q, froe) {
+  const ord = normaliser(froe).split(' ').filter(Boolean).map((w) => w.replace(/s$/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return ord.length > 0 && new RegExp(`\\b${ord.map((w) => `${w}(s|es)?`).join(' ')}\\b`).test(normaliser(q));
+}
+
 // froer: startordene i prioriteret rækkefølge. Returnerer { pr: Map(startord → [{ q, t }]), log }.
 export async function hentSpoergsmaal(froer, praefikser, { nu = Date.now(), fil = FORSLAG, husk_ = HUSK } = {}) {
   let gemt = {};
@@ -229,7 +235,9 @@ export async function hentSpoergsmaal(froer, praefikser, { nu = Date.now(), fil 
           const t = oversaet(it);
           if (!gyldig(q)) continue;
           husk[q] = { d, t };   // søgetallet er betalt — gem det, så hentTal ikke spørger igen
-          if (praefiksFor(q, praefikser)) s.push({ q, t });
+          // Startordet skal stå SAMLET i spørgsmålet (prøve #57, 13/11): DataForSEO matcher enkeltord, så "big data"
+          // gav "why is system data so big mac" (Mac-lagerplads) og "data engineering" gav "engineering data management".
+          if (praefiksFor(q, praefikser) && indeholderFrase(q, f)) s.push({ q, t });
         }
         gemt[f] = { d, s };
         pr.set(f, s);

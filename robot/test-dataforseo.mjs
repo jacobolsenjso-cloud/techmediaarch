@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { oversaet, vaerdi, gruppe, hentTal, laesHusk, talTekst, MIN_SOEGNINGER, vaelgHoved, gscOmEmnet, KD_MAKS, hentSpoergsmaal, praefiksFor } from './lib/dataforseo.mjs';
+import { oversaet, vaerdi, gruppe, hentTal, laesHusk, talTekst, MIN_SOEGNINGER, vaelgHoved, gscOmEmnet, KD_MAKS, hentSpoergsmaal, praefiksFor, indeholderFrase } from './lib/dataforseo.mjs';
 import { spred } from './lib/spredning.mjs';
 let fejl = 0;
 const t = (navn, ok) => { console.log(`${ok ? 'OK  ' : 'FEJL'} ${navn}`); if (!ok) fejl++; };
@@ -118,6 +118,8 @@ t('navnesøgning på sitet tæller aldrig', !gscOmEmnet('techmediaarch ransomwar
     return { ok: true, status: 200, json: async () => ({ status_code: 20000, tasks: [{ status_code: 20000, cost: 0.0132,
       result: [{ items: [item('is smart glasses worth it', 880, 4), item('smart glasses for runners', 1300, 9), item('what is smart glasses display', 90, 12)] }] }] }) };
   };
+  t('startordet skal stå samlet (prøve #57)', indeholderFrase('what is big data define', 'big data') && !indeholderFrase('why is system data so big mac', 'big data')
+    && !indeholderFrase('what is engineering data management', 'data engineering') && indeholderFrase('what are ai agents used for', 'ai agents') && indeholderFrase('what is an ai agent', 'ai agents'));
   t('praefiksFor: længste præfiks vinder, kun hele ord', praefiksFor('how much does x cost', PR) === 'how much does' && praefiksFor('island x', PR) === null);
   let r2 = await hentSpoergsmaal(['smart glasses'], PR, { nu, fil: ffil, husk_: hfil });
   t(`beder om sværhed ≤ ${KD_MAKS}, mindst 20 søgn., USA, mærket tma, mest søgte først`, JSON.stringify(body.filters) === JSON.stringify([['keyword_info.search_volume', '>=', 20], 'and', ['keyword_properties.keyword_difficulty', '<=', KD_MAKS]])
