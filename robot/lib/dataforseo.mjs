@@ -64,17 +64,24 @@ export function oversaet(it) {
   };
 }
 
-// Værdi = søgninger × lethed. Ukendt sværhed regnes som 50. Tidløs ×1,5 (Jacob vil have tidløse artikler);
+// Værdi = søgninger × lethed³. Ukendt sværhed regnes som 50. Tidløs ×1,5 (Jacob vil have tidløse artikler);
 // faldet med mindst halvdelen på et år ×0,7 (ofte en nyhed, der er ved at dø ud).
 // Under MIN_SOEGNINGER → 0 (for få søgninger til at være en artikel værd i sig selv).
+// 13/11-2026 (Jacob: "smallere spørgsmål, hvis det giver flere klik"): før var lethed kun 1 − sværhed/100, så
+// "what is generative ai" (22.200 søgn., sværhed 47) og "what is cloud computing" (sværhed 71) altid vandt — søgninger,
+// et nyt site uden links udefra ikke kan komme op på (målt 13/11: gns. placering 66, 11 klik på 28 dage). Nu:
+// sværhed over KD_MAKS er "for svær" (gruppe 2, bagerst), og lethed tæller i 3. potens (sværhed 10 → 0,73,
+// 20 → 0,51, 30 → 0,34), så et lettere spørgsmål med færre søgninger slår et svært med mange.
+export const KD_MAKS = 30;
+export const forSvaer = (t) => !!t && t.kd !== null && t.kd !== undefined && t.kd > KD_MAKS;
 export function vaerdi(t) {
-  if (!t || (t.v || 0) < MIN_SOEGNINGER) return 0;
+  if (!t || (t.v || 0) < MIN_SOEGNINGER || forSvaer(t)) return 0;
   const lethed = 1 - (t.kd ?? 50) / 100;
-  return Math.round(t.v * Math.max(lethed, 0.05) * (t.j ? 1.5 : 1) * (t.a !== null && t.a <= -50 ? 0.7 : 1));
+  return Math.round(t.v * Math.max(lethed, 0.05) ** 3 * (t.j ? 1.5 : 1) * (t.a !== null && t.a <= -50 ? 0.7 : 1));
 }
 
-// Gruppe: 0 = kendt med søgninger · 1 = ukendt (ikke i DataForSEO, eller ikke spurgt) · 2 = kendt, men for få søgninger
-export const gruppe = (t) => (t === undefined ? 1 : t === null ? 1 : (t.v || 0) >= MIN_SOEGNINGER ? 0 : 2);
+// Gruppe: 0 = kendt med søgninger · 1 = ukendt (ikke i DataForSEO, eller ikke spurgt) · 2 = for få søgninger ELLER for svær
+export const gruppe = (t) => (t === undefined ? 1 : t === null ? 1 : (t.v || 0) >= MIN_SOEGNINGER && !forSvaer(t) ? 0 : 2);
 // NB: t === null betyder "spurgt, men DataForSEO kendte det ikke" — det er IKKE det samme som 0 søgninger.
 
 const gyldig = (q) => q.length <= 80 && q.split(' ').length <= 10;

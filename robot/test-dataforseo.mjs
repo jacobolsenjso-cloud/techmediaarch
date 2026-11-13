@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { oversaet, vaerdi, gruppe, hentTal, laesHusk, talTekst, MIN_SOEGNINGER, vaelgHoved, gscOmEmnet } from './lib/dataforseo.mjs';
+import { oversaet, vaerdi, gruppe, hentTal, laesHusk, talTekst, MIN_SOEGNINGER, vaelgHoved, gscOmEmnet, KD_MAKS } from './lib/dataforseo.mjs';
 import { spred } from './lib/spredning.mjs';
 let fejl = 0;
 const t = (navn, ok) => { console.log(`${ok ? 'OK  ' : 'FEJL'} ${navn}`); if (!ok) fejl++; };
@@ -14,9 +14,12 @@ const item = (keyword, v, kd, kurve, yearly = 0) => ({ keyword, keyword_info: { 
 const cyber = oversaet(item('how much does cybersecurity pay', 4400, 10));
 t('jævn kurve = tidløs', cyber.j === true);
 t('svingende kurve = ikke tidløs', oversaet(item('x', 500, 10, [2000, 100, 100, 100, 1500, 100, 100, 100, 100, 1500, 100, 100])).j === false);
-t(`værdi: 4400 søgn., sværhed 10, tidløs = 4400×0,9×1,5 = 5940 (${vaerdi(cyber)})`, vaerdi(cyber) === 5940);
+t(`værdi: 4400 søgn., sværhed 10, tidløs = 4400×0,9³×1,5 = 4811 (${vaerdi(cyber)})`, vaerdi(cyber) === 4811);
+t(`sværhed over ${KD_MAKS} = for svær: værdi 0, gruppe 2 (bagerst)`, vaerdi({ v: 22200, kd: KD_MAKS + 1, j: true, a: 0 }) === 0 && gruppe({ v: 22200, kd: KD_MAKS + 1 }) === 2);
+t('sværhed præcis på grænsen tæller med', gruppe({ v: 100, kd: KD_MAKS }) === 0 && vaerdi({ v: 1000, kd: KD_MAKS, j: false, a: null }) === 343);
+t('lettere spørgsmål med færre søgninger slår sværere med flere (1000/sværhed 0 > 2400/sværhed 30)', vaerdi({ v: 1000, kd: 0, j: false, a: null }) > vaerdi({ v: 2400, kd: 30, j: false, a: null }));
 t('under 20 søgninger = værdi 0', vaerdi(oversaet(item('x', MIN_SOEGNINGER - 1, 0))) === 0);
-t('ukendt sværhed regnes som 50', vaerdi({ v: 100, kd: null, j: false, a: null }) === 50);
+t('ukendt sværhed regnes som 50 (100×0,5³ = 12,5 → 13)', vaerdi({ v: 100, kd: null, j: false, a: null }) === 13);
 t('faldet ≥ 50 % på et år ×0,7', vaerdi({ v: 1000, kd: 0, j: false, a: -70 }) === 700);
 t('gruppe: ikke spurgt / ukendt / nok / for få = 1/1/0/2', gruppe(undefined) === 1 && gruppe(null) === 1 && gruppe({ v: 20 }) === 0 && gruppe({ v: 19 }) === 2);
 t('tekst', talTekst(cyber) === '4400 søgn./md · sværhed 10 · tidløs' && talTekst(null).includes('ukendt') && talTekst(undefined).includes('ikke spurgt'));
@@ -88,10 +91,10 @@ const T = { 'what is ransomware': { v: 9900, kd: 70, j: true, a: 0 }, 'ransomwar
   'ransomware definition': { v: 15, kd: 10, j: false, a: 0 }, 'how does ransomware attack work': { v: 400, kd: 25, j: true, a: 0 } };
 const tf = (q) => (q in T ? T[q] : null);
 let v = vaelgHoved([{ q: 'what is ransomware', kilde: 'gemini' }, { q: 'ransomware meaning', kilde: 'gemini' }, { q: 'ransomware definition', kilde: 'gemini' }], tf);
-// 9900×0,3×1,5 = 4455 mod 1300×0,8×1,5 = 1560
-t(`flest søgninger × lethed vinder (${v.valgt.q})`, v.valgt.q === 'what is ransomware' && v.kendte.length === 2);
+// 13/11: 'what is ransomware' har sværhed 70 = for svær → 'ransomware meaning' (1300×0,8³×1,5 = 998) vælges
+t(`for svær taber til et lettere søgeord (${v.valgt.q})`, v.valgt.q === 'ransomware meaning' && v.kendte.length === 1);
 v = vaelgHoved([{ q: 'ransomware meaning', kilde: 'gemini' }, { q: 'how does ransomware attack work', kilde: 'gsc', vis: 40 }], tf);
-// 1560 mod 400×0,75×1,5×1,5 (Search Console-bonus) = 675 → Geminis vinder stadig
+// 998 mod 400×0,75³×1,5×1,5 (Search Console-bonus) = 380 → Geminis vinder stadig
 t(`Search Console-bonus ×1,5 vender ikke et klart større tal (${v.valgt.q})`, v.valgt.q === 'ransomware meaning');
 v = vaelgHoved([{ q: 'ransomware definition', kilde: 'gemini' }, { q: 'how does ransomware attack work', kilde: 'gsc', vis: 40 }], tf);
 t(`kendte søgetal slår for få søgninger (${v.valgt.q}, ${v.grund})`, v.valgt.q === 'how does ransomware attack work');
