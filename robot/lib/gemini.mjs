@@ -103,8 +103,10 @@ export async function skriv(prompt, { soeg = false, temperatur = 0.7, model = te
 }
 
 // Svar som JSON (uden søgning — de to kan ikke kombineres).
-export async function json(prompt) {
-  const j = await kald(tekstModel, { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json', temperature: 0.2 } });
+// model/temperatur (19/11-2026): kvalitetsmålingen (robot/kvalitet.mjs) bruger en stærkere model med temperatur 0;
+// alle andre kald er uændrede (tekstModel, 0,2).
+export async function json(prompt, { model = tekstModel, temperatur = 0.2 } = {}) {
+  const j = await kald(model, { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: 'application/json', temperature: temperatur } });
   return JSON.parse(tekstAf(j));
 }
 

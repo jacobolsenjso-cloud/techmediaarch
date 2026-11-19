@@ -19,7 +19,7 @@ on:
       opgave:
         description: 'Hvad skal robotten gøre?'
         type: choice
-        options: [soegeord, noegletjek, proeveartikel, proeveomskriv, test-foraeldet, faq-ekstra, dataforseo-maaling]
+        options: [soegeord, noegletjek, proeveartikel, proeveomskriv, test-foraeldet, faq-ekstra, dataforseo-maaling, kvalitetsmaaling]
         default: soegeord
       omskriv:
         description: 'proeveomskriv: artiklens adresse, fx /2026/04/mdm-activate-your-mac-with-this-essential-guide'
@@ -98,6 +98,10 @@ jobs:
               # Måling 9/11-2026: søgeordsrobotten som normalt, derefter ét DataForSEO-kald (højst ca. $0,10)
               node robot/soegeord.mjs --pakker 5 --gem robot/ud/raa.json > /dev/null
               node robot/dataforseo-maaling.mjs > /dev/null ;;
+            kvalitetsmaaling)
+              # 19/11-2026: uafhængig redaktør bedømmer alle artikler (robot/kvalitet.mjs). Kun læsning — intet
+              # gemmes på en gren; resultatet står i loggen og i bilaget robot-ud (kvalitet-maaling.json).
+              node robot/kvalitet.mjs ;;
             *) echo "Ukendt opgave"; exit 1 ;;
           esac
       - name: Gem prøveartiklen på en egen gren (ikke main)
