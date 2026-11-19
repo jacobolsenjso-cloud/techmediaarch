@@ -23,8 +23,10 @@ export const MAKS_PR_DAG = 2;
 // 4/11-2026 (Jacob 12:01): 3 artikler i dag, mens tma-starter (Cloudflare) testes.
 export const EKSTRA_LOFT = { '2026-11-04': 3 };
 const loftFor = (d) => EKSTRA_LOFT[dkDato(d)] ?? MAKS_PR_DAG;
-export const FRIDAGE = ['Tue', 'Fri', 'Sun']; // tirsdag, fredag og søndag (Jacob 29/10-2026: udgiver man, ons, tor, lør)
-export const TOMGANG_TIMER = 60;            // længste normale pause: fx lørdag eftermiddag → mandag morgen (~40 t) + GitHubs forsinkelse
+// Rytme (Jacob 19/11-2026): nye artikler KUN mandag, onsdag og fredag (dansk tid) — pris og Googles kvalitetsfokus.
+// Før (29/10-2026): fri tirsdag, fredag og søndag.
+export const FRIDAGE = ['Tue', 'Thu', 'Sat', 'Sun'];
+export const TOMGANG_TIMER = 100;           // længste normale pause: fredag tidligt → mandag sent (op til ca. 94 t) — før 60 (19/11-2026)
 const SITE = 'https://www.techmediaarch.com';
 
 const dkDato = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Copenhagen' }).format(d);            // 2026-09-26
@@ -80,13 +82,17 @@ export function maaUdgive(nu = new Date(), liste = robotArtikler()) {
 const OMSKRIV_KOE = 'robot/data/omskriv-koe.json';         // [{ sti, maade: 'fuld' | 'titel' }] i Jacobs rækkefølge
 const OMSKRIV_PROEVET = 'robot/data/omskriv-proevet.json'; // [{ sti, dato, grund }] — afvist; hviler 30 dage
 // Googles beløbsloft er 400 kr/md (Jacob 31/10-2026). Med den stærke model koster en artikel målt ca. 5,80 kr.
-export const MAANED_LOFT_KR = 390;                         // nye artikler stopper her (10 kr luft under Googles 400)
-export const OMSKRIV_LOFT_KR = 290;                        // omskrivning stopper ved 290 kr i alt i måneden, så ca. 100 kr altid er til nye artikler
+// 19/11-2026: Googles loft for projektet "Gemini Project Tech Media Arch" er 200 kr (AI Studio → Spend; Jacob hævede det fra
+// 150 den 19/11). Robottens eget regnskab (robot/data/pris.json) lå 13/11 på 132,77 kr mod AI Studios 128,95 kr, så det kan
+// bruges som stopklods. Skal ALTID ligge under Googles loft — ellers rammer robotten Googles loft midt i en artikel.
+export const GOOGLE_LOFT_KR = 200;
+export const MAANED_LOFT_KR = 190;                         // nye artikler stopper her (10 kr luft under Googles loft)
+export const OMSKRIV_LOFT_KR = 110;                        // omskrivning stopper ved 110 kr i alt i måneden, så ca. 80 kr altid er til nye artikler
 // Tempo (Jacob 31/10-2026: 2 om dagen; før 3 fra 30/10), 6 dage om ugen (fri søndag), højst 1 med Google-visninger
 // ("visninger: true" i køen) — så et eventuelt fald i Google kan ses og bremses, før det rammer dem alle.
 export const OMSKRIV_PR_DAG = 2;
 export const OMSKRIV_VISNINGER_PR_DAG = 1;
-export const OMSKRIV_FRIDAGE = ['Sun'];
+export const OMSKRIV_FRIDAGE = ['Tue', 'Thu', 'Sat', 'Sun'];   // 19/11-2026: omskrivning også kun man/ons/fre (før: fri søndag)
 const OMSKRIV_FORSOEG_PR_KOERSEL = 5;                      // også afviste tæller, så en kørsel aldrig løber løbsk
 
 // Pristæller (trin 7, Jacob 29/10-2026): hver del (søgeord, artikel, "People also ask") skriver sin opgørelse

@@ -81,6 +81,11 @@ async function kald(model, body, forsoeg = 3) {
     const r = await fetch(URL(model), { method: 'POST', headers: { 'x-goog-api-key': noegle, 'content-type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json().catch(() => ({}));
     if (r.ok) { noter(model, j, Boolean(body.tools?.length)); return j; }
+    // Googles månedlige budgetloft (AI Studio → Spend) er nået (lært på techfeedwatch 13/11 og 16/11-2026): prøv IKKE igen,
+    // og sig det klart, så den røde kørsel (= mail til Jacob) fortæller hvad der er galt.
+    if (r.status === 429 && /spend(ing)? cap|spending limit|monthly spending/i.test(j.error?.message || '')) {
+      throw new Error(`Gemini: Googles månedlige budgetloft er nået (AI Studio → Spend, projektet Gemini Project Tech Media Arch). Robotten kan ikke skrive, før loftet hæves eller måneden skifter. (${skjul(j.error?.message || '')})`);
+    }
     // 429/500/503: vent og prøv igen (Google er af og til overbelastet)
     if (i < forsoeg && [429, 500, 503].includes(r.status)) { await new Promise((s) => setTimeout(s, 5000 * i)); continue; }
     throw new Error(`Gemini ${model} svarede ${r.status}: ${skjul(j.error?.message || '')}`);

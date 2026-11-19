@@ -15,7 +15,7 @@ preview_urls = false
 [triggers]
 # UGEDAGE MED NAVN (7/11-2026): Cloudflare tæller 1 = SØNDAG ... 7 = lørdag (ikke som GitHub, hvor 0 = søndag).
 # "1-6" betød derfor søndag-fredag: lørdag 7/11 startede intet. Navne kan ikke misforstås.
-crons = ["43 7,15 * * MON-SAT"]
+crons = ["43 7,15 * * MON,WED,FRI"]
 
 [observability]
 enabled = true

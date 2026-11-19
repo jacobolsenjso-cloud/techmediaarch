@@ -5,7 +5,7 @@
 # (samme mønster som techfeedwatch): kl. 05:43, 13:43 og 21:43 UTC
 # = 7:43, 15:43 og 23:43 dansk sommertid (6:43, 14:43, 22:43 vintertid).
 # Minuttallet er skævt med vilje: GitHub er mest bagud på hele og halve timer.
-# Rød kørsel = mail til Jacob, hvis der ikke er kommet en ny artikel i 60 timer,
+# Rød kørsel = mail til Jacob, hvis der ikke er kommet en ny artikel i 100 timer (TOMGANG_TIMER i robot/plan.mjs; 60 før 19/11-2026),
 # eller den nyeste ikke svarer live (robot/plan.mjs --tomgang).
 name: Tomgangsalarm
 

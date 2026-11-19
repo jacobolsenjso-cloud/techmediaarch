@@ -21,7 +21,8 @@ const WORKFLOW = 'robot-tidsplan.yml';
 // techfeedwatch's starter (minut 17 og 37 hver time). Ren funktion, så den kan testes uden net (test.mjs).
 export function skalStarte(tid) {
   const dag = tid.getUTCDay(); // 0 = søndag
-  return dag !== 0 && tid.getUTCMinutes() === 43 && [7, 15].includes(tid.getUTCHours());
+  // Kun mandag, onsdag og fredag (Jacob 19/11-2026: ny rytme; før mandag-lørdag)
+  return [1, 3, 5].includes(dag) && tid.getUTCMinutes() === 43 && [7, 15].includes(tid.getUTCHours());
 }
 
 async function start(env) {
