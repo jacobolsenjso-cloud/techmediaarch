@@ -39,7 +39,7 @@ export function organisation(emner) {
 export function person(emner) {
   return {
     '@type': 'Person', '@id': PERSON_ID, name: PERSON_NAVN, jobTitle: PERSON_TITEL, description: PERSON_BIO,
-    url: `${SITE}/p/about-us`, image: `${SITE}/jacob-olsen.png`,
+    url: `${SITE}/p/about-us`, image: `${SITE}/jacob-s-olsen.jpg`,
     worksFor: { '@id': ORG_ID }, knowsAbout: emner,
   };
 }

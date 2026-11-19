@@ -19,7 +19,7 @@ https://techmediaarch.:konto.workers.dev/*
 # Faste småfiler uden fingeraftryk: gemmes en dag (kan ændres, så ikke "immutable")
 /logo.svg
   Cache-Control: public, max-age=86400
-/jacob-olsen-96.jpg
+/jacob-s-olsen-96.jpg
   Cache-Control: public, max-age=86400
 # Manifestet (appen, 10/11-2026): højst en time i browserens cache — med et døgn kaldte Chrome ikke sitet installérbart,
 # fordi den gamle udgave lå gemt. Ved ændringer: skift også ?v= i MainLayout.astro.

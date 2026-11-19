@@ -173,6 +173,11 @@ async function haandter(request, env) {
   const emneSide = sti.match(/^\/topic\/([A-Za-z0-9-]+?)(?:\.html)?\/?$/);
   if (emneSide && HYLDE_FOR_EMNE[emneSide[1].toLowerCase()]) return flyt(url, nyEmneAdresse(emneSide[1].toLowerCase()));
 
+  // Forfatterbilledet (19/11-2026): det gamle AI-lavede billede er skiftet ud med et rigtigt foto af Jacob
+  // (Googles vejledning om "deceptive authorship", oktober 2026). Gamle adresser -> det nye foto (301).
+  if (sti === '/jacob-olsen.png') return flyt(url, '/jacob-s-olsen.jpg');
+  if (sti === '/jacob-olsen-96.jpg') return flyt(url, '/jacob-s-olsen-96.jpg');
+
   // Nedlagte faste sider (worker/nedlagte.js, fx Watch i trin 5): med og uden .html -> målet (301, ét hop)
   const nedlagt = NEDLAGTE[sti.replace(/\/$/, '').replace(/\.html$/, '')];
   if (nedlagt) return flyt(url, nedlagt);
