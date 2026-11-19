@@ -14,6 +14,7 @@
 const PROD = 'www.techmediaarch.com';
 import { SLETTEDE } from './slettede.js';
 import { NEDLAGTE } from './nedlagte.js';
+import { godkend } from './godkend.js';
 
 // "/2026/05/navn.html" -> "/2026/05/navn"; "/index.html" -> "/" (samme regel som src/lib/adresse.mjs)
 const udenHtml = (sti) => sti.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
@@ -147,6 +148,9 @@ async function haandter(request, env) {
 
   // Domænet uden www sendes til www, som Blogger også gjorde
   if (host === 'techmediaarch.com') return Response.redirect(`https://${PROD}${url.pathname}${url.search}`, 301);
+
+  // Godkend-sidens bagdel (19/11-2026, worker/godkend.js): kun med gyldig Cloudflare Access-billet
+  if (sti === '/api/godkend') return godkend(request, env);
 
   // Findes videoen ikke, fortsætter vi ned til den almindelige 404-side
   if (sti.startsWith('/video/')) {

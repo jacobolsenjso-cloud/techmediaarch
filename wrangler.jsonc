@@ -21,7 +21,8 @@
     // 1/11-2026: også forsiden, artiklerne (/20…), de faste sider (/p/…) og *.md, så workeren kan
     // svare AI-agenter med Markdown og sætte Link-headers (se "AI-agenter" i worker/index.js).
     // Billeder, CSS, skrifter og hylder går stadig direkte til de statiske filer.
-    "run_worker_first": ["/video/*", "/*.html", "/*.md", "/", "/20*", "/p/*"]
+    // 19/11-2026: også /api/* (godkend-sidens bagdel, worker/godkend.js).
+    "run_worker_first": ["/video/*", "/*.html", "/*.md", "/", "/20*", "/p/*", "/api/*"]
   },
   // Test-adressen techmediaarch.<konto>.workers.dev er slået til (trin 4).
   // Forhåndsvisnings-adresser pr. version slås fra: de ville ikke være dækket af
@@ -43,5 +44,10 @@
     { "pattern": "www.techmediaarch.com", "custom_domain": true }
   ],
   "preview_urls": false,
+  // Godkend-siden (19/11-2026): Jacobs OK/Fejl pr. artikel. Egen KV "tma-godkend" — ALDRIG tfw-godkend eller push-
+  // databaserne. ACCESS_TEAM er kontoens fælles Zero Trust-teamdomæne (jacob-sites.cloudflareaccess.com). ACCESS_AUD og
+  // GODKEND_EMAIL er Secrets på Workeren (wrangler secret put) og står derfor ikke her (repoet er offentligt).
+  "kv_namespaces": [{ "binding": "GODKEND", "id": "f1f4a58c97f0499cac0cf42c760d7521" }],
+  "vars": { "ACCESS_TEAM": "jacob-sites" },
   "observability": { "enabled": true }
 }
