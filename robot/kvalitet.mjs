@@ -13,7 +13,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parse } from 'yaml';
 import { sti } from './lib/arkiv.mjs';
-import { json, KONTROLMODEL, gemPrisVedExit } from './lib/gemini.mjs';
+import { json, ARTIKELMODEL, gemPrisVedExit } from './lib/gemini.mjs';
+// Model (19/11-2026): gemini-3.8-flash ($0,75/$3,75 pr. mio. tokens) — gemini-3.5-flash ($1,50/$9) ville koste ca. 25 kr for
+// alle 208 artikler. Redaktøren er stadig uafhængig: den har ikke skrevet artiklen og får sin egen strenge opgave.
+const MODEL = ARTIKELMODEL;
 gemPrisVedExit('kvalitet');
 
 const arg = (n, std) => { const i = process.argv.indexOf(`--${n}`); return i > 0 ? process.argv[i + 1] : std; };
@@ -78,7 +81,7 @@ const PUNKTER = ['effort', 'originality', 'skill', 'accuracy'];
 const SPM = ['q1_firsthand', 'q2_complete', 'q3_trust', 'q4_value', 'q5_people'];
 async function bedoem(a) {
   try {
-    const j = await json(prompt(a), { model: KONTROLMODEL, temperatur: 0 });
+    const j = await json(prompt(a), { model: MODEL, temperatur: 0 });
     if (PUNKTER.some((p) => typeof j[p] !== 'number')) throw new Error('mangler point');
     return { sti: a.sti, robot: a.robot, opskrift: a.opskrift, ord: a.tekst.split(/\s+/).length, ...j, laveste: Math.min(...PUNKTER.map((p) => j[p])), nej: SPM.filter((q) => j[q] === false).length };
   } catch (e) { return { sti: a.sti, robot: a.robot, fejl: String(e.message || e).slice(0, 400) }; }
@@ -88,7 +91,7 @@ let liste = artikler();
 if (KUN === 'robot') liste = liste.filter((a) => a.robot);
 if (KUN === 'gamle') liste = liste.filter((a) => !a.robot);
 liste = liste.slice(0, MAKS);
-console.log(`Kvalitetsmåling ${DATO}: ${liste.length} artikler (${liste.filter((a) => a.robot).length} fra robotten, ${liste.filter((a) => !a.robot).length} gamle), model ${KONTROLMODEL}`);
+console.log(`Kvalitetsmåling ${DATO}: ${liste.length} artikler (${liste.filter((a) => a.robot).length} fra robotten, ${liste.filter((a) => !a.robot).length} gamle), model ${MODEL}`);
 if (!process.env.GEMINI_API_KEY) { console.log('GEMINI_API_KEY mangler — stopper.'); process.exit(1); }
 
 const res = [];
@@ -97,7 +100,7 @@ for (let i = 0; i < liste.length; i += SAMTIDIGE) {
   if (res.length % 20 < SAMTIDIGE || res.length === liste.length) console.log(`   bedømt ${res.length}/${liste.length}`);
 }
 fs.mkdirSync(sti('robot/ud'), { recursive: true });
-fs.writeFileSync(sti('robot/ud/kvalitet-maaling.json'), JSON.stringify({ dato: DATO, model: KONTROLMODEL, resultater: res }, null, 1));
+fs.writeFileSync(sti('robot/ud/kvalitet-maaling.json'), JSON.stringify({ dato: DATO, model: MODEL, resultater: res }, null, 1));
 
 const ok = res.filter((r) => !r.fejl); const fejl = res.filter((r) => r.fejl);
 if (fejl.length) console.log(`\nFØRSTE FEJL: ${fejl[0].sti}: ${fejl[0].fejl}`);

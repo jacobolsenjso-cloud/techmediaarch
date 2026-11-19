@@ -101,7 +101,8 @@ jobs:
             kvalitetsmaaling)
               # 19/11-2026: uafhængig redaktør bedømmer alle artikler (robot/kvalitet.mjs). Kun læsning — intet
               # gemmes på en gren; resultatet står i loggen og i bilaget robot-ud (kvalitet-maaling.json).
-              node robot/kvalitet.mjs ;;
+              # Feltet "emne" = robot eller gamle måler kun den gruppe (tomt = alle)
+              if [ -n "$EMNE" ]; then node robot/kvalitet.mjs --kun "$EMNE"; else node robot/kvalitet.mjs; fi ;;
             *) echo "Ukendt opgave"; exit 1 ;;
           esac
       - name: Gem prøveartiklen på en egen gren (ikke main)
